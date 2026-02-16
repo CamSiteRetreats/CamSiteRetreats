@@ -6,9 +6,9 @@
 const UIComponents = {
     // Determine path based on current location
     getPathPrefix: function () {
-        const path = window.location.pathname;
+        const path = window.location.pathname.toLowerCase();
         // Check if we are in a subfolder (TOUR or ADMIN)
-        if (path.includes('/TOUR/') || path.includes('/ADMIN/')) {
+        if (path.includes('/tour/') || path.includes('/admin/')) {
             return '../';
         }
         return '';
