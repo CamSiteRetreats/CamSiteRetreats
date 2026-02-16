@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán còn lại - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen pb-20">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2">
+                <img src="../logo.png" alt="Logo" class="h-10 w-auto object-contain">
+            </a>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Final Payment
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-6 py-8">
+
+        <!-- Info Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i data-lucide="user-check" class="w-5 h-5 text-primary"></i> Thông tin vé
+            </h2>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between border-b border-gray-50 pb-2">
+                    <span class="text-gray-500">Khách hàng:</span>
+                    <span class="font-bold text-gray-800" id="cust-name">...</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-50 pb-2">
+                    <span class="text-gray-500">Tour:</span>
+                    <span class="font-bold text-gray-800" id="tour-name">...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div id="payment-section"
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center animate__animated animate__fadeIn">
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền còn lại cần thanh toán</p>
+            <div class="text-4xl font-black text-primary mb-2" id="amount-due">0đ</div>
+            <p class="text-xs text-gray-500 italic mb-8">Vui lòng hoàn tất thanh toán trước ngày khởi hành</p>
+
+            <div
+                class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
+                <!-- Similar to Deposit, but Transfer Content differs -->
+                <div class="text-left space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Ngân hàng:</span>
+                        <span class="font-bold">Vietcombank</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Số tài khoản:</span>
+                        <span class="font-bold text-lg tracking-wide">0123 456 789</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Chủ tài khoản:</span>
+                        <span class="font-bold uppercase">NGUYEN VAN CAM</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-yellow-50 p-2 rounded-lg -mx-2">
+                        <span class="text-gray-500 text-xs">Nội dung CK:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-primary font-mono" id="transfer-content">CAM XXXXX FULL</span>
+                            <button onclick="copyContent()" class="text-gray-400 hover:text-primary"><i
+                                    data-lucide="copy" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="confirmFinalPayment()"
+                class="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-green-600/30 hover:scale-[1.02] active:scale-95 transition-all">
+                Xác nhận đã thanh toán
+            </button>
+        </div>
+
+        <!-- Success Section -->
+        <div id="success-section" class="hidden text-center py-10 animate__animated animate__fadeIn">
+            <div
+                class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+                <i data-lucide="check-circle" class="w-10 h-10 stroke-[3]"></i>
+            </div>
+            <h2 class="text-2xl font-black text-gray-800 mb-4">Thanh toán hoàn tất!</h2>
+            <p class="text-gray-500 max-w-md mx-auto leading-relaxed mb-8">
+                Cảm ơn bạn đã hoàn tất nghĩa vụ thanh toán. Chúng tôi rất mong chờ được đón tiếp bạn trong chuyến đi sắp
+                tới!
+            </p>
+            <a href="../index.html"
+                class="inline-block px-8 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">
+                Về trang chủ
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Parse Params
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('code');
+
+        let bookingId = '';
+        let name = '...';
+        let tour = '...';
+        let remaining = 0;
+
+        if (token) {
+            try {
+                // Decode Base64 Token with UTF-8 support
+                const jsonStr = decodeURIComponent(atob(token).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+
+                const data = JSON.parse(jsonStr);
+
+                bookingId = data.i;
+                name = data.n;
+                tour = data.t;
+                remaining = Number(data.r) || 0;
+            } catch (e) {
+                console.error('Invalid Token', e);
+                // Fallback for old simple base64
+                try {
+                    const jsonStr = decodeURIComponent(atob(token));
+                    const data = JSON.parse(jsonStr);
+                    bookingId = data.i;
+                    name = data.n;
+                    tour = data.t;
+                    remaining = Number(data.r) || 0;
+                } catch (e2) {
+                    alert('Mã thanh toán không hợp lệ hoặc bị lỗi!');
+                }
+            }
+        } else {
+            // Fallback old params (optional)
+            bookingId = params.get('bookingId');
+            name = params.get('name') || '';
+            tour = params.get('tour') || '';
+            remaining = Number(params.get('remaining')) || 0;
+        }
+
+        // Render Params
+        document.getElementById('cust-name').textContent = name;
+        document.getElementById('tour-name').textContent = tour;
+        document.getElementById('amount-due').textContent = remaining.toLocaleString('vi-VN') + 'đ';
+
+        // Transfer Content
+        const transferCode = `CAM ${bookingId ? bookingId.toString().slice(-6) : 'XXXXX'} FULL`;
+        document.getElementById('transfer-content').textContent = transferCode;
+
+        function copyContent() {
+            navigator.clipboard.writeText(transferCode);
+            alert('Đã copy nội dung!');
+        }
+
+        function confirmFinalPayment() {
+            if (!confirm('Bạn chắc chắn đã chuyển khoản phần còn lại?')) return;
+
+            // Try to update LocalStorage (if on same device)
+            const BOOKINGS_KEY = 'cam_site_bookings';
+            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            // If bookingId exists
+            if (bookingId) {
+                bookings = bookings.map(b => {
+                    // bookingId might be string from URL, ensure comparison is correct
+                    if (b.id == bookingId) {
+                        b.status = 'Hoàn tất';
+                        b.remainingPaid = true;
+                    }
+                    return b;
+                });
+                localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+            }
+
+            // Show Success
+            document.getElementById('payment-section').classList.add('hidden');
+            document.getElementById('success-section').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+
+</html>

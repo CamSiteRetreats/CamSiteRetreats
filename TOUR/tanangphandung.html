@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tà Năng - Phan Dũng: Bản Giao Hưởng Của Những Đồi Cỏ | CAM SITE RETREATS</title>
+    <meta name="description"
+        content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS. Tour 2 ngày 1 đêm trải nghiệm đồi cỏ cháy, biển mây và tiệc BBQ giữa đại ngàn.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/tour-manager.js"></script>
+    <script src="../js/ui-components.js"></script>
+
+    <style>
+        :root {
+            --primary: #E85D04;
+            --secondary: #FFF8F0;
+            --text: #333333;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            color: var(--text);
+            scroll-behavior: smooth;
+        }
+
+        .glass-nav {
+            background: rgba(255, 248, 240, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(232, 93, 4, 0.1);
+        }
+
+        /* Utility Classes for Tailwind Colors */
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .border-primary {
+            border-color: var(--primary);
+        }
+
+        .hero-title {
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .spec-item {
+            border: 1px solid #E85D04;
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .itinerary-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #E5E7EB;
+        }
+
+        .itinerary-step.active::before {
+            background: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px !important;
+            }
+
+            h1 {
+                font-size: 2.2rem !important;
+                line-height: 1.2 !important;
+            }
+
+            h2 {
+                font-size: 1.8rem !important;
+                line-height: 1.3 !important;
+            }
+
+            .sticky-sidebar {
+                position: static;
+                margin-top: 2rem;
+            }
+
+            .mobile-sticky-cta {
+                display: flex !important;
+            }
+        }
+
+        .mobile-sticky-cta {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem 1.5rem;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            border-top: 1px solid rgba(232, 93, 4, 0.1);
+        }
+
+        .input-field {
+            background: #FFF8F0;
+            border: 1px solid #F3E5D8;
+            border-radius: 4px;
+            padding: 10px 16px;
+            width: 100%;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .date-option {
+            border: 1px solid #F3E5D8;
+            background: #FFF8F0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .date-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(232, 93, 4, 0.2);
+        }
+
+        .date-option.selected .date-status {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Success Popup Styles */
+        #success-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #success-modal.active {
+            display: flex;
+        }
+
+        .success-content {
+            background: white;
+            border-radius: 40px;
+            width: 100%;
+            max-width: 420px;
+            padding: 50px 30px;
+            text-align: center;
+            transform: translateY(30px) scale(0.9);
+            opacity: 0;
+            box-shadow: 0 30px 60px -12px rgba(232, 93, 4, 0.15);
+        }
+
+        #success-modal.active .success-content {
+            animation: popupEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes popupEnter {
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-icon-wrapper {
+            width: 100px;
+            height: 100px;
+            background: rgba(232, 93, 4, 0.08);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .check-circle {
+            width: 50px;
+            height: 50px;
+            color: var(--primary);
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        #success-modal.active .check-circle {
+            animation: checkPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+        }
+
+        #success-modal.active .success-icon-wrapper {
+            animation: circleScale 0.4s ease-out 0.1s both;
+        }
+
+        @keyframes checkPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes circleScale {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Texture Overlay for Footer */
+        .footer-texture {
+            background-image: url('../bg-texture.png');
+            background-size: cover;
+            background-position: center;
+            mask-image: linear-gradient(to bottom, transparent, black 15%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Navigation Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- SECTION 1: HERO -->
+    <section
+        class="relative h-[60vh] md:h-[75vh] w-full flex items-end justify-center overflow-hidden mt-0 pb-16 md:pb-24">
+        <img src="hero.jpg" class="absolute inset-0 w-full h-full object-cover object-center"
+            alt="Tà Năng Phan Dũng Hero">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative z-10 text-center px-6">
+            <span
+                class="bg-primary text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 inline-block animate__animated animate__fadeInUp">
+                Trekking | Miền Nam
+            </span>
+            <h1
+                class="hero-title text-5xl md:text-7xl font-black text-white uppercase animate__animated animate__fadeInUp animate__delay-1s">
+                TÀ NĂNG - PHAN DŨNG
+            </h1>
+        </div>
+    </section>
+
+    <!-- Main Content Layout -->
+    <section class="bg-[#F9F7F4] py-16 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+            <!-- LEFT COLUMN (Content) -->
+            <div class="lg:col-span-2 space-y-12">
+
+                <!-- SECTION 2: OVERVIEW -->
+                <div class="content-card p-8 md:p-12">
+                    <h2 class="text-2xl font-black uppercase text-primary mb-6">Giới thiệu chung</h2>
+                    <p class="text-gray-600 leading-relaxed text-justify mb-6">
+                        Được mệnh danh là cung đường trekking đẹp nhất miền Nam, Tà Năng - Phan Dũng dài khoảng 30km nối
+                        liền Lâm Đồng và Bình Thuận.
+                        Hành trình đưa bạn băng qua những đồi cỏ xanh mướt, những rừng thông reo vi vu và đón bình minh
+                        rực rỡ trên đỉnh đồi lộng gió.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed text-justify">
+                        Đây không chỉ là một chuyến đi, mà là hành trình chữa lành, tìm về với thiên nhiên nguyên bản để
+                        tái tạo năng lượng sau những ngày làm việc căng thẳng.
+                    </p>
+                </div>
+
+                <!-- SECTION 3: SPECS (8 Items Grid - User Requested) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Spec 1: Location -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="map-pin" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Địa điểm</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Lâm Đồng - Bình Thuận</p>
+                        </div>
+                    </div>
+                    <!-- Spec 2: Duration -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="clock" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Thời gian</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">2 Ngày 1 Đêm</p>
+                        </div>
+                    </div>
+                    <!-- Spec 3: Length (Distance) -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="footprints" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ dài</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">30 km</p>
+                        </div>
+                    </div>
+                    <!-- Spec 4: Elevation -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="mountain" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ cao</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">~900m</p>
+                        </div>
+                    </div>
+                    <!-- Spec 5: Level (Difficulty) -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="dumbbell" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ khó</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Trung bình</p>
+                        </div>
+                    </div>
+                    <!-- Spec 6: Transport -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="bus" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Phương tiện</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Xe giường nằm</p>
+                        </div>
+                    </div>
+                    <!-- Spec 7: Quantity (Group Size) -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="users" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Số lượng</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Tối đa 15 khách</p>
+                        </div>
+                    </div>
+                    <!-- Spec 8: Guide Ratio -->
+                    <div
+                        class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="user-check" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Tỷ lệ HDV</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">1 HDV / 4 Khách</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: ITINERARY -->
+                <div class="content-card p-8 md:p-12">
+                    <h2 class="text-2xl font-black uppercase text-primary mb-8 flex items-center gap-3">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i> Lịch trình chi tiết
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Day 0: Accordion (Starts Open) -->
+                        <div class="relative pl-8 itinerary-step active">
+                            <div class="absolute left-[-5px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-md transition-colors duration-300"
+                                id="dot-day-0"></div>
+                            <button onclick="toggleDay(0)" class="w-full text-left group">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4
+                                        class="text-lg font-bold text-primary uppercase group-hover:text-primary transition-colors">
+                                        Ngày 0: Khởi hành</h4>
+                                    <i data-lucide="chevron-down"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-primary transition-transform duration-300"
+                                        id="icon-day-0" style="transform: rotate(180deg);"></i>
+                                </div>
+                            </button>
+                            <div id="content-day-0" class="space-y-4 overflow-hidden pb-6">
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">21h45:</span>
+                                    <span class="font-light italic text-gray-600">Tập trung tại nhà xe Xuân Mẫn (A75/30,
+                                        Bạch Đằng, Tân Bình, HCM)</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">22h15:</span>
+                                    <span class="font-light italic text-gray-600">Xe bắt đầu khởi hành đến xã Đức Trọng,
+                                        Lâm Đồng</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Day 1: Accordion -->
+                        <div class="relative pl-8 itinerary-step">
+                            <div class="absolute left-[-5px] top-0 w-4 h-4 rounded-full bg-gray-300 border-4 border-white shadow-md transition-colors duration-300"
+                                id="dot-day-1"></div>
+                            <button onclick="toggleDay(1)" class="w-full text-left group">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4
+                                        class="text-lg font-bold text-primary uppercase group-hover:text-primary transition-colors">
+                                        Ngày 1: Chinh phục đồi cỏ</h4>
+                                    <i data-lucide="chevron-down"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-primary transition-transform duration-300"
+                                        id="icon-day-1"></i>
+                                </div>
+                            </button>
+                            <div id="content-day-1" class="hidden space-y-4 overflow-hidden pb-6">
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">04h30:</span>
+                                    <span class="font-light italic text-gray-600">Đến điểm ăn sáng / tắm thay tại Đức
+                                        Trọng</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">05h30:</span>
+                                    <span class="font-light italic text-gray-600">Thưởng thức buổi sáng gồm có bún, phở
+                                        bò</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">06h30:</span>
+                                    <span class="font-light italic text-gray-600">Lên xe trung chuyển thêm 20km vào bìa
+                                        rừng</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">07h30:</span>
+                                    <span class="font-light italic text-gray-600">Khởi động, phổ biến cung đường cũng
+                                        như đội ngũ dẫn đường và bắt đầu xuất phát</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">11h30:</span>
+                                    <span class="font-light italic text-gray-600">Đoàn nghỉ ngơi, ăn trưa, tận hưởng một
+                                        bữa trưa giản dị ngay tại khu rừng già</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">16h30:</span>
+                                    <span class="font-light italic text-gray-600">Về đến Cam'p Site, nhận lều, tắm, vệ
+                                        sinh cá nhân và tận hưởng hoàng hôn tuyệt đẹp trên đỉnh đồi</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">18h30:</span>
+                                    <span class="font-light italic text-gray-600">Thưởng thức buổi tối ấm cúng cùng
+                                        những món BBQ bên bếp lửa hồng, ánh đèn thơ mộng và kể nhau nghe những câu
+                                        chuyện</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Day 2: Accordion -->
+                        <div class="relative pl-8 itinerary-step">
+                            <div class="absolute left-[-5px] top-0 w-4 h-4 rounded-full bg-gray-300 border-4 border-white shadow-md transition-colors duration-300"
+                                id="dot-day-2"></div>
+                            <button onclick="toggleDay(2)" class="w-full text-left group">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4
+                                        class="text-lg font-bold text-primary uppercase group-hover:text-primary transition-colors">
+                                        Ngày 2: Bình minh & Rừng xanh</h4>
+                                    <i data-lucide="chevron-down"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-primary transition-transform duration-300"
+                                        id="icon-day-2"></i>
+                                </div>
+                            </button>
+                            <div id="content-day-2" class="hidden space-y-4 overflow-hidden pb-6">
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">05h30:</span>
+                                    <span class="font-light italic text-gray-600">Thức dậy đón bình minh ban sớm, cùng
+                                        thưởng thức tách trà, ly cafe giữa thời tiết se lạnh</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">06h30:</span>
+                                    <span class="font-light italic text-gray-600">Thưởng thức buổi sáng dưới ánh bình
+                                        minh trên những ngon đồi thơ mộng</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">07h30:</span>
+                                    <span class="font-light italic text-gray-600">Chuẩn bị, khởi động và tiếp tục hành
+                                        trình</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">11h30:</span>
+                                    <span class="font-light italic text-gray-600">Dừng chân bên suối, ngâm chân, thưởng
+                                        thức bữa ăn trưa nhẹ nhàng cùng trái cây</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">14h00:</span>
+                                    <span class="font-light italic text-gray-600">Đến bãi grab rừng, trải nghiệm thêm
+                                        5km du ngoạn đường rừng trên xe máy</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">14h30:</span>
+                                    <span class="font-light italic text-gray-600">Về đến điểm tập kết, tắm thay, ăn
+                                        chiều</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">16h00:</span>
+                                    <span class="font-light italic text-gray-600">Kiểm tra lại đồ đạc và lên xe quay về
+                                        HCM</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">23h00:</span>
+                                    <span class="font-light italic text-gray-600">Có mặt tại nhà xe Xuân Mẫn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Notes (Moved Inside for Balance) -->
+                    <div class="mt-8 pt-8 border-t border-gray-100">
+                        <div class="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                            <h5
+                                class="text-xs font-black text-gray-400 uppercase mb-3 flex items-center gap-2 tracking-widest">
+                                <i data-lucide="info" class="w-4 h-4 text-primary"></i> Lưu ý nhỏ:
+                            </h5>
+                            <ul class="space-y-3 text-[13px] text-gray-500 leading-relaxed font-semibold italic">
+                                <li class="flex gap-2">• <span class="whitespace-nowrap md:whitespace-normal">Nhà xe sẽ
+                                        có thể thay đổi trong một số trường hợp đặc biệt...</span></li>
+                                <li class="flex gap-2">• <span>Điểm đón trả linh động. Xe đi tuyến QL1 - QL20 nên có thể
+                                        đón dọc đường, liên hệ Cam hỗ trợ nhé!</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: TOUR GALLERY (Auto-play & Scroll) -->
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-black uppercase text-primary tracking-tight">Cảm xúc hành trình</h2>
+                        <div class="hidden md:flex gap-2">
+                            <button onclick="scrollGallery('left')"
+                                class="p-2 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all shadow-sm">
+                                <i data-lucide="chevron-left" class="w-5 h-5 text-gray-400"></i>
+                            </button>
+                            <button onclick="scrollGallery('right')"
+                                class="p-2 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all shadow-sm">
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative group">
+                        <div id="tour-gallery"
+                            class="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 scroll-smooth">
+                            <!-- Image 1 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 1">
+                            </div>
+                            <!-- Image 2 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 2">
+                            </div>
+                            <!-- Image 3 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 3">
+                            </div>
+                            <!-- Image 4 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 4">
+                            </div>
+                            <!-- Image 5 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 5">
+                            </div>
+                            <!-- Image 6 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 6">
+                            </div>
+                            <!-- Image 7 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 7">
+                            </div>
+                            <!-- Image 8 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 8">
+                            </div>
+                            <!-- Image 9 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1526491109672-7474bd61c41f?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 9">
+                            </div>
+                            <!-- Image 10 -->
+                            <div
+                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
+                                <img src="https://images.unsplash.com/photo-1544735038-179ad9194ef4?auto=format&fit=crop&q=80&w=800"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                                    alt="Tà Năng 10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: COST DETAILS -->
+                <div class="space-y-8 mt-12">
+                    <!-- Inclusions (Full Width) -->
+                    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+                        <h3 class="text-3xl font-black text-primary uppercase text-center mb-12 tracking-tight">Chi phí
+                            bao gồm</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            <!-- Item 1 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="XeTrungChuyen.png" alt="Xe đưa đón" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Xe
+                                        đưa đón</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Di chuyển bằng xe
+                                        giường nằm, đưa đón 2 chiều từ TP HCM.</p>
+                                </div>
+                            </div>
+                            <!-- Item 2 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="HuongDanVien-SuaLai.png" alt="Hướng dẫn viên"
+                                        class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Hướng
+                                        dẫn viên</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Hướng dẫn viên
+                                        chuyên nghiệp, dễ thương và nhiệt tình.</p>
+                                </div>
+                            </div>
+                            <!-- Item 3 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="DoAn-SuaLai.png" alt="Bữa ăn" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Bữa
+                                        ăn</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Gồm 6 bữa ăn: món
+                                        nước, BBQ... trong suốt hành trình.</p>
+                                </div>
+                            </div>
+                            <!-- Item 4 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="Leu-SuaLai.png" alt="Lều trại" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Lều
+                                        trại</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Tiêu chuẩn 3
+                                        người/lều, bao gồm túi ngủ, cách nhiệt, gối hơi.</p>
+                                </div>
+                            </div>
+                            <!-- Item 5 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="NuocUong.png" alt="Nước uống" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Nước
+                                        uống</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Tiêu chuẩn 1.5L /
+                                        người / ngày trong suốt hành trình.</p>
+                                </div>
+                            </div>
+                            <!-- Item 6 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="NuocTam-SuaLai_20260113000157.png" alt="Nước tắm"
+                                        class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Nước
+                                        tắm</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Mỗi người được
+                                        15L
+                                        nước sạch để tắm tại bãi camping rừng.</p>
+                                </div>
+                            </div>
+                            <!-- Item 7 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="BaoHiem.png" alt="Bảo hiểm" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Bảo
+                                        hiểm</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Được trang bị bảo
+                                        hiểm du lịch lên đến 70.000.000 đồng.</p>
+                                </div>
+                            </div>
+                            <!-- Item 8 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="HuyChuong.png" alt="Huy chương" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Huy
+                                        chương</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Được thiết kế đặc
+                                        biệt, in tên và ngày kỷ niệm của đoàn.</p>
+                                </div>
+                            </div>
+                            <!-- Item 9 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="GayTrekking.png" alt="Gậy trekking" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Gậy
+                                        trekking</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Được hỗ trợ mượn
+                                        gậy chất lượng, đảm bảo an toàn chuyến đi.</p>
+                                </div>
+                            </div>
+                            <!-- Item 10 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="AoMua.png" alt="Áo mưa" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Áo
+                                        mưa</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Áo mưa chuyên
+                                        dụng,
+                                        kèm túi ZIP bảo vệ quần áo bên trong.</p>
+                                </div>
+                            </div>
+                            <!-- Item 11 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="ChupAnhCamera.png" alt="Chụp ảnh" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Chụp
+                                        ảnh</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Chụp ảnh bằng máy
+                                        cơ và hỗ trợ quay chụp bằng điện thoại.</p>
+                                </div>
+                            </div>
+                            <!-- Item 12 -->
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-24 h-24 rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
+                                    <img src="XeGrab.png" alt="Grab rừng" class="w-20 h-20 object-contain">
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-black text-primary uppercase mb-1 whitespace-nowrap">Grab
+                                        rừng</h4>
+                                    <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium">Trải nghiệm ngồi
+                                        xe
+                                        máy băng rừng trong 5km hành trình cuối.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exclusions (Full Width) -->
+                    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden">
+                        <h3 class="text-3xl font-black text-red-500 uppercase text-center mb-12 tracking-tight">Chi phí
+                            không bao gồm</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
+                            <!-- Item 1 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Gửi đồ lên
+                                        bãi trại</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Mức giá
+                                        thông thường là 100k / balo / chiều.</p>
+                                </div>
+                            </div>
+                            <!-- Item 2 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Sử dụng
+                                        thêm nước tắm</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Có thể mua
+                                        thêm với giá 50k / 15L tại bãi camping.</p>
+                                </div>
+                            </div>
+                            <!-- Item 3 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Lều riêng
+                                        theo yêu cầu</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Phụ thu
+                                        200k/lều 1 người hoặc 150k/lều 2 người.</p>
+                                </div>
+                            </div>
+                            <!-- Item 4 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Các chi
+                                        phí cá nhân</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Ăn uống
+                                        ngoài đoàn, vé máy bay (khách ngoài HCM).</p>
+                                </div>
+                            </div>
+                            <!-- Item 5 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Phụ thu lễ
+                                        / tết</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Tùy vào thời
+                                        điểm sẽ có các mức phụ thu khác nhau.</p>
+                                </div>
+                            </div>
+                            <!-- Item 6 -->
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-black text-red-500 uppercase mb-1 tracking-wider">Tip cho
+                                        HDV</h5>
+                                    <p class="text-[12px] text-gray-400 font-medium italic leading-relaxed">Tùy hỷ nếu
+                                        bạn thấy hài lòng với sự nhiệt tình của đội ngũ.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: PREPARATION -->
+                <div class="space-y-12 mt-16 pb-12">
+                    <h2 class="text-3xl font-black uppercase text-primary tracking-tight text-center">MANG GÌ KHI ĐI
+                        TREKKING</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 px-4">
+                        <!-- Giày Trekking -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="shrink-0 w-48 h-48 object-contain">
+                                <img src="NMG_giay.png"
+                                    class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500"
+                                    alt="Giày Trekking">
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">
+                                    Giày Trekking</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium italic">
+                                    Lựa chọn giày có độ bám tốt, ưu tiên cao cổ bảo vệ cổ chân. Đặc biệt nên chọn kích
+                                    cỡ
+                                    lớn hơn chân từ 1-2 size để tránh đau mũi chân khi xuống dốc.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Balo Trekking -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="shrink-0 w-48 h-48 object-contain">
+                                <img src="NMG_balo.png"
+                                    class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500"
+                                    alt="Balo Trekking">
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">
+                                    Balo Trekking</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium italic">
+                                    Sử dụng balo có hệ thống trợ lực để giảm áp lực cột sống. Nên sắp xếp đồ nặng sát
+                                    lưng
+                                    và cân đối hai bên để di chuyển dễ dàng hơn.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Quần Áo -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="shrink-0 w-48 h-48 object-contain">
+                                <img src="NMG_quanao.png"
+                                    class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500"
+                                    alt="Quần Áo">
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">
+                                    Trang phục</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium italic">
+                                    Ưu tiên chất liệu khô nhanh (Quick-dry), thoáng khí. Nên mang theo áo khoác gió mỏng
+                                    và
+                                    quần dài để tránh trầy xước từ cây cỏ ven đường.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Dụng cụ -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="shrink-0 w-48 h-48 object-contain">
+                                <img src="NMG_dungcu.png"
+                                    class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500"
+                                    alt="Dụng cụ">
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">
+                                    Dụng cụ cá nhân</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium italic">
+                                    Cần chuẩn bị sạc dự phòng, đèn pin, kem chống nắng và thuốc xịt côn trùng. Gậy
+                                    trekking
+                                    cũng là một món đồ "vàng" giúp trợ lực hành trình.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (Sticky Sidebar) -->
+            <div class="lg:col-span-1">
+                <div class="sticky-sidebar space-y-6">
+
+                    <!-- Price Card -->
+                    <div class="content-card py-5 px-8 text-center border-2 border-primary/10">
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">CHI PHÍ</p>
+                        <p id="tour-price-display" class="text-4xl font-black text-primary mb-2">3.200.000đ</p>
+                        <p class="text-xs text-gray-500 font-medium">(Chi phí đã bao gồm trọn gói)</p>
+                    </div>
+
+                    <!-- SECTION 7: BOOKING FORM -->
+                    <div class="content-card p-6">
+                        <h3 class="text-lg font-black uppercase text-primary mb-5 flex items-center gap-2">
+                            <i data-lucide="calendar-check" class="w-5 h-5 text-primary"></i> Đặt chỗ ngay
+                        </h3>
+                        <form id="booking-form" class="space-y-3" onsubmit="handleBookingSubmit(event)">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Họ tên</label>
+                                <input type="text" id="cust-name" class="input-field" placeholder="Nhập họ tên..."
+                                    required>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Số điện
+                                    thoại</label>
+                                <input type="tel" id="cust-phone" class="input-field" placeholder="09xxxx..." required>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2">Chọn
+                                    Tour</label>
+                                <select id="tour-select" onchange="filterSchedules()" class="input-field font-bold">
+                                    <!-- Danh sách tour sẽ được load động -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2">Chọn ngày
+                                    đi</label>
+                                <div class="grid grid-cols-2 gap-2" id="date-selector">
+                                    <!-- Lịch trình sẽ được load dựa trên tour đã chọn -->
+                                </div>
+                                <input type="hidden" name="selected_date" id="selected-date-input" required>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Lời nhắn</label>
+                                <textarea id="cust-message" class="input-field h-24 resize-none"
+                                    placeholder="hãy để lại yêu cầu của bạn tại đây"></textarea>
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-primary text-white py-2.5 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02] active:scale-95 transition-all mt-2">
+                                Gửi Yêu Cầu
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Success Modal -->
+                    <div id="success-modal" onclick="if(event.target === this) closeSuccessModal()">
+                        <div class="success-content">
+                            <div class="success-icon-wrapper">
+                                <i data-lucide="check" class="check-circle stroke-[4]"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-primary mb-2">Gửi Thành Công!</h4>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-8">
+                                Cảm ơn bạn đã tin tưởng CAM SITE RETREATS. Đội ngũ chúng mình sẽ liên hệ phản hồi cho
+                                bạn trong vòng 24 giờ tới.
+                            </p>
+                            <button onclick="closeSuccessModal()"
+                                class="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                                Đồng ý
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Support Info -->
+                    <div class="text-center">
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-2">Cần hỗ trợ gấp?</p>
+                        <p class="text-lg font-black text-primary">0819 685 878</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION: RECOMMENDED TOURS ( độc lập ) -->
+    <section class="py-20 bg-gray-50/50 border-t border-b border-gray-100 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 mb-12 flex justify-between items-center">
+            <h2 class="text-3xl font-black uppercase text-primary tracking-tight">CÓ THỂ BẠN SẼ THÍCH</h2>
+            <div class="flex gap-3">
+                <button onclick="scrollRecc('left')"
+                    class="p-3 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all shadow-sm bg-white group">
+                    <i data-lucide="chevron-left" class="w-6 h-6 text-gray-400 group-hover:text-primary"></i>
+                </button>
+                <button onclick="scrollRecc('right')"
+                    class="p-3 border border-gray-200 rounded-full hover:bg-white hover:border-primary transition-all shadow-sm bg-white group">
+                    <i data-lucide="chevron-right" class="w-6 h-6 text-gray-400 group-hover:text-primary"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="relative">
+            <div id="recc-marquee" class="flex gap-8 overflow-x-auto scrollbar-hide pb-12 px-6 scroll-smooth">
+                <!-- Đề xuất tour sẽ được load động tại đây -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Sticky CTA -->
+    <div class="mobile-sticky-cta animate__animated animate__fadeInUp">
+        <div>
+            <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest leading-none mb-1">Giá tour từ</p>
+            <p class="text-xl font-black text-primary leading-none">3.200.000đ</p>
+        </div>
+        <button onclick="window.location.href='#booking-form'"
+            class="bg-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all uppercase text-sm tracking-widest">
+            Đặt Ngay
+        </button>
+    </div>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleDay(dayNumber) {
+            const content = document.getElementById(`content-day-${dayNumber}`);
+            const icon = document.getElementById(`icon-day-${dayNumber}`);
+            const dot = document.getElementById(`dot-day-${dayNumber}`);
+            const parent = content.parentElement;
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                dot.classList.add('bg-primary');
+                dot.classList.remove('bg-gray-300');
+                parent.classList.add('active');
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+                dot.classList.remove('bg-primary');
+                dot.classList.add('bg-gray-300');
+                parent.classList.remove('active');
+            }
+        }
+
+        function selectDate(element, dateStr) {
+            // Remove selected class from all options
+            document.querySelectorAll('.date-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Add selected class to clicked element
+            element.classList.add('selected');
+            // Update hidden input
+            document.getElementById('selected-date-input').value = dateStr;
+        }
+
+        // Initialize Data & Recommendations
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTourOptions();
+            filterSchedules(); // Initial load
+
+            // Render Recommended Tours (Excluding current Tà Năng ID = 1)
+            TourManager.renderRecommendations('recc-marquee', 1);
+            lucide.createIcons();
+        });
+
+        function loadTourOptions() {
+            const tourSelect = document.getElementById('tour-select');
+            const TOURS_KEY = 'cam_site_tours';
+            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+
+            tourSelect.innerHTML = '';
+
+            // If no tours in local storage, add default Tà Năng for safety
+            if (tours.length === 0) {
+                tours.push({ name: 'Tà Năng - Phan Dũng' });
+            }
+
+            tours.forEach(tour => {
+                const option = document.createElement('option');
+                option.value = tour.name;
+                option.textContent = tour.name;
+                // Auto select Tà Năng if on this page
+                if (tour.name === 'Tà Năng - Phan Dũng') option.selected = true;
+                tourSelect.appendChild(option);
+            });
+        }
+
+        function filterSchedules() {
+            const selectedTour = document.getElementById('tour-select').value;
+            const SCHEDULES_KEY = 'cam_site_schedules';
+            const TOURS_KEY = 'cam_site_tours';
+
+            const schedulesData = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
+            const toursData = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+
+            const dateSelector = document.getElementById('date-selector');
+            const priceDisplay = document.getElementById('tour-price-display');
+
+            // Sync Price
+            const currentTour = toursData.find(t => t.name === selectedTour);
+            if (currentTour && currentTour.price) {
+                // Format price with dots (e.g., 3.200.000)
+                const formattedPrice = Number(currentTour.price).toLocaleString('vi-VN') + 'đ';
+                priceDisplay.textContent = formattedPrice;
+            } else if (selectedTour === 'Tà Năng - Phan Dũng') {
+                priceDisplay.textContent = '3.200.000đ'; // Default fallback
+            }
+
+            dateSelector.innerHTML = '';
+
+            const tourSchedules = schedulesData.filter(item => item.tour === selectedTour);
+
+            if (tourSchedules.length > 0) {
+                tourSchedules.forEach(item => {
+                    const statusClass = item.status === 'Đang mở' ? 'text-primary' : 'text-gray-400';
+                    const opacityClass = item.status === 'Hết chỗ' ? 'opacity-50 cursor-not-allowed' : '';
+
+                    const start = new Date(item.startDate);
+                    const end = new Date(item.endDate);
+                    const formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+
+                    const clickAction = item.status === 'Hết chỗ' ? '' : `onclick="selectDate(this, '${formattedDisplay}')"`;
+
+                    const scheduleHTML = `
+                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}"
+                            ${clickAction}>
+                            <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
+                            <span class="text-[13px] date-status ${statusClass} font-bold">${item.status === 'Hết chỗ' ? 'Hết chỗ' : 'Còn ' + item.slots + ' chỗ'}</span>
+                        </div>
+                    `;
+                    dateSelector.insertAdjacentHTML('afterbegin', scheduleHTML);
+                });
+            } else {
+                dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>';
+            }
+        }
+
+        function handleBookingSubmit(event) {
+            event.preventDefault();
+
+            // Collect Data (Optional: can be saved to LocalStorage for Admin Leads page)
+            const LEADS_KEY = 'cam_site_leads';
+            const newLead = {
+                id: Date.now(),
+                name: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                tour: document.getElementById('tour-select').value,
+                date: document.getElementById('selected-date-input').value,
+                message: document.getElementById('cust-message').value,
+                status: 'Chờ tư vấn',
+                createdAt: new Date().toISOString()
+            };
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            leads.push(newLead);
+            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+
+            // Show Popup
+            document.getElementById('success-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Reset Form
+            document.getElementById('booking-form').reset();
+            document.getElementById('selected-date-input').value = '';
+            const allOptions = document.querySelectorAll('.date-option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+
+            // Re-load default tour sequence if needed
+            filterSchedules();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        // --- END SYNC DATA ---
+
+        lucide.createIcons();
+
+        // Gallery Slider Logic
+        const gallery = document.getElementById('tour-gallery');
+        let isAutoScrolling = true;
+
+        function scrollGallery(direction) {
+            const scrollAmount = gallery.offsetWidth * 0.8;
+            if (direction === 'left') {
+                gallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                gallery.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+            isAutoScrolling = false; // Stop auto-play on user interaction
+        }
+
+        // Auto-play logic
+        setInterval(() => {
+            if (isAutoScrolling) {
+                if (gallery.scrollLeft + gallery.offsetWidth >= gallery.scrollWidth) {
+                    gallery.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    gallery.scrollBy({ left: 300, behavior: 'smooth' });
+                }
+            }
+        }, 3000);
+
+        // Resume auto-play after 10s of inactivity
+        let timeout;
+        // Recommendation Marquee Logic
+        const reccMarquee = document.getElementById('recc-marquee');
+        let isReccAutoScrolling = true;
+        let scrollPos = 0;
+        let animationId;
+
+        // Start Marquee Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            startMarquee();
+        });
+
+        function startMarquee() {
+            function step() {
+                if (isReccAutoScrolling) {
+                    scrollPos += 0.8; // Change this for speed
+                    if (scrollPos >= reccMarquee.scrollWidth / 2) {
+                        scrollPos = 0;
+                    }
+                    reccMarquee.scrollLeft = scrollPos;
+                }
+                animationId = requestAnimationFrame(step);
+            }
+            animationId = requestAnimationFrame(step);
+        }
+
+        function scrollRecc(direction) {
+            const scrollAmount = reccMarquee.offsetWidth * 0.8;
+            if (direction === 'left') {
+                scrollPos -= scrollAmount;
+            } else {
+                scrollPos += scrollAmount;
+            }
+
+            // Boundary checks
+            if (scrollPos < 0) scrollPos = 0;
+            if (scrollPos >= reccMarquee.scrollWidth / 2) scrollPos = 0;
+
+            reccMarquee.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            isReccAutoScrolling = false;
+        }
+
+        reccMarquee.addEventListener('mouseenter', () => { isReccAutoScrolling = false; });
+        reccMarquee.addEventListener('mouseleave', () => {
+            // Update scrollPos to current scrollLeft before resuming
+            scrollPos = reccMarquee.scrollLeft;
+            isReccAutoScrolling = true;
+        });
+
+        // Resume after 15s if manually scrolled
+        let reccTimeout;
+        reccMarquee.addEventListener('scroll', (e) => {
+            if (!isReccAutoScrolling && e.isTrusted) { // Only for human interaction
+                clearTimeout(reccTimeout);
+                reccTimeout = setTimeout(() => {
+                    scrollPos = reccMarquee.scrollLeft;
+                    isReccAutoScrolling = true;
+                }, 15000);
+            }
+        });
+    </script>
+</body>
+
+</html>

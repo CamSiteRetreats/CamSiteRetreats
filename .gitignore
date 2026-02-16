@@ -1,0 +1,20 @@
+# System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node Modules (if using npm later)
+node_modules/
+npm-debug.log
+
+# Build Artifacts
+dist/
+build/
+
+# IDE Settings
+.vscode/
+.idea/
+
+# Environment Variables
+.env
+.env.local

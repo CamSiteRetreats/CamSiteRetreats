@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch trình Tour - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background-color: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #F8F9FA;
+            border: 1px solid #E9ECEF;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(232, 93, 4, 0.1);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group text-[15px] text-gray-500 hover:bg-gray-50">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link active flex items-center space-x-3 p-3 rounded-xl font-medium transition-all text-[15px]">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Lịch Trình Khởi Hành</h1>
+                <p class="text-gray-500 text-sm">Quản lý ngày đi và số lượng chỗ cho từng tour.</p>
+            </div>
+            <button id="btn-add-schedule" onclick="openModal()"
+                class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                <span>Thêm lịch trình</span>
+            </button>
+        </header>
+
+        <!-- Schedules Table -->
+        <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                <h3 class="font-black text-gray-800 uppercase tracking-tight">Danh sách ngày khởi hành</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Tour</th>
+                            <th class="px-6 py-4">Ngày khởi hành</th>
+                            <th class="px-6 py-4">Số lượng</th>
+                            <th class="px-6 py-4">Đã đặt</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                            <th class="px-6 py-4 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50" id="schedule-table-body">
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="px-6 py-4 text-sm font-bold">Tà Năng - Phan Dũng</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">15/03/2026</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">20</td>
+                            <td class="px-6 py-4 text-sm text-primary font-bold">12</td>
+                            <td class="px-6 py-4 text-right">
+                                <span
+                                    class="text-[10px] font-bold text-green-500 uppercase px-2 py-1 bg-green-50 rounded-lg">Đang
+                                    mở</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Schedule Modal -->
+    <div id="add-modal" class="modal-backdrop" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800">Thêm Lịch Khởi Hành</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form id="schedule-form" class="p-6 space-y-4" onsubmit="saveSchedule(event)">
+                <input type="hidden" id="edit-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Chọn Tour</label>
+                    <select id="tour-name" class="form-input font-medium" required>
+                        <!-- Ưu tiên load từ Quản lý Tour -->
+                        <option value="">-- Chọn Tour --</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ngày bắt đầu</label>
+                        <input type="date" id="start-date" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ngày kết thúc</label>
+                        <input type="date" id="end-date" class="form-input" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Số lượng chỗ</label>
+                    <input type="number" id="max-slots" class="form-input" placeholder="Ví dụ: 20" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Trạng thái</label>
+                    <select id="schedule-status" class="form-input font-medium">
+                        <option value="Đang mở">Đang mở</option>
+                        <option value="Sắp hết">Sắp hết</option>
+                        <option value="Hết chỗ">Hết chỗ</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex space-x-3">
+                    <button type="button" onclick="closeModal()"
+                        class="flex-1 px-6 py-3 border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-all">
+                        Hủy
+                    </button>
+                    <button type="submit" id="submit-btn"
+                        class="flex-1 px-6 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                        Lưu lịch trình
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const SCHEDULES_KEY = 'cam_site_schedules';
+        const TOURS_KEY = 'cam_site_tours';
+        let isEditing = false;
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check Auth
+            currentUser = checkAuth();
+            if (currentUser) {
+                // Update Sidebar
+                document.getElementById('sidebar-avatar').src = currentUser.avatar;
+                document.getElementById('sidebar-name').textContent = currentUser.fullName;
+                document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
+
+                // Role Permissions
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('nav-users').classList.add('hidden');
+                    document.getElementById('btn-add-schedule').classList.add('hidden'); // Hide Add Button
+                }
+            }
+
+            loadSchedules();
+            loadTourOptions();
+            syncBadges();
+        });
+
+        // Đồng bộ số lượng khách hàng
+        function syncBadges() {
+            const LEADS_KEY = 'cam_site_leads';
+            const BOOKINGS_KEY = 'cam_site_bookings';
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
+            const lBadge = document.getElementById('leads-badge-count');
+            if (lBadge) {
+                lBadge.textContent = pendingLeads;
+                lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            }
+
+            const bBadge = document.getElementById('bookings-badge-count');
+            if (bBadge) {
+                bBadge.textContent = bookings.length;
+                bBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function loadTourOptions() {
+            const tourSelect = document.getElementById('tour-name');
+            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+
+            // Keep the first default option
+            tourSelect.innerHTML = '<option value="">-- Chọn Tour --</option>';
+
+            tours.forEach(tour => {
+                const option = document.createElement('option');
+                option.value = tour.name;
+                option.textContent = tour.name;
+                tourSelect.appendChild(option);
+            });
+        }
+
+        function openModal(editData = null) {
+            const modal = document.getElementById('add-modal');
+            const submitBtn = document.getElementById('submit-btn');
+            const title = modal.querySelector('h3');
+
+            if (editData) {
+                isEditing = true;
+                title.innerText = 'Chỉnh Sửa Lịch Trình';
+                submitBtn.innerText = 'Cập nhật';
+                document.getElementById('edit-id').value = editData.id;
+                document.getElementById('tour-name').value = editData.tour;
+                document.getElementById('start-date').value = editData.startDate;
+                document.getElementById('end-date').value = editData.endDate;
+                document.getElementById('max-slots').value = editData.slots;
+                document.getElementById('schedule-status').value = editData.status;
+            } else {
+                isEditing = false;
+                title.innerText = 'Thêm Lịch Khởi Hành';
+                submitBtn.innerText = 'Lưu lịch trình';
+                document.getElementById('schedule-form').reset();
+                document.getElementById('edit-id').value = '';
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('schedule-form').reset();
+        }
+
+        function loadSchedules() {
+            const tableBody = document.getElementById('schedule-table-body');
+            tableBody.innerHTML = '';
+            const data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
+            data.forEach(item => {
+                renderRow(item);
+            });
+        }
+
+        function renderRow(item) {
+            const tableBody = document.getElementById('schedule-table-body');
+            const statusClass = item.status === 'Đang mở' ? 'text-green-500 bg-green-50' :
+                item.status === 'Sắp hết' ? 'text-orange-500 bg-orange-50' :
+                    'text-red-500 bg-red-50';
+
+            const displayDate = `${new Date(item.startDate).toLocaleDateString('vi-VN')} - ${new Date(item.endDate).toLocaleDateString('vi-VN')}`;
+
+            // Check Access
+            let actionButtons = '';
+            if (currentUser && currentUser.role === 'admin') {
+                actionButtons = `
+                    <button onclick='prepEdit(${JSON.stringify(item)})' class="p-2 text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="deleteSchedule(${item.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+            } else {
+                actionButtons = `
+                    <span class="text-gray-300 text-xs italic cursor-not-allowed">Chỉ xem</span>
+                `;
+            }
+
+            const newRow = `
+                <tr class="hover:bg-gray-50/50" id="row-${item.id}">
+                    <td class="px-6 py-4 text-sm font-bold">${item.tour}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${displayDate}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.slots}</td>
+                    <td class="px-6 py-4 text-sm text-primary font-bold">0</td>
+                    <td class="px-6 py-4">
+                        <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${item.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        ${actionButtons}
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('afterbegin', newRow);
+            lucide.createIcons();
+        }
+
+        function prepEdit(item) {
+            openModal(item);
+        }
+
+        function saveSchedule(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('edit-id').value;
+            const tour = document.getElementById('tour-name').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const slots = document.getElementById('max-slots').value;
+            const status = document.getElementById('schedule-status').value;
+
+            const item = {
+                tour,
+                startDate,
+                endDate,
+                slots,
+                status,
+                id: id ? parseInt(id) : Date.now()
+            };
+
+            let data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
+
+            if (id) {
+                // Update
+                data = data.map(d => d.id === parseInt(id) ? item : d);
+            } else {
+                // Add
+                data.push(item);
+            }
+
+            localStorage.setItem(SCHEDULES_KEY, JSON.stringify(data));
+            loadSchedules();
+            closeModal();
+        }
+
+        function deleteSchedule(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) {
+                let data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
+                data = data.filter(d => d.id !== id);
+                localStorage.setItem(SCHEDULES_KEY, JSON.stringify(data));
+                loadSchedules();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin tư vấn - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script src="../js/crm.js"></script> <!-- CRM Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background-color: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.1);
+            animation: modalEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalEnter {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link active flex items-center space-x-3 p-3 rounded-xl font-medium transition-all text-[15px]">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Khách hàng đăng ký tư vấn</h1>
+                <p class="text-gray-500 text-sm">Danh sách khách hàng điền form nhận tư vấn từ website.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-bold text-gray-400">Sale:</span>
+                <select id="filter-sale" onchange="loadLeads()"
+                    class="px-4 py-2 bg-white rounded-xl border border-gray-100 text-sm font-bold outline-none">
+                    <option value="">Tất cả</option>
+                    <!-- Options populated dynamically -->
+                </select>
+
+                <span class="text-sm font-bold text-gray-400 ml-2">Tình trạng:</span>
+                <select id="filter-status" onchange="loadLeads()"
+                    class="px-4 py-2 bg-white rounded-xl border border-gray-100 text-sm font-bold outline-none">
+                    <option value="">Tất cả</option>
+                    <option value="Chờ tư vấn">Chờ tư vấn</option>
+                    <option value="Đang liên hệ">Đang liên hệ</option>
+                    <option value="Chờ cọc">Chờ cọc</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Leads Table -->
+        <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 bg-orange-50/20">
+                <h3
+                    class="font-black text-gray-800 uppercase tracking-tight text-primary underline decoration-primary/30 underline-offset-8">
+                    Khách hàng đăng ký tư vấn
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Khách hàng</th>
+                            <th class="px-6 py-4">SĐT / Zalo</th>
+                            <th class="px-6 py-4">Tour Quan tâm</th>
+                            <th class="px-6 py-4">Người phụ trách</th>
+                            <th class="px-6 py-4">Ngày nhận</th>
+                            <th class="px-6 py-4 text-center">Trạng thái</th>
+                            <th class="px-6 py-4 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-table-body" class="divide-y divide-gray-50">
+                        <!-- Dữ liệu sẽ được load động từ Javascript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="modal" onclick="if(event.target === this) closeDetailModal()">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Chi tiết tư vấn</h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="lead-detail-content" class="space-y-6">
+                <!-- Nội dung sẽ load từ JS -->
+            </div>
+            <div class="mt-10 flex gap-4">
+                <button id="modal-btn-booking"
+                    class="flex-1 py-3.5 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Chuyển thành Đơn hàng chốt
+                </button>
+                <button onclick="closeDetailModal()"
+                    class="px-6 py-3.5 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-all">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal" onclick="if(event.target === this) closeEditModal()">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Chỉnh sửa thông tin</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form id="edit-lead-form" onsubmit="saveEditLead(event)" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Họ tên</label>
+                    <input type="text" id="edit-name"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Số điện thoại</label>
+                    <input type="text" id="edit-phone"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Tour quan tâm</label>
+                    <input type="text" id="edit-tour"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Ngày dự kiến</label>
+                    <input type="text" id="edit-date"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="VD: 19/04/2026">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Ghi chú</label>
+                    <textarea id="edit-message" rows="3"
+                        class="w-full p-3 bg-gray-50 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeEditModal()"
+                        class="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">Hủy</button>
+                    <button type="submit"
+                        class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Lưu
+                        thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        const LEADS_KEY = 'cam_site_leads';
+        const BOOKINGS_KEY = 'cam_site_bookings';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check Auth
+            currentUser = checkAuth();
+            if (currentUser) {
+                // Update Sidebar
+                document.getElementById('sidebar-avatar').src = currentUser.avatar;
+                document.getElementById('sidebar-name').textContent = currentUser.fullName;
+                document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
+
+                // Role Permissions
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('nav-users').classList.add('hidden');
+                }
+            }
+            loadLeads();
+        });
+
+        function loadLeads() {
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            updateSaleFilterOptions(leads);
+            renderLeads(leads);
+            updateBadgeCount(leads);
+            updateBookingsBadge();
+        }
+
+        function updateSaleFilterOptions(leads) {
+            const saleSelect = document.getElementById('filter-sale');
+            if (!saleSelect) return;
+
+            const currentVal = saleSelect.value;
+            const sales = new Set();
+
+            leads.forEach(l => {
+                if (l.saleName) sales.add(JSON.stringify({ id: l.saleId, name: l.saleName }));
+            });
+
+            saleSelect.innerHTML = '<option value="">Tất cả</option>';
+
+            // Add 'Chưa phân công' option
+            const unassignedOption = document.createElement('option');
+            unassignedOption.value = 'unassigned';
+            unassignedOption.textContent = 'Chưa có Sale';
+            saleSelect.appendChild(unassignedOption);
+
+            sales.forEach(s => {
+                const saleObj = JSON.parse(s);
+                const option = document.createElement('option');
+                option.value = saleObj.id;
+                option.textContent = saleObj.name;
+                saleSelect.appendChild(option);
+            });
+
+            saleSelect.value = currentVal;
+        }
+
+        function renderLeads(leads) {
+            const tableBody = document.getElementById('leads-table-body');
+            tableBody.innerHTML = '';
+
+            if (leads.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-400 italic text-sm">Chưa có khách hàng đăng ký tư vấn.</td></tr>';
+                return;
+            }
+
+            const filterSale = document.getElementById('filter-sale')?.value;
+            const filterStatus = document.getElementById('filter-status')?.value;
+
+            // Filter logic
+            let filteredLeads = leads.filter(l => {
+                const matchStatus = !filterStatus || l.status === filterStatus;
+
+                let matchSale = true;
+                if (filterSale === 'unassigned') {
+                    matchSale = !l.saleId;
+                } else if (filterSale) {
+                    // Start loose comparison just in case types differ
+                    matchSale = l.saleId == filterSale;
+                }
+
+                return matchStatus && matchSale;
+            });
+
+            if (filteredLeads.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-400 italic text-sm">Chưa có khách hàng đăng ký tư vấn phù hợp.</td></tr>';
+                return;
+            }
+
+            filteredLeads.sort((a, b) => b.id - a.id);
+
+            filteredLeads.forEach(lead => {
+                const date = new Date(lead.createdAt || lead.id);
+                const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+
+                const statusOptions = ['Chờ tư vấn', 'Đang liên hệ', 'Chờ cọc', 'Đã hủy'];
+                let statusOptionsHTML = '';
+                statusOptions.forEach(opt => {
+                    statusOptionsHTML += `<option value="${opt}" ${lead.status === opt ? 'selected' : ''}>${opt}</option>`;
+                });
+
+                // Sale Column Logic
+                let saleHtml = '';
+                if (lead.saleId) {
+                    saleHtml = `
+                        <div class="flex items-center space-x-2">
+                            <img src="${lead.saleAvatar || 'https://ui-avatars.com/api/?name=' + lead.saleName}" class="w-6 h-6 rounded-full border border-gray-200">
+                            <span class="text-xs font-bold text-gray-700">${lead.saleName}</span>
+                        </div>
+                    `;
+                } else {
+                    saleHtml = `
+                        <button onclick="assignSale(${lead.id})" 
+                            class="text-[10px] font-bold uppercase tracking-wider bg-orange-50 text-primary border border-primary/20 hover:bg-primary hover:text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                            nhận khách
+                        </button>
+                    `;
+                }
+
+                const row = `
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-sm text-gray-800">${lead.name}</div>
+                            <div class="text-[10px] text-gray-400 font-mono bg-gray-100 px-1 rounded inline-block mt-1">#L${getShortId(lead.id)}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-600">${lead.phone}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <div class="font-bold text-gray-800">${lead.tour}</div>
+                            <div class="text-[10px] text-primary italic font-medium">${lead.date || ''}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${saleHtml}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${formattedDate}</td>
+                        <td class="px-6 py-4 text-center">
+                            <select onchange="updateStatus(${lead.id}, this.value)" 
+                                class="text-[11px] font-bold px-3 py-1.5 rounded-full border-none outline-none cursor-pointer tracking-wide uppercase ${getStatusStyle(lead.status)}">
+                                ${statusOptionsHTML}
+                            </select>
+                        </td>
+                        <td class="px-6 py-4">
+                                <button onclick="generateBookingLink(${lead.id})" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Copy Link Đặt Chỗ">
+                                    <i data-lucide="link" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="openEditModal(${lead.id})" class="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors" title="Chỉnh sửa thông tin">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="openDetailModal(${lead.id})" class="text-primary hover:bg-orange-50 p-2 rounded-lg transition-colors" title="Xem chi tiết">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="convertToBooking(${lead.id})" class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition-colors" title="Chốt đơn thủ công">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                </button>
+                                ${(currentUser && currentUser.role === 'admin') ? `
+                                <button onclick="deleteLead(${lead.id})" class="text-gray-300 hover:text-red-500 p-2 rounded-lg transition-colors" title="Xóa">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+            lucide.createIcons();
+        }
+
+        function getStatusStyle(status) {
+            switch (status) {
+                case 'Chờ tư vấn': return 'bg-orange-100 text-orange-600';
+                case 'Đang liên hệ': return 'bg-blue-100 text-blue-600';
+                case 'Chờ cọc': return 'bg-purple-100 text-purple-600';
+                case 'Đã hủy': return 'bg-gray-100 text-gray-400';
+                default: return 'bg-gray-100 text-gray-600';
+            }
+        }
+
+        function updateStatus(id, newStatus) {
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            leads = leads.map(l => {
+                if (l.id === id) l.status = newStatus;
+                return l;
+            });
+            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+            loadLeads();
+        }
+
+        function assignSale(leadId) {
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập để thực hiện chức năng này!');
+                return;
+            }
+
+            if (!confirm(`Bạn có chắc muốn nhận khách hàng này?`)) return;
+
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const index = leads.findIndex(l => l.id === leadId);
+
+            if (index !== -1) {
+                // Check if already assigned (double check)
+                if (leads[index].saleId) {
+                    alert('Khách hàng này đã có người phụ trách!');
+                    loadLeads();
+                    return;
+                }
+
+                leads[index].saleId = currentUser.id;
+                leads[index].saleName = currentUser.fullName;
+                leads[index].saleAvatar = currentUser.avatar;
+                leads[index].status = 'Đang liên hệ'; // Auto update status
+
+                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+                alert(`Đã phân công ${currentUser.fullName} phụ trách!`);
+                loadLeads();
+            }
+        }
+
+        function updateBadgeCount(leads) {
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+            const badges = document.querySelectorAll('#leads-badge-count');
+            badges.forEach(badge => {
+                badge.textContent = pendingLeads;
+                badge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            });
+        }
+
+        function updateBookingsBadge() {
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            const badge = document.getElementById('bookings-badge-count');
+            if (badge) {
+                badge.textContent = bookings.length;
+                badge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        // Modal Logic
+        function openDetailModal(id) {
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+
+            const content = document.getElementById('lead-detail-content');
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Khách hàng</p>
+                        <p class="font-bold text-gray-800">${lead.name}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Số điện thoại</p>
+                        <p class="font-bold text-primary">${lead.phone}</p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Tour đăng ký</p>
+                    <p class="font-bold text-gray-800">${lead.tour}</p>
+                    <p class="text-sm text-gray-500 italic">${lead.date || 'Chưa chọn ngày'}</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 italic text-gray-600 text-sm leading-relaxed">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 not-italic">Lời nhắn từ khách:</p>
+                    "${lead.message || 'Không có lời nhắn nào.'}"
+                </div>
+            `;
+
+            document.getElementById('modal-btn-booking').onclick = () => {
+                closeDetailModal();
+                convertToBooking(lead.id);
+            };
+
+            document.getElementById('detail-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function convertToBooking(id) {
+            if (!confirm('Xác nhận khách hàng đã đặt cọc / thanh toán? Thao tác này sẽ chuyển dữ liệu sang mục Đơn hàng chốt.')) return;
+
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const leadIndex = leads.findIndex(l => l.id === id);
+            if (leadIndex === -1) return;
+
+            const lead = leads[leadIndex];
+
+            // Thêm vào Bookings
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            const newBooking = {
+                id: Date.now(),
+                leadId: lead.id,
+                name: lead.name,
+                phone: lead.phone,
+                tour: lead.tour,
+                date: lead.date,
+                amount: '2.690.000đ', // Mặc định hoặc lấy từ Tour database
+                status: 'HOÀN TẤT',
+                saleId: lead.saleId,       // Preserve Sale Info
+                saleName: lead.saleName,   // Preserve Sale Info
+                createdAt: new Date().toISOString()
+            };
+            bookings.push(newBooking);
+            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+
+            // Sync to Customer DB & Update Booking with Customer ID
+            try {
+                const customerId = syncCustomerFromBooking(newBooking);
+                if (customerId) {
+                    bookings[bookings.length - 1].customerId = customerId;
+                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+                }
+            } catch (e) {
+                console.error('CRM Sync Error:', e);
+            }
+
+            // Xóa khỏi Leads
+            leads.splice(leadIndex, 1);
+            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+
+            loadLeads();
+            alert('Chốt đơn thành công! Đã chuyển khách hàng sang danh sách Đơn hàng chốt.');
+        }
+
+        function deleteLead(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa thông tin tư vấn này?')) {
+                let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+                leads = leads.filter(l => l.id !== id);
+                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+                loadLeads();
+            }
+        }
+
+        function generateBookingLink(id) {
+            // Admin đang ở /ADMIN/leads.html -> Link sẽ là /booking/process.html?leadId={id}
+            // Logic để lấy đúng base URL dù ở localhost hay production
+            // Giả sử cấu trúc là ROOT/ADMIN/leads.html và ROOT/booking/process.html
+
+            // Use URL API for robust path resolution (handles /ADMIN/ vs /admin/ automatically)
+            // Assuming current page is .../ADMIN/leads.html, target is .../booking/process.html
+            const bookingUrl = new URL('../booking/process.html', window.location.href).href + '?' + queryParams;
+
+            navigator.clipboard.writeText(bookingUrl).then(() => {
+                alert(`✅ Đã copy Link đặt chỗ!\n\nLink này an toàn để gửi cho khách hàng, chứa sẵn thông tin họ tên và tour.\n\n${bookingUrl}`);
+
+                // Cập nhật trạng thái "Đang liên hệ"
+                let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+                const lead = leads.find(l => l.id === id);
+                if (lead && lead.status === 'Chờ tư vấn') {
+                    updateStatus(id, 'Đang liên hệ');
+                }
+            }).catch(err => {
+                prompt('Không thể copy tự động. Hãy copy link dưới đây:', bookingUrl);
+            });
+        }
+
+        // --- Utils & Edit Logic ---
+
+        function getShortId(id) {
+            // Lấy 6 số cuối của ID (timestamp)
+            return id.toString().slice(-6);
+        }
+
+        function openEditModal(id) {
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            // So sánh lỏng lẻo để accept cả string/number ID
+            const lead = leads.find(l => l.id == id);
+            if (!lead) return;
+
+            document.getElementById('edit-id').value = lead.id;
+            document.getElementById('edit-name').value = lead.name;
+            document.getElementById('edit-phone').value = lead.phone;
+            document.getElementById('edit-tour').value = lead.tour;
+            document.getElementById('edit-date').value = lead.date || '';
+            document.getElementById('edit-message').value = lead.message || '';
+
+            document.getElementById('edit-modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        function saveEditLead(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const name = document.getElementById('edit-name').value;
+            const phone = document.getElementById('edit-phone').value;
+            const tour = document.getElementById('edit-tour').value;
+            const date = document.getElementById('edit-date').value;
+            const message = document.getElementById('edit-message').value;
+
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const index = leads.findIndex(l => l.id == id);
+
+            if (index !== -1) {
+                leads[index].name = name;
+                leads[index].phone = phone;
+                leads[index].tour = tour;
+                leads[index].date = date;
+                leads[index].message = message;
+
+                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+
+                alert('Đã cập nhật thông tin thành công!');
+                closeEditModal();
+                loadLeads();
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý User - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link active bg-primary/10 text-primary border-l-4 border-primary flex items-center space-x-3 p-3 rounded-xl font-medium transition-all text-[15px]">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="current-user-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="current-user-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="current-user-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Quản lý Tài khoản</h1>
+                <p class="text-gray-500 text-sm">Phân quyền và quản lý nhân sự hệ thống.</p>
+            </div>
+            <button onclick="openUserModal()"
+                class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-[1.05] transition-transform">
+                <i data-lucide="user-plus" class="w-5 h-5"></i>
+                <span>Thêm User mới</span>
+            </button>
+        </header>
+
+        <!-- Users Table -->
+        <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Nhân viên</th>
+                            <th class="px-6 py-4">Vai trò</th>
+                            <th class="px-6 py-4">Thông tin liên hệ</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                            <th class="px-6 py-4 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="divide-y divide-gray-50">
+                        <!-- Data loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all scale-100">
+            <h2 id="modal-title" class="text-xl font-bold text-gray-800 mb-6">Thêm User mới</h2>
+            <form onsubmit="handleSaveUser(event)" class="space-y-4">
+                <input type="hidden" id="user-id">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tên đăng nhập *</label>
+                    <input type="text" id="username" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Họ và tên *</label>
+                    <input type="text" id="fullname" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Vai trò</label>
+                        <select id="role" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                            <option value="sale">Sale / NV</option>
+                            <option value="admin">Admin / Quản lý</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mật khẩu</label>
+                        <input type="password" id="password" placeholder="(Leave empty to keep)"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Email</label>
+                    <input type="email" id="email"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeUserModal()"
+                        class="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200">Hủy</button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/30">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Check Auth & Role
+        document.addEventListener('DOMContentLoaded', () => {
+            // Only Admin can access this page
+            requireRole(['admin']);
+
+            loadUsers();
+            updateCurrentUserUI();
+            syncBadges();
+        });
+
+        function syncBadges() {
+            const LEADS_KEY = 'cam_site_leads';
+            const BOOKINGS_KEY = 'cam_site_bookings';
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
+            const lBadge = document.getElementById('leads-badge-count');
+            if (lBadge) {
+                lBadge.textContent = pendingLeads;
+                lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            }
+
+            const bBadge = document.getElementById('bookings-badge-count');
+            if (bBadge) {
+                bBadge.textContent = bookings.length;
+                bBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function updateCurrentUserUI() {
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('current-user-avatar').src = user.avatar;
+                document.getElementById('current-user-name').textContent = user.fullName;
+                document.getElementById('current-user-role').textContent = user.role.toUpperCase();
+            }
+        }
+
+        function loadUsers() {
+            const users = getAllUsers();
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const roleBadge = user.role === 'admin'
+                    ? '<span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-1 rounded-full font-bold uppercase">Admin</span>'
+                    : '<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-1 rounded-full font-bold uppercase">Sale Staff</span>';
+
+                const row = `
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <img src="${user.avatar}" class="w-8 h-8 rounded-full border border-gray-100">
+                                <div>
+                                    <div class="font-bold text-gray-800 text-sm">${user.fullName}</div>
+                                    <div class="text-[10px] text-gray-400 font-mono">@${user.username}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">${roleBadge}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-600">${user.email || '-'}</div>
+                            <div class="text-[10px] text-gray-400">${user.phone || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-green-600 font-bold text-xs flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button onclick='openUserModal(${JSON.stringify(user)})' class="text-gray-400 hover:text-primary p-1">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </button>
+                            ${user.username !== 'admin' ? `
+                            <button onclick="handleDelete(${user.id})" class="text-gray-400 hover:text-red-500 p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>` : ''}
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+            lucide.createIcons();
+        }
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('user-modal');
+
+        function openUserModal(user = null) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            if (user) {
+                document.getElementById('modal-title').innerText = 'Sửa thông tin User';
+                document.getElementById('user-id').value = user.id;
+                document.getElementById('username').value = user.username;
+                document.getElementById('username').disabled = true; // Username immutable
+                document.getElementById('fullname').value = user.fullName;
+                document.getElementById('role').value = user.role;
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('password').placeholder = "Nhập nếu muốn đổi mật khẩu mới";
+            } else {
+                document.getElementById('modal-title').innerText = 'Thêm User mới';
+                document.querySelector('form').reset();
+                document.getElementById('user-id').value = '';
+                document.getElementById('username').disabled = false;
+                document.getElementById('password').placeholder = "Mật khẩu mặc định: 123456";
+            }
+        }
+
+        function closeUserModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleSaveUser(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('user-id').value;
+            const users = getAllUsers();
+
+            // Check duplicate username if new
+            const username = document.getElementById('username').value;
+            if (!id && users.some(u => u.username === username)) {
+                alert('Tên đăng nhập đã tồn tại!');
+                return;
+            }
+
+            const userData = {
+                id: id ? Number(id) : null,
+                username: username,
+                fullName: document.getElementById('fullname').value,
+                role: document.getElementById('role').value,
+                email: document.getElementById('email').value,
+                status: 'active'
+            };
+
+            const pass = document.getElementById('password').value;
+            if (pass) userData.password = pass; // Only update if provided
+            if (!id && !pass) userData.password = '123456'; // Default for new
+
+            saveUser(userData);
+            closeUserModal();
+            loadUsers();
+            alert('Đã lưu thông tin người dùng!');
+        }
+
+        function handleDelete(id) {
+            if (confirm('Bạn có chắc muốn xóa tài khoản này?')) {
+                deleteUser(id);
+                loadUsers();
+                // If deleted self (should happen via logic checks but just in case)
+                const currentUser = getCurrentUser();
+                if (currentUser && currentUser.id === id) logout();
+            }
+        }
+    </script>
+</body>
+
+</html>

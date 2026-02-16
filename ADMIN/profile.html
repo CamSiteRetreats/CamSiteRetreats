@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        /* Profile Card Hover Effect */
+        .profile-card:hover .edit-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Hồ sơ cá nhân</h1>
+                <p class="text-gray-500 text-sm">Quản lý thông tin và cài đặt tài khoản của bạn.</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Column: Profile Card -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 p-6 text-center">
+                    <div class="relative w-32 h-32 mx-auto mb-4 group cursor-pointer profile-card">
+                        <img id="profile-avatar" src="" alt="Avatar"
+                            class="w-full h-full rounded-full object-cover border-4 border-gray-50">
+                        <div onclick="promptAvatar()"
+                            class="edit-overlay absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 transition-opacity">
+                            <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                        </div>
+                    </div>
+                    <h2 id="profile-name" class="text-xl font-bold text-gray-800">Your Name</h2>
+                    <p id="profile-role" class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-6">Role
+                    </p>
+
+                    <div class="space-y-3 text-left">
+                        <div class="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-xl">
+                            <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
+                            <span id="profile-email">email@example.com</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-xl">
+                            <i data-lucide="phone" class="w-4 h-4 text-gray-400"></i>
+                            <span id="profile-phone">0909xxxxxx</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Edit Form -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-primary"></i>
+                        Cập nhật thông tin
+                    </h3>
+
+                    <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Họ và tên</label>
+                                <input type="text" id="edit-fullname"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-primary transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Số điện
+                                    thoại</label>
+                                <input type="tel" id="edit-phone"
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-primary transition-colors">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Email</label>
+                            <input type="email" id="edit-email"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-primary transition-colors">
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6"></div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Đổi mật khẩu mới</label>
+                            <input type="password" id="edit-password" placeholder="Bỏ trống nếu không muốn đổi"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-primary transition-colors">
+                            <p class="text-xs text-gray-400 mt-1 italic">Mật khẩu nên có ít nhất 6 ký tự.</p>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit"
+                                class="bg-primary text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-primary/30 hover:scale-[1.02] transition-transform">
+                                Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Check Auth
+        let currentUser = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = checkAuth();
+            if (currentUser) {
+                renderProfile(currentUser);
+
+                // Sidebar Logic for Role
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('nav-users').classList.add('hidden');
+                }
+            }
+            syncBadges();
+        });
+
+        function syncBadges() {
+            const LEADS_KEY = 'cam_site_leads';
+            const BOOKINGS_KEY = 'cam_site_bookings';
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
+            const lBadge = document.getElementById('leads-badge-count');
+            if (lBadge) {
+                lBadge.textContent = pendingLeads;
+                lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            }
+
+            const bBadge = document.getElementById('bookings-badge-count');
+            if (bBadge) {
+                bBadge.textContent = bookings.length;
+                bBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function renderProfile(user) {
+            // Sidebar
+            document.getElementById('sidebar-avatar').src = user.avatar;
+            document.getElementById('sidebar-name').textContent = user.fullName;
+            document.getElementById('sidebar-role').textContent = user.role.toUpperCase();
+
+            // Profile Card
+            document.getElementById('profile-avatar').src = user.avatar;
+            document.getElementById('profile-name').textContent = user.fullName;
+            document.getElementById('profile-role').textContent = user.role.toUpperCase();
+            document.getElementById('profile-email').textContent = user.email || 'Chưa cập nhật';
+            document.getElementById('profile-phone').textContent = user.phone || 'Chưa cập nhật';
+
+            // Edit Form
+            document.getElementById('edit-fullname').value = user.fullName;
+            document.getElementById('edit-phone').value = user.phone || '';
+            document.getElementById('edit-email').value = user.email || '';
+        }
+
+        function promptAvatar() {
+            const url = prompt("Nhập URL ảnh đại diện mới:", currentUser.avatar);
+            if (url) {
+                currentUser.avatar = url;
+                document.getElementById('profile-avatar').src = url;
+            }
+        }
+
+        function handleUpdateProfile(e) {
+            e.preventDefault();
+
+            const updatedUser = {
+                id: currentUser.id, // Mandatory to identify user
+                fullName: document.getElementById('edit-fullname').value,
+                phone: document.getElementById('edit-phone').value,
+                email: document.getElementById('edit-email').value,
+                avatar: currentUser.avatar
+            };
+
+            const newPass = document.getElementById('edit-password').value;
+            if (newPass) {
+                if (newPass.length < 6) {
+                    alert('Mật khẩu quá ngắn!');
+                    return;
+                }
+                updatedUser.password = newPass;
+            }
+
+            saveUser(updatedUser);
+
+            // Reload to reflect changes globally
+            alert('Cập nhật thành công!');
+            location.reload();
+        }
+    </script>
+</body>
+
+</html>

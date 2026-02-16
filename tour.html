@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Tour - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/tour-manager.js"></script>
+    <script src="js/ui-components.js"></script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --secondary: #FFF8F0;
+            --accent: #F48C06;
+            --text: #333333;
+            --input-bg: #FFFDF5;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            /* Linear gradient screens the image to lighten it (simulating opacity reduction) before multiplying */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('bg-texture.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: screen, multiply;
+            color: var(--text);
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-serif {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .border-primary {
+            border-color: var(--primary);
+        }
+
+        .bg-secondary {
+            background-color: var(--secondary);
+        }
+
+        .glass-nav {
+            background: rgba(255, 248, 240, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(232, 93, 4, 0.1);
+        }
+
+        .tour-card-shadow {
+            box-shadow: 0 10px 30px -10px rgba(232, 93, 4, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+        }
+
+        .tour-card {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        .tour-card>div:last-child {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden pt-24">
+
+    <!-- Navigation -->
+    <!-- Navigation Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-12">
+
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-black mb-6 text-gray-800 uppercase tracking-tight">Khám Phá Hành Trình
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Chọn điểm đến tiếp theo của bạn và sẵn sàng cho những trải nghiệm
+                không thể nào quên.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-12 space-y-6">
+            <!-- Region Filter -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="font-bold text-gray-400 uppercase text-[10px] tracking-widest py-2">Khu vực:</span>
+                <button onclick="filterTours('region', 'all')" data-value="all"
+                    class="filter-btn region-btn active px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Tất
+                    cả</button>
+                <button onclick="filterTours('region', 'south')" data-value="south"
+                    class="filter-btn region-btn px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Miền
+                    Nam</button>
+                <button onclick="filterTours('region', 'north')" data-value="north"
+                    class="filter-btn region-btn px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Miền
+                    Bắc</button>
+            </div>
+
+            <!-- Type Filter -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="font-bold text-gray-400 uppercase text-[10px] tracking-widest py-2">Loại hình:</span>
+                <button onclick="filterTours('type', 'all')" data-value="all"
+                    class="filter-btn type-btn active px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Tất
+                    cả</button>
+                <button onclick="filterTours('type', 'trekking')" data-value="trekking"
+                    class="filter-btn type-btn px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Trekking</button>
+                <button onclick="filterTours('type', 'canyoning')" data-value="canyoning"
+                    class="filter-btn type-btn px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Canyoning</button>
+                <button onclick="filterTours('type', 'camping')" data-value="camping"
+                    class="filter-btn type-btn px-4 py-1.5 rounded-full border border-gray-100 bg-white text-gray-500 font-bold text-xs hover:text-primary transition-all">Camping</button>
+            </div>
+        </div>
+
+        <!-- Tour Grid -->
+        <div id="tour-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Dynamic tours will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        lucide.createIcons();
+
+        lucide.createIcons();
+
+        let currentRegion = 'all';
+        let currentType = 'all';
+
+        function initTours() {
+            const tours = TourManager.getAllTours();
+            const grid = document.getElementById('tour-grid');
+            if (grid) {
+                // Use compact style true for the grid
+                grid.innerHTML = tours.map(tour => TourManager.createTourCardHTML(tour, true)).join('');
+                lucide.createIcons();
+                TourManager.initSlideshows();
+                filterTours('region', 'all'); // Initial filter
+            }
+        }
+
+        function filterTours(filterType, value) {
+            // Update State
+            if (filterType === 'region') currentRegion = value;
+            if (filterType === 'type') currentType = value;
+
+            // Update UI Buttons
+            const buttons = document.querySelectorAll(`.${filterType}-btn`);
+            buttons.forEach(btn => {
+                if (btn.dataset.value === value) {
+                    btn.classList.add('active', 'bg-primary', 'text-white', 'border-primary');
+                    btn.classList.remove('bg-white', 'text-gray-500', 'border-gray-100');
+                } else {
+                    btn.classList.remove('active', 'bg-primary', 'text-white', 'border-primary');
+                    btn.classList.add('bg-white', 'text-gray-500', 'border-gray-100');
+                }
+            });
+
+            // Filter Logic
+            const items = document.querySelectorAll('.tour-item');
+            items.forEach(item => {
+                const itemRegion = item.dataset.region;
+                const itemType = item.dataset.type;
+
+                const matchRegion = currentRegion === 'all' || itemRegion === currentRegion;
+                const matchType = currentType === 'all' || itemType === currentType;
+
+                if (matchRegion && matchType) {
+                    item.classList.remove('hidden');
+                    item.classList.add('animate__animated', 'animate__fadeIn');
+                } else {
+                    item.classList.add('hidden');
+                    item.classList.remove('animate__animated', 'animate__fadeIn');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initTours);
+    </script>
+</body>
+
+</html>

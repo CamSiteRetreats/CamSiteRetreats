@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background-color: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .card-stats {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            transition: transform 0.3s ease;
+        }
+
+        .card-stats:hover {
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link active flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group text-[15px]">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800" id="header-greeting">Chào buổi sáng!</h1>
+                <p class="text-gray-500 text-sm">Hôm nay có <span id="pending-count">0</span> đơn đăng ký mới cần xử lý.
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button
+                        class="p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                    </button>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                </div>
+                <div class="flex items-center space-x-3 ml-4" onclick="window.location.href='profile.html'"
+                    style="cursor: pointer;">
+                    <img id="header-avatar" src="" class="w-10 h-10 rounded-full border border-gray-100 object-cover">
+                    <div>
+                        <p id="header-name" class="text-sm font-bold">User</p>
+                        <p id="header-role" class="text-[10px] text-gray-400 uppercase">Role</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="card-stats p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-orange-100 text-primary rounded-xl">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold">+12%</span>
+                </div>
+                <p class="text-gray-400 text-sm font-medium">Tổng khách hàng</p>
+                <h2 class="text-2xl font-bold mt-1">1,280</h2>
+            </div>
+            <div class="card-stats p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold">+25%</span>
+                </div>
+                <p class="text-gray-400 text-sm font-medium">Tổng đơn tour</p>
+                <h2 class="text-2xl font-bold mt-1">452</h2>
+            </div>
+            <div class="card-stats p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-100 text-green-600 rounded-xl">
+                        <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-red-500 text-xs font-bold">-2%</span>
+                </div>
+                <p class="text-gray-400 text-sm font-medium">Doanh thu tháng</p>
+                <h2 class="text-2xl font-bold mt-1">120M</h2>
+            </div>
+            <div class="card-stats p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                        <i data-lucide="eye" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold">+8%</span>
+                </div>
+                <p class="text-gray-400 text-sm font-medium">Lượt truy cập</p>
+                <h2 class="text-2xl font-bold mt-1">24.5K</h2>
+            </div>
+        </div>
+
+        <!-- Recent Activity / Bookings Snippet -->
+        <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mb-10">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Hoạt động gần đây</h3>
+                <a href="bookings.html" class="text-primary text-sm font-bold hover:underline">Xem tất cả</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Khách hàng</th>
+                            <th class="px-6 py-4">Tên Tour</th>
+                            <th class="px-6 py-4">Giá trị</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold">
+                                        A</div>
+                                    <span class="text-sm font-bold">Nguyễn Văn An</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium">Tà Năng - Phan Dũng</td>
+                            <td class="px-6 py-4 text-sm font-bold text-primary">2.690.000đ</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Thành
+                                    công</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Đồng bộ số lượng khách hàng
+        function syncBadges() {
+            const LEADS_KEY = 'cam_site_leads';
+            const BOOKINGS_KEY = 'cam_site_bookings';
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
+            const lBadge = document.getElementById('leads-badge-count');
+            if (lBadge) {
+                lBadge.textContent = pendingLeads;
+                lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            }
+
+            const bBadge = document.getElementById('bookings-badge-count');
+            if (bBadge) {
+                bBadge.textContent = bookings.length;
+                bBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check Auth
+            const currentUser = checkAuth();
+            if (currentUser) {
+                // Update Sidebar
+                document.getElementById('sidebar-avatar').src = currentUser.avatar;
+                document.getElementById('sidebar-name').textContent = currentUser.fullName;
+                document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
+
+                // Update Header
+                document.getElementById('header-greeting').textContent = `Chào buổi sáng, ${currentUser.fullName}!`;
+                document.getElementById('header-avatar').src = currentUser.avatar;
+                document.getElementById('header-name').textContent = currentUser.fullName;
+                document.getElementById('header-role').textContent = currentUser.role.toUpperCase();
+
+                // Role Permissions
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('nav-users').classList.add('hidden');
+                }
+            }
+            syncBadges();
+        });
+    </script>
+</body>
+
+</html>

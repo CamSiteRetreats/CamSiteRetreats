@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAM SITE RETREATS - Chữa lành tâm hồn bằng những chuyến đi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/tour-manager.js"></script>
+    <script src="js/ui-components.js"></script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --secondary: #FFF8F0;
+            --accent: #F48C06;
+            --text: #333333;
+            --input-bg: #FFFDF5;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            /* Linear gradient screens the image to lighten it (simulating opacity reduction) before multiplying */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('bg-texture.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: screen, multiply;
+            color: var(--text);
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-serif {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .border-primary {
+            border-color: var(--primary);
+        }
+
+        .bg-secondary {
+            background-color: var(--secondary);
+        }
+
+        .glass-nav {
+            background: rgba(255, 248, 240, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(232, 93, 4, 0.1);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+        }
+
+        .tour-card-shadow {
+            box-shadow: 0 10px 30px -10px rgba(232, 93, 4, 0.2);
+        }
+
+        .custom-input {
+            background-color: var(--input-bg);
+            border: 1px solid rgba(232, 93, 4, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .custom-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px !important;
+            }
+
+            h1 {
+                font-size: 2.2rem !important;
+                line-height: 1.2 !important;
+            }
+
+            h2 {
+                font-size: 1.8rem !important;
+                line-height: 1.3 !important;
+            }
+
+            h3 {
+                font-size: 1.4rem !important;
+            }
+
+            .mobile-snap-slider {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                gap: 1.5rem;
+                padding-bottom: 1rem;
+                scrollbar-width: none;
+            }
+
+            .mobile-snap-slider::-webkit-scrollbar {
+                display: none;
+            }
+
+            .mobile-snap-slider>div {
+                min-width: 85%;
+                scroll-snap-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <!-- Navigation Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+        <img src="anhbia.jpg" class="absolute inset-0 w-full h-full object-cover" alt="Trekking Vietnam">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="relative z-10 text-center text-white px-4">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 animate__animated animate__fadeInUp">Chữa lành tâm hồn
+                bằng<br>những chuyến đi</h1>
+            <p
+                class="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90 animate__animated animate__fadeInUp animate__delay-1s">
+                Khám phá những cung đường trekking đẹp nhất Việt Nam cùng CAM SITE RETREATS. Lưu giữ ký ức thanh xuân
+                rực rỡ nhất.
+            </p>
+            <div
+                class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 animate__animated animate__fadeInUp animate__delay-2s">
+                <a href="#chuyen-di"
+                    class="bg-white text-primary px-8 py-4 rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-2xl">
+                    KHÁM PHÁ CÁC TOUR
+                </a>
+                <a href="#"
+                    class="border-2 border-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-black transition-all">
+                    XEM VIDEO GIỚI THIỆU
+                </a>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float">
+            <i data-lucide="chevron-down" class="text-white w-8 h-8"></i>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-20 bg-white/90 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-black mb-6 text-gray-800 uppercase tracking-tight">VỀ CHÚNG TÔI
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    <span class="font-bold text-primary">Tụi mình</span>, hay tên gọi thân thương hơn là những người bạn
+                    đồng hành. Nơi mà bạn có thể tham gia những chuyến đi trekking để cùng nhau về rừng, cùng nhau thả
+                    lòng vào những cánh rừng, thả mình vào những áng mây xanh và có những giây phút trải lòng cùng nhau
+                    với những người bạn mới.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mobile-snap-slider">
+                <!-- Pillar 1: Về Rừng -->
+                <div
+                    class="flex items-start gap-5 group bg-white p-8 rounded-[32px] md:bg-transparent md:p-0 shadow-sm md:shadow-none transition-all duration-300">
+                    <div
+                        class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 shrink-0 group-hover:scale-110 group-hover:bg-green-100 transition-all duration-300 shadow-sm">
+                        <i data-lucide="trees" class="w-8 h-8"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <h3
+                            class="text-lg font-bold text-gray-800 uppercase tracking-wide border-b border-green-500/30 pb-1 inline-block">
+                            VỀ RỪNG</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">
+                            Rừng không chỉ là đích đến, rừng là khởi đầu. Nơi mỗi tán lá xanh đều đang dang tay ôm lấy
+                            những mệt mỏi, và hơi thở của tự nhiên sẽ chữa lành những vết xước trong tâm hồn.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pillar 2: Về Lòng -->
+                <div
+                    class="flex items-start gap-5 group bg-white p-8 rounded-[32px] md:bg-transparent md:p-0 shadow-sm md:shadow-none transition-all duration-300">
+                    <div
+                        class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 group-hover:bg-blue-100 transition-all duration-300 shadow-sm">
+                        <i data-lucide="heart-handshake" class="w-8 h-8"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <h3
+                            class="text-lg font-bold text-gray-800 uppercase tracking-wide border-b border-blue-500/30 pb-1 inline-block">
+                            VỀ LÒNG</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">
+                            Khi sóng điện thoại mất đi, chỉ còn tiếng gió và nhịp thở, đó là lúc những cuộc đối thoại
+                            nội tâm bắt đầu. Học cách bao dung, yêu thương lấy phiên bản chân thật nhất của mình.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pillar 3: Về Nhau -->
+                <div
+                    class="flex items-start gap-5 group bg-white p-8 rounded-[32px] md:bg-transparent md:p-0 shadow-sm md:shadow-none transition-all duration-300">
+                    <div
+                        class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 shrink-0 group-hover:scale-110 group-hover:bg-orange-100 transition-all duration-300 shadow-sm">
+                        <i data-lucide="users" class="w-8 h-8"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <h3
+                            class="text-lg font-bold text-gray-800 uppercase tracking-wide border-b border-orange-500/30 pb-1 inline-block">
+                            VỀ NHAU</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">
+                            Chúng ta bắt đầu hành trình như những người lạ, nhưng trở về như những người thân. Là những
+                            câu chuyện đời được kể bên ánh lửa, tìm lại sự kết nối kỳ diệu giữa những tâm hồn.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tour Explorer Section -->
+    <section id="chuyen-di" class="py-24 px-6 md:px-20">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl md:text-4xl font-black mb-6">KHÁM PHÁ CHUYẾN ĐI</h2>
+
+                <!-- Region Tabs -->
+                <div class="flex justify-center space-x-3">
+                    <button id="btn-south"
+                        class="px-6 py-2 rounded-full bg-primary text-white font-bold shadow-lg transition-all border-2 border-primary hover:bg-primary hover:text-white text-sm">MIỀN
+                        NAM</button>
+                    <button id="btn-north"
+                        class="px-6 py-2 rounded-full bg-white text-gray-500 font-bold hover:text-primary transition-all border-2 border-transparent hover:border-primary text-sm">MIỀN
+                        BẮC</button>
+                </div>
+            </div>
+
+            <!-- Carousel Wrapper -->
+            <div class="relative">
+                <!-- Tour Slider Container -->
+                <div id="tour-slider"
+                    class="flex overflow-x-auto space-x-6 scrollbar-hide snap-x snap-mandatory py-16 scroll-smooth px-4 md:px-0 transition-opacity duration-300 ease-in-out">
+                    <!-- Dynamic tours will be loaded here -->
+                </div>
+
+                <!-- Navigation Controls -->
+                <button id="prev-tour"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 bg-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-gray-800 hover:text-primary transition-all z-10 hidden md:flex border border-gray-100">
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                </button>
+                <button id="next-tour"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 bg-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-gray-800 hover:text-primary transition-all z-10 hidden md:flex border border-gray-100">
+                    <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+
+
+
+        </div>
+
+        <div class="text-center mt-12">
+            <a href="tour.html"
+                class="inline-block px-8 py-3 rounded-full border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all transform hover:scale-105 shadow-md">
+                XEM TẤT CẢ CÁC TOUR
+            </a>
+        </div>
+    </section>
+
+    <!-- Motivation Section -->
+    <section class="py-20 bg-white/90 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- Image Side -->
+                <div class="relative rounded-[32px] overflow-hidden shadow-2xl h-[400px] md:h-[500px] group">
+                    <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&q=80&w=1600"
+                        alt="Camping Motivation"
+                        class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                </div>
+
+                <!-- Text Side -->
+                <div class="md:pl-10">
+                    <div class="mb-6">
+                        <i data-lucide="quote" class="w-12 h-12 text-primary/40 mb-4"></i>
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
+                            Hành trình tìm lại<br>
+                            <span class="text-primary">chính mình</span>
+                        </h2>
+                    </div>
+
+                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed font-medium italic"
+                        style="font-family: 'Montserrat', sans-serif;">
+                        "Hành trình tìm lại không đơn thuần là chỉ đi và đến, ở đây tụi mình thấu hiểu bạn bằng những sự
+                        tử tế bằng sự chân thành, không phải chỉ vì bạn là một khách hàng nhưng đâu đó giữa cuộc đời này
+                        sự hiện diện của bạn tại nơi đây chính là một điều đặc biệt dành cho chúng mình!"
+                    </p>
+
+                    <div class="mt-8 flex items-center gap-4">
+                        <div class="w-12 h-1 bg-primary rounded-full"></div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">CAM SITE RETREATS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Booking Section -->
+    <section id="contact" class="py-24 bg-[#FAFAFA] relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Left Side: Center text and hide icons -->
+            <div class="animate__animated animate__fadeInLeft text-center">
+                <span class="text-primary font-bold uppercase tracking-[0.2em] text-sm mb-4 block">LIÊN HỆ</span>
+                <h2 class="text-4xl md:text-5xl font-black text-[#1A202C] mb-8 leading-[1.1] mx-auto">
+                    Bắt đầu hành trình<br>của bạn
+                </h2>
+                <p class="text-gray-500 text-lg mb-0 mx-auto max-w-md leading-relaxed">
+                    Để lại thông tin, đội ngũ CAM SITE sẽ liên hệ tư vấn lộ trình phù hợp nhất với thể lực và mong muốn
+                    của bạn.
+                </p>
+            </div>
+
+            <!-- Right Side: Booking Form Card -->
+            <div class="animate__animated animate__fadeInRight">
+                <div
+                    class="bg-white p-8 md:p-12 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border-2 border-primary/20">
+                    <div class="flex items-center gap-3 mb-10">
+                        <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                            <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-[#1A202C] uppercase tracking-tight">ĐẶT CHỖ NGAY</h3>
+                    </div>
+
+                    <form id="home-booking-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Họ
+                                    tên</label>
+                                <input type="text" id="home-cust-name" required placeholder="Nhập họ tên..."
+                                    class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Số
+                                    điện thoại</label>
+                                <input type="tel" id="home-cust-phone" required placeholder="09xxxx..."
+                                    class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Chọn
+                                tour</label>
+                            <select id="home-tour-select" onchange="loadHomeSchedules()" required
+                                class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none cursor-pointer">
+                                <!-- Tours will be loaded here -->
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Chọn ngày
+                                đi</label>
+                            <div id="home-date-selector" class="grid grid-cols-2 gap-4">
+                                <!-- Dates will be loaded here -->
+                            </div>
+                            <input type="hidden" id="home-selected-date-input" required>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Lời
+                                nhắn</label>
+                            <textarea id="home-cust-message" rows="3" placeholder="hãy để lại yêu cầu của bạn tại đây"
+                                class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-none"></textarea>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-primary text-white font-black py-5 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 text-lg uppercase tracking-widest mt-4">
+                            GỬI YÊU CẦU
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSuccessModal()"></div>
+        <div
+            class="bg-white rounded-[40px] p-12 max-w-md w-full mx-6 relative z-10 text-center shadow-2xl animate__animated animate__zoomIn">
+            <div
+                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 mx-auto mb-8 shadow-inner">
+                <i data-lucide="check-circle-2" class="w-12 h-12"></i>
+            </div>
+            <h3 class="text-3xl font-black text-gray-800 mb-4 uppercase tracking-tight">GỬI THÀNH CÔNG</h3>
+            <p class="text-gray-500 mb-8 leading-relaxed">
+                Cảm ơn bạn đã tin tưởng CAM SITE RETREATS. Đội ngũ tư vấn sẽ liên hệ với bạn trong thời gian sớm nhất!
+            </p>
+            <button onclick="closeSuccessModal()"
+                class="w-full bg-[#1A202C] text-white font-bold py-4 rounded-2xl hover:bg-primary transition-all active:scale-95 shadow-lg">
+                ĐỒNG Ý
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        lucide.createIcons();
+
+        lucide.createIcons();
+
+        // Tour Slider Logic
+        const slider = document.getElementById('tour-slider');
+        const prevBtn = document.getElementById('prev-tour');
+        const nextBtn = document.getElementById('next-tour');
+        const dots = document.querySelectorAll('.dot');
+        const progress = document.getElementById('slider-progress');
+
+        const updateUI = () => {
+            if (!slider) return;
+            const scrollPercentage = (slider.scrollLeft / (slider.scrollWidth - slider.clientWidth)) * 100;
+            if (progress) progress.style.width = Math.max(20, scrollPercentage) + '%';
+
+            // Update dots
+            const activeIndex = Math.round((slider.scrollLeft / slider.scrollWidth) * dots.length);
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('bg-primary', i === activeIndex);
+                dot.classList.toggle('bg-gray-300', i !== activeIndex);
+            });
+        };
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: 400, behavior: 'smooth' });
+                setTimeout(updateUI, 500);
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: -400, behavior: 'smooth' });
+                setTimeout(updateUI, 500);
+            });
+        }
+
+        if (slider) {
+            slider.addEventListener('scroll', updateUI);
+        }
+
+
+        // Styles for uniform sizing and scrollbar removal
+        const style = document.createElement('style');
+        style.textContent = `
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            .tour-card { display: flex; flex-direction: column; height: auto; }
+            .tour-card.hidden { display: none !important; }
+            .tour-card > div:last-child { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+            #tour-slider { display: flex; align-items: stretch; cursor: grab; user-select: none; }
+            #tour-slider.active { cursor: grabbing; cursor: -webkit-grabbing; scale: 1; }
+            
+            /* Marquee Animation */
+            @keyframes scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-scroll {
+                animation: scroll 60s linear infinite;
+            }
+            .animate-scroll:hover {
+                animation-play-state: paused;
+            }
+        `;
+        document.head.append(style);
+
+        // Drag to Scroll Logic
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.classList.add('active');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll-fast
+            slider.scrollLeft = scrollLeft - walk;
+        });
+
+        // Initialize Tours Logic
+        function initTours() {
+            const tours = TourManager.getAllTours();
+            const slider = document.getElementById('tour-slider');
+            if (slider) {
+                slider.innerHTML = tours.map(tour => TourManager.createTourCardHTML(tour)).join('');
+                lucide.createIcons();
+                TourManager.initSlideshows();
+                // Re-initialize Slideshow logic if needed or it will be handled by hover
+                filterTours('south'); // Default filter
+            }
+        }
+
+        // Region Filtering Logic
+        const btnSouth = document.getElementById('btn-south');
+        const btnNorth = document.getElementById('btn-north');
+
+        const filterTours = (region) => {
+            const slider = document.getElementById('tour-slider');
+            const allTourCards = document.querySelectorAll('.tour-card');
+
+            // 1. Fade Out
+            if (slider) slider.classList.add('opacity-0');
+
+            // 2. Wait for transition, then update content
+            setTimeout(() => {
+                // Update Cards
+                allTourCards.forEach(card => {
+                    if (card.dataset.region === region) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Reset Scroll
+                if (slider) slider.scrollLeft = 0;
+
+                // 3. Fade In
+                if (slider) slider.classList.remove('opacity-0');
+            }, 300);
+
+            // Update Buttons (Immediate)
+            if (region === 'south') {
+                btnSouth.classList.add('bg-primary', 'text-white', 'border-primary');
+                btnSouth.classList.remove('bg-white', 'text-gray-500', 'border-transparent');
+
+                btnNorth.classList.add('bg-white', 'text-gray-500', 'border-transparent');
+                btnNorth.classList.remove('bg-primary', 'text-white', 'border-primary');
+            } else {
+                btnNorth.classList.add('bg-primary', 'text-white', 'border-primary');
+                btnNorth.classList.remove('bg-white', 'text-gray-500', 'border-transparent');
+
+                btnSouth.classList.add('bg-white', 'text-gray-500', 'border-transparent');
+                btnSouth.classList.remove('bg-primary', 'text-white', 'border-primary');
+            }
+        };
+
+        // Initialize Everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initTours();
+            loadHomeBookingData();
+
+            // Handle Form Submit
+            const bookingForm = document.getElementById('home-booking-form');
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', handleHomeBookingSubmit);
+            }
+        });
+
+        // Load Tours into Dropdown
+        function loadHomeBookingData() {
+            const tours = TourManager.getAllTours();
+            const select = document.getElementById('home-tour-select');
+            if (!select) return;
+
+            select.innerHTML = '<option value="" disabled selected>Chọn tour bạn quan tâm</option>' +
+                tours.map(t => `<option value="${t.name}" data-id="${t.id}">${t.name}</option>`).join('');
+        }
+
+        // Load Schedules for Selected Tour
+        function loadHomeSchedules() {
+            const select = document.getElementById('home-tour-select');
+            const selectedOption = select.options[select.selectedIndex];
+            const tourId = selectedOption.dataset.id;
+
+            const dateSelector = document.getElementById('home-date-selector');
+            const dateInput = document.getElementById('home-selected-date-input');
+            dateSelector.innerHTML = '';
+            dateInput.value = '';
+
+            const tour = TourManager.getTourById(tourId);
+            if (tour && tour.schedules && tour.schedules.length > 0) {
+                tour.schedules.forEach(item => {
+                    let formattedDisplay = item.date;
+
+                    // If date is missing (e.g. from Admin/LocalStorage), format from start/end
+                    if (!formattedDisplay && item.startDate && item.endDate) {
+                        const start = new Date(item.startDate);
+                        const end = new Date(item.endDate);
+                        formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+                    }
+
+                    const opacityClass = item.status === 'Hết chỗ' ? 'opacity-40 grayscale cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5';
+                    const statusClass = item.status === 'Hết chỗ' ? 'text-gray-400' : 'text-primary';
+
+                    const html = `
+                        <div class="home-date-option p-4 rounded-2xl border-2 border-gray-100 flex flex-col items-center justify-center gap-1 transition-all ${opacityClass}"
+                             onclick="${item.status !== 'Hết chỗ' ? `selectHomeDate(this, '${formattedDisplay}')` : ''}">
+                            <span class="text-sm font-bold text-gray-700">${formattedDisplay}</span>
+                            <span class="text-[11px] font-bold ${statusClass}">${item.status === 'Hết chỗ' ? 'Hết chỗ' : `Còn ${item.slots} chỗ`}</span>
+                        </div>
+                    `;
+                    dateSelector.insertAdjacentHTML('beforeend', html);
+                });
+            } else {
+                dateSelector.innerHTML = '<div class="col-span-2 py-4 text-center text-gray-400 text-sm italic">Tour này chưa có lịch khởi hành cụ thể.</div>';
+            }
+        }
+
+        function selectHomeDate(element, date) {
+            document.querySelectorAll('.home-date-option').forEach(opt => {
+                opt.classList.remove('border-primary', 'bg-primary/5', 'selected');
+                opt.classList.add('border-gray-100');
+            });
+            element.classList.remove('border-gray-100');
+            element.classList.add('border-primary', 'bg-primary/5', 'selected');
+            document.getElementById('home-selected-date-input').value = date;
+        }
+
+        function handleHomeBookingSubmit(e) {
+            e.preventDefault();
+            const LEADS_KEY = 'cam_site_leads';
+
+            const newLead = {
+                id: Date.now(),
+                name: document.getElementById('home-cust-name').value,
+                phone: document.getElementById('home-cust-phone').value,
+                tour: document.getElementById('home-tour-select').value,
+                date: document.getElementById('home-selected-date-input').value,
+                message: document.getElementById('home-cust-message').value,
+                status: 'Chờ tư vấn',
+                createdAt: new Date().toISOString()
+            };
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            leads.push(newLead);
+            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+
+            // Show Modal
+            const modal = document.getElementById('success-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Reset
+            e.target.reset();
+            document.getElementById('home-date-selector').innerHTML = '';
+            document.getElementById('home-selected-date-input').value = '';
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        if (btnSouth && btnNorth) {
+            btnSouth.addEventListener('click', () => filterTours('south'));
+            btnNorth.addEventListener('click', () => filterTours('north'));
+        }
+    </script>
+</body>
+
+</html>

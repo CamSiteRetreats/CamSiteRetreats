@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tour - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background-color: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group text-[15px] text-gray-500 hover:bg-gray-50">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link active flex items-center space-x-3 p-3 rounded-xl font-medium transition-all text-[15px]">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="schedules.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Lịch trình Tour</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng đăng ký tư vấn</span>
+                <span id="leads-badge-count" class="bg-primary text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="bookings.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Khách hàng đã đăng ký</span>
+                <span id="bookings-badge-count"
+                    class="bg-green-500 text-white text-[10px] px-2 py-1 rounded-full ml-auto"
+                    style="display: none;">0</span>
+            </a>
+            <a href="users.html" id="nav-users"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span>Quản lý User</span>
+            </a>
+            <a href="customers.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a href="reports.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span>Báo cáo</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
+                onclick="window.location.href='profile.html'">
+                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
+                    <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
+                </div>
+            </div>
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Quản lý Hành Trình</h1>
+                <p class="text-gray-500 text-sm">Cập nhật và chỉnh sửa thông tin các tour trekking.</p>
+            </div>
+            <button id="btn-add-tour" onclick="openAddTourModal()"
+                class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>Thêm tour mới</span>
+            </button>
+        </header>
+
+        <!-- Quản Lý Tour Table -->
+        <div class="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                <h3 class="font-black text-gray-800 uppercase tracking-tight">Danh sách Tour hiện có</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Tên Tour</th>
+                            <th class="px-6 py-4">Thời gian</th>
+                            <th class="px-6 py-4">Giá trị</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                            <th class="px-6 py-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-sm font-bold">Tà Năng - Phan Dũng</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm">2 Ngày 1 Đêm</td>
+                            <td class="px-6 py-4 text-sm font-bold text-primary">2.690.000đ</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hiển
+                                    thị</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <button class="text-gray-400 hover:text-primary transition-colors"><i
+                                        data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Tour Modal -->
+        <div id="addTourModal"
+            class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+            <div
+                class="bg-white w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl animate__animated animate__zoomIn">
+                <div class="p-8 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Thêm Tour Mới</h2>
+                    <button onclick="closeAddTourModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="p-8 overflow-y-auto max-h-[70vh]">
+                    <form id="addTourForm" class="space-y-6" onsubmit="saveTour(event)">
+                        <input type="hidden" id="edit-id">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Tên Tour</label>
+                                <input type="text" id="tour-name" placeholder="VD: Tà Năng Phan Dũng" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div class="col-span-2 grid grid-cols-3 gap-4">
+                                <div class="col-span-3">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Ảnh Chính (Hero)</label>
+                                    <input type="text" id="tour-image" placeholder="https://images.unsplash.com/..."
+                                        required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        1</label>
+                                    <input type="text" id="tour-image-2" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        2</label>
+                                    <input type="text" id="tour-image-3" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        3</label>
+                                    <input type="text" id="tour-image-4" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Mô tả ngắn</label>
+                                <textarea id="tour-short-desc" placeholder="Nhập mô tả ngắn gọn về tour..." rows="2"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Độ cao (Met)</label>
+                                <input type="text" id="tour-altitude" placeholder="VD: 2.287M"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Cấp độ</label>
+                                <select id="tour-level"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all font-bold">
+                                    <option value="Dễ">Dễ</option>
+                                    <option value="Trung Bình">Trung Bình</option>
+                                    <option value="Khó">Khó</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Vùng miền</label>
+                                <select id="tour-region"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                    <option value="Miền Nam">Miền Nam</option>
+                                    <option value="Miền Bắc">Miền Bắc</option>
+                                    <option value="Miền Trung">Miền Trung</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Loại hình</label>
+                                <select id="tour-type"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                    <option value="TREKKING">TREKKING</option>
+                                    <option value="CAMPING">CAMPING</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Thời gian</label>
+                                <input type="text" id="tour-duration" placeholder="VD: 2 Ngày 1 Đêm" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Giá tiền (VNĐ)</label>
+                                <input type="number" id="tour-price" placeholder="2690000" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                        </div>
+                        <div class="p-8 bg-gray-50 flex space-x-4">
+                            <button type="button" onclick="closeAddTourModal()"
+                                class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-100 rounded-2xl transition-all">Hủy</button>
+                            <button type="submit" id="submit-btn"
+                                class="flex-1 py-4 font-bold text-white bg-primary rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Lưu
+                                Tour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+        const TOURS_KEY = 'cam_site_tours';
+        const modal = document.getElementById('addTourModal');
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check Auth
+            currentUser = checkAuth();
+            if (currentUser) {
+                // Update Sidebar
+                document.getElementById('sidebar-avatar').src = currentUser.avatar;
+                document.getElementById('sidebar-name').textContent = currentUser.fullName;
+                document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
+
+                // Role Permissions
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('nav-users').classList.add('hidden'); // Hide User Management
+                    document.getElementById('btn-add-tour').classList.add('hidden'); // Hide Add Button
+                }
+            }
+
+            loadTours();
+            syncBadges();
+        });
+
+        // Đồng bộ số lượng khách hàng
+        function syncBadges() {
+            const LEADS_KEY = 'cam_site_leads';
+            const BOOKINGS_KEY = 'cam_site_bookings';
+
+            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
+            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
+            const lBadge = document.getElementById('leads-badge-count');
+            if (lBadge) {
+                lBadge.textContent = pendingLeads;
+                lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
+            }
+
+            const bBadge = document.getElementById('bookings-badge-count');
+            if (bBadge) {
+                bBadge.textContent = bookings.length;
+                bBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function openAddTourModal(editData = null) {
+            const title = modal.querySelector('h2');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (editData) {
+                title.innerText = 'Chỉnh Sửa Tour';
+                submitBtn.innerText = 'Cập nhật';
+                document.getElementById('edit-id').value = editData.id;
+                document.getElementById('tour-name').value = editData.name;
+                document.getElementById('tour-image').value = editData.image;
+                document.getElementById('tour-image-2').value = editData.image2 || '';
+                document.getElementById('tour-image-3').value = editData.image3 || '';
+                document.getElementById('tour-image-4').value = editData.image4 || '';
+                document.getElementById('tour-short-desc').value = editData.shortDesc || '';
+                document.getElementById('tour-altitude').value = editData.altitude || '';
+                document.getElementById('tour-level').value = editData.level || 'Trung Bình';
+                document.getElementById('tour-region').value = editData.region;
+                document.getElementById('tour-type').value = editData.type;
+                document.getElementById('tour-duration').value = editData.duration;
+                document.getElementById('tour-price').value = editData.price;
+            } else {
+                title.innerText = 'Thêm Tour Mới';
+                submitBtn.innerText = 'Lưu Tour';
+                document.getElementById('addTourForm').reset();
+                document.getElementById('edit-id').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddTourModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function loadTours() {
+            const tableBody = document.querySelector('tbody');
+            tableBody.innerHTML = '';
+            const data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+
+            // Add default if empty for first time demo
+            if (data.length === 0) {
+                const defaultTours = [
+                    { id: 1, name: 'Tà Năng - Phan Dũng', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100', region: 'Miền Nam', type: 'TREKKING', duration: '2 Ngày 1 Đêm', price: 2690000 }
+                ];
+                localStorage.setItem(TOURS_KEY, JSON.stringify(defaultTours));
+                defaultTours.forEach(item => renderRow(item));
+            } else {
+                data.forEach(item => renderRow(item));
+            }
+        }
+
+        function renderRow(item) {
+            const tableBody = document.querySelector('tbody');
+
+            // Check Access
+            let actionButtons = '';
+            if (currentUser && currentUser.role === 'admin') {
+                actionButtons = `
+                    <button onclick='openAddTourModal(${JSON.stringify(item)})' class="text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="deleteTour(${item.id})" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+            } else {
+                actionButtons = `
+                    <span class="text-gray-300 text-xs italic cursor-not-allowed">Chỉ xem</span>
+                `;
+            }
+
+            const newRow = `
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
+                                <img src="${item.image}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm font-bold">${item.name}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm">${item.duration}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-primary">${parseInt(item.price).toLocaleString('vi-VN')}đ</td>
+                    <td class="px-6 py-4">
+                        <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hiển thị</span>
+                    </td>
+                    <td class="px-6 py-4 space-x-2">
+                        ${actionButtons}
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', newRow);
+            lucide.createIcons();
+        }
+
+        function saveTour(event) {
+            event.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const tour = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('tour-name').value,
+                image: document.getElementById('tour-image').value,
+                image2: document.getElementById('tour-image-2').value,
+                image3: document.getElementById('tour-image-3').value,
+                image4: document.getElementById('tour-image-4').value,
+                shortDesc: document.getElementById('tour-short-desc').value,
+                altitude: document.getElementById('tour-altitude').value,
+                level: document.getElementById('tour-level').value,
+                region: document.getElementById('tour-region').value,
+                type: document.getElementById('tour-type').value,
+                duration: document.getElementById('tour-duration').value,
+                price: document.getElementById('tour-price').value
+            };
+
+            let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            if (id) {
+                data = data.map(d => d.id === parseInt(id) ? tour : d);
+            } else {
+                data.push(tour);
+            }
+
+            localStorage.setItem(TOURS_KEY, JSON.stringify(data));
+            loadTours();
+            closeAddTourModal();
+        }
+
+        function deleteTour(id) {
+            if (confirm('Dữ liệu các lịch trình liên quan đến tour này có thể bị ảnh hưởng. Bạn vẫn muốn xóa?')) {
+                let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+                data = data.filter(d => d.id !== id);
+                localStorage.setItem(TOURS_KEY, JSON.stringify(data));
+                loadTours();
+            }
+        }
+    </script>
+</body>
+
+</html>

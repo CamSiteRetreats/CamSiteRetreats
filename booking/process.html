@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoàn tất đặt chỗ - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/crm.js"></script> <!-- CRM Logic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .step-active {
+            border-color: #E85D04;
+            color: #E85D04;
+        }
+
+        .step-point-active {
+            background-color: #E85D04;
+            color: white;
+            border-color: #E85D04;
+        }
+
+        .waiver-box {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            color: #555;
+            background: #f9fafb;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen pb-20">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2">
+                <img src="../logo.png" alt="Logo" class="h-10 w-auto object-contain">
+            </a>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Booking Process
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-6 py-8">
+
+        <!-- Steps Progress -->
+        <div class="flex items-center justify-between mb-10 relative">
+            <div class="absolute left-0 top-1/2 w-full h-0.5 bg-gray-200 -z-10"></div>
+
+            <!-- Step 1 -->
+            <div class="flex flex-col items-center gap-2 bg-gray-50 px-2 z-10 step-indicator" data-step="1">
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-primary bg-primary text-white flex items-center justify-center font-bold text-sm">
+                    1</div>
+                <span class="text-[10px] uppercase font-bold text-primary tracking-wider">Cá nhân</span>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex flex-col items-center gap-2 bg-gray-50 px-2 z-10 step-indicator" data-step="2">
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-gray-300 bg-white text-gray-400 flex items-center justify-center font-bold text-sm">
+                    2</div>
+                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Khảo sát</span>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center gap-2 bg-gray-50 px-2 z-10 step-indicator" data-step="3">
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-gray-300 bg-white text-gray-400 flex items-center justify-center font-bold text-sm">
+                    3</div>
+                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Cam kết</span>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="flex flex-col items-center gap-2 bg-gray-50 px-2 z-10 step-indicator" data-step="4">
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-gray-300 bg-white text-gray-400 flex items-center justify-center font-bold text-sm">
+                    4</div>
+                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Cọc</span>
+            </div>
+        </div>
+
+        <!-- Notification Area -->
+        <div id="notification-area"></div>
+
+        <form id="booking-form" onsubmit="return false;" class="space-y-8 animate__animated animate__fadeIn">
+
+            <!-- STEP 1: PERSONAL INFO -->
+            <div id="step-1" class="step-content">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="user" class="w-5 h-5 text-primary"></i> Thông tin khách hàng
+                    </h2>
+
+                    <!-- Tour Info Display (Read only) -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
+                        <div>
+                            <span class="block text-gray-400 text-xs uppercase font-bold mb-1">Tour</span>
+                            <input type="text" id="tour-name"
+                                class="w-full font-bold text-gray-800 bg-transparent border-none p-0" readonly>
+                        </div>
+                        <div>
+                            <span class="block text-gray-400 text-xs uppercase font-bold mb-1">Ngày khởi hành</span>
+                            <input type="text" id="tour-date"
+                                class="w-full font-bold text-primary bg-transparent border-none p-0" readonly>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Họ và tên *</label>
+                            <input type="text" id="cust-name"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ngày sinh *</label>
+                            <input type="date" id="cust-dob"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Số điện thoại *</label>
+                            <input type="tel" id="cust-phone"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Giới tính *</label>
+                            <select id="cust-gender"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Số CCCD / Hộ chiếu *</label>
+                        <input type="text" id="cust-idcard"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                            placeholder="Nhập số CCCD để mua bảo hiểm" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Địa chỉ thường trú *</label>
+                        <input type="text" id="cust-address"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                            placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/TP" required>
+                    </div>
+                </div>
+                <button type="button" onclick="nextStep(2)"
+                    class="w-full mt-6 bg-primary text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
+                    Tiếp tục: Khảo sát
+                </button>
+            </div>
+
+            <!-- STEP 2: HEALTH & DIET -->
+            <div id="step-2" class="step-content hidden animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="utensils" class="w-5 h-5 text-primary"></i> Khảo sát ăn uống & Yêu cầu
+                    </h2>
+
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <span class="font-bold text-gray-700 text-sm">Bạn có ăn chay không?</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="diet-vegetarian" class="sr-only peer">
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <span class="font-bold text-gray-700 text-sm">Bạn có muốn mượn gậy trekking không?</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="diet-trekking-pole" class="sr-only peer">
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Bạn có dị ứng với gì
+                            không?</label>
+                        <input type="text" id="diet-allergy"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                            placeholder="Ví dụ: Hải sản, đậu phộng, phấn hoa...">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Bạn có yêu cầu đặc biệt gì
+                            không?</label>
+                        <textarea id="diet-special"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors h-24 resize-none"
+                            placeholder="Ví dụ: Cần hỗ trợ xe đưa đón, thuê thêm lều riêng..."></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="nextStep(1)"
+                        class="w-1/3 bg-gray-100 text-gray-600 font-bold text-lg py-4 rounded-2xl hover:bg-gray-200 transition-all">
+                        Quay lại
+                    </button>
+                    <button type="button" onclick="nextStep(3)"
+                        class="flex-1 bg-primary text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
+                        Tiếp tục: Cam kết
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: WAIVERS -->
+            <div id="step-3" class="step-content hidden animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i> Cam kết tham gia
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
+                            <input type="checkbox" id="commitment-health"
+                                class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="commitment-health"
+                                class="text-sm text-gray-700 leading-snug cursor-pointer select-none font-medium">
+                                Tôi cam kết <span class="text-red-600 font-bold">KHÔNG</span> mắc các bệnh liên quan đến
+                                đường hô hấp, tim mạch, xương khớp và hoàn toàn tự chịu trách nhiệm khi có vấn đề sức
+                                khỏe liên quan xảy ra trong chuyến đi.
+                            </label>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <input type="checkbox" id="commitment-waiver"
+                                class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="commitment-waiver"
+                                class="text-sm text-gray-600 leading-snug cursor-pointer select-none">
+                                Tôi đồng ý với điều khoản <span class="font-bold">Miễn trừ trách nhiệm</span> của Cam
+                                Site Retreats (không chịu trách nhiệm với các tai nạn do lỗi chủ quan cá nhân).
+                            </label>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <input type="checkbox" id="commitment-rules"
+                                class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="commitment-rules"
+                                class="text-sm text-gray-600 leading-snug cursor-pointer select-none">
+                                Tôi cam kết <span class="font-bold">Tuân thủ quy định</span> của đoàn, hướng dẫn của HDV
+                                và giữ gìn vệ sinh môi trường.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="nextStep(2)"
+                        class="w-1/3 bg-gray-100 text-gray-600 font-bold text-lg py-4 rounded-2xl hover:bg-gray-200 transition-all">
+                        Quay lại
+                    </button>
+                    <button type="button" onclick="nextStep(4)"
+                        class="flex-1 bg-primary text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
+                        Tiếp tục: Thanh toán Cọc
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 4: PAYMENT (DEPOSIT) -->
+            <div id="step-4" class="step-content hidden animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền cọc cần thanh toán
+                    </p>
+                    <div class="text-4xl font-black text-primary mb-2">500.000đ</div>
+                    <p class="text-xs text-gray-500 italic mb-8">Vui lòng chuyển khoản để giữ chỗ</p>
+
+                    <div
+                        class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
+                        <div class="scale-90 origin-center mb-4">
+                            <!-- Placeholder QR -->
+                            <div
+                                class="w-48 h-48 bg-white mx-auto border-2 border-primary rounded-xl flex items-center justify-center">
+                                <span class="text-gray-300 font-bold">QR CODE</span>
+                            </div>
+                        </div>
+                        <div class="text-left space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Ngân hàng:</span>
+                                <span class="font-bold">Vietcombank</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Số tài khoản:</span>
+                                <span class="font-bold text-lg tracking-wide">0123 456 789</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Chủ tài khoản:</span>
+                                <span class="font-bold uppercase">NGUYEN VAN CAM</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-yellow-50 p-2 rounded-lg -mx-2">
+                                <span class="text-gray-500 text-xs">Nội dung CK:</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-primary font-mono" id="transfer-content">CAM
+                                        XXXXX</span>
+                                    <button onclick="copyContent()" class="text-gray-400 hover:text-primary"><i
+                                            data-lucide="copy" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-left bg-blue-50 p-4 rounded-xl mb-8 flex gap-3 text-blue-700 text-sm">
+                        <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <p>Sau khi chuyển khoản thành công, hãy nhấn nút "Xác nhận đã chuyển khoản" bên dưới. Hệ thống
+                            sẽ ghi nhận và Admin sẽ kiểm tra ngay lập tức.</p>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="button" onclick="nextStep(3)"
+                            class="w-1/3 bg-gray-100 text-gray-600 font-bold text-lg py-4 rounded-2xl hover:bg-gray-200 transition-all">
+                            Quay lại
+                        </button>
+                        <button type="button" onclick="confirmTransfer()"
+                            class="flex-1 bg-green-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-green-600/30 hover:scale-[1.02] active:scale-95 transition-all">
+                            Xác nhận đã chuyển khoản
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- SUCCESS SECTION (Hidden) -->
+        <div id="success-section" class="hidden text-center py-10 animate__animated animate__fadeIn">
+            <div
+                class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+                <i data-lucide="check" class="w-10 h-10 stroke-[3]"></i>
+            </div>
+            <h2 class="text-2xl font-black text-gray-800 mb-4">Gửi xác nhận thành công!</h2>
+            <p class="text-gray-500 max-w-md mx-auto leading-relaxed mb-8">
+                Cảm ơn bạn đã hoàn tất thủ tục. Chúng tôi đã nhận được thông tin và sẽ xác nhận thanh toán trong vòng
+                1-2 giờ làm việc.
+            </p>
+            <a href="../index.html"
+                class="inline-block px-8 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">
+                Về trang chủ
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Initial Logic
+        const params = new URLSearchParams(window.location.search);
+        const leadData = {
+            id: params.get('leadId') || Date.now(),
+            name: params.get('name') || '',
+            phone: params.get('phone') || '',
+            tour: params.get('tour') || '',
+            date: params.get('date') || '',
+            saleId: params.get('saleId') || null,
+            saleName: params.get('saleName') || null
+        };
+
+        // Populate Read-only Info
+        document.getElementById('tour-name').value = leadData.tour;
+        document.getElementById('tour-date').value = leadData.date;
+        document.getElementById('cust-name').value = leadData.name;
+        document.getElementById('cust-phone').value = leadData.phone;
+
+        // Generate Transfer Code
+        const transferCode = `CAM ${leadData.id.toString().slice(-6)}`;
+        document.getElementById('transfer-content').textContent = transferCode;
+
+        function copyContent() {
+            navigator.clipboard.writeText(transferCode);
+            alert('Đã copy nội dung chuyển khoản!');
+        }
+
+        // 2. Wizard Logic
+        let currentStep = 1;
+
+        function nextStep(step) {
+            // Validation Logic
+            if (step > currentStep) {
+                if (!validateStep(currentStep)) return;
+            }
+
+            // Update UI
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+
+            // Update Indicators
+            document.querySelectorAll('.step-indicator div').forEach((el, index) => {
+                if (index + 1 <= step) {
+                    el.classList.remove('bg-white', 'text-gray-400', 'border-gray-300');
+                    el.classList.add('bg-primary', 'text-white', 'border-primary');
+                    el.nextElementSibling.classList.remove('text-gray-400');
+                    el.nextElementSibling.classList.add('text-primary');
+                } else {
+                    el.classList.add('bg-white', 'text-gray-400', 'border-gray-300');
+                    el.classList.remove('bg-primary', 'text-white', 'border-primary');
+                    el.nextElementSibling.classList.add('text-gray-400');
+                    el.nextElementSibling.classList.remove('text-primary');
+                }
+            });
+
+            currentStep = step;
+            window.scrollTo(0, 0);
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                const requiredIds = ['cust-name', 'cust-dob', 'cust-phone', 'cust-idcard', 'cust-address'];
+                for (const id of requiredIds) {
+                    const el = document.getElementById(id);
+                    if (!el.value.trim()) {
+                        alert('Vui lòng điền đầy đủ thông tin bắt buộc (*)!');
+                        el.focus();
+                        return false;
+                    }
+                }
+            }
+            if (step === 3) {
+                const requiredChecks = ['commitment-health', 'commitment-waiver', 'commitment-rules'];
+                for (const id of requiredChecks) {
+                    if (!document.getElementById(id).checked) {
+                        alert('Bạn cần đồng ý với tất cả các cam kết để tiếp tục!');
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // 3. Submit Logic
+        function confirmTransfer() {
+            if (!confirm('Bạn chắc chắn đã chuyển khoản và muốn hoàn tất đăng ký?')) return;
+
+            // Gather Data
+            const bookingData = {
+                id: leadData.id,
+                tour: leadData.tour,
+                date: leadData.date,
+
+                // Step 1: Personal
+                name: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                dob: document.getElementById('cust-dob').value,
+                gender: document.getElementById('cust-gender').value,
+                idCard: document.getElementById('cust-idcard').value,
+                address: document.getElementById('cust-address').value,
+
+                // Step 2: Health
+                diet: document.getElementById('diet-vegetarian').checked ? 'Ăn chay' : 'Không',
+                trekkingPole: document.getElementById('diet-trekking-pole').checked ? 'Có' : 'Không',
+                allergy: document.getElementById('diet-allergy').value,
+                special: document.getElementById('diet-special').value,
+
+                // Step 3: Commitments (Implicitly true if submitted)
+                commitments: true,
+
+                // Step 4: Payment
+                deposit: 500000,
+                totalPrice: (function () {
+                    const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
+                    const found = tours.find(t => t.name === leadData.tour);
+                    return found ? Number(found.price) : 3200000;
+                })(),
+                status: 'Chờ xác nhận cọc',
+
+                // Sale Info (Preserved from Link)
+                saleId: leadData.saleId,
+                saleName: leadData.saleName,
+
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to LocalStorage
+            const BOOKINGS_KEY = 'cam_site_bookings';
+            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            bookings.push(bookingData);
+            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+
+            // Sync to Customer DB & Update Booking with Customer ID
+            try {
+                const customerId = syncCustomerFromBooking(bookingData);
+                if (customerId) {
+                    bookings[bookings.length - 1].customerId = customerId;
+                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+                }
+            } catch (e) {
+                console.error('CRM Sync Error:', e);
+            }
+
+            // Show Success
+            document.getElementById('booking-form').classList.add('hidden');
+            document.getElementById('success-section').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+
+</html>
