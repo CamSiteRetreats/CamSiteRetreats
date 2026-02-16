@@ -10,6 +10,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script src="../js/tour-manager.js"></script> <!-- Tour Logic -->
     <script>
         tailwind.config = {
             theme: {
@@ -409,8 +410,27 @@
 
         function renderRow(item) {
             const tableBody = document.getElementById('schedule-table-body');
-            const statusClass = item.status === 'Đang mở' ? 'text-green-500 bg-green-50' :
-                item.status === 'Sắp hết' ? 'text-orange-500 bg-orange-50' :
+
+            // Calculate availability using TourManager
+            let booked = 0;
+            let status = item.status;
+            let remaining = item.slots;
+
+            if (typeof TourManager !== 'undefined') {
+                const availability = TourManager.getScheduleAvailability(item.tour, item.startDate, item.slots);
+                booked = availability.booked;
+                remaining = availability.remaining;
+
+                // Override status based on real availability if it's "Đang mở" or "Sắp hết"
+                // but if admin manually set "Hết chỗ" or "Đã hủy", maybe keep it? 
+                // For now, let's Auto-update status based on availability to ensure consistency with user request
+                if (remaining <= 0) status = 'Hết chỗ';
+                else if (remaining <= 3) status = 'Sắp hết';
+                else status = 'Đang mở';
+            }
+
+            const statusClass = status === 'Đang mở' ? 'text-green-500 bg-green-50' :
+                status === 'Sắp hết' ? 'text-orange-500 bg-orange-50' :
                     'text-red-500 bg-red-50';
 
             const displayDate = `${new Date(item.startDate).toLocaleDateString('vi-VN')} - ${new Date(item.endDate).toLocaleDateString('vi-VN')}`;
@@ -437,9 +457,9 @@
                     <td class="px-6 py-4 text-sm font-bold">${item.tour}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${displayDate}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${item.slots}</td>
-                    <td class="px-6 py-4 text-sm text-primary font-bold">0</td>
+                    <td class="px-6 py-4 text-sm text-primary font-bold">${booked}</td>
                     <td class="px-6 py-4">
-                        <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${item.status}</span>
+                        <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${status}</span>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
                         ${actionButtons}

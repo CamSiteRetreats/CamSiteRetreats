@@ -11,6 +11,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="../js/auth.js"></script> <!-- Auth Logic -->
+    <script src="../js/tour-manager.js"></script> <!-- Tour Logic -->
     <script src="../js/crm.js"></script> <!-- CRM Logic -->
     <script>
         tailwind.config = {
@@ -205,6 +206,11 @@
                     <option value="Đang liên hệ">Đang liên hệ</option>
                     <option value="Chờ cọc">Chờ cọc</option>
                 </select>
+
+                <button onclick="openAddLeadModal()"
+                    class="bg-primary text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-transform flex items-center gap-2 ml-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Thêm thủ công
+                </button>
             </div>
         </header>
 
@@ -312,6 +318,59 @@
         </div>
     </div>
     </main>
+
+    <!-- Add Modal -->
+    <div id="add-modal" class="modal" onclick="if(event.target === this) closeAddModal()">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Thêm khách hàng thủ công</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form id="add-lead-form" onsubmit="saveAddLead(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Họ tên *</label>
+                    <input type="text" id="add-name"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Số điện thoại *</label>
+                    <input type="text" id="add-phone"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Tour quan tâm</label>
+                    <select id="add-tour" onchange="updateAddLeadDates()"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <option value="">-- Chọn Tour --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Ngày dự kiến</label>
+                    <select id="add-date"
+                        class="w-full p-3 bg-gray-50 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <option value="">-- Chọn Ngày --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Ghi chú</label>
+                    <textarea id="add-message" rows="3"
+                        class="w-full p-3 bg-gray-50 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeAddModal()"
+                        class="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">Hủy</button>
+                    <button type="submit"
+                        class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
+                        Thêm khách hàng
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         lucide.createIcons();
@@ -658,7 +717,23 @@
 
             // Use URL API for robust path resolution (handles /ADMIN/ vs /admin/ automatically)
             // Assuming current page is .../ADMIN/leads.html, target is .../booking/process.html
-            const bookingUrl = new URL('../booking/process.html', window.location.href).href + '?' + queryParams;
+
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+
+            const params = new URLSearchParams();
+            params.set('leadId', lead.id);
+            params.set('name', lead.name);
+            params.set('phone', lead.phone);
+            params.set('tour', lead.tour);
+            if (lead.date) params.set('date', lead.date);
+            if (lead.saleId) {
+                params.set('saleId', lead.saleId);
+                params.set('saleName', lead.saleName);
+            }
+
+            const bookingUrl = new URL('../booking/process.html', window.location.href).href + '?' + params.toString();
 
             navigator.clipboard.writeText(bookingUrl).then(() => {
                 alert(`✅ Đã copy Link đặt chỗ!\n\nLink này an toàn để gửi cho khách hàng, chứa sẵn thông tin họ tên và tour.\n\n${bookingUrl}`);
@@ -729,6 +804,125 @@
             }
         }
 
+        // --- Add Lead Logic ---
+        function openAddLeadModal() {
+            document.getElementById('add-lead-form').reset();
+            loadAddLeadTours(); // Load dynamic options
+            document.getElementById('add-modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function loadAddLeadTours() {
+            const tourSelect = document.getElementById('add-tour');
+            const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
+
+            tourSelect.innerHTML = '<option value="">-- Chọn Tour --</option>';
+            tours.forEach(tour => {
+                const option = document.createElement('option');
+                option.value = tour.name;
+                option.textContent = tour.name;
+                tourSelect.appendChild(option);
+            });
+
+            // Reset Date Select
+            updateAddLeadDates();
+        }
+
+        function updateAddLeadDates() {
+            const tourName = document.getElementById('add-tour').value;
+            const dateSelect = document.getElementById('add-date');
+
+            dateSelect.innerHTML = '<option value="">-- Chọn Ngày --</option>';
+
+            if (!tourName) return;
+
+            const schedules = JSON.parse(localStorage.getItem('cam_site_schedules')) || [];
+            let tourSchedules = schedules.filter(s => s.tour === tourName);
+
+            // Filter out schedules that are explicitly marked as "Hết chỗ" AND check real availability
+            // Or better, just rely on real availability?
+            // Let's rely on real availability primarily, but respect manual "Hết chỗ" if it was set?
+            // Actually, getScheduleAvailability doesn't check 'status' field of schedule, it counts bookings.
+            // But we should probably filter out those where calculate remaining <= 0.
+
+            tourSchedules = tourSchedules.filter(sch => {
+                if (typeof TourManager !== 'undefined') {
+                    const avail = TourManager.getScheduleAvailability(sch.tour, sch.startDate, sch.slots);
+                    sch.realRemaining = avail.remaining;
+                    return avail.remaining > 0;
+                }
+                return sch.status !== 'Hết chỗ';
+            });
+
+            if (tourSchedules.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "Không có lịch trình khả dụng";
+                option.disabled = true;
+                dateSelect.appendChild(option);
+                return;
+            }
+
+            tourSchedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+            tourSchedules.forEach(sch => {
+                const option = document.createElement('option');
+                // Format: 15/03/2026
+                const d = new Date(sch.startDate);
+                const dateStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+                option.value = dateStr; // Store formatted date as value to match existing logic
+                option.textContent = `${dateStr} (Còn ${sch.realRemaining} chỗ)`;
+                dateSelect.appendChild(option);
+            });
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+        }
+
+        function saveAddLead(e) {
+            e.preventDefault();
+            const name = document.getElementById('add-name').value;
+            const phone = document.getElementById('add-phone').value;
+            const tour = document.getElementById('add-tour').value;
+            const date = document.getElementById('add-date').value;
+            const message = document.getElementById('add-message').value;
+
+            // Auto-assign current user as sale if available
+            let leadStatus = 'Chờ tư vấn';
+            let saleId = null;
+            let saleName = null;
+            let saleAvatar = null;
+
+            if (currentUser) {
+                saleId = currentUser.id;
+                saleName = currentUser.fullName;
+                saleAvatar = currentUser.avatar;
+                leadStatus = 'Đang liên hệ'; // Active handling since created manually by a user
+            }
+
+            const newLead = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                tour: tour,
+                date: date,
+                message: message,
+                status: leadStatus,
+                saleId: saleId,
+                saleName: saleName,
+                saleAvatar: saleAvatar,
+                createdAt: new Date().toISOString()
+            };
+
+            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            leads.push(newLead);
+            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+
+            alert('Đã thêm khách hàng tư vấn mới thành công!');
+            closeAddModal();
+            loadLeads();
+        }
 
     </script>
 </body>

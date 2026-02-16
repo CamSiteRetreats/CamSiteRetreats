@@ -32,14 +32,56 @@ const TourManager = {
         if (tour) {
             // Attach schedules from separate key
             const schedulesData = JSON.parse(localStorage.getItem('cam_site_schedules')) || [];
-            tour.schedules = schedulesData.filter(s => s.tour === tour.name);
+
+            // Filter schedules for this tour
+            let tourSchedules = schedulesData.filter(s => s.tour === tour.name);
 
             // If no schedules in LocalStorage, check if there are default ones
-            if (tour.schedules.length === 0 && tour.defaultSchedules) {
-                tour.schedules = tour.defaultSchedules;
+            if (tourSchedules.length === 0 && tour.defaultSchedules) {
+                tourSchedules = tour.defaultSchedules;
             }
+
+            // Calculate availability for each schedule
+            tour.schedules = tourSchedules.map(sch => {
+                const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);
+                return {
+                    ...sch,
+                    booked: availability.booked,
+                    remaining: availability.remaining,
+                    calculatedStatus: availability.remaining <= 0 ? 'Hết chỗ' : (availability.remaining <= 3 ? 'Sắp hết' : 'Đang mở')
+                };
+            });
         }
         return tour;
+    },
+
+    // NEW: Calculate real-time availability
+    getScheduleAvailability: function (tourName, startDateStr, maxSlots) {
+        const bookings = JSON.parse(localStorage.getItem('cam_site_bookings')) || [];
+
+        // Count confirmed/pending bookings (Exclude 'Đã hủy')
+        // Matching by Tour Name and Start Date
+        // Note: Booking date might need normalization depending on how it's stored. 
+        // Assuming booking.date matches schedule.startDate format or we compare loosely.
+
+        // Normalize date for comparison (YYYY-MM-DD)
+        const normalizeDate = (d) => new Date(d).toISOString().split('T')[0];
+        const targetDate = normalizeDate(startDateStr);
+
+        const bookedCount = bookings.filter(b => {
+            return b.tourName === tourName &&
+                normalizeDate(b.date) === targetDate &&
+                b.status !== 'Đã hủy';
+        }).length;
+
+        const max = parseInt(maxSlots) || 0;
+        const remaining = Math.max(0, max - bookedCount);
+
+        return {
+            max: max,
+            booked: bookedCount,
+            remaining: remaining
+        };
     },
 
     // Get random tours (excluding current)
@@ -155,8 +197,8 @@ const TourManager = {
 
         // CSS classes based on screen size/context
         const cardClass = isCompact
-            ? "tour-item group"
-            : "tour-card w-[340px] md:w-[400px] bg-white rounded-[24px] shadow-md snap-center flex-shrink-0 border border-gray-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 overflow-hidden flex flex-col group";
+            ? "tour-item group bg-white rounded-[24px] shadow-lg border-2 border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden flex flex-col"
+            : "tour-card w-[340px] md:w-[400px] bg-white rounded-[24px] shadow-lg snap-center flex-shrink-0 border-2 border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden flex flex-col group";
 
         const tourType = (tour.type || 'TREKKING').toLowerCase();
         const tourRegion = this.mapRegion(tour.region || '');
@@ -172,27 +214,27 @@ const TourManager = {
                     </div>
                     ${this.createImageSlideshow(tour)}
                 </div>
-                <div class="p-6 flex flex-col flex-grow justify-between">
+                <div class="p-5 flex flex-col flex-grow justify-between">
                     <div>
-                        <div class="flex items-center gap-2 text-orange-500 font-bold text-sm mb-3">
-                            <i data-lucide="clock" class="w-4 h-4"></i>
+                        <div class="flex items-center gap-2 text-orange-500 font-bold text-xs mb-2">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
                             <span>${tour.duration}</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors line-clamp-1">
                             ${tour.name}
                         </h3>
-                        <p class="text-gray-500 text-sm line-clamp-2 mb-4">
+                        <p class="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
                             ${tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
                         </p>
                     </div>
 
-                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
                         <div>
-                            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Chi phí</p>
-                            <p class="text-2xl font-black text-orange-500">${priceStr}</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Chi phí</p>
+                            <p class="text-xl font-black text-orange-500">${priceStr}</p>
                         </div>
                         <a href="${tourUrl}"
-                            class="bg-gray-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-primary transition-all active:scale-95 shadow-md flex items-center justify-center">
+                            class="bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-primary transition-all active:scale-95 shadow-md flex items-center justify-center">
                             CHI TIẾT
                         </a>
                     </div>

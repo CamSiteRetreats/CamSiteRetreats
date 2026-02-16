@@ -1224,24 +1224,60 @@
             const tourSchedules = schedulesData.filter(item => item.tour === selectedTour);
 
             if (tourSchedules.length > 0) {
+                // Sort by date logic if needed, currently they seem pre-sorted or random order
+                tourSchedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
                 tourSchedules.forEach(item => {
-                    const statusClass = item.status === 'Đang mở' ? 'text-primary' : 'text-gray-400';
-                    const opacityClass = item.status === 'Hết chỗ' ? 'opacity-50 cursor-not-allowed' : '';
+                    // Calculate Real Availability
+                    let remaining = item.slots;
+                    if (typeof TourManager !== 'undefined') {
+                        const avail = TourManager.getScheduleAvailability(item.tour, item.startDate, item.slots);
+                        remaining = avail.remaining;
+                    }
+
+                    // Determine Status based on Remaining Slots
+                    let statusText = '';
+                    let statusClass = '';
+                    let opacityClass = '';
+                    let isClickable = true;
+
+                    if (remaining <= 0) {
+                        statusText = 'Hết chỗ';
+                        statusClass = 'text-gray-400';
+                        opacityClass = 'opacity-50 cursor-not-allowed bg-gray-100'; // Make it look disabled
+                        isClickable = false;
+                    } else if (remaining <= 3) {
+                        statusText = `Chỉ còn ${remaining} chỗ`;
+                        statusClass = 'text-orange-500';
+                        opacityClass = ''; // Normal
+                    } else {
+                        statusText = `Còn ${remaining} chỗ`;
+                        statusClass = 'text-primary';
+                        opacityClass = '';
+                    }
+
+                    // Override if manually set to closed/cancelled? (Optional, but let's respect "Hết chỗ" status from admin if set manually)
+                    if (item.status === 'Hết chỗ') {
+                        statusText = 'Hết chỗ';
+                        statusClass = 'text-gray-400';
+                        opacityClass = 'opacity-50 cursor-not-allowed bg-gray-100';
+                        isClickable = false;
+                    }
 
                     const start = new Date(item.startDate);
                     const end = new Date(item.endDate);
                     const formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
 
-                    const clickAction = item.status === 'Hết chỗ' ? '' : `onclick="selectDate(this, '${formattedDisplay}')"`;
+                    const clickAction = isClickable ? `onclick="selectDate(this, '${formattedDisplay}')"` : '';
 
                     const scheduleHTML = `
                         <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}"
                             ${clickAction}>
                             <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
-                            <span class="text-[13px] date-status ${statusClass} font-bold">${item.status === 'Hết chỗ' ? 'Hết chỗ' : 'Còn ' + item.slots + ' chỗ'}</span>
+                            <span class="text-[13px] date-status ${statusClass} font-bold">${statusText}</span>
                         </div>
                     `;
-                    dateSelector.insertAdjacentHTML('afterbegin', scheduleHTML);
+                    dateSelector.insertAdjacentHTML('beforeend', scheduleHTML);
                 });
             } else {
                 dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>';
