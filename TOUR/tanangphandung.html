@@ -1219,7 +1219,7 @@
     <div class="mobile-sticky-cta animate__animated animate__fadeInUp">
         <div>
             <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest leading-none mb-1">Giá tour từ</p>
-            <p class="text-xl font-black text-primary leading-none">3.200.000đ</p>
+            <p id="mobile-tour-price-display" class="text-xl font-black text-primary leading-none">3.200.000đ</p>
         </div>
         <button onclick="window.location.href='#booking-form'"
             class="bg-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all uppercase text-sm tracking-widest">
@@ -1307,6 +1307,7 @@
 
             const dateSelector = document.getElementById('date-selector');
             const priceDisplay = document.getElementById('tour-price-display');
+            const mobilePriceDisplay = document.getElementById('mobile-tour-price-display');
 
             // Sync Price
             const currentTour = toursData.find(t => t.name === selectedTour);
@@ -1314,8 +1315,11 @@
                 // Format price with dots (e.g., 3.200.000)
                 const formattedPrice = Number(currentTour.price).toLocaleString('vi-VN') + 'đ';
                 priceDisplay.textContent = formattedPrice;
+                if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
             } else if (selectedTour === 'Tà Năng - Phan Dũng') {
-                priceDisplay.textContent = '3.200.000đ'; // Default fallback
+                const defaultPrice = '3.200.000đ';
+                priceDisplay.textContent = defaultPrice;
+                if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
             }
 
             dateSelector.innerHTML = '';
