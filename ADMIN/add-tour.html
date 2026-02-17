@@ -148,6 +148,25 @@
                                 <option>CYCLING</option>
                             </select>
                         </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Thời gian</label>
+                            <input type="text" id="tour-duration-top" placeholder="2 ngày 1 đêm" required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Độ cao (Lên tới)</label>
+                            <input type="text" id="tour-altitude-top" placeholder="1100m"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Cấp độ kỹ thuật</label>
+                            <select id="tour-level-top"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-100 outline-none">
+                                <option>Cơ bản</option>
+                                <option>Trung bình</option>
+                                <option>Thách thức</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -603,6 +622,10 @@
                     });
                 }
 
+                document.getElementById('tour-duration-top').value = tour.duration || '';
+                document.getElementById('tour-altitude-top').value = tour.altitude || '';
+                document.getElementById('tour-level-top').value = tour.level || 'Cơ bản';
+
                 document.querySelector('h1').innerText = 'Chỉnh sửa: ' + tour.name;
             } catch (err) {
                 console.error(err);
@@ -611,90 +634,124 @@
 
         async function saveTour(event) {
             event.preventDefault();
+            console.log("Bat dau luu tour...");
+
             const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Đang lưu PRO MAX...';
-
-            const cardImages = Array.from(document.getElementById('card-slideshow-container').querySelectorAll('input')).map(i => i.value).filter(v => v);
-            const galleryImages = Array.from(document.getElementById('detail-gallery-container').querySelectorAll('input')).map(i => i.value).filter(v => v);
-
-            const itinerary = Array.from(document.getElementById('itinerary-days-container').children).map(div => {
-                const day = div.querySelector('.tour-itinerary-day-label').value;
-                const title = div.querySelector('.tour-itinerary-day-title').value;
-                const events = Array.from(div.querySelectorAll('.tour-day-events-container div')).map(e => {
-                    const t = e.querySelector('.tour-event-time').value;
-                    const c = e.querySelector('.tour-event-content').value;
-                    return t ? `${t}: ${c}` : c;
-                }).filter(v => v);
-                return { day, title, events };
-            });
-
-            const inclusions = [];
-            DEFAULT_INCLUSIONS.forEach(item => {
-                const cb = document.getElementById(`inc-${item.id}`);
-                if (cb.checked) {
-                    const desc = cb.closest('.inclusion-item').querySelector('textarea').value;
-                    inclusions.push({ id: item.id, title: item.title, icon: item.icon, desc });
-                }
-            });
-
-            const exclusions = Array.from(document.getElementById('exclusions-container').children).map(row => ({
-                title: row.querySelector('.tour-exclusion-title').value,
-                content: row.querySelector('.tour-exclusion-content').value
-            })).filter(v => v.title);
-
-            const id = document.getElementById('edit-id').value;
-            const tour = {
-                id: id ? parseInt(id) : null,
-                name: document.getElementById('tour-name').value,
-                slug: document.getElementById('tour-slug').value,
-                image: cardImages[0] || '',
-                image2: cardImages[1] || '',
-                image3: cardImages[2] || '',
-                image4: cardImages[3] || '',
-                hero_image: document.getElementById('tour-hero-image').value,
-                short_desc: document.getElementById('tour-short-desc').value,
-                long_desc: document.getElementById('tour-long-desc').value,
-                region: document.getElementById('tour-region').value,
-                type: document.getElementById('tour-type').value,
-                price: parseInt(document.getElementById('tour-price').value),
-                specs: {
-                    location: document.getElementById('spec-location').value,
-                    duration: document.getElementById('spec-duration').value,
-                    distance: document.getElementById('spec-distance').value,
-                    elevation: document.getElementById('spec-elevation').value,
-                    difficulty: document.getElementById('spec-difficulty').value,
-                    transport: document.getElementById('spec-transport').value,
-                    quantity: document.getElementById('spec-quantity').value,
-                    guide_ratio: document.getElementById('spec-guide-ratio').value
-                },
-                itinerary, inclusions, exclusions,
-                preparation: document.getElementById('tour-note').value,
-                gallery: galleryImages
-            };
+            const originalText = submitBtn.innerHTML; // Dung innerHTML de giu icon svg
 
             try {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Đang lưu PRO MAX...';
+
+                // Helper de lay gia tri an toan
+                const getVal = (id) => document.getElementById(id)?.value || '';
+
+                const cardImages = Array.from(document.getElementById('card-slideshow-container').querySelectorAll('input')).map(i => i.value).filter(v => v);
+                const galleryImages = Array.from(document.getElementById('detail-gallery-container').querySelectorAll('input')).map(i => i.value).filter(v => v);
+
+                const itinerary = Array.from(document.getElementById('itinerary-days-container').children).map(div => {
+                    const labelInput = div.querySelector('.tour-itinerary-day-label');
+                    const titleInput = div.querySelector('.tour-itinerary-day-title');
+                    if (!labelInput) return null;
+
+                    const day = labelInput.value;
+                    const title = titleInput ? titleInput.value : '';
+                    const events = Array.from(div.querySelectorAll('.tour-day-events-container .flex')).map(e => {
+                        const tEl = e.querySelector('.tour-event-time');
+                        const cEl = e.querySelector('.tour-event-content');
+                        if (!cEl) return null;
+                        const t = tEl ? tEl.value : '';
+                        const c = cEl.value;
+                        return t ? `${t}: ${c}` : c;
+                    }).filter(v => v);
+                    return { day, title, events };
+                }).filter(v => v);
+
+                const inclusions = [];
+                DEFAULT_INCLUSIONS.forEach(item => {
+                    const cb = document.getElementById(`inc-${item.id}`);
+                    if (cb && cb.checked) {
+                        const itemDiv = cb.closest('.inclusion-item');
+                        const desc = itemDiv ? itemDiv.querySelector('textarea').value : item.desc;
+                        inclusions.push({ id: item.id, title: item.title, icon: item.icon, desc });
+                    }
+                });
+
+                const exclusions = Array.from(document.getElementById('exclusions-container').children).map(row => {
+                    const tEl = row.querySelector('.tour-exclusion-title');
+                    const cEl = row.querySelector('.tour-exclusion-content');
+                    if (!tEl) return null;
+                    return {
+                        title: tEl.value,
+                        content: cEl ? cEl.value : ''
+                    };
+                }).filter(v => v && v.title);
+
+                const id = getVal('edit-id');
+                const tour = {
+                    id: id ? parseInt(id) : null,
+                    name: getVal('tour-name'),
+                    slug: getVal('tour-slug'),
+                    image: cardImages[0] || '',
+                    image2: cardImages[1] || '',
+                    image3: cardImages[2] || '',
+                    image4: cardImages[3] || '',
+                    hero_image: getVal('tour-hero-image'),
+                    short_desc: getVal('tour-short-desc'),
+                    long_desc: getVal('tour-long-desc'),
+                    region: getVal('tour-region'),
+                    type: getVal('tour-type'),
+                    price: parseInt(getVal('tour-price')) || 0,
+                    duration: getVal('tour-duration-top'),
+                    altitude: getVal('tour-altitude-top'),
+                    level: getVal('tour-level-top'),
+                    specs: {
+                        location: getVal('spec-location'),
+                        duration: getVal('spec-duration'),
+                        distance: getVal('spec-distance'),
+                        elevation: getVal('spec-elevation'),
+                        difficulty: getVal('spec-difficulty'),
+                        transport: getVal('spec-transport'),
+                        quantity: getVal('spec-quantity'),
+                        guide_ratio: getVal('spec-guide-ratio')
+                    },
+                    itinerary, inclusions, exclusions,
+                    preparation: getVal('tour-note'),
+                    gallery: galleryImages
+                };
+
+                console.log("Dữ liệu gửi đi:", tour);
+
+                if (window.location.protocol === 'file:') {
+                    throw new Error("Ứng dụng cần chạy qua server (Netlify Dev) để gọi API. Không thể lưu khi mở file trực tiếp.");
+                }
+
                 const res = await fetch('/.netlify/functions/save-tour', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(tour)
                 });
-                if (!res.ok) throw new Error('Không thể lưu Tour');
+
+                if (!res.ok) {
+                    const errorResp = await res.json().catch(() => ({}));
+                    throw new Error(errorResp.error || 'Lỗi server ' + res.status);
+                }
+
                 alert('Khởi tạo hành trình PRO MAX thành công!');
                 window.location.href = '/ADMIN/tours.html';
             } catch (err) {
+                console.error("Loi khi luu:", err);
                 alert('Lỗi: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
+                submitBtn.innerHTML = originalText;
             }
         }
 
         // Auto Slug
         document.getElementById('tour-name').addEventListener('input', (e) => {
             if (document.getElementById('edit-id').value) return;
-            const slug = e.target.value.toLowerCase()
+            let slug = e.target.value.toLowerCase()
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd')
                 .replace(/([^0-9a-z-\s])/g, '').replace(/(\s+)/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
             document.getElementById('tour-slug').value = slug;
