@@ -1376,9 +1376,12 @@
                         isClickable = false;
                     }
 
-                    const start = new Date(item.startDate);
-                    const end = new Date(item.endDate);
-                    const formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+                    let formattedDisplay = item.date;
+                    if (!formattedDisplay) {
+                        const start = new Date(item.startDate);
+                        const end = new Date(item.endDate);
+                        formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
+                    }
 
                     const clickAction = isClickable ? `onclick="selectDate(this, '${formattedDisplay}')"` : '';
 

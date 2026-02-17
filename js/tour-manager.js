@@ -72,16 +72,23 @@ const TourManager = {
             // Frontend expects: { tour: "Tour Name", startDate: "YYYY-MM-DD", slots: 20, status: "..." }
             // Let's map it to match what getTourById expects (it expects `s.tour === tour.name`)
 
-            const mappedSchedules = schedules.map(s => ({
-                id: s.id,
-                tour: s.tour_name,
-                startDate: s.start_date, // ISO string or YYYY-MM-DD from DB? DB returns ISO usually. 
-                // We might need to ensure it's comparable. 
-                // DB date is usually full ISO. `getTourById` logic:
-                // `const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);`
-                slots: s.slots,
-                status: s.status
-            }));
+            const mappedSchedules = schedules.map(s => {
+                const formatDate = (isoStr) => {
+                    if (!isoStr) return '';
+                    const d = new Date(isoStr);
+                    return `${d.getDate()}/${d.getMonth() + 1}`;
+                };
+
+                return {
+                    id: s.id,
+                    tour: s.tour_name,
+                    startDate: s.start_date,
+                    endDate: s.end_date,
+                    date: `${formatDate(s.start_date)} - ${formatDate(s.end_date)}`,
+                    slots: s.slots,
+                    status: s.status
+                };
+            });
 
             localStorage.setItem('cam_site_schedules', JSON.stringify(mappedSchedules));
             localStorage.setItem('cam_site_schedules_last_fetch', Date.now().toString());
