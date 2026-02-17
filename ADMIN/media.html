@@ -272,16 +272,27 @@
                         setTimeout(() => progressParent.classList.add('hidden'), 2000);
                     } else {
                         const errorData = await saveResponse.json();
-                        throw new Error(errorData.error || 'Không thể lưu vào Database');
+                        // Trả về JSON để catch xử lý
+                        throw new Error(JSON.stringify(errorData));
                     }
                 } else {
                     // Xử lý khi ImgBB trả về lỗi (Ví dụ: Sai API key)
                     throw new Error(result.error ? result.error.message : 'Lỗi từ ImgBB');
                 }
             } catch (error) {
-                console.error('CRITICAL ERROR at Step', progressBar.style.width, ':', error);
-                showToast(`Lỗi: ${error.message}`, true);
-                progressParent.classList.add('hidden'); // Ẩn thanh tiến trình nếu lỗi
+                console.error('CRITICAL ERROR:', error);
+                let errorMsg = error.message;
+
+                // Nếu fetch trả về error body có details
+                try {
+                    const errData = JSON.parse(error.message);
+                    if (errData.details) {
+                        errorMsg = `${errData.details} (${errData.db_code || ''})`;
+                    }
+                } catch (e) { }
+
+                showToast(`Lỗi: ${errorMsg}`, true);
+                progressParent.classList.add('hidden');
             }
         }
 
