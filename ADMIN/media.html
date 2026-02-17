@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Media - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --bg-dashboard: #F8F9FA;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+        }
+
+        .nav-link.active {
+            background-color: rgba(232, 93, 4, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-area {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area.dragging {
+            border-color: var(--primary);
+            background-color: rgba(232, 93, 4, 0.05);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+        <div class="p-6 border-b border-gray-100">
+            <a href="../index.html" class="block">
+                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
+                    Panel</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <a href="dashboard.html"
+                class="nav-link flex items-center space-x-3 p-3 rounded-xl font-medium transition-all group text-[15px]">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="tours.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span>Quản lý Tour</span>
+            </a>
+            <a href="media.html"
+                class="nav-link active text-[15px] flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="image" class="w-5 h-5"></i>
+                <span>Quản lý Media</span>
+            </a>
+            <a href="leads.html"
+                class="nav-link text-[15px] text-gray-500 hover:bg-gray-50 flex items-center space-x-3 p-3 rounded-xl font-medium transition-all">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span>Khách hàng tư vấn</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <button onclick="logout()"
+                class="w-full flex items-center space-x-3 p-3 rounded-xl font-medium text-red-500 hover:bg-red-50 transition-all">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-[260px] p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Quản lý Media</h1>
+                <p class="text-gray-500 text-sm">Upload và quản lý link ảnh cho website</p>
+            </div>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 mb-10">
+            <div id="upload-area"
+                class="upload-area rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer">
+                <div class="w-16 h-16 bg-orange-50 text-primary rounded-full flex items-center justify-center mb-4">
+                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Click hoặc Kéo thả ảnh vào đây</h3>
+                <p class="text-gray-400 text-sm">Hỗ trợ PNG, JPG, GIF (Max 10MB)</p>
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="upload-progress" class="hidden mt-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700" id="progress-filename">Uploading...</span>
+                    <span class="text-sm font-medium text-primary" id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div id="progress-bar" class="bg-primary h-2 rounded-full transition-all duration-300"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6" id="media-grid">
+            <!-- Loading Skeletons -->
+            <div class="animate-pulse bg-white rounded-2xl h-64 border border-gray-100"></div>
+            <div class="animate-pulse bg-white rounded-2xl h-64 border border-gray-100"></div>
+            <div class="animate-pulse bg-white rounded-2xl h-64 border border-gray-100"></div>
+            <div class="animate-pulse bg-white rounded-2xl h-64 border border-gray-100"></div>
+        </div>
+    </main>
+
+    <!-- Success Toast -->
+    <div id="toast"
+        class="fixed bottom-10 right-10 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-3">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <span id="toast-msg">Đã sao chép link!</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const mediaGrid = document.getElementById('media-grid');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+
+        // ImgBB API Key (Free)
+        const IMGBB_API_KEY = '5f0a25695624795777161b55977a4216';
+
+        // 1. Check Auth & Health
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!checkAuth()) return;
+            console.log('--- Media Manager Diagnostic ---');
+            checkBackendHealth();
+            fetchMedia();
+        });
+
+        async function checkBackendHealth() {
+            try {
+                const res = await fetch('/.netlify/functions/get-media');
+                if (res.ok) console.log('Backend: OK');
+                else console.error('Backend: Request failed with status', res.status);
+            } catch (err) {
+                console.error('Backend: Unreachable. Are you running "netlify dev"?', err);
+            }
+        }
+
+        // 2. Upload Logic
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                uploadImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) uploadImage(file);
+        });
+
+        async function uploadImage(file) {
+            // Check file size (max 10MB for ImgBB free)
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('File quá lớn (Max 10MB)', true);
+                return;
+            }
+
+            console.log('Step 1: Preparing upload for', file.name);
+            const formData = new FormData();
+            formData.append('image', file);
+
+            // Show progress
+            const progressParent = document.getElementById('upload-progress');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            document.getElementById('progress-filename').textContent = file.name;
+
+            progressParent.classList.remove('hidden');
+            progressBar.style.width = '20%';
+            progressPercent.textContent = '20%';
+
+            try {
+                console.log('Step 2: Sending to ImgBB...');
+                // Step 1: Upload to ImgBB
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`ImgBB API responded with ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('Step 3: ImgBB Response received', result);
+
+                if (result.success) {
+                    progressBar.style.width = '80%';
+                    progressPercent.textContent = '80%';
+                    console.log('Step 4: Saving link to Neon DB...');
+
+                    // Step 2: Save to Neon DB via Backend Function
+                    const saveResponse = await fetch('/.netlify/functions/save-media', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            url: result.data.url,
+                            filename: file.name
+                        })
+                    });
+
+                    if (saveResponse.ok) {
+                        progressBar.style.width = '100%';
+                        progressPercent.textContent = '100%';
+                        console.log('Step 5: Process completed!');
+                        showToast('Tải lên thành công!');
+                        fetchMedia();
+                        setTimeout(() => progressParent.classList.add('hidden'), 2000);
+                    } else {
+                        const errorData = await saveResponse.json();
+                        throw new Error(errorData.error || 'Không thể lưu vào Database');
+                    }
+                } else {
+                    // Xử lý khi ImgBB trả về lỗi (Ví dụ: Sai API key)
+                    throw new Error(result.error ? result.error.message : 'Lỗi từ ImgBB');
+                }
+            } catch (error) {
+                console.error('CRITICAL ERROR at Step', progressBar.style.width, ':', error);
+                showToast(`Lỗi: ${error.message}`, true);
+                progressParent.classList.add('hidden'); // Ẩn thanh tiến trình nếu lỗi
+            }
+        }
+
+        // 3. Fetch Gallery
+        async function fetchMedia() {
+            try {
+                const response = await fetch('/.netlify/functions/get-media');
+                const data = await response.json();
+
+                mediaGrid.innerHTML = data.map(item => {
+                    const brandedUrl = `${window.location.origin}/photo/${item.slug || 'unknown'}.jpg`;
+                    return `
+                    <div class="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100 group hover:shadow-xl transition-all duration-300">
+                        <div class="relative h-48 overflow-hidden bg-gray-50">
+                            <img src="${item.url}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 px-4">
+                                <button onclick="copyToClipboard('${brandedUrl}')" class="w-full bg-primary text-white py-2 px-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors">
+                                    <i data-lucide="link" class="w-4 h-4"></i> Sao chép Link Riêng
+                                </button>
+                                <button onclick="copyToClipboard('${item.url}')" class="w-full bg-white text-gray-700 py-2 px-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
+                                    <i data-lucide="image" class="w-4 h-4"></i> Link Gốc
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mã ảnh: ${item.slug || 'N/A'}</p>
+                            <p class="text-xs font-bold text-gray-800 truncate mb-1">${item.filename}</p>
+                            <p class="text-[10px] text-gray-400 capitalize">${new Date(item.created_at).toLocaleDateString('vi-VN')}</p>
+                        </div>
+                    </div>
+                `}).join('');
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Fetch media error:', error);
+                mediaGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10">Không tải được danh sách ảnh.</p>';
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Đã sao chép link ảnh!');
+            });
+        }
+
+        function showToast(msg, isError = false) {
+            toastMsg.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            if (isError) toast.classList.add('bg-red-500');
+            else toast.classList.remove('bg-red-500');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

@@ -1273,6 +1273,15 @@
             // Render Recommended Tours (Excluding current Tà Năng ID = 1)
             TourManager.renderRecommendations('recc-marquee', 1);
             lucide.createIcons();
+
+            // Listen for API updates
+            window.addEventListener('tours-updated', () => {
+                console.log('UI refreshing from API update...');
+                loadTourOptions();
+                filterSchedules();
+                TourManager.renderRecommendations('recc-marquee', 1);
+                lucide.createIcons();
+            });
         });
 
         function loadTourOptions() {

@@ -3,3 +3,9 @@
 
 [dev]
   framework = "#static"
+
+[[redirects]]
+  from = "/photo/:slug"
+  to = "/.netlify/functions/photo?id=:slug"
+  status = 301
+  force = true

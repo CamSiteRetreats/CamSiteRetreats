@@ -711,6 +711,12 @@
             btnSouth.addEventListener('click', () => filterTours('south'));
             btnNorth.addEventListener('click', () => filterTours('north'));
         }
+
+        // Listen for API updates
+        window.addEventListener('tours-updated', () => {
+            console.log('UI refreshing from API update...');
+            initTours();
+        });
     </script>
 </body>
 
