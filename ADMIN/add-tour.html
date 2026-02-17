@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <form id="addTourForm" onsubmit="saveTour(event)" novalidate>
+        <div id="addTourForm">
             <input type="hidden" id="edit-id">
 
             <!-- Step 1: Basic Info -->
@@ -358,16 +358,17 @@
                         class="bg-primary text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center">
                         Tiếp theo <i data-lucide="chevron-right" class="w-5 h-5 ml-2"></i>
                     </button>
-                    <button type="submit" id="submitBtn"
+                    <button type="button" id="submitBtn" onclick="saveTour()"
                         class="bg-primary text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all hidden flex items-center">
                         Hoàn tất & Lưu Tour <i data-lucide="save" class="w-5 h-5 ml-2"></i>
                     </button>
                 </div>
             </div>
-        </form>
+        </div>
     </main>
 
     <script>
+        console.log("--- TOUR ADMIN VERSION 2.0 (NO-FORM) ---");
         let currentStep = 1;
         const totalSteps = 4;
 
