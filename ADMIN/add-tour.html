@@ -742,7 +742,7 @@
                 }
 
                 submitBtn.innerText = 'Đang gửi lên Server...';
-                const res = await fetch('/.netlify/functions/save-tour', {
+                const res = await fetch('/api/save-tour', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(tour)

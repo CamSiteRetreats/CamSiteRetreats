@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/tour/taotourmoi",
+      "destination": "/ADMIN/add-tour.html"
+    },
+    {
+      "source": "/tour/:slug",
+      "destination": "/TOUR/detail.html?slug=:slug"
+    },
+    {
+      "source": "/photo/:slug",
+      "destination": "/api/photo?id=:slug"
+    }
+  ]
+}

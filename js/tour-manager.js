@@ -33,7 +33,7 @@ const TourManager = {
         try {
             // Fetch every time to ensure fresh data, now with no-cache headers on server
 
-            const response = await fetch(`/.netlify/functions/get-tours?t=${Date.now()}`);
+            const response = await fetch(`/api/get-tours?t=${Date.now()}`);
             if (!response.ok) throw new Error('API Network response was not ok');
 
             const tours = await response.json();
