@@ -233,9 +233,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const slug = urlParams.get('slug');
+            let slug = urlParams.get('slug');
 
-            if (!slug) { window.location.href = '../index.html'; return; }
+            // Fallback: Lấy slug từ đường dẫn /tour/:slug nếu dùng Rewrite của Vercel
+            if (!slug) {
+                const pathParts = window.location.pathname.split('/');
+                const tourIdx = pathParts.indexOf('tour');
+                if (tourIdx !== -1 && pathParts[tourIdx + 1]) {
+                    slug = pathParts[tourIdx + 1];
+                }
+            }
+
+            if (!slug) {
+                console.warn("Không tìm thấy slug trong URL.");
+                window.location.href = '../index.html';
+                return;
+            }
 
             try {
                 // Fetch Tours
