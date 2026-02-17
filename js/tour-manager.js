@@ -238,7 +238,9 @@ const TourManager = {
     createTourCardHTML: function (tour, isCompact = false) {
         const priceStr = this.formatPrice(tour.price);
         const levelColor = tour.level === 'Dễ' ? 'bg-green-500' : (tour.level === 'Khó' ? 'bg-red-500' : 'bg-orange-500');
-        const tourUrl = tour.url || '#';
+
+        // Use slug if available, else fallback to URL or ID
+        const tourUrl = tour.slug ? `/tour/${tour.slug}` : (tour.url || '#');
 
         // CSS classes based on screen size/context
         const cardClass = isCompact
@@ -269,7 +271,7 @@ const TourManager = {
                             ${tour.name}
                         </h3>
                         <p class="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
-                            ${tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
+                            ${tour.short_desc || tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
                         </p>
                     </div>
 

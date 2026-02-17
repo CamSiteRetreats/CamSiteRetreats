@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Tour | CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/tour-manager.js"></script>
+    <script src="../js/ui-components.js"></script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --secondary: #FFF8F0;
+            --text: #333333;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+
+        .hero-title {
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .spec-item {
+            border: 1.5px solid var(--primary);
+            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(232, 93, 4, 0.05);
+        }
+
+        .itinerary-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #E5E7EB;
+        }
+
+        .itinerary-step.active::before {
+            background: var(--primary);
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden opacity-0 transition-opacity duration-500">
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="relative h-[65vh] w-full flex items-end justify-center overflow-hidden pb-20">
+        <img id="tour-hero" src="" class="absolute inset-0 w-full h-full object-cover" alt="Tour Hero">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="relative z-10 text-center px-6">
+            <span id="tour-category"
+                class="bg-primary text-white text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest mb-6 inline-block"></span>
+            <h1 id="tour-title" class="hero-title text-5xl md:text-7xl font-black text-white uppercase leading-tight">
+            </h1>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <section class="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div class="lg:col-span-2 space-y-12">
+            <!-- Overview -->
+            <div class="content-card p-10 md:p-14">
+                <h2 class="text-3xl font-black uppercase text-primary mb-8 border-l-4 border-primary pl-6">Giới thiệu
+                    hành trình</h2>
+                <div id="tour-long-desc" class="text-gray-600 leading-relaxed text-lg space-y-6"></div>
+            </div>
+
+            <!-- Specs Grid -->
+            <div id="tour-specs-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+            <!-- Itinerary -->
+            <div class="content-card p-10 md:p-14">
+                <h2 class="text-3xl font-black uppercase text-primary mb-10 flex items-center gap-4">
+                    <i data-lucide="map" class="w-8 h-8"></i> Lịch trình chi tiết
+                </h2>
+                <div id="tour-itinerary-list" class="space-y-10"></div>
+            </div>
+
+            <!-- Gallery -->
+            <div id="gallery-section" class="space-y-8">
+                <h2 class="text-3xl font-black uppercase text-primary">Cảm xúc hành trình</h2>
+                <div id="tour-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Booking -->
+        <div class="space-y-8">
+            <div class="content-card p-8 sticky top-24 border-2 border-primary/10">
+                <div class="mb-8 p-6 bg-primary/5 rounded-2xl border border-primary/10 text-center">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Chi phí trọn gói</p>
+                    <p id="tour-price" class="text-4xl font-black text-primary"></p>
+                </div>
+
+                <h3 class="text-sm font-black uppercase text-gray-400 mb-6 tracking-widest flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i> Lịch khởi hành
+                </h3>
+                <div id="tour-schedules" class="space-y-3 mb-8"></div>
+
+                <button
+                    class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-primary transition-all shadow-xl shadow-gray-200 active:scale-95">
+                    ĐẶT CHUYẾN ĐI NGAY
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Tours -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-black uppercase text-gray-800 mb-12">Có thể bạn sẽ thích</h2>
+            <div id="related-tours" class="flex gap-6 overflow-x-auto pb-10 scrollbar-hide">
+                <!-- Recommendations will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+
+            if (!slug) { window.location.href = '../index.html'; return; }
+
+            try {
+                // Fetch Tours
+                const res = await fetch('/.netlify/functions/get-tours');
+                const tours = await res.json();
+                const tour = tours.find(t => t.slug === slug);
+
+                if (!tour) throw new Error('Tour không tồn tại');
+
+                // Render Content
+                document.title = `${tour.name} | CAM SITE RETREATS`;
+                document.getElementById('tour-title').innerText = tour.name;
+                document.getElementById('tour-hero').src = tour.hero_image || tour.image;
+                document.getElementById('tour-category').innerText = `${tour.type} | ${tour.region}`;
+                document.getElementById('tour-long-desc').innerHTML = tour.long_desc ? tour.long_desc.replace(/\n/g, '<br>') : tour.short_desc;
+                document.getElementById('tour-price').innerText = parseInt(tour.price).toLocaleString('vi-VN') + 'đ';
+
+                // Specs
+                const specs = tour.specs || {};
+                const specsGrid = document.getElementById('tour-specs-grid');
+                const specsMap = [
+                    { key: 'distance', label: 'Quãng đường', icon: 'footprints' },
+                    { key: 'duration', label: 'Thời gian', icon: 'clock', val: tour.duration },
+                    { key: 'altitude', label: 'Độ cao', icon: 'mountain', val: tour.altitude },
+                    { key: 'difficulty', label: 'Độ khó', icon: 'dumbbell', val: tour.level }
+                ];
+
+                specsGrid.innerHTML = specsMap.map(s => `
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center text-center gap-4">
+                        <div class="spec-item"><i data-lucide="${s.icon}" class="w-6 h-6 text-primary"></i></div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">${s.label}</p>
+                            <p class="text-sm font-black text-gray-800">${s.val || (tour.specs ? tour.specs[s.key] : '---')}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Itinerary
+                const itinerary = tour.itinerary || [];
+                const itineraryList = document.getElementById('tour-itinerary-list');
+                itineraryList.innerHTML = itinerary.map((day, idx) => `
+                    <div class="relative pl-10 itinerary-step ${idx === 0 ? 'active' : ''}">
+                        <div class="absolute left-[-6px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-lg"></div>
+                        <h4 class="text-xl font-black text-primary uppercase mb-6">Ngày ${day.day || idx + 1}: ${day.title}</h4>
+                        <div class="space-y-4">
+                            ${(day.events || []).map(event => `
+                                <div class="flex gap-4 text-gray-600 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                                    <span class="font-black text-gray-800 shrink-0 min-w-[70px]">${event.split(':')[0]}:</span>
+                                    <span>${event.split(':').slice(1).join(':')}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Gallery
+                const gallery = tour.gallery || [];
+                if (gallery.length > 0) {
+                    document.getElementById('tour-gallery').innerHTML = gallery.map(img => `
+                        <div class="h-64 rounded-2xl overflow-hidden shadow-md">
+                            <img src="${img}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('gallery-section').classList.add('hidden');
+                }
+
+                // Render Recommendations
+                TourManager.renderRecommendations('related-tours', tour.id, 4);
+
+                document.body.classList.remove('opacity-0');
+                lucide.createIcons();
+
+                // Load Dynamic Parts (Header/Footer)
+                UIComponents.initHeader();
+                UIComponents.initFooter();
+
+            } catch (err) {
+                console.error(err);
+                alert('Không tìm thấy thông tin tour này.');
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
