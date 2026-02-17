@@ -415,11 +415,15 @@
             let actionButtons = '';
             if (currentUser && currentUser.role === 'admin') {
                 // Fix: Pass ID instead of object
+                // Add Details Button
                 actionButtons = `
-                    <button onclick="prepEdit(${item.id})" class="p-2 text-gray-400 hover:text-primary transition-colors">
+                    <button onclick="viewDetails('${item.tour_name}', '${item.start_date}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Danh sách khách">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="prepEdit(${item.id})" class="p-2 text-gray-400 hover:text-primary transition-colors" title="Sửa">
                         <i data-lucide="edit-3" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="deleteSchedule(${item.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <button onclick="deleteSchedule(${item.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Xóa">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 `;
@@ -436,7 +440,7 @@
                     <td class="px-6 py-4">
                         <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${status}</span>
                     </td>
-                    <td class="px-6 py-4 text-right space-x-2">
+                    <td class="px-6 py-4 text-right space-x-1">
                         ${actionButtons}
                     </td>
                 </tr>
@@ -455,9 +459,12 @@
                 submitBtn.innerText = 'Cập nhật';
                 document.getElementById('edit-id').value = editData.id;
                 document.getElementById('tour-name').value = editData.tour_name;
-                // Format date to YYYY-MM-DD for input[type=date]
-                document.getElementById('start-date').value = editData.start_date.split('T')[0];
-                document.getElementById('end-date').value = editData.end_date.split('T')[0];
+
+                // Safe Date Parsing
+                const safeDate = (d) => d && d.includes('T') ? d.split('T')[0] : d;
+                document.getElementById('start-date').value = safeDate(editData.start_date);
+                document.getElementById('end-date').value = safeDate(editData.end_date);
+
                 document.getElementById('max-slots').value = editData.slots;
                 document.getElementById('schedule-status').value = editData.status;
             } else {
@@ -480,8 +487,21 @@
 
         // New Helper to find item by ID safely
         function prepEdit(id) {
-            const item = currentSchedules.find(s => s.id === id);
-            if (item) openModal(item);
+            // Loose comparison to handle string/number diffs
+            const item = currentSchedules.find(s => s.id == id);
+            if (item) {
+                openModal(item);
+            } else {
+                console.error('Schedule not found for ID:', id, 'Current List:', currentSchedules);
+                alert('Không tìm thấy dữ liệu lịch trình!');
+            }
+        }
+
+        function viewDetails(tourName, startDate) {
+            // Safe Date extraction just in case
+            const dateStr = startDate && startDate.includes('T') ? startDate.split('T')[0] : startDate;
+            const url = `schedule-details.html?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(dateStr)}`;
+            window.open(url, '_blank');
         }
 
         async function saveSchedule(event) {
