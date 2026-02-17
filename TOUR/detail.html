@@ -240,10 +240,15 @@
             try {
                 // Fetch Tours
                 const res = await fetch(`/api/get-tours?t=${Date.now()}`);
-                const tours = await res.json();
-                const tour = tours.find(t => t.slug === slug);
+                if (!res.ok) throw new Error(`Lỗi Server (${res.status})`);
 
-                if (!tour) throw new Error('Tour không tồn tại');
+                const tours = await res.json();
+                if (!Array.isArray(tours)) {
+                    throw new Error(tours.error || tours.details || 'Dữ liệu không hợp lệ');
+                }
+
+                const tour = tours.find(t => t.slug === slug);
+                if (!tour) throw new Error('Không tìm thấy hành trình này.');
 
                 // --- SEO & SOCIAL PREVIEW ---
                 document.title = `${tour.name} | CAM SITE RETREATS`;
