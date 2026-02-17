@@ -306,7 +306,11 @@
 
     <script>
         lucide.createIcons();
-        const TOURS_KEY = 'cam_site_tours';
+        const TOURS_KEY = 'cam_site_tours'; // We'll still update this as cache
+        const API_GET_TOURS = '/api/get-tours';
+        const API_SAVE_TOUR = '/api/save-tour';
+        const API_DELETE_TOUR = '/api/delete-tour';
+
         const modal = document.getElementById('addTourModal');
         let currentUser = null;
 
@@ -366,7 +370,7 @@
                 document.getElementById('tour-image-2').value = editData.image2 || '';
                 document.getElementById('tour-image-3').value = editData.image3 || '';
                 document.getElementById('tour-image-4').value = editData.image4 || '';
-                document.getElementById('tour-short-desc').value = editData.shortDesc || '';
+                document.getElementById('tour-short-desc').value = editData.short_desc || editData.shortDesc || ''; // Handle inconsistency
                 document.getElementById('tour-altitude').value = editData.altitude || '';
                 document.getElementById('tour-level').value = editData.level || 'Trung Bình';
                 document.getElementById('tour-region').value = editData.region;
@@ -389,20 +393,32 @@
             document.body.style.overflow = 'auto';
         }
 
-        function loadTours() {
+        async function loadTours() {
             const tableBody = document.querySelector('tbody');
-            tableBody.innerHTML = '';
-            const data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Đang tải dữ liệu...</td></tr>';
 
-            // Add default if empty for first time demo
-            if (data.length === 0) {
-                const defaultTours = [
-                    { id: 1, name: 'Tà Năng - Phan Dũng', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100', region: 'Miền Nam', type: 'TREKKING', duration: '2 Ngày 1 Đêm', price: 2690000 }
-                ];
-                localStorage.setItem(TOURS_KEY, JSON.stringify(defaultTours));
-                defaultTours.forEach(item => renderRow(item));
-            } else {
-                data.forEach(item => renderRow(item));
+            try {
+                const res = await fetch(API_GET_TOURS);
+                if (!res.ok) throw new Error('Failed to load tours');
+                const data = await res.json();
+
+                // Sort by ID desc
+                data.sort((a, b) => b.id - a.id);
+
+                tableBody.innerHTML = '';
+                if (data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Chưa có tour nào.</td></tr>';
+                } else {
+                    data.forEach(item => renderRow(item));
+                }
+
+                // Update Cache for Frontend
+                localStorage.setItem(TOURS_KEY, JSON.stringify(data));
+                localStorage.setItem('cam_site_last_fetch', Date.now().toString());
+
+            } catch (err) {
+                console.error(err);
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-400">Lỗi kết nối server.</td></tr>';
             }
         }
 
@@ -412,8 +428,10 @@
             // Check Access
             let actionButtons = '';
             if (currentUser && currentUser.role === 'admin') {
+                // Pass full object safely
+                const jsonItem = JSON.stringify(item).replace(/"/g, '&quot;');
                 actionButtons = `
-                    <button onclick='openAddTourModal(${JSON.stringify(item)})' class="text-gray-400 hover:text-primary transition-colors">
+                    <button onclick="openAddTourModal(${jsonItem})" class="text-gray-400 hover:text-primary transition-colors">
                         <i data-lucide="edit-3" class="w-4 h-4"></i>
                     </button>
                     <button onclick="deleteTour(${item.id})" class="text-gray-400 hover:text-red-500 transition-colors">
@@ -450,11 +468,11 @@
             lucide.createIcons();
         }
 
-        function saveTour(event) {
+        async function saveTour(event) {
             event.preventDefault();
             const id = document.getElementById('edit-id').value;
             const tour = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? parseInt(id) : null,
                 name: document.getElementById('tour-name').value,
                 image: document.getElementById('tour-image').value,
                 image2: document.getElementById('tour-image-2').value,
@@ -469,24 +487,35 @@
                 price: document.getElementById('tour-price').value
             };
 
-            let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
-            if (id) {
-                data = data.map(d => d.id === parseInt(id) ? tour : d);
-            } else {
-                data.push(tour);
-            }
+            try {
+                const res = await fetch(API_SAVE_TOUR, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tour)
+                });
 
-            localStorage.setItem(TOURS_KEY, JSON.stringify(data));
-            loadTours();
-            closeAddTourModal();
+                if (!res.ok) throw new Error('Save failed');
+
+                closeAddTourModal();
+                loadTours(); // Refresh from DB
+                alert(id ? 'Cập nhật thành công!' : 'Thêm tour mới thành công!');
+
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi khi lưu: ' + err.message);
+            }
         }
 
-        function deleteTour(id) {
+        async function deleteTour(id) {
             if (confirm('Dữ liệu các lịch trình liên quan đến tour này có thể bị ảnh hưởng. Bạn vẫn muốn xóa?')) {
-                let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
-                data = data.filter(d => d.id !== id);
-                localStorage.setItem(TOURS_KEY, JSON.stringify(data));
-                loadTours();
+                try {
+                    const res = await fetch(`${API_DELETE_TOUR}?id=${id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('Delete failed');
+                    loadTours();
+                } catch (err) {
+                    console.error(err);
+                    alert('Lỗi khi xóa: ' + err.message);
+                }
             }
         }
     </script>

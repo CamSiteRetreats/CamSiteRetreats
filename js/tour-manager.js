@@ -10,6 +10,7 @@ const TourManager = {
     getAllTours: function () {
         // Try to fetch from API in background to update cache
         this.fetchToursFromAPI();
+        this.fetchSchedulesFromAPI(); // NEW: Fetch schedules too
 
         const data = localStorage.getItem(TOURS_KEY);
         let tours = data ? JSON.parse(data) : [];
@@ -41,11 +42,6 @@ const TourManager = {
 
             const tours = await response.json();
 
-            // Map DB fields to Frontend fields if necessary (DB has snake_case, JS uses camelCase usually but I used same names/snake_case in Seed)
-            // Seed used: name, image, region, type, duration, price, short_desc
-            // Frontend expects: same mostly.
-            // Let's ensure structure match.
-
             // Save to LocalStorage to act as cache
             localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
             localStorage.setItem('cam_site_last_fetch', Date.now().toString());
@@ -56,6 +52,46 @@ const TourManager = {
 
         } catch (error) {
             console.warn('Failed to fetch tours from API, using offline data:', error);
+        }
+    },
+
+    // NEW: Fetch Schedules from API to LocalStorage
+    fetchSchedulesFromAPI: async function () {
+        try {
+            // Short cache 30s
+            const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
+            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return;
+
+            const res = await fetch('/api/get-schedules');
+            if (!res.ok) throw new Error('Failed to fetch schedules');
+
+            const schedules = await res.json();
+
+            // Transform DB structure to Frontend structure if needed? 
+            // DB: id, tour_name, start_date, end_date, slots, status
+            // Frontend expects: { tour: "Tour Name", startDate: "YYYY-MM-DD", slots: 20, status: "..." }
+            // Let's map it to match what getTourById expects (it expects `s.tour === tour.name`)
+
+            const mappedSchedules = schedules.map(s => ({
+                id: s.id,
+                tour: s.tour_name,
+                startDate: s.start_date, // ISO string or YYYY-MM-DD from DB? DB returns ISO usually. 
+                // We might need to ensure it's comparable. 
+                // DB date is usually full ISO. `getTourById` logic:
+                // `const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);`
+                slots: s.slots,
+                status: s.status
+            }));
+
+            localStorage.setItem('cam_site_schedules', JSON.stringify(mappedSchedules));
+            localStorage.setItem('cam_site_schedules_last_fetch', Date.now().toString());
+            console.log('Schedules updated from API');
+
+            // Dispatch event
+            window.dispatchEvent(new Event('schedules-updated'));
+
+        } catch (error) {
+            console.warn('Failed to fetch schedules:', error);
         }
     },
 
