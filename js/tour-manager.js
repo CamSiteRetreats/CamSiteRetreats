@@ -6,13 +6,16 @@
 const TOURS_KEY = 'cam_site_tours';
 
 const TourManager = {
-    // Get all tours from LocalStorage
+    // Get all tours from LocalStorage or API
     getAllTours: function () {
-        const data = localStorage.getItem(TOURS_KEY);
-        let tours = data ? JSON.parse(data) : this.getDefaultTours();
+        // Try to fetch from API in background to update cache
+        this.fetchToursFromAPI();
 
-        // Refresh defaults if only 1 tour exists (previous state) to add new demo tours
-        if (tours.length === 1 && tours[0].id === 1) {
+        const data = localStorage.getItem(TOURS_KEY);
+        let tours = data ? JSON.parse(data) : [];
+
+        // If no data in local storage, return defaults (or empty if we want to force API wait, but better to show something)
+        if (tours.length === 0) {
             tours = this.getDefaultTours();
         }
 
@@ -23,6 +26,36 @@ const TourManager = {
             localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
         }
         return tours;
+    },
+
+    // NEW: Fetch from Backend API
+    fetchToursFromAPI: async function () {
+        try {
+            // Only fetch if not recently fetched (e.g. 1 minute cache)
+            const lastFetch = localStorage.getItem('cam_site_last_fetch');
+            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
+
+            const response = await fetch('/.netlify/functions/get-tours');
+            if (!response.ok) throw new Error('API Network response was not ok');
+
+            const tours = await response.json();
+
+            // Map DB fields to Frontend fields if necessary (DB has snake_case, JS uses camelCase usually but I used same names/snake_case in Seed)
+            // Seed used: name, image, region, type, duration, price, short_desc
+            // Frontend expects: same mostly.
+            // Let's ensure structure match.
+
+            // Save to LocalStorage to act as cache
+            localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
+            localStorage.setItem('cam_site_last_fetch', Date.now().toString());
+            console.log('Tours updated from API');
+
+            // Dispatch event to refresh UI if needed
+            window.dispatchEvent(new Event('tours-updated'));
+
+        } catch (error) {
+            console.warn('Failed to fetch tours from API, using offline data:', error);
+        }
     },
 
     // NEW: Get single tour by ID with schedules linked
@@ -99,10 +132,10 @@ const TourManager = {
             {
                 id: 1,
                 name: 'Tà Năng - Phan Dũng',
-                image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800',
-                image2: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=800',
-                image3: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800',
-                image4: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800',
+                image: 'TOUR/Tanang/thumb1.png',
+                image2: 'TOUR/Tanang/thumb2.png',
+                image3: 'TOUR/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
@@ -120,7 +153,10 @@ const TourManager = {
             {
                 id: 2,
                 name: 'Bidoup - Tà Giang',
-                image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800',
+                image: 'TOUR/Tanang/thumb1.png',
+                image2: 'TOUR/Tanang/thumb2.png',
+                image3: 'TOUR/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Trung',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
@@ -137,7 +173,10 @@ const TourManager = {
             {
                 id: 3,
                 name: 'Thác Liêng Ài',
-                image: 'https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&q=80&w=800',
+                image: 'TOUR/Tanang/thumb1.png',
+                image2: 'TOUR/Tanang/thumb2.png',
+                image3: 'TOUR/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Nam',
                 type: 'CANYONING',
                 duration: '2 Ngày 1 Đêm',
@@ -152,7 +191,10 @@ const TourManager = {
             {
                 id: 4,
                 name: 'Núi Langbiang',
-                image: 'https://images.unsplash.com/photo-1544735038-179ad9194ef4?auto=format&fit=crop&q=80&w=800',
+                image: 'TOUR/Tanang/thumb1.png',
+                image2: 'TOUR/Tanang/thumb2.png',
+                image3: 'TOUR/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Trung',
                 type: 'HIKING',
                 duration: 'Trong ngày',
@@ -167,7 +209,10 @@ const TourManager = {
             {
                 id: 5,
                 name: 'Mũi Kê Gà',
-                image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
+                image: 'TOUR/Tanang/thumb1.png',
+                image2: 'TOUR/Tanang/thumb2.png',
+                image3: 'TOUR/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Nam',
                 type: 'CAMPING',
                 duration: '2 Ngày 1 Đêm',
@@ -287,7 +332,7 @@ const TourManager = {
         if (!container) return;
 
         // Auto-detect if we are in a subfolder (checking for /TOUR/ in path)
-        const isSubfolder = window.location.pathname.includes('/TOUR/');
+        const isSubfolder = window.location.pathname.includes('/TOUR/') || window.location.pathname.includes('/tour/');
 
         const randomTours = this.getRandomTours(count, excludeId);
         if (randomTours.length === 0) {
@@ -312,13 +357,24 @@ const TourManager = {
     // Create Slideshow HTML if multiple images exist
     createImageSlideshow: function (tour) {
         const images = [tour.image, tour.image2, tour.image3, tour.image4].filter(img => img);
+
+        // Auto-detect if we are in a subfolder
+        const isSubfolder = window.location.pathname.includes('/TOUR/') || window.location.pathname.includes('/tour/');
+        const resolvePath = (path) => {
+            if (isSubfolder && path && !path.startsWith('http') && !path.startsWith('/') && !path.startsWith('../')) {
+                return '../' + path;
+            }
+            return path;
+        };
+
         if (images.length <= 1) {
-            return `<img src="${tour.image}" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
+            return `<img src="${resolvePath(tour.image)}" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
         }
 
         let imgsHTML = '';
         images.forEach((img, index) => {
-            imgsHTML += `<img src="${img}" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
+            const resolvedImg = resolvePath(img);
+            imgsHTML += `<img src="${resolvedImg}" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
         });
 
         return `<div class="slideshow absolute inset-0">${imgsHTML}</div>`;

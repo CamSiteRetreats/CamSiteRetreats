@@ -1,0 +1,25 @@
+{
+  "name": "cam-site-retreats",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CamSiteRetreats/CamSiteRetreats.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/CamSiteRetreats/CamSiteRetreats/issues"
+  },
+  "homepage": "https://github.com/CamSiteRetreats/CamSiteRetreats#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "pg": "^8.18.0"
+  }
+}
