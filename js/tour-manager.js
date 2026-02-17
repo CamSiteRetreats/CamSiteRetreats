@@ -31,11 +31,9 @@ const TourManager = {
     // NEW: Fetch from Backend API
     fetchToursFromAPI: async function () {
         try {
-            // Only fetch if not recently fetched (e.g. 1 minute cache)
-            const lastFetch = localStorage.getItem('cam_site_last_fetch');
-            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
+            // Fetch every time to ensure fresh data, now with no-cache headers on server
 
-            const response = await fetch('/.netlify/functions/get-tours');
+            const response = await fetch(`/.netlify/functions/get-tours?t=${Date.now()}`);
             if (!response.ok) throw new Error('API Network response was not ok');
 
             const tours = await response.json();

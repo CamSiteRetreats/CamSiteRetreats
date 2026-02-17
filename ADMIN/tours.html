@@ -417,7 +417,7 @@
             tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">Đang tải dữ liệu...</td></tr>';
 
             try {
-                const response = await fetch('/.netlify/functions/get-tours');
+                const response = await fetch(`/.netlify/functions/get-tours?t=${Date.now()}`);
                 const data = await response.json();
 
                 if (data.error) {
@@ -491,7 +491,7 @@
         async function deleteTour(id) {
             if (confirm('Bạn chắc chắn muốn xóa Tour này? Hành động này không thể hoàn tác.')) {
                 try {
-                    const response = await fetch(`/.netlify/functions/save-tour?id=${id}`, { method: 'DELETE' });
+                    const response = await fetch(`/.netlify/functions/save-tour?id=${id}&t=${Date.now()}`, { method: 'DELETE' });
                     if (!response.ok) throw new Error('Không thể xóa tour.');
                     alert('Đã xóa dữ liệu thành công.');
                     loadTours();

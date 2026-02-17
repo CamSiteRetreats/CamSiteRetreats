@@ -9,7 +9,11 @@ exports.handler = async (event, context) => {
             body: JSON.stringify(rows),
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*' // Enable CORS for development
+                'Access-Control-Allow-Origin': '*',
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'Surrogate-Control': 'no-store'
             }
         };
     } catch (error) {
