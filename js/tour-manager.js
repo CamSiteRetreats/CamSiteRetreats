@@ -136,19 +136,44 @@ const TourManager = {
     getScheduleAvailability: function (tourName, startDateStr, maxSlots) {
         const bookings = JSON.parse(localStorage.getItem('cam_site_bookings')) || [];
 
-        // Count confirmed/pending bookings (Exclude 'Đã hủy')
-        // Matching by Tour Name and Start Date
-        // Note: Booking date might need normalization depending on how it's stored. 
-        // Assuming booking.date matches schedule.startDate format or we compare loosely.
+        // Helper to extract "DD/MM" from various formats
+        const getDayMonth = (dateInput) => {
+            if (!dateInput) return '';
 
-        // Normalize date for comparison (YYYY-MM-DD)
-        const normalizeDate = (d) => new Date(d).toISOString().split('T')[0];
-        const targetDate = normalizeDate(startDateStr);
+            // If it's a "DD/MM - DD/MM" range string
+            if (dateInput.includes(' - ')) {
+                const startPart = dateInput.split(' - ')[0]; // "15/03"
+                // Normalize 15/3 to 15/03
+                const parts = startPart.split('/');
+                if (parts.length === 2) {
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}`;
+                }
+                return startPart;
+            }
+
+            // If it's ISO or Date string
+            const d = new Date(dateInput);
+            if (!isNaN(d.getTime())) {
+                return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+            }
+
+            return '';
+        };
+
+        const targetDM = getDayMonth(startDateStr);
 
         const bookedCount = bookings.filter(b => {
-            return b.tourName === tourName &&
-                normalizeDate(b.date) === targetDate &&
-                b.status !== 'Đã hủy';
+            // Handle Tour Name mismatch (sometimes "Tà Năng" vs "Tà Năng - Phan Dũng")
+            const isTourMatch = b.tour && (b.tour === tourName || b.tour.includes(tourName) || tourName.includes(b.tour));
+
+            // Check Status (Exclude cancelled)
+            const isStatusValid = b.status !== 'Đã hủy';
+
+            // Check Date
+            const bookingDM = getDayMonth(b.date);
+            const isDateMatch = bookingDM === targetDM;
+
+            return isTourMatch && isStatusValid && isDateMatch;
         }).length;
 
         const max = parseInt(maxSlots) || 0;

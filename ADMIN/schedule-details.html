@@ -10,6 +10,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="../js/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -34,14 +35,15 @@
             border-collapse: collapse;
             width: 100%;
             background: white;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .excel-table th,
         .excel-table td {
             border: 1px solid #d1d5db;
-            padding: 8px 12px;
+            padding: 8px 10px;
             text-align: left;
+            vertical-align: middle;
         }
 
         .excel-table th {
@@ -49,33 +51,51 @@
             font-weight: 700;
             color: #374151;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         .excel-table tr:hover {
             background-color: #f9fafb;
         }
 
+        .check-icon {
+            color: #10b981;
+            width: 16px;
+            height: 16px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .dash-icon {
+            color: #d1d5db;
+            text-align: center;
+            display: block;
+            font-weight: bold;
+        }
+
         @media print {
             .no-print {
-                display: none;
+                display: none !important;
             }
 
             body {
                 background: white;
+                padding: 0;
             }
 
             .excel-table th {
                 background-color: #f3f4f6 !important;
+                -webkit-print-color-adjust: exact;
             }
         }
     </style>
 </head>
 
-<body class="p-8">
+<body class="p-4 md:p-8">
 
-    <div
-        class="max-w-[1200px] mx-auto bg-white min-h-[calc(100vh-4rem)] shadow-lg rounded-none md:rounded-2xl overflow-hidden flex flex-col">
+    <div id="content-to-export"
+        class="max-w-[1400px] mx-auto bg-white min-h-[calc(100vh-4rem)] shadow-lg rounded-none md:rounded-2xl overflow-hidden flex flex-col">
 
         <!-- Header -->
         <div
@@ -91,14 +111,18 @@
                         class="text-primary font-bold">--/--/----</span></p>
             </div>
 
-            <div class="flex gap-3 no-print">
+            <div class="flex gap-3 no-print flex-wrap">
                 <button onclick="window.close()"
                     class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors">
                     Đóng
                 </button>
                 <button onclick="window.print()"
                     class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-bold hover:bg-blue-100 transition-colors flex items-center gap-2">
-                    <i data-lucide="printer" class="w-4 h-4"></i> In danh sách
+                    <i data-lucide="printer" class="w-4 h-4"></i> In
+                </button>
+                <button onclick="exportToPDF()"
+                    class="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Xuất PDF
                 </button>
                 <button onclick="exportToExcel()"
                     class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20 flex items-center gap-2">
@@ -112,13 +136,18 @@
             <table class="excel-table" id="members-table">
                 <thead>
                     <tr>
-                        <th class="w-12 text-center">STT</th>
-                        <th>Họ và tên</th>
-                        <th class="w-32">Ngày sinh</th>
-                        <th>Địa chỉ thường trú</th>
-                        <th class="w-32">SĐT liên lạc</th>
-                        <th>Tên in Huy chương</th>
-                        <th class="w-32">Ghi chú</th>
+                        <th class="w-10 text-center">STT</th>
+                        <th class="min-w-[150px]">Họ và tên</th>
+                        <th class="w-24">Ngày sinh</th>
+                        <th class="w-28">Số CCCD</th>
+                        <th class="w-24">SĐT</th>
+                        <th class="w-16 text-center">Giới tính</th>
+                        <th class="min-w-[150px]">Địa chỉ thường trú</th>
+                        <th class="min-w-[120px]">Tên in Huy chương</th>
+                        <th class="w-16 text-center">Gậy Trekking</th>
+                        <th class="w-16 text-center">Ăn Chay</th>
+                        <th class="min-w-[150px]">Ghi chú</th>
+                        <th class="w-20 text-center">Đã ký cam kết</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -143,7 +172,6 @@
         const BOOKINGS_KEY = 'cam_site_bookings';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Get Params
             const params = new URLSearchParams(window.location.search);
             const tourName = params.get('tour');
             const tourDateStr = params.get('date');
@@ -153,10 +181,8 @@
                 return;
             }
 
-            // Display Header Info
             document.getElementById('tour-title').textContent = tourName;
 
-            // Format Date Display (Input is YYYY-MM-DD usually)
             let displayDate = tourDateStr;
             try {
                 const d = new Date(tourDateStr);
@@ -164,47 +190,26 @@
             } catch (e) { }
             document.getElementById('tour-date').textContent = displayDate;
 
-            // 2. Load Bookings
             const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-
-            // 3. Filter Bookings
-            // Matching logic same as bookings.html but stricter?
-            // bookings.html uses loose string matching. 
-            // We need to match tour name exactly logic + date match mechanism.
 
             const filtered = bookings.filter(b => {
                 const isTourMatch = b.tour === tourName;
 
-                // Date Matching:
-                // b.date might be "15/03/2026 - 16/03/2026" or "2026-03-15"
-                // tourDateStr is "2026-03-15" (Start Date from DB)
-
-                // Normalize User Input Booking Date:
-                // If b.date contains the start date string (e.g. "15/03")?
-
-                // Let's reuse the logic from bookings.html roughly but simplified:
-                // Check if `b.date` includes the formatted start date.
-
-                // Format tourDateStr to DD/MM
+                // Fuzzy Date Matching
                 let dateMatch = false;
                 if (b.date) {
-                    // Direct match
                     if (b.date.includes(tourDateStr)) dateMatch = true;
 
-                    // Formatted match (15/03)
                     const d = new Date(tourDateStr);
                     const dd = d.getDate().toString().padStart(2, '0');
                     const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const shortDate = `${dd}/${mm}`;
-                    const shortDate2 = `${d.getDate()}/${d.getMonth() + 1}`;
+                    const shortDate = `${dd}/${mm}`; // 15/03
+                    const shortDate2 = `${d.getDate()}/${d.getMonth() + 1}`; // 15/3
 
                     if (b.date.includes(shortDate) || b.date.includes(shortDate2)) dateMatch = true;
                 }
 
-                // Only show confirmed bookings? Or all? User said "danh sách thành viên", usually implies confirmed/deposited.
-                // But let's show all except cancelled for overview.
                 const isNotCancelled = b.status !== 'Đã hủy';
-
                 return isTourMatch && dateMatch && isNotCancelled;
             });
 
@@ -224,24 +229,36 @@
             }
 
             data.forEach((member, index) => {
-                // DOB Format
                 let dob = member.dob;
                 try {
                     const d = new Date(dob);
                     if (!isNaN(d)) dob = d.toLocaleDateString('vi-VN');
                 } catch (e) { }
 
+                const checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="check-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                const dash = `<span class="dash-icon">-</span>`;
+
+                // Combine Notes
+                const notes = [];
+                if (member.allergy) notes.push(`Dị ứng: ${member.allergy}`);
+                if (member.special) notes.push(`YC khác: ${member.special}`);
+                const noteHtml = notes.length > 0 ? notes.join('<br>') : dash;
+
                 const row = `
                     <tr>
                         <td class="text-center font-bold text-gray-500">${index + 1}</td>
-                        <td class="font-bold text-gray-800">${member.name || '-'}</td>
+                        <td class="font-bold text-gray-800 uppercase text-xs">${member.name || '-'}</td>
                         <td>${dob || '-'}</td>
-                        <td>${member.address || '-'}</td>
-                        <td class="font-mono">${member.phone || '-'}</td>
-                        <td class="font-medium text-primary">${member.medalName || member.name || '-'}</td>
-                        <td class="text-gray-500 text-xs italic">
-                            ${member.diet !== 'Không' ? 'Ăn chay, ' : ''}
-                            ${member.allergy ? 'Dị ứng: ' + member.allergy : ''}
+                        <td class="font-mono text-xs">${member.idCard || '-'}</td>
+                        <td class="font-mono text-xs">${member.phone || '-'}</td>
+                        <td class="text-center">${member.gender || '-'}</td>
+                        <td class="text-xs break-words max-w-[200px]">${member.address || '-'}</td>
+                        <td class="font-bold text-primary uppercase text-xs">${member.medalName || member.name || '-'}</td>
+                        <td class="text-center">${(member.trekkingPole === 'Có' || member.trekkingPole === true) ? checkIcon : dash}</td>
+                        <td class="text-center">${(member.diet === 'Ăn chay' || member.diet === true) ? checkIcon : dash}</td>
+                        <td class="text-xs italic text-gray-500">${noteHtml}</td>
+                        <td class="text-center text-xs text-gray-400 italic">
+                             ${(member.commitments) ? checkIcon : dash}
                         </td>
                     </tr>
                 `;
@@ -249,29 +266,26 @@
             });
         }
 
-        // Simple CSV Export
+        // CSV Export
         function exportToExcel() {
             const tourTitle = document.getElementById('tour-title').textContent;
             const dateStr = document.getElementById('tour-date').textContent.replace(/\//g, '-');
             const filename = `DS_${tourTitle}_${dateStr}.csv`;
 
             const table = document.getElementById('members-table');
-            let method = 'csv';
-
-            // Basic CSV generation
             let csv = [];
             const rows = table.querySelectorAll("tr");
 
-            // Add BOM for Excel UTF-8
-
             for (let i = 0; i < rows.length; i++) {
                 let row = [], cols = rows[i].querySelectorAll("td, th");
-                for (let j = 0; j < cols.length; j++)
-                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                for (let j = 0; j < cols.length; j++) {
+                    // Clean text content for CSV
+                    let text = cols[j].innerText.replace(/"/g, '""').replace(/\n/g, '; ');
+                    row.push('"' + text + '"');
+                }
                 csv.push(row.join(","));
             }
 
-            // Download
             const csvFile = new Blob(["\uFEFF" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
             const downloadLink = document.createElement("a");
             downloadLink.download = filename;
@@ -280,6 +294,33 @@
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
+        }
+
+        // PDF Export
+        function exportToPDF() {
+            const element = document.getElementById('content-to-export');
+            const tourTitle = document.getElementById('tour-title').textContent;
+            const dateStr = document.getElementById('tour-date').textContent.replace(/\//g, '-');
+            const filename = `DanhSach_${tourTitle}_${dateStr}.pdf`;
+
+            // Clone to remove non-print buttons temporarily (or use CSS)
+            // html2pdf handles ignoring .no-print elements if configured or via CSS
+
+            const opt = {
+                margin: 5,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            // Temporarily hide buttons not covered by @media print in some cases
+            const buttons = document.querySelector('.no-print');
+            buttons.style.display = 'none';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                buttons.style.display = 'flex';
+            });
         }
     </script>
 </body>

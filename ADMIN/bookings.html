@@ -211,21 +211,14 @@
                 <table class="w-full text-left border-collapse whitespace-nowrap">
                     <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-widest">
                         <tr>
-                            <th class="px-6 py-4 sticky left-0 bg-gray-50 z-10 shadow-sm border-r border-gray-100">Khách
-                                hàng</th>
-                            <th class="px-6 py-4">Mã KH</th>
+                            <th class="px-6 py-4 sticky left-0 bg-gray-50 z-10 shadow-sm border-r border-gray-100">Họ và
+                                tên</th>
                             <th class="px-6 py-4">Tour / Ngày</th>
                             <th class="px-6 py-4">Người phụ trách</th>
                             <th class="px-6 py-4 text-center">Trạng thái</th>
-
-                            <!-- Combined Info & Notes -->
-                            <th class="px-6 py-4 border-l border-gray-100 w-[300px]">Ghi chú & Yêu cầu</th>
-
-                            <!-- Payment -->
                             <th class="px-6 py-4 text-right border-l border-gray-100">Tổng tiền</th>
                             <th class="px-6 py-4 text-right">Đã cọc</th>
                             <th class="px-6 py-4 text-right">Còn lại</th>
-
                             <th
                                 class="px-6 py-4 text-right sticky right-0 bg-gray-50 z-10 shadow-sm border-l border-gray-100">
                                 Thao tác</th>
@@ -265,6 +258,12 @@
                     </div>
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tên in Huy chương</label>
+                    <input type="text" id="edit-medal-name"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-primary font-bold">
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tour</label>
@@ -296,13 +295,23 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mượn gậy trekking</label>
-                    <select id="edit-trekking-pole"
-                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                        <option value="Không">Không</option>
-                        <option value="Có">Có</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Mượn gậy trekking</label>
+                        <select id="edit-trekking-pole"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                            <option value="Không">Không</option>
+                            <option value="Có">Có</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ăn chay</label>
+                        <select id="edit-diet"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                            <option value="Không">Không</option>
+                            <option value="Ăn chay">Ăn chay</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">CMND / Hộ chiếu</label>
@@ -313,6 +322,27 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Địa chỉ</label>
                     <input type="text" id="edit-address"
                         class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Dị ứng</label>
+                        <input type="text" id="edit-allergy"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                            placeholder="VD: Hải sản...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Yêu cầu đặc biệt</label>
+                        <input type="text" id="edit-special"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 pb-2">
+                    <input type="checkbox" id="edit-commitment"
+                        class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                    <label for="edit-commitment" class="text-sm font-bold text-gray-700 select-none">Đã ký cam kết miễn
+                        trừ trách nhiệm</label>
                 </div>
 
                 <div class="border-t border-gray-100 pt-4 grid grid-cols-2 gap-4">
@@ -708,25 +738,9 @@
 
                 const row = `
                     <tr class="hover:bg-gray-50/50 transition-colors text-sm group">
-                        <!-- Customer Info (Sticky Left) -->
+                        <!-- Customer Name (Sticky Left) -->
                         <td class="px-6 py-4 sticky left-0 bg-white group-hover:bg-gray-50/50 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-black uppercase shrink-0">
-                                    ${initial}
-                                </div>
-                                <div>
-                                    <div class="font-bold text-gray-800">${booking.name}</div>
-                                    <div class="text-[10px] text-gray-400 font-medium">${booking.phone}</div>
-                                    <div class="text-[10px] text-gray-400 font-mono bg-gray-100 px-1 rounded inline-block mt-1">#B${getShortId(booking.id)}</div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <!-- Customer Code -->
-                         <td class="px-6 py-4">
-                            <span class="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                ${booking.customerId ? '#' + booking.customerId : '--'}
-                            </span>
+                             <div class="font-bold text-gray-800">${booking.name}</div>
                         </td>
 
                         <!-- Tour Info -->
@@ -754,11 +768,6 @@
                             </span>
                         </td>
 
-                        <!-- Consolidated Info & Notes -->
-                        <td class="px-6 py-4 border-l border-gray-100 text-left align-top">
-                            ${notesHtml}
-                        </td>
-
                         <!-- Payment -->
                         <td class="px-6 py-4 text-right border-l border-gray-100 font-bold text-gray-800">${fmt(total)}</td>
                         <td class="px-6 py-4 text-right font-bold text-green-600">${fmt(deposit)}</td>
@@ -766,7 +775,7 @@
 
                         <!-- Actions (Sticky Right) -->
                         <td class="px-6 py-4 text-right sticky right-0 bg-white group-hover:bg-gray-50/50 z-10 border-l border-gray-100 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
-                            <div class="flex items-center justify-end space-x-2">
+                             <div class="flex items-center justify-end space-x-2">
                                 ${booking.status === 'Chờ xác nhận cọc' ? `
                                 <button onclick="confirmDeposit(${booking.id})" class="bg-primary text-white p-2 rounded-lg hover:shadow-lg hover:bg-orange-600 transition-all" title="Xác nhận cọc">
                                     <i data-lucide="check" class="w-4 h-4"></i>
@@ -953,6 +962,13 @@
             document.getElementById('edit-address').value = booking.address || '';
             document.getElementById('edit-trekking-pole').value = booking.trekkingPole || 'Không';
 
+            // New Fields
+            document.getElementById('edit-medal-name').value = booking.medalName || booking.name || '';
+            document.getElementById('edit-diet').value = booking.diet || 'Không';
+            document.getElementById('edit-allergy').value = booking.allergy || '';
+            document.getElementById('edit-special').value = booking.special || '';
+            document.getElementById('edit-commitment').checked = !!booking.commitments;
+
             // Money
             const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
             const tourData = tours.find(t => t.name === booking.tour);
@@ -997,19 +1013,31 @@
             const index = bookings.findIndex(b => b.id == id);
 
             if (index !== -1) {
-                bookings[index].name = document.getElementById('edit-name').value;
-                bookings[index].phone = document.getElementById('edit-phone').value;
-                bookings[index].tour = document.getElementById('edit-tour').value;
-                bookings[index].date = document.getElementById('edit-date').value;
+                bookings[index].name = name;
+                bookings[index].phone = phone;
+                bookings[index].tour = tour;
+                bookings[index].date = date;
 
+                // Existing + New Fields
                 bookings[index].dob = document.getElementById('edit-dob').value;
                 bookings[index].gender = document.getElementById('edit-gender').value;
                 bookings[index].idCard = document.getElementById('edit-idcard').value;
                 bookings[index].address = document.getElementById('edit-address').value;
                 bookings[index].trekkingPole = document.getElementById('edit-trekking-pole').value;
 
+                bookings[index].medalName = document.getElementById('edit-medal-name').value;
+                bookings[index].diet = document.getElementById('edit-diet').value;
+                bookings[index].allergy = document.getElementById('edit-allergy').value;
+                bookings[index].special = document.getElementById('edit-special').value;
+                bookings[index].commitments = document.getElementById('edit-commitment').checked;
+
                 bookings[index].totalPrice = total;
                 bookings[index].deposit = deposit;
+
+                // Auto update status if fully paid? (Optional, skipping to avoid side effects)
+                if (total > 0 && deposit >= total && bookings[index].status === 'Đã cọc (Chờ đi)') {
+                    bookings[index].status = 'Hoàn tất';
+                }
 
                 localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
 
