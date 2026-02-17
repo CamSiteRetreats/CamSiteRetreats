@@ -148,6 +148,10 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Khách hàng đã đăng ký</h1>
                 <p class="text-gray-500 text-sm">Danh sách khách hàng đã hoàn thành đăng ký và thanh toán.</p>
+                <button onclick="migrateLocalToDB()"
+                    class="mt-2 text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition-colors">
+                    <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Migrate Local to DB
+                </button>
             </div>
         </header>
 
@@ -422,18 +426,23 @@
         const LEADS_KEY = 'cam_site_leads';
         const SCHEDULES_KEY = 'cam_site_schedules';
         const TOURS_KEY = 'cam_site_tours';
+
+        // API Endpoints
+        const API_GET_BOOKINGS = '/api/get-bookings';
+        const API_SAVE_BOOKING = '/api/save-booking';
+        const API_DELETE_BOOKING = '/api/delete-booking';
+
         let currentUser = null;
+        let currentFilteredBookings = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Check Auth
             currentUser = checkAuth();
             if (currentUser) {
-                // Update Sidebar
                 document.getElementById('sidebar-avatar').src = currentUser.avatar;
                 document.getElementById('sidebar-name').textContent = currentUser.fullName;
                 document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
 
-                // Role Permissions
                 if (currentUser.role !== 'admin') {
                     document.getElementById('nav-users').classList.add('hidden');
                 }
@@ -441,14 +450,33 @@
 
             loadTourOptions();
             loadDateOptions();
-            loadTourOptions(); // Duplicate call in original, keeping structure
-            loadDateOptions(); // Duplicate call in original, keeping structure
 
-            // Migration: Fix legacy 3.2M prices
-            migrateLegacyPrices();
-
+            // Initial Data Load
             loadBookings();
         });
+
+        async function loadBookings() {
+            try {
+                const response = await fetch(API_GET_BOOKINGS);
+                const bookings = await response.json();
+
+                // Process for Legacy Data (ID normalization handled by DB usually, but local data might be mixed if we migrate)
+                // For now just assume they are valid objects.
+
+                window.allBookings = bookings;
+
+                updateSaleFilterOptions(bookings);
+                renderBookings(bookings);
+                updateBadges(bookings);
+
+                // Refresh Date Options after data load
+                loadDateOptions();
+
+            } catch (error) {
+                console.error('Failed to load bookings:', error);
+                document.getElementById('bookings-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-4 text-red-500 font-bold">Lỗi kết nối Server! Vui lòng thử lại.</td></tr>';
+            }
+        }
 
         function loadTourOptions() {
             const tourSelect = document.getElementById('filter-tour');
@@ -590,62 +618,47 @@
             }
         }
 
-        let currentFilteredBookings = [];
-
         function renderBookings(bookings) {
+            if (!bookings) bookings = [];
+
             // --- FILTER LOGIC ---
             const searchTerm = document.getElementById('filter-search')?.value.toLowerCase() || '';
             const filterTour = document.getElementById('filter-tour')?.value || '';
             const filterStatus = document.getElementById('filter-status')?.value || '';
-            const filterDateStart = document.getElementById('filter-date')?.value || ''; // This is YYYY-MM-DD start date
+            const filterDateStart = document.getElementById('filter-date')?.value || '';
             const filterSale = document.getElementById('filter-sale')?.value || '';
 
-            // Prepare Matchers
-            // We need to match against what's actually in booking.date.
-            // booking.date could be "15/3/2026 - 16/3/2026" or "15/03/2026 - 16/03/2026"
-            // or maybe "15/3 - 16/3" if user manually entered it.
-
+            // Date Matching Logic
             let possibleMatches = [];
             const filterDateParts = filterDateStart ? filterDateStart.split('|') : [];
             const hasCompositeDate = filterDateParts.length === 2;
 
             if (filterDateStart) {
-                // Determine Start and End dates for matching
                 let startDateVal, endDateVal;
-
                 if (hasCompositeDate) {
                     startDateVal = filterDateParts[0];
                     endDateVal = filterDateParts[1];
                 } else {
-                    // Fallback for legacy single value
                     startDateVal = filterDateStart;
                     const schedules = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
                     const sched = schedules.find(s => s.startDate === startDateVal && (!filterTour || s.tour === filterTour));
                     if (sched) endDateVal = sched.endDate;
                 }
 
-                possibleMatches.push(startDateVal); // Match raw YYYY-MM-DD
-
+                possibleMatches.push(startDateVal);
                 if (endDateVal && startDateVal) {
                     const d1 = new Date(startDateVal);
                     const d2 = new Date(endDateVal);
 
-                    // Variants for "DD/MM - DD/MM" logic
-                    // 1. Strict label format: 15/03 - 16/03
                     const f1 = `${d1.getDate().toString().padStart(2, '0')}/${(d1.getMonth() + 1).toString().padStart(2, '0')}`;
                     const f2 = `${d2.getDate().toString().padStart(2, '0')}/${(d2.getMonth() + 1).toString().padStart(2, '0')}`;
-                    possibleMatches.push(`${f1} - ${f2}`); // "15/03 - 16/03"
-
-                    // 2. Short format: 15/3 - 16/3
                     const f1_s = `${d1.getDate()}/${d1.getMonth() + 1}`;
                     const f2_s = `${d2.getDate()}/${d2.getMonth() + 1}`;
-                    possibleMatches.push(`${f1_s} - ${f2_s}`); // "15/3 - 16/3"
 
-                    // 3. Mixed format? Just in case
+                    possibleMatches.push(`${f1} - ${f2}`);
+                    possibleMatches.push(`${f1_s} - ${f2_s}`);
                     possibleMatches.push(`${f1} - ${f2_s}`);
                     possibleMatches.push(`${f1_s} - ${f2}`);
-
-                    // 4. Also match just the Start Date string for loose matching if strict fails
                     possibleMatches.push(f1);
                     possibleMatches.push(f1_s);
                 }
@@ -657,14 +670,14 @@
                 const matchesStatus = filterStatus ? b.status === filterStatus : true;
 
                 let matchesSale = true;
-                if (filterSale) {
-                    matchesSale = b.saleId == filterSale;
-                }
+                // sale_id in DB (snake_case) but might be camelCase in local if not mapped? 
+                // DB returns snake_case.
+                const saleId = b.sale_id || b.saleId;
+                if (filterSale) matchesSale = saleId == filterSale;
 
                 let matchesDate = true;
                 if (filterDateStart) {
                     const bDate = (b.date || '').trim();
-                    // Check if booking date *starts with* or *contains* any of the possible start date versions
                     matchesDate = possibleMatches.some(m => bDate.includes(m));
                 }
 
@@ -675,124 +688,76 @@
             tableBody.innerHTML = '';
 
             if (currentFilteredBookings.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-400 italic text-sm">Không tìm thấy đơn hàng nào phù hợp.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-10 text-center text-gray-400 italic text-sm">Không tìm thấy đơn hàng nào phù hợp.</td></tr>';
                 return;
             }
 
-            // Sort logic (Newest first)
+            // Sort by Created At (desc) or ID
             currentFilteredBookings.sort((a, b) => b.id - a.id);
 
             currentFilteredBookings.forEach(booking => {
-                const date = new Date(booking.createdAt || booking.id);
-                const initial = booking.name.charAt(0).toUpperCase();
-
-                // Money
-                // Find Tour Price from DB if not saved in booking
-                const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
-                const tourData = tours.find(t => t.name === booking.tour);
-                const defaultPrice = tourData ? Number(tourData.price) : 0;
-
-                const total = Number(booking.totalPrice) || defaultPrice;
+                const total = Number(booking.total_price || booking.totalPrice) || 0;
                 const deposit = Number(booking.deposit) || 0;
                 const remaining = total - deposit;
                 const fmt = (n) => n.toLocaleString('vi-VN') + 'đ';
 
-                // Status Badge
                 let statusClass = 'bg-gray-100 text-gray-600';
                 if (booking.status === 'Chờ xác nhận cọc') statusClass = 'bg-yellow-100 text-yellow-700';
                 if (booking.status === 'Đã cọc (Chờ đi)') statusClass = 'bg-blue-100 text-blue-700';
                 if (booking.status === 'Hoàn tất') statusClass = 'bg-green-100 text-green-700';
 
-                // --- BUILD NOTES TAGS ---
+                // Notes (Handle snake_case from DB)
+                let diet = booking.diet;
+                let trekkingPole = booking.trekking_pole || booking.trekkingPole;
+                let allergy = booking.allergy;
+                let special = booking.special;
+                let saleName = booking.sale_name || booking.saleName;
+
                 let notesHtml = '';
-
-                // Vegeterian Tag
-                if (booking.diet === 'Ăn chay') {
-                    notesHtml += `<span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 mr-1 mb-1">
-                        <i data-lucide="leaf" class="w-3 h-3"></i> Ăn chay
-                    </span>`;
+                if (diet === 'Ăn chay' || diet === true) {
+                    notesHtml += `<span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 mr-1 mb-1"><i data-lucide="leaf" class="w-3 h-3"></i> Ăn chay</span>`;
                 }
-
-                // Trekking Pole Tag
-                if (booking.trekkingPole === 'Có') {
-                    notesHtml += `<span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 mr-1 mb-1">
-                        <i data-lucide="person-standing" class="w-3 h-3"></i> Gậy
-                    </span>`;
+                if (trekkingPole === 'Có') {
+                    notesHtml += `<span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 mr-1 mb-1"><i data-lucide="person-standing" class="w-3 h-3"></i> Gậy</span>`;
                 }
-
-                // Allergy (Only if has value)
-                if (booking.allergy) {
-                    notesHtml += `<div class="text-[11px] text-red-500 font-medium mt-1 truncate" title="Dị ứng: ${booking.allergy}">
-                        • Dị ứng: ${booking.allergy}
-                     </div>`;
+                if (allergy) {
+                    notesHtml += `<div class="text-[11px] text-red-500 font-medium mt-1 truncate" title="Dị ứng: ${allergy}">• Dị ứng: ${allergy}</div>`;
                 }
-
-                // Special Request (Only if has value)
-                if (booking.special) {
-                    notesHtml += `<div class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[200px]" title="Note: ${booking.special}">
-                        • Note: ${booking.special}
-                     </div>`;
+                if (special) {
+                    notesHtml += `<div class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[200px]" title="Note: ${special}">• Note: ${special}</div>`;
                 }
-
                 if (!notesHtml) notesHtml = '<span class="text-gray-300 text-xs">-</span>';
 
                 const row = `
                     <tr class="hover:bg-gray-50/50 transition-colors text-sm group">
-                        <!-- Customer Name (Sticky Left) -->
-                        <td class="px-6 py-4 sticky left-0 bg-white group-hover:bg-gray-50/50 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                        <td class="px-6 py-4 sticky left-0 bg-white group-hover:bg-gray-50/50 z-10 border-r border-gray-100 shadow-sm">
                              <div class="font-bold text-gray-800">${booking.name}</div>
                         </td>
-
-                        <!-- Tour Info -->
                         <td class="px-6 py-4">
                              <div class="font-bold text-gray-700">${booking.tour}</div>
                              <div class="text-[10px] text-primary italic font-medium">${booking.date || 'Chưa chọn'}</div>
                         </td>
-
-                        <!-- Sale Info -->
                         <td class="px-6 py-4">
-                            ${booking.saleName ?
+                            ${saleName ?
                         `<div class="flex items-center space-x-2">
-                                    <div class="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-[10px] font-bold">
-                                        ${booking.saleName.charAt(0)}
-                                    </div>
-                                    <span class="text-xs font-bold text-gray-700">${booking.saleName}</span>
-                                </div>` :
-                        '<span class="text-xs text-gray-400 italic">--</span>'}
+                                    <div class="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-[10px] font-bold">${saleName.charAt(0)}</div>
+                                    <span class="text-xs font-bold text-gray-700">${saleName}</span>
+                                </div>` : '<span class="text-xs text-gray-400 italic">--</span>'}
                         </td>
-
-                        <!-- Status -->
                         <td class="px-6 py-4 text-center">
-                            <span class="${statusClass} text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest block w-fit mx-auto whitespace-nowrap">
-                                ${booking.status}
-                            </span>
+                            <span class="${statusClass} text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest block w-fit mx-auto whitespace-nowrap">${booking.status}</span>
                         </td>
-
-                        <!-- Payment -->
                         <td class="px-6 py-4 text-right border-l border-gray-100 font-bold text-gray-800">${fmt(total)}</td>
                         <td class="px-6 py-4 text-right font-bold text-green-600">${fmt(deposit)}</td>
                         <td class="px-6 py-4 text-right font-bold text-red-500">${fmt(remaining)}</td>
-
-                        <!-- Actions (Sticky Right) -->
-                        <td class="px-6 py-4 text-right sticky right-0 bg-white group-hover:bg-gray-50/50 z-10 border-l border-gray-100 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                        <td class="px-6 py-4 text-right sticky right-0 bg-white group-hover:bg-gray-50/50 z-10 border-l border-gray-100 shadow-sm">
                              <div class="flex items-center justify-end space-x-2">
-                                ${booking.status === 'Chờ xác nhận cọc' ? `
-                                <button onclick="confirmDeposit(${booking.id})" class="bg-primary text-white p-2 rounded-lg hover:shadow-lg hover:bg-orange-600 transition-all" title="Xác nhận cọc">
-                                    <i data-lucide="check" class="w-4 h-4"></i>
-                                </button>` : ''}
-                                
-                                <button onclick="copyPaymentLink(${booking.id})" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors" title="Copy Link Payment">
-                                    <i data-lucide="credit-card" class="w-4 h-4"></i>
-                                </button>
-                                
-                                <button onclick="openEditModal('${booking.id}')" class="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors" title="Sửa">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
-
-                                ${(currentUser && currentUser.role === 'admin') ? `
-                                <button onclick="deleteBooking(${booking.id})" class="text-gray-300 hover:text-red-500 transition-colors p-2" title="Xóa">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>` : ''}
+                                ${booking.status === 'Chờ xác nhận cọc' ?
+                        `<button onclick="confirmDeposit('${booking.id}')" class="bg-primary text-white p-2 rounded-lg hover:shadow-lg hover:bg-orange-600 transition-all"><i data-lucide="check" class="w-4 h-4"></i></button>` : ''}
+                                <button onclick="copyPaymentLink('${booking.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i data-lucide="credit-card" class="w-4 h-4"></i></button>
+                                <button onclick="openEditModal('${booking.id}')" class="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                ${(currentUser && currentUser.role === 'admin') ?
+                        `<button onclick="deleteBooking('${booking.id}')" class="text-gray-300 hover:text-red-500 transition-colors p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
                             </div>
                         </td>
                     </tr>
@@ -802,49 +767,39 @@
             lucide.createIcons();
         }
 
-        function updateBadges() {
-            // Update Bookings Badge
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            const bookingsBadge = document.getElementById('bookings-badge-count');
-            if (bookingsBadge) {
-                bookingsBadge.textContent = bookings.length;
-                bookingsBadge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
-            }
-
-            // Update Leads Badge
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
-            const leadsBadge = document.getElementById('leads-badge-count');
-            if (leadsBadge) {
-                leadsBadge.textContent = pendingLeads;
-                leadsBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
-            }
-        }
-
-        function confirmDeposit(id) {
+        async function confirmDeposit(id) {
             if (!confirm('Xác nhận đã nhận 500.000đ tiền cọc từ khách hàng này?')) return;
 
-            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            bookings = bookings.map(b => {
-                if (b.id == id) {
-                    b.status = 'Đã cọc (Chờ đi)';
-                }
-                return b;
-            });
-            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-            loadBookings();
+            const booking = window.allBookings.find(b => b.id == id);
+            if (!booking) return;
+
+            booking.status = 'Đã cọc (Chờ đi)';
+
+            try {
+                await fetch(API_SAVE_BOOKING, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(booking)
+                });
+                alert('Đã xác nhận cọc!');
+                loadBookings();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi khi lưu!');
+            }
         }
 
         function copyPaymentLink(id) {
-            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            const booking = bookings.find(b => b.id == id);
-
+            const booking = window.allBookings.find(b => b.id == id);
             if (booking) {
-                const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
-                const tourData = tours.find(t => t.name === booking.tour);
-                const defaultPrice = tourData ? Number(tourData.price) : 0;
+                // Determine price if not set
+                let total = Number(booking.total_price || booking.totalPrice);
+                if (!total) {
+                    const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+                    const tourData = tours.find(t => t.name === booking.tour);
+                    total = tourData ? Number(tourData.price) : 0;
+                }
 
-                const total = Number(booking.totalPrice) || defaultPrice;
                 const deposit = Number(booking.deposit) || 0;
                 const remaining = total - deposit;
 
@@ -856,34 +811,29 @@
                 };
 
                 const jsonStr = JSON.stringify(data);
-
-                // Use UTF-8 safe encoding for Base64
                 const token = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g,
-                    function toSolidBytes(match, p1) {
-                        return String.fromCharCode('0x' + p1);
-                    }));
+                    function toSolidBytes(match, p1) { return String.fromCharCode('0x' + p1); }));
 
-                // Use URL API for relative path (works with any casing of /ADMIN/)
-                // Assuming current page is .../ADMIN/bookings.html, target is .../booking/payment.html
                 const url = new URL('../booking/payment.html', window.location.href).href + '?code=' + token;
 
                 navigator.clipboard.writeText(url)
-                    .then(() => {
-                        alert(`✅ Đã copy Link rút gọn!\n\nLink: ${url}`);
-                    })
-                    .catch(err => {
-                        console.error('Clipboard failed', err);
-                        prompt("Không thể tự động copy (Do trình duyệt chặn). Vui lòng copy link dưới đây:", url);
-                    });
+                    .then(() => alert(`✅ Đã copy Link rút gọn!\n\nLink: ${url}`))
+                    .catch(() => prompt("Copy link:", url));
             }
         }
 
-        function deleteBooking(id) {
+        async function deleteBooking(id) {
             if (!confirm('Bạn có chắc muốn xóa khách hàng đã đăng ký này?')) return;
-            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            bookings = bookings.filter(b => b.id != id);
-            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-            loadBookings();
+            try {
+                await fetch(API_DELETE_BOOKING, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: id })
+                });
+                loadBookings();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi xóa dữ liệu!');
+            }
         }
 
         function exportToExcel() {
@@ -944,8 +894,7 @@
         }
 
         function openEditModal(id) {
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            const booking = bookings.find(b => b.id == id);
+            const booking = window.allBookings.find(b => b.id == id);
             if (!booking) return;
 
             // Basic Info
@@ -955,34 +904,40 @@
             document.getElementById('edit-tour').value = booking.tour;
             document.getElementById('edit-date').value = booking.date || '';
 
-            // Extended Info
+            // Extended Info (Handle snake_case from DB)
             document.getElementById('edit-dob').value = booking.dob || '';
             document.getElementById('edit-gender').value = booking.gender || 'Nam';
-            document.getElementById('edit-idcard').value = booking.idCard || '';
+            document.getElementById('edit-idcard').value = booking.id_card || booking.idCard || '';
             document.getElementById('edit-address').value = booking.address || '';
-            document.getElementById('edit-trekking-pole').value = booking.trekkingPole || 'Không';
+            document.getElementById('edit-trekking-pole').value = booking.trekking_pole || booking.trekkingPole || 'Không';
 
             // New Fields
-            document.getElementById('edit-medal-name').value = booking.medalName || booking.name || '';
+            document.getElementById('edit-medal-name').value = booking.medal_name || booking.medalName || booking.name || '';
             document.getElementById('edit-diet').value = booking.diet || 'Không';
             document.getElementById('edit-allergy').value = booking.allergy || '';
             document.getElementById('edit-special').value = booking.special || '';
             document.getElementById('edit-commitment').checked = !!booking.commitments;
 
             // Money
-            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
-            const tourData = tours.find(t => t.name === booking.tour);
-            const defaultPrice = tourData ? Number(tourData.price) : 0;
+            const total = Number(booking.total_price || booking.totalPrice) || 0;
+            const deposit = Number(booking.deposit) || 0;
 
-            document.getElementById('edit-total').value = Number(booking.totalPrice) || defaultPrice;
-            document.getElementById('edit-deposit').value = Number(booking.deposit) || 0;
+            // If total is 0, try to fetch default from Tour (via localStorage for now)
+            if (total === 0) {
+                const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+                const tourData = tours.find(t => t.name === booking.tour);
+                if (tourData) document.getElementById('edit-total').value = Number(tourData.price);
+                else document.getElementById('edit-total').value = 0;
+            } else {
+                document.getElementById('edit-total').value = total;
+            }
 
+            document.getElementById('edit-deposit').value = deposit;
             updateRemainingCalculation();
 
             const modal = document.getElementById('edit-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-
             lucide.createIcons();
         }
 
@@ -999,51 +954,102 @@
             document.getElementById('edit-remaining').textContent = remaining.toLocaleString('vi-VN') + 'đ';
         }
 
-        function saveEditBooking(e) {
+        async function saveEditBooking(e) {
             e.preventDefault();
-            const id = document.getElementById('edit-id').value;
-            const name = document.getElementById('edit-name').value;
-            const phone = document.getElementById('edit-phone').value;
-            const tour = document.getElementById('edit-tour').value;
-            const date = document.getElementById('edit-date').value;
-            const total = Number(document.getElementById('edit-total').value);
-            const deposit = Number(document.getElementById('edit-deposit').value);
 
-            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            const index = bookings.findIndex(b => b.id == id);
+            const bookingData = {
+                id: document.getElementById('edit-id').value,
+                name: document.getElementById('edit-name').value,
+                phone: document.getElementById('edit-phone').value,
+                tour: document.getElementById('edit-tour').value,
+                date: document.getElementById('edit-date').value,
 
-            if (index !== -1) {
-                bookings[index].name = name;
-                bookings[index].phone = phone;
-                bookings[index].tour = tour;
-                bookings[index].date = date;
+                dob: document.getElementById('edit-dob').value,
+                gender: document.getElementById('edit-gender').value,
+                id_card: document.getElementById('edit-idcard').value,
+                address: document.getElementById('edit-address').value,
+                trekking_pole: document.getElementById('edit-trekking-pole').value,
 
-                // Existing + New Fields
-                bookings[index].dob = document.getElementById('edit-dob').value;
-                bookings[index].gender = document.getElementById('edit-gender').value;
-                bookings[index].idCard = document.getElementById('edit-idcard').value;
-                bookings[index].address = document.getElementById('edit-address').value;
-                bookings[index].trekkingPole = document.getElementById('edit-trekking-pole').value;
+                medal_name: document.getElementById('edit-medal-name').value,
+                diet: document.getElementById('edit-diet').value,
+                allergy: document.getElementById('edit-allergy').value,
+                special: document.getElementById('edit-special').value,
+                commitments: document.getElementById('edit-commitment').checked,
 
-                bookings[index].medalName = document.getElementById('edit-medal-name').value;
-                bookings[index].diet = document.getElementById('edit-diet').value;
-                bookings[index].allergy = document.getElementById('edit-allergy').value;
-                bookings[index].special = document.getElementById('edit-special').value;
-                bookings[index].commitments = document.getElementById('edit-commitment').checked;
+                total_price: Number(document.getElementById('edit-total').value),
+                deposit: Number(document.getElementById('edit-deposit').value),
+            };
 
-                bookings[index].totalPrice = total;
-                bookings[index].deposit = deposit;
+            // Preserve existing fields (status, sale info) if editing
+            const existing = window.allBookings.find(b => b.id == bookingData.id);
+            if (existing) {
+                bookingData.status = existing.status;
+                bookingData.sale_id = existing.sale_id || existing.saleId;
+                bookingData.sale_name = existing.sale_name || existing.saleName;
+                bookingData.customer_id = existing.customer_id;
 
-                // Auto update status if fully paid? (Optional, skipping to avoid side effects)
-                if (total > 0 && deposit >= total && bookings[index].status === 'Đã cọc (Chờ đi)') {
-                    bookings[index].status = 'Hoàn tất';
+                // Auto Complete logic
+                if (bookingData.total_price > 0 && bookingData.deposit >= bookingData.total_price && bookingData.status === 'Đã cọc (Chờ đi)') {
+                    bookingData.status = 'Hoàn tất';
                 }
+            }
 
-                localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-
-                alert('Đã cập nhật đơn hàng thành công!');
+            try {
+                await fetch(API_SAVE_BOOKING, {
+                    method: 'POST',
+                    body: JSON.stringify(bookingData)
+                });
+                alert('Lưu thành công!');
                 closeEditModal();
                 loadBookings();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi khi lưu!');
+            }
+        }
+
+        async function migrateLocalToDB() {
+            if (!confirm('Bạn có chắc muốn chuyển toàn bộ dữ liệu từ LocalStorage lên Database? Hành động này sẽ thêm mới tất cả đơn hàng từ LocalStorage vào Database.')) return;
+
+            const localBookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            if (localBookings.length === 0) {
+                alert('Không có dữ liệu local để chuyển.');
+                return;
+            }
+
+            let count = 0;
+            const btn = document.querySelector('button[onclick="migrateLocalToDB()"]');
+            if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin inline mr-1"></i> Migrating...';
+
+            try {
+                for (const b of localBookings) {
+                    const dbBooking = {
+                        ...b,
+                        id_card: b.idCard,
+                        trekking_pole: b.trekkingPole,
+                        medal_name: b.medalName,
+                        total_price: b.totalPrice,
+                        sale_id: b.saleId,
+                        sale_name: b.saleName
+                    };
+                    // Remove ID to allow DB to generate new SERIAL ID
+                    delete dbBooking.id;
+                    delete dbBooking.createdAt;
+
+                    await fetch(API_SAVE_BOOKING, {
+                        method: 'POST',
+                        body: JSON.stringify(dbBooking)
+                    });
+                    count++;
+                }
+                alert(`Đã chuyển thành công ${count} đơn hàng!`);
+                loadBookings();
+            } catch (e) {
+                console.error(e);
+                alert('Có lỗi xảy ra khi Data Migration!');
+            } finally {
+                if (btn) btn.innerHTML = '<i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Migrate Local to DB';
+                lucide.createIcons();
             }
         }
 

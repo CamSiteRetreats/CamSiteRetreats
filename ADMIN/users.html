@@ -130,6 +130,11 @@
                 <i data-lucide="user-plus" class="w-5 h-5"></i>
                 <span>Thêm User mới</span>
             </button>
+            <button onclick="migrateUsersLocalToDB()"
+                class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-indigo-600/20 hover:scale-[1.05] transition-transform ml-3">
+                <i data-lucide="database" class="w-5 h-5"></i>
+                <span>Migrate Local to DB</span>
+            </button>
         </header>
 
         <!-- Users Table -->
@@ -207,15 +212,113 @@
         lucide.createIcons();
 
         // 1. Check Auth & Role
-        document.addEventListener('DOMContentLoaded', () => {
+        // 1. Check Auth & Role
+        document.addEventListener('DOMContentLoaded', async () => {
             // Only Admin can access this page
             requireRole(['admin']);
 
-            loadUsers();
+            await loadUsers();
             updateCurrentUserUI();
             syncBadges();
         });
 
+        // ...
+
+        async function loadUsers() {
+            const users = await getAllUsers();
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const roleBadge = user.role === 'admin'
+                    ? '<span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-1 rounded-full font-bold uppercase">Admin</span>'
+                    : '<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-1 rounded-full font-bold uppercase">Sale Staff</span>';
+
+                const row = `
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <img src="${user.avatar}" class="w-8 h-8 rounded-full border border-gray-100">
+                                <div>
+                                    <div class="font-bold text-gray-800 text-sm">${user.fullName}</div>
+                                    <div class="text-[10px] text-gray-400 font-mono">@${user.username}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">${roleBadge}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-600">${user.email || '-'}</div>
+                            <div class="text-[10px] text-gray-400">${user.phone || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-green-600 font-bold text-xs flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button onclick='openUserModal(${JSON.stringify(user)})' class="text-gray-400 hover:text-primary p-1">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </button>
+                            ${user.username !== 'admin' ? `
+                            <button onclick="handleDelete(${user.id})" class="text-gray-400 hover:text-red-500 p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>` : ''}
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+            lucide.createIcons();
+        }
+
+        async function handleSaveUser(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('user-id').value;
+            const users = await getAllUsers();
+
+            // Check duplicate username if new
+            const username = document.getElementById('username').value;
+            if (!id && users.some(u => u.username === username)) {
+                alert('Tên đăng nhập đã tồn tại!');
+                return;
+            }
+
+            const userData = {
+                id: id ? Number(id) : null,
+                username: username,
+                fullName: document.getElementById('fullname').value,
+                role: document.getElementById('role').value,
+                email: document.getElementById('email').value,
+                status: 'active'
+            };
+
+            const pass = document.getElementById('password').value;
+            if (pass) userData.password = pass;
+            if (!id && !pass) userData.password = '123456';
+
+            try {
+                await saveUser(userData);
+                closeUserModal();
+                await loadUsers();
+                alert('Đã lưu thông tin người dùng!');
+            } catch (e) {
+                alert('Lỗi lưu thông tin!');
+            }
+        }
+
+        async function handleDelete(id) {
+            if (confirm('Bạn có chắc muốn xóa tài khoản này?')) {
+                const success = await deleteUser(id);
+                if (success) {
+                    await loadUsers();
+                    const currentUser = getCurrentUser();
+                    if (currentUser && currentUser.id === id) logout();
+                } else {
+                    alert('Lỗi khi xóa!');
+                }
+            }
+        }
         function syncBadges() {
             const LEADS_KEY = 'cam_site_leads';
             const BOOKINGS_KEY = 'cam_site_bookings';
@@ -356,13 +459,62 @@
             alert('Đã lưu thông tin người dùng!');
         }
 
-        function handleDelete(id) {
+        async function handleDelete(id) {
             if (confirm('Bạn có chắc muốn xóa tài khoản này?')) {
-                deleteUser(id);
+                const success = await deleteUser(id);
+                if (success) {
+                    await loadUsers();
+                    const currentUser = getCurrentUser();
+                    if (currentUser && currentUser.id === id) logout();
+                } else {
+                    alert('Lỗi khi xóa!');
+                }
+            }
+        }
+
+        async function migrateUsersLocalToDB() {
+            if (!confirm('Bạn có chắc muốn chuyển toàn bộ Users từ LocalStorage lên Database? (Username trùng sẽ bị bỏ qua)')) return;
+
+            const localUsers = JSON.parse(localStorage.getItem('cam_site_users')) || [];
+            if (localUsers.length === 0) {
+                alert('Không có dữ liệu local để chuyển.');
+                return;
+            }
+
+            let count = 0;
+            const btn = document.querySelector('button[onclick="migrateUsersLocalToDB()"]');
+            if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Migrating...';
+
+            try {
+                // Fetch existing users to check duplicates
+                const dbUsers = await getAllUsers();
+                const existingUsernames = dbUsers.map(u => u.username);
+
+                for (const u of localUsers) {
+                    if (existingUsernames.includes(u.username)) continue;
+
+                    const dbUser = {
+                        username: u.username,
+                        password: u.password || '123456',
+                        fullName: u.fullName,
+                        role: u.role,
+                        email: u.email,
+                        phone: u.phone,
+                        avatar: u.avatar,
+                        status: u.status || 'active'
+                    };
+
+                    await saveUser(dbUser);
+                    count++;
+                }
+                alert(`Đã chuyển thành công ${count} users mới!`);
                 loadUsers();
-                // If deleted self (should happen via logic checks but just in case)
-                const currentUser = getCurrentUser();
-                if (currentUser && currentUser.id === id) logout();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi Migration!');
+            } finally {
+                if (btn) btn.innerHTML = '<i data-lucide="database" class="w-5 h-5"></i> <span>Migrate Local to DB</span>';
+                lucide.createIcons();
             }
         }
     </script>

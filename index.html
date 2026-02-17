@@ -672,34 +672,50 @@
             document.getElementById('home-selected-date-input').value = date;
         }
 
-        function handleHomeBookingSubmit(e) {
+        async function handleHomeBookingSubmit(e) {
             e.preventDefault();
-            const LEADS_KEY = 'cam_site_leads';
+
+            // Show loading
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'ĐANG GỬI...';
+            btn.disabled = true;
 
             const newLead = {
-                id: Date.now(),
                 name: document.getElementById('home-cust-name').value,
                 phone: document.getElementById('home-cust-phone').value,
                 tour: document.getElementById('home-tour-select').value,
                 date: document.getElementById('home-selected-date-input').value,
                 message: document.getElementById('home-cust-message').value,
-                status: 'Chờ tư vấn',
-                createdAt: new Date().toISOString()
+                status: 'Chờ tư vấn'
             };
 
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            leads.push(newLead);
-            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+            try {
+                const response = await fetch('./api/save-lead.js', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newLead)
+                });
 
-            // Show Modal
-            const modal = document.getElementById('success-modal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+                if (!response.ok) throw new Error('Network response was not ok');
 
-            // Reset
-            e.target.reset();
-            document.getElementById('home-date-selector').innerHTML = '';
-            document.getElementById('home-selected-date-input').value = '';
+                // Show Modal
+                const modal = document.getElementById('success-modal');
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+
+                // Reset
+                e.target.reset();
+                document.getElementById('home-date-selector').innerHTML = '';
+                document.getElementById('home-selected-date-input').value = '';
+
+            } catch (error) {
+                console.error('Error submitting lead:', error);
+                alert('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau hoặc liên hệ hotline!');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
 
         function closeSuccessModal() {

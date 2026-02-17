@@ -211,6 +211,10 @@
                     class="bg-primary text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-transform flex items-center gap-2 ml-2">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i> Thêm thủ công
                 </button>
+                <button onclick="migrateLeadsLocalToDB()"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 hover:scale-105 transition-transform flex items-center gap-2 ml-2">
+                    <i data-lucide="database" class="w-4 h-4"></i> Migrate Local to DB
+                </button>
             </div>
         </header>
 
@@ -377,9 +381,17 @@
 
         const LEADS_KEY = 'cam_site_leads';
         const BOOKINGS_KEY = 'cam_site_bookings';
-        let currentUser = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // API Endpoints
+        const API_GET_LEADS = '../api/get-leads.js';
+        const API_SAVE_LEAD = '../api/save-lead.js';
+        const API_DELETE_LEAD = '../api/delete-lead.js';
+        const API_SAVE_BOOKING = '../api/save-booking.js'; // For convertToBooking
+
+        let currentUser = null;
+        window.allLeads = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
             // 1. Check Auth
             currentUser = checkAuth();
             if (currentUser) {
@@ -393,15 +405,25 @@
                     document.getElementById('nav-users').classList.add('hidden');
                 }
             }
-            loadLeads();
+            await loadLeads();
         });
 
-        function loadLeads() {
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            updateSaleFilterOptions(leads);
-            renderLeads(leads);
-            updateBadgeCount(leads);
-            updateBookingsBadge();
+        async function loadLeads() {
+            try {
+                const response = await fetch(API_GET_LEADS);
+                const leads = await response.json();
+
+                window.allLeads = leads;
+
+                updateSaleFilterOptions(leads);
+                renderLeads(leads);
+                updateBadgeCount(leads);
+                updateBookingsBadge();
+
+            } catch (error) {
+                console.error('Failed to load leads:', error);
+                document.getElementById('leads-table-body').innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500 font-bold">Lỗi kết nối Server!</td></tr>';
+            }
         }
 
         function updateSaleFilterOptions(leads) {
@@ -553,43 +575,51 @@
             }
         }
 
-        function updateStatus(id, newStatus) {
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            leads = leads.map(l => {
-                if (l.id === id) l.status = newStatus;
-                return l;
-            });
-            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-            loadLeads();
+        async function updateStatus(id, newStatus) {
+            const lead = window.allLeads.find(l => l.id == id);
+            if (!lead) return;
+
+            lead.status = newStatus;
+
+            try {
+                await fetch(API_SAVE_LEAD, {
+                    method: 'POST',
+                    body: JSON.stringify(lead)
+                });
+                loadLeads();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi cập nhật trạng thái!');
+            }
         }
 
-        function assignSale(leadId) {
-            if (!currentUser) {
-                alert('Vui lòng đăng nhập để thực hiện chức năng này!');
-                return;
-            }
-
+        async function assignSale(leadId) {
+            if (!currentUser) return alert('Vui lòng đăng nhập!');
             if (!confirm(`Bạn có chắc muốn nhận khách hàng này?`)) return;
 
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const index = leads.findIndex(l => l.id === leadId);
+            const lead = window.allLeads.find(l => l.id == leadId);
+            if (!lead) return;
 
-            if (index !== -1) {
-                // Check if already assigned (double check)
-                if (leads[index].saleId) {
-                    alert('Khách hàng này đã có người phụ trách!');
-                    loadLeads();
-                    return;
-                }
+            if (lead.sale_id || lead.saleId) {
+                alert('Khách hàng này đã có người phụ trách!');
+                return loadLeads();
+            }
 
-                leads[index].saleId = currentUser.id;
-                leads[index].saleName = currentUser.fullName;
-                leads[index].saleAvatar = currentUser.avatar;
-                leads[index].status = 'Đang liên hệ'; // Auto update status
+            lead.sale_id = currentUser.id;
+            lead.sale_name = currentUser.fullName;
+            lead.sale_avatar = currentUser.avatar;
+            lead.status = 'Đang liên hệ';
 
-                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+            try {
+                await fetch(API_SAVE_LEAD, {
+                    method: 'POST',
+                    body: JSON.stringify(lead)
+                });
                 alert(`Đã phân công ${currentUser.fullName} phụ trách!`);
                 loadLeads();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi phân công!');
             }
         }
 
@@ -603,18 +633,18 @@
         }
 
         function updateBookingsBadge() {
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            // Bookings are now in DB, need separate API call or assume badge update elsewhere?
+            // For now, let's just hide it or leave it as 0 unless we fetch bookings too.
+            // Or we can fetch bookings here briefly to count? 
+            // Better to skip or separate. Let's try to fetch if we really want to show count.
+            // Simplified:
             const badge = document.getElementById('bookings-badge-count');
-            if (badge) {
-                badge.textContent = bookings.length;
-                badge.style.display = bookings.length > 0 ? 'inline-block' : 'none';
-            }
+            if (badge) badge.style.display = 'none';
         }
 
         // Modal Logic
         function openDetailModal(id) {
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const lead = leads.find(l => l.id === id);
+            const lead = window.allLeads.find(l => l.id == id);
             if (!lead) return;
 
             const content = document.getElementById('lead-detail-content');
@@ -655,71 +685,69 @@
             document.body.style.overflow = 'auto';
         }
 
-        function convertToBooking(id) {
+        async function convertToBooking(id) {
             if (!confirm('Xác nhận khách hàng đã đặt cọc / thanh toán? Thao tác này sẽ chuyển dữ liệu sang mục Đơn hàng chốt.')) return;
 
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const leadIndex = leads.findIndex(l => l.id === id);
-            if (leadIndex === -1) return;
+            const lead = window.allLeads.find(l => l.id == id);
+            if (!lead) return;
 
-            const lead = leads[leadIndex];
+            // Try to find price
+            const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
+            const tourData = tours.find(t => t.name === lead.tour);
+            const price = tourData ? Number(tourData.price) : 0;
 
-            // Thêm vào Bookings
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
             const newBooking = {
-                id: Date.now(),
-                leadId: lead.id,
                 name: lead.name,
                 phone: lead.phone,
                 tour: lead.tour,
                 date: lead.date,
-                amount: '2.690.000đ', // Mặc định hoặc lấy từ Tour database
-                status: 'HOÀN TẤT',
-                saleId: lead.saleId,       // Preserve Sale Info
-                saleName: lead.saleName,   // Preserve Sale Info
-                createdAt: new Date().toISOString()
+                status: 'Hoàn tất',
+                sale_id: lead.saleId || lead.sale_id,
+                sale_name: lead.saleName || lead.sale_name,
+                total_price: price,
+                deposit: 0
             };
-            bookings.push(newBooking);
-            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
 
-            // Sync to Customer DB & Update Booking with Customer ID
             try {
-                const customerId = syncCustomerFromBooking(newBooking);
-                if (customerId) {
-                    bookings[bookings.length - 1].customerId = customerId;
-                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-                }
+                // 1. Save Booking
+                await fetch(API_SAVE_BOOKING, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newBooking)
+                });
+
+                // 2. Delete Lead
+                await fetch(API_DELETE_LEAD, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: lead.id })
+                });
+
+                alert('Chốt đơn thành công! Đã chuyển khách hàng sang danh sách Đơn hàng chốt.');
+                loadLeads();
+
             } catch (e) {
-                console.error('CRM Sync Error:', e);
+                console.error(e);
+                alert('Lỗi khi chuyển đổi dữ liệu!');
             }
-
-            // Xóa khỏi Leads
-            leads.splice(leadIndex, 1);
-            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-
-            loadLeads();
-            alert('Chốt đơn thành công! Đã chuyển khách hàng sang danh sách Đơn hàng chốt.');
         }
 
-        function deleteLead(id) {
+        async function deleteLead(id) {
             if (confirm('Bạn có chắc chắn muốn xóa thông tin tư vấn này?')) {
-                let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-                leads = leads.filter(l => l.id !== id);
-                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-                loadLeads();
+                try {
+                    await fetch(API_DELETE_LEAD, {
+                        method: 'DELETE',
+                        body: JSON.stringify({ id: id })
+                    });
+                    loadLeads();
+                } catch (e) {
+                    console.error(e);
+                    alert('Lỗi xóa dữ liệu!');
+                }
             }
         }
 
         function generateBookingLink(id) {
-            // Admin đang ở /ADMIN/leads.html -> Link sẽ là /booking/process.html?leadId={id}
-            // Logic để lấy đúng base URL dù ở localhost hay production
-            // Giả sử cấu trúc là ROOT/ADMIN/leads.html và ROOT/booking/process.html
-
-            // Use URL API for robust path resolution (handles /ADMIN/ vs /admin/ automatically)
-            // Assuming current page is .../ADMIN/leads.html, target is .../booking/process.html
-
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const lead = leads.find(l => l.id === id);
+            const lead = window.allLeads.find(l => l.id == id);
             if (!lead) return;
 
             const params = new URLSearchParams();
@@ -728,38 +756,34 @@
             params.set('phone', lead.phone);
             params.set('tour', lead.tour);
             if (lead.date) params.set('date', lead.date);
-            if (lead.saleId) {
-                params.set('saleId', lead.saleId);
-                params.set('saleName', lead.saleName);
+
+            const saleId = lead.saleId || lead.sale_id;
+            const saleName = lead.saleName || lead.sale_name;
+            if (saleId) {
+                params.set('saleId', saleId);
+                params.set('saleName', saleName);
             }
 
             const bookingUrl = new URL('../booking/process.html', window.location.href).href + '?' + params.toString();
 
             navigator.clipboard.writeText(bookingUrl).then(() => {
-                alert(`✅ Đã copy Link đặt chỗ!\n\nLink này an toàn để gửi cho khách hàng, chứa sẵn thông tin họ tên và tour.\n\n${bookingUrl}`);
-
-                // Cập nhật trạng thái "Đang liên hệ"
-                let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-                const lead = leads.find(l => l.id === id);
-                if (lead && lead.status === 'Chờ tư vấn') {
+                alert(`✅ Đã copy Link đặt chỗ!\n\n${bookingUrl}`);
+                if (lead.status === 'Chờ tư vấn') {
                     updateStatus(id, 'Đang liên hệ');
                 }
             }).catch(err => {
-                prompt('Không thể copy tự động. Hãy copy link dưới đây:', bookingUrl);
+                prompt('Copy link:', bookingUrl);
             });
         }
 
         // --- Utils & Edit Logic ---
 
         function getShortId(id) {
-            // Lấy 6 số cuối của ID (timestamp)
             return id.toString().slice(-6);
         }
 
         function openEditModal(id) {
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            // So sánh lỏng lẻo để accept cả string/number ID
-            const lead = leads.find(l => l.id == id);
+            const lead = window.allLeads.find(l => l.id == id);
             if (!lead) return;
 
             document.getElementById('edit-id').value = lead.id;
@@ -777,37 +801,33 @@
             document.getElementById('edit-modal').classList.remove('active');
         }
 
-        function saveEditLead(e) {
+        async function saveEditLead(e) {
             e.preventDefault();
             const id = document.getElementById('edit-id').value;
-            const name = document.getElementById('edit-name').value;
-            const phone = document.getElementById('edit-phone').value;
-            const tour = document.getElementById('edit-tour').value;
-            const date = document.getElementById('edit-date').value;
-            const message = document.getElementById('edit-message').value;
+            const lead = window.allLeads.find(l => l.id == id);
+            if (!lead) return;
 
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            const index = leads.findIndex(l => l.id == id);
+            lead.name = document.getElementById('edit-name').value;
+            lead.phone = document.getElementById('edit-phone').value;
+            lead.tour = document.getElementById('edit-tour').value;
+            lead.date = document.getElementById('edit-date').value;
+            lead.message = document.getElementById('edit-message').value;
 
-            if (index !== -1) {
-                leads[index].name = name;
-                leads[index].phone = phone;
-                leads[index].tour = tour;
-                leads[index].date = date;
-                leads[index].message = message;
-
-                localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-
-                alert('Đã cập nhật thông tin thành công!');
+            try {
+                await fetch(API_SAVE_LEAD, { method: 'POST', body: JSON.stringify(lead) });
+                alert('Cập nhật thành công!');
                 closeEditModal();
                 loadLeads();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi cập nhật!');
             }
         }
 
         // --- Add Lead Logic ---
         function openAddLeadModal() {
             document.getElementById('add-lead-form').reset();
-            loadAddLeadTours(); // Load dynamic options
+            loadAddLeadTours();
             document.getElementById('add-modal').classList.add('active');
             lucide.createIcons();
         }
@@ -823,27 +843,17 @@
                 option.textContent = tour.name;
                 tourSelect.appendChild(option);
             });
-
-            // Reset Date Select
             updateAddLeadDates();
         }
 
         function updateAddLeadDates() {
             const tourName = document.getElementById('add-tour').value;
             const dateSelect = document.getElementById('add-date');
-
             dateSelect.innerHTML = '<option value="">-- Chọn Ngày --</option>';
-
             if (!tourName) return;
 
             const schedules = JSON.parse(localStorage.getItem('cam_site_schedules')) || [];
             let tourSchedules = schedules.filter(s => s.tour === tourName);
-
-            // Filter out schedules that are explicitly marked as "Hết chỗ" AND check real availability
-            // Or better, just rely on real availability?
-            // Let's rely on real availability primarily, but respect manual "Hết chỗ" if it was set?
-            // Actually, getScheduleAvailability doesn't check 'status' field of schedule, it counts bookings.
-            // But we should probably filter out those where calculate remaining <= 0.
 
             tourSchedules = tourSchedules.filter(sch => {
                 if (typeof TourManager !== 'undefined') {
@@ -856,7 +866,6 @@
 
             if (tourSchedules.length === 0) {
                 const option = document.createElement('option');
-                option.value = "";
                 option.textContent = "Không có lịch trình khả dụng";
                 option.disabled = true;
                 dateSelect.appendChild(option);
@@ -864,13 +873,11 @@
             }
 
             tourSchedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
             tourSchedules.forEach(sch => {
-                const option = document.createElement('option');
-                // Format: 15/03/2026
                 const d = new Date(sch.startDate);
                 const dateStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-                option.value = dateStr; // Store formatted date as value to match existing logic
+                const option = document.createElement('option');
+                option.value = dateStr;
                 option.textContent = `${dateStr} (Còn ${sch.realRemaining} chỗ)`;
                 dateSelect.appendChild(option);
             });
@@ -880,7 +887,7 @@
             document.getElementById('add-modal').classList.remove('active');
         }
 
-        function saveAddLead(e) {
+        async function saveAddLead(e) {
             e.preventDefault();
             const name = document.getElementById('add-name').value;
             const phone = document.getElementById('add-phone').value;
@@ -888,7 +895,6 @@
             const date = document.getElementById('add-date').value;
             const message = document.getElementById('add-message').value;
 
-            // Auto-assign current user as sale if available
             let leadStatus = 'Chờ tư vấn';
             let saleId = null;
             let saleName = null;
@@ -898,30 +904,71 @@
                 saleId = currentUser.id;
                 saleName = currentUser.fullName;
                 saleAvatar = currentUser.avatar;
-                leadStatus = 'Đang liên hệ'; // Active handling since created manually by a user
+                leadStatus = 'Đang liên hệ';
             }
 
             const newLead = {
-                id: Date.now(),
                 name: name,
                 phone: phone,
                 tour: tour,
                 date: date,
                 message: message,
                 status: leadStatus,
-                saleId: saleId,
-                saleName: saleName,
-                saleAvatar: saleAvatar,
-                createdAt: new Date().toISOString()
+                sale_id: saleId,
+                sale_name: saleName,
+                sale_avatar: saleAvatar
             };
 
-            let leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            leads.push(newLead);
-            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+            try {
+                await fetch(API_SAVE_LEAD, { method: 'POST', body: JSON.stringify(newLead) });
+                alert('Thêm khách hàng thành công!');
+                closeAddModal();
+                loadLeads();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi thêm khách hàng!');
+            }
+        }
 
-            alert('Đã thêm khách hàng tư vấn mới thành công!');
-            closeAddModal();
-            loadLeads();
+        async function migrateLeadsLocalToDB() {
+            if (!confirm('Bạn có chắc muốn chuyển toàn bộ dữ liệu LEADS từ LocalStorage lên Database?')) return;
+
+            const localLeads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+            if (localLeads.length === 0) {
+                alert('Không có dữ liệu local để chuyển.');
+                return;
+            }
+
+            let count = 0;
+            const btn = document.querySelector('button[onclick="migrateLeadsLocalToDB()"]');
+            if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin inline mr-1"></i> Migrating...';
+
+            try {
+                for (const l of localLeads) {
+                    const dbLead = {
+                        ...l,
+                        sale_id: l.saleId,
+                        sale_name: l.saleName,
+                        sale_avatar: l.saleAvatar
+                    };
+                    delete dbLead.id;
+                    delete dbLead.createdAt;
+
+                    await fetch(API_SAVE_LEAD, {
+                        method: 'POST',
+                        body: JSON.stringify(dbLead)
+                    });
+                    count++;
+                }
+                alert(`Đã chuyển thành công ${count} leads!`);
+                loadLeads();
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi Migration!');
+            } finally {
+                if (btn) btn.innerHTML = '<i data-lucide="database" class="w-4 h-4 inline mr-1"></i> Migrate Local to DB';
+                lucide.createIcons();
+            }
         }
 
     </script>

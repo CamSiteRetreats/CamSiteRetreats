@@ -142,20 +142,26 @@
     <script>
         lucide.createIcons();
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const result = login(username, password);
+            // Show loading state if desired
+            const btn = event.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'ĐANG ĐĂNG NHẬP...';
+            btn.disabled = true;
+
+            const result = await login(username, password);
 
             if (result.success) {
-                // Determine redirect based on role (Optional, but good for UX)
-                // For now, simple redirect
                 window.location.href = 'dashboard.html';
             } else {
                 alert(result.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         }
     </script>
