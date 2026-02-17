@@ -261,7 +261,10 @@
                 }
 
                 const tour = tours.find(t => t.slug === slug);
-                if (!tour) throw new Error('Không tìm thấy hành trình này.');
+                if (!tour) {
+                    console.log("Slugs hiện có trong DB:", tours.map(t => t.slug));
+                    throw new Error(`Hành trình với mã "${slug}" không tồn tại trong hệ thống.`);
+                }
 
                 // --- SEO & SOCIAL PREVIEW ---
                 document.title = `${tour.name} | CAM SITE RETREATS`;
