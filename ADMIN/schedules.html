@@ -302,24 +302,27 @@
     <script>
         lucide.createIcons();
 
-        const SCHEDULES_KEY = 'cam_site_schedules';
-        const TOURS_KEY = 'cam_site_tours';
+        // API Endpoints
+        const API_GET = '/api/get-schedules';
+        const API_SAVE = '/api/save-schedule';
+        const API_DELETE = '/api/delete-schedule';
+        const API_TOURS = '/api/get-tours';
+
         let isEditing = false;
         let currentUser = null;
+        let currentSchedules = []; // Store locally for easy access
 
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Check Auth
             currentUser = checkAuth();
             if (currentUser) {
-                // Update Sidebar
                 document.getElementById('sidebar-avatar').src = currentUser.avatar;
                 document.getElementById('sidebar-name').textContent = currentUser.fullName;
                 document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
 
-                // Role Permissions
                 if (currentUser.role !== 'admin') {
                     document.getElementById('nav-users').classList.add('hidden');
-                    document.getElementById('btn-add-schedule').classList.add('hidden'); // Hide Add Button
+                    document.getElementById('btn-add-schedule').classList.add('hidden');
                 }
             }
 
@@ -328,14 +331,13 @@
             syncBadges();
         });
 
-        // Đồng bộ số lượng khách hàng
         function syncBadges() {
+            // Keep badge sync local for now or update if API available? 
+            // Leaving local as requested only schedule fixes.
             const LEADS_KEY = 'cam_site_leads';
             const BOOKINGS_KEY = 'cam_site_bookings';
-
             const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
             const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-
             const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
 
             const lBadge = document.getElementById('leads-badge-count');
@@ -343,7 +345,6 @@
                 lBadge.textContent = pendingLeads;
                 lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
             }
-
             const bBadge = document.getElementById('bookings-badge-count');
             if (bBadge) {
                 bBadge.textContent = bookings.length;
@@ -351,19 +352,96 @@
             }
         }
 
-        function loadTourOptions() {
+        async function loadTourOptions() {
             const tourSelect = document.getElementById('tour-name');
-            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            try {
+                // Fetch Tours from API
+                const res = await fetch(API_TOURS);
+                if (!res.ok) throw new Error('Failed to load tours');
+                const tours = await res.json();
 
-            // Keep the first default option
-            tourSelect.innerHTML = '<option value="">-- Chọn Tour --</option>';
+                tourSelect.innerHTML = '<option value="">-- Chọn Tour --</option>';
+                tours.forEach(tour => {
+                    const option = document.createElement('option');
+                    option.value = tour.name;
+                    option.textContent = tour.name;
+                    tourSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Error loading tours:', err);
+                tourSelect.innerHTML = '<option value="">Lỗi tải danh sách tour</option>';
+            }
+        }
 
-            tours.forEach(tour => {
-                const option = document.createElement('option');
-                option.value = tour.name;
-                option.textContent = tour.name;
-                tourSelect.appendChild(option);
-            });
+        async function loadSchedules() {
+            const tableBody = document.getElementById('schedule-table-body');
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải dữ liệu...</td></tr>';
+
+            try {
+                const res = await fetch(API_GET);
+                if (!res.ok) throw new Error('Failed to fetch schedules');
+                currentSchedules = await res.json();
+
+                tableBody.innerHTML = '';
+                if (currentSchedules.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Chưa có lịch trình nào.</td></tr>';
+                    return;
+                }
+
+                currentSchedules.forEach(item => {
+                    renderRow(item);
+                });
+                lucide.createIcons(); // Re-render icons after DOM update
+            } catch (err) {
+                console.error('Error loading schedules:', err);
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-400">Lỗi kết nối server.</td></tr>';
+            }
+        }
+
+        function renderRow(item) {
+            const tableBody = document.getElementById('schedule-table-body');
+
+            // Format Dates
+            const startDate = new Date(item.start_date).toLocaleDateString('vi-VN');
+            const endDate = new Date(item.end_date).toLocaleDateString('vi-VN');
+
+            // Status Logic (Simple)
+            let status = item.status || 'Đang mở';
+            const statusClass = status === 'Đang mở' ? 'text-green-500 bg-green-50' :
+                status === 'Sắp hết' ? 'text-orange-500 bg-orange-50' :
+                    'text-red-500 bg-red-50';
+
+            // Check Access
+            let actionButtons = '';
+            if (currentUser && currentUser.role === 'admin') {
+                // Fix: Pass ID instead of object
+                actionButtons = `
+                    <button onclick="prepEdit(${item.id})" class="p-2 text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="deleteSchedule(${item.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+            } else {
+                actionButtons = '<span class="text-gray-300 text-xs italic cursor-not-allowed">Chỉ xem</span>';
+            }
+
+            const newRow = `
+                <tr class="hover:bg-gray-50/50" id="row-${item.id}">
+                    <td class="px-6 py-4 text-sm font-bold">${item.tour_name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${startDate} - ${endDate}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.slots}</td>
+                    <td class="px-6 py-4 text-sm text-primary font-bold">0</td> <!-- Placeholder for booked -->
+                    <td class="px-6 py-4">
+                        <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        ${actionButtons}
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', newRow);
         }
 
         function openModal(editData = null) {
@@ -376,9 +454,10 @@
                 title.innerText = 'Chỉnh Sửa Lịch Trình';
                 submitBtn.innerText = 'Cập nhật';
                 document.getElementById('edit-id').value = editData.id;
-                document.getElementById('tour-name').value = editData.tour;
-                document.getElementById('start-date').value = editData.startDate;
-                document.getElementById('end-date').value = editData.endDate;
+                document.getElementById('tour-name').value = editData.tour_name;
+                // Format date to YYYY-MM-DD for input[type=date]
+                document.getElementById('start-date').value = editData.start_date.split('T')[0];
+                document.getElementById('end-date').value = editData.end_date.split('T')[0];
                 document.getElementById('max-slots').value = editData.slots;
                 document.getElementById('schedule-status').value = editData.status;
             } else {
@@ -399,121 +478,63 @@
             document.getElementById('schedule-form').reset();
         }
 
-        function loadSchedules() {
-            const tableBody = document.getElementById('schedule-table-body');
-            tableBody.innerHTML = '';
-            const data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
-            data.forEach(item => {
-                renderRow(item);
-            });
+        // New Helper to find item by ID safely
+        function prepEdit(id) {
+            const item = currentSchedules.find(s => s.id === id);
+            if (item) openModal(item);
         }
 
-        function renderRow(item) {
-            const tableBody = document.getElementById('schedule-table-body');
-
-            // Calculate availability using TourManager
-            let booked = 0;
-            let status = item.status;
-            let remaining = item.slots;
-
-            if (typeof TourManager !== 'undefined') {
-                const availability = TourManager.getScheduleAvailability(item.tour, item.startDate, item.slots);
-                booked = availability.booked;
-                remaining = availability.remaining;
-
-                // Override status based on real availability if it's "Đang mở" or "Sắp hết"
-                // but if admin manually set "Hết chỗ" or "Đã hủy", maybe keep it? 
-                // For now, let's Auto-update status based on availability to ensure consistency with user request
-                if (remaining <= 0) status = 'Hết chỗ';
-                else if (remaining <= 3) status = 'Sắp hết';
-                else status = 'Đang mở';
-            }
-
-            const statusClass = status === 'Đang mở' ? 'text-green-500 bg-green-50' :
-                status === 'Sắp hết' ? 'text-orange-500 bg-orange-50' :
-                    'text-red-500 bg-red-50';
-
-            const displayDate = `${new Date(item.startDate).toLocaleDateString('vi-VN')} - ${new Date(item.endDate).toLocaleDateString('vi-VN')}`;
-
-            // Check Access
-            let actionButtons = '';
-            if (currentUser && currentUser.role === 'admin') {
-                actionButtons = `
-                    <button onclick='prepEdit(${JSON.stringify(item)})' class="p-2 text-gray-400 hover:text-primary transition-colors">
-                        <i data-lucide="edit-3" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="deleteSchedule(${item.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                `;
-            } else {
-                actionButtons = `
-                    <span class="text-gray-300 text-xs italic cursor-not-allowed">Chỉ xem</span>
-                `;
-            }
-
-            const newRow = `
-                <tr class="hover:bg-gray-50/50" id="row-${item.id}">
-                    <td class="px-6 py-4 text-sm font-bold">${item.tour}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${displayDate}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.slots}</td>
-                    <td class="px-6 py-4 text-sm text-primary font-bold">${booked}</td>
-                    <td class="px-6 py-4">
-                        <span class="text-[10px] font-bold ${statusClass} uppercase px-2 py-1 rounded-lg">${status}</span>
-                    </td>
-                    <td class="px-6 py-4 text-right space-x-2">
-                        ${actionButtons}
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('afterbegin', newRow);
-            lucide.createIcons();
-        }
-
-        function prepEdit(item) {
-            openModal(item);
-        }
-
-        function saveSchedule(event) {
+        async function saveSchedule(event) {
             event.preventDefault();
 
             const id = document.getElementById('edit-id').value;
-            const tour = document.getElementById('tour-name').value;
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
+            const tour_name = document.getElementById('tour-name').value;
+            const start_date = document.getElementById('start-date').value;
+            const end_date = document.getElementById('end-date').value;
             const slots = document.getElementById('max-slots').value;
             const status = document.getElementById('schedule-status').value;
 
-            const item = {
-                tour,
-                startDate,
-                endDate,
+            const payload = {
+                id: id ? parseInt(id) : null,
+                tour_name,
+                start_date,
+                end_date,
                 slots,
-                status,
-                id: id ? parseInt(id) : Date.now()
+                status
             };
 
-            let data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
+            try {
+                const res = await fetch(API_SAVE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            if (id) {
-                // Update
-                data = data.map(d => d.id === parseInt(id) ? item : d);
-            } else {
-                // Add
-                data.push(item);
+                if (!res.ok) throw new Error('Failed to save');
+
+                closeModal();
+                loadSchedules(); // Reload list
+                alert(id ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi khi lưu dữ liệu: ' + err.message);
             }
-
-            localStorage.setItem(SCHEDULES_KEY, JSON.stringify(data));
-            loadSchedules();
-            closeModal();
         }
 
-        function deleteSchedule(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) {
-                let data = JSON.parse(localStorage.getItem(SCHEDULES_KEY)) || [];
-                data = data.filter(d => d.id !== id);
-                localStorage.setItem(SCHEDULES_KEY, JSON.stringify(data));
+        async function deleteSchedule(id) {
+            if (!confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) return;
+
+            try {
+                const res = await fetch(`${API_DELETE}?id=${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) throw new Error('Failed to delete');
+
                 loadSchedules();
+            } catch (err) {
+                console.error(err);
+                alert('Không thể xóa: ' + err.message);
             }
         }
     </script>
