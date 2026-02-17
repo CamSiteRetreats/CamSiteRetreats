@@ -30,10 +30,19 @@ exports.handler = async (event, context) => {
             }
         };
     } catch (error) {
-        console.error('Error saving media:', error);
+        console.error('DATABASE ERROR:', {
+            message: error.message,
+            code: error.code,
+            detail: error.detail,
+            table: error.table
+        });
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to save media', details: error.message })
+            body: JSON.stringify({
+                error: 'Failed to save media',
+                details: error.message,
+                db_code: error.code
+            })
         };
     }
 };
