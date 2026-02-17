@@ -173,17 +173,11 @@
                         placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/TP" required>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tên in trên huy chương</label>
-                    <input type="text" id="cust-medal-name"
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
-                        placeholder="Để trống nếu giống Họ tên">
-                </div>
-            </div>
-            <button type="button" onclick="nextStep(2)"
-                class="w-full mt-6 bg-primary text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
-                Tiếp tục: Khảo sát
-            </button>
+
+                <button type="button" onclick="nextStep(2)"
+                    class="w-full mt-6 bg-primary text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">
+                    Tiếp tục: Khảo sát
+                </button>
             </div>
 
             <!-- STEP 2: HEALTH & DIET -->
@@ -227,6 +221,14 @@
                         <textarea id="diet-special"
                             class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors h-24 resize-none"
                             placeholder="Ví dụ: Cần hỗ trợ xe đưa đón, thuê thêm lều riêng..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tên in trên huy
+                            chương</label>
+                        <input type="text" id="cust-medal-name"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                            placeholder="Để trống nếu giống Họ tên">
                     </div>
                 </div>
                 <div class="flex gap-4 mt-6">
