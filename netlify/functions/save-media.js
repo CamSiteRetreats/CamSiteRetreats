@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
         console.error('Error saving media:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to save media' })
+            body: JSON.stringify({ error: 'Failed to save media', details: error.message })
         };
     }
 };
