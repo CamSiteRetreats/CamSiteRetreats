@@ -1,16 +1,24 @@
 {
+  "functions": {
+    "api/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
-    {
-      "source": "/tour/taotourmoi",
-      "destination": "/ADMIN/add-tour.html"
-    },
-    {
-      "source": "/tour/:slug",
-      "destination": "/TOUR/detail.html?slug=:slug"
-    },
     {
       "source": "/photo/:slug",
       "destination": "/api/photo?id=:slug"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
     }
   ]
 }

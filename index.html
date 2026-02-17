@@ -550,15 +550,10 @@
                 slider.innerHTML = tours.map(tour => TourManager.createTourCardHTML(tour)).join('');
                 lucide.createIcons();
                 TourManager.initSlideshows();
+                // Re-initialize Slideshow logic if needed or it will be handled by hover
                 filterTours('south'); // Default filter
             }
         }
-
-        // Refresh UI when API data arrives
-        window.addEventListener('tours-updated', () => {
-            console.log('UI Refreshing with DB data...');
-            initTours();
-        });
 
         // Region Filtering Logic
         const btnSouth = document.getElementById('btn-south');

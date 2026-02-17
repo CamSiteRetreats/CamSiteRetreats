@@ -31,9 +31,12 @@ const TourManager = {
     // NEW: Fetch from Backend API
     fetchToursFromAPI: async function () {
         try {
-            // Fetch every time to ensure fresh data, now with no-cache headers on server
+            // Only fetch if not recently fetched (e.g. 1 minute cache)
+            const lastFetch = localStorage.getItem('cam_site_last_fetch');
+            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
 
-            const response = await fetch(`/api/get-tours?t=${Date.now()}`);
+            // Vercel API endpoint
+            const response = await fetch('/api/get-tours');
             if (!response.ok) throw new Error('API Network response was not ok');
 
             const tours = await response.json();
@@ -236,9 +239,7 @@ const TourManager = {
     createTourCardHTML: function (tour, isCompact = false) {
         const priceStr = this.formatPrice(tour.price);
         const levelColor = tour.level === 'Dễ' ? 'bg-green-500' : (tour.level === 'Khó' ? 'bg-red-500' : 'bg-orange-500');
-
-        // Use slug if available, else fallback to URL or ID
-        const tourUrl = tour.slug ? `/tour/${tour.slug}` : (tour.url || '#');
+        const tourUrl = tour.url || '#';
 
         // CSS classes based on screen size/context
         const cardClass = isCompact
@@ -269,7 +270,7 @@ const TourManager = {
                             ${tour.name}
                         </h3>
                         <p class="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
-                            ${tour.short_desc || tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
+                            ${tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
                         </p>
                     </div>
 

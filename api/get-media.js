@@ -11,10 +11,10 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const { rows } = await db.query('SELECT * FROM tours');
+        const { rows } = await db.query('SELECT * FROM media ORDER BY created_at DESC');
         return res.status(200).json(rows);
     } catch (error) {
-        console.error('Error fetching tours:', error);
-        return res.status(500).json({ error: 'Failed to fetch tours', details: error.message });
+        console.error('Error fetching media:', error);
+        return res.status(500).json({ error: 'Failed to fetch media' });
     }
 };

@@ -148,7 +148,7 @@
                 <h1 class="text-2xl font-bold text-gray-800">Quản lý Hành Trình</h1>
                 <p class="text-gray-500 text-sm">Cập nhật và chỉnh sửa thông tin các tour trekking.</p>
             </div>
-            <button id="btn-add-tour" onclick="window.location.href='add-tour.html'"
+            <button id="btn-add-tour" onclick="openAddTourModal()"
                 class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 <span>Thêm tour mới</span>
@@ -199,212 +199,154 @@
             </div>
         </div>
 
-        <!-- Tours Table already rendered above -->
+        <!-- Add Tour Modal -->
+        <div id="addTourModal"
+            class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+            <div
+                class="bg-white w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl animate__animated animate__zoomIn">
+                <div class="p-8 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Thêm Tour Mới</h2>
+                    <button onclick="closeAddTourModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="p-8 overflow-y-auto max-h-[70vh]">
+                    <form id="addTourForm" class="space-y-6" onsubmit="saveTour(event)">
+                        <input type="hidden" id="edit-id">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Tên Tour</label>
+                                <input type="text" id="tour-name" placeholder="VD: Tà Năng Phan Dũng" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div class="col-span-2 grid grid-cols-3 gap-4">
+                                <div class="col-span-3">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Ảnh Chính (Hero)</label>
+                                    <input type="text" id="tour-image" placeholder="https://images.unsplash.com/..."
+                                        required
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        1</label>
+                                    <input type="text" id="tour-image-2" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        2</label>
+                                    <input type="text" id="tour-image-3" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Ảnh phụ
+                                        3</label>
+                                    <input type="text" id="tour-image-4" placeholder="URL ảnh..."
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all text-xs">
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Mô tả ngắn</label>
+                                <textarea id="tour-short-desc" placeholder="Nhập mô tả ngắn gọn về tour..." rows="2"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Độ cao (Met)</label>
+                                <input type="text" id="tour-altitude" placeholder="VD: 2.287M"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Cấp độ</label>
+                                <select id="tour-level"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all font-bold">
+                                    <option value="Dễ">Dễ</option>
+                                    <option value="Trung Bình">Trung Bình</option>
+                                    <option value="Khó">Khó</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Vùng miền</label>
+                                <select id="tour-region"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                    <option value="Miền Nam">Miền Nam</option>
+                                    <option value="Miền Bắc">Miền Bắc</option>
+                                    <option value="Miền Trung">Miền Trung</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Loại hình</label>
+                                <select id="tour-type"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                                    <option value="TREKKING">TREKKING</option>
+                                    <option value="CAMPING">CAMPING</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Thời gian</label>
+                                <input type="text" id="tour-duration" placeholder="VD: 2 Ngày 1 Đêm" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Giá tiền (VNĐ)</label>
+                                <input type="number" id="tour-price" placeholder="2690000" required
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-primary outline-none transition-all">
+                            </div>
+                        </div>
+                        <div class="p-8 bg-gray-50 flex space-x-4">
+                            <button type="button" onclick="closeAddTourModal()"
+                                class="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-100 rounded-2xl transition-all">Hủy</button>
+                            <button type="submit" id="submit-btn"
+                                class="flex-1 py-4 font-bold text-white bg-primary rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Lưu
+                                Tour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
         lucide.createIcons();
+        const TOURS_KEY = 'cam_site_tours';
         const modal = document.getElementById('addTourModal');
         let currentUser = null;
 
-        // Configuration for 12 Inclusions
-        const DEFAULT_INCLUSIONS = [
-            { id: 'xe', title: 'Xe đưa đón', icon: 'XeTrungChuyen.png', desc: 'Di chuyển bằng xe giường nằm, đưa đón 2 chiều từ TP HCM.' },
-            { id: 'hdv', title: 'Hướng dẫn viên', icon: 'HuongDanVien-SuaLai.png', desc: 'Hướng dẫn viên chuyên nghiệp, dễ thương và nhiệt tình.' },
-            { id: 'an_uong', title: 'Bữa ăn', icon: 'DoAn-SuaLai.png', desc: 'Gồm 6 bữa ăn: món nước, BBQ... trong suốt hành trình.' },
-            { id: 'leu', title: 'Lều trại', icon: 'Leu-SuaLai.png', desc: 'Tiêu chuẩn 3 người/lều, bao gồm túi ngủ, cách nhiệt, gối hơi.' },
-            { id: 'nuoc_uong', title: 'Nước uống', icon: 'NuocUong.png', desc: 'Tiêu chuẩn 1.5L / người / ngày trong suốt hành trình.' },
-            { id: 'nuoc_tam', title: 'Nước tắm', icon: 'NuocTam-SuaLai_20260113000157.png', desc: 'Mỗi người được 15L nước sạch để tắm tại bãi camping rừng.' },
-            { id: 'bao_hiem', title: 'Bảo hiểm', icon: 'BaoHiem.png', desc: 'Được trang bị bảo hiểm du lịch lên đến 70.000.000 đồng.' },
-            { id: 'huy_chuong', title: 'Huy chương', icon: 'HuyChuong.png', desc: 'Được thiết kế đặc biệt, in tên và ngày kỷ niệm của đoàn.' },
-            { id: 'gay', title: 'Gậy trekking', icon: 'GayTrekking.png', desc: 'Được hỗ trợ mượn gậy chất lượng, đảm bảo an toàn chuyến đi.' },
-            { id: 'ao_mua', title: 'Áo mưa', icon: 'AoMua.png', desc: 'Áo mưa chuyên dụng, kèm túi ZIP bảo vệ quần áo bên trong.' },
-            { id: 'chup_anh', title: 'Chụp ảnh', icon: 'ChupAnhCamera.png', desc: 'Chụp ảnh bằng máy cơ và hỗ trợ quay chụp bằng điện thoại.' },
-            { id: 'grab', title: 'Grab rừng', icon: 'XeGrab.png', desc: 'Trải nghiệm ngồi xe máy băng rừng trong 5km hành trình cuối.' }
-        ];
-
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check Auth
             currentUser = checkAuth();
             if (currentUser) {
+                // Update Sidebar
                 document.getElementById('sidebar-avatar').src = currentUser.avatar;
                 document.getElementById('sidebar-name').textContent = currentUser.fullName;
                 document.getElementById('sidebar-role').textContent = currentUser.role.toUpperCase();
 
+                // Role Permissions
                 if (currentUser.role !== 'admin') {
-                    document.getElementById('nav-users').classList.add('hidden');
-                    document.getElementById('btn-add-tour').classList.add('hidden');
+                    document.getElementById('nav-users').classList.add('hidden'); // Hide User Management
+                    document.getElementById('btn-add-tour').classList.add('hidden'); // Hide Add Button
                 }
             }
 
-            renderInclusionsGrid();
             loadTours();
             syncBadges();
         });
 
-        // UI Helpers
-        function switchTab(tab) {
-            const basicTab = document.getElementById('tab-basic');
-            const detailTab = document.getElementById('tab-detail');
-            const btnBasic = document.getElementById('tab-btn-basic');
-            const btnDetail = document.getElementById('tab-btn-detail');
-
-            if (tab === 'basic') {
-                basicTab.classList.remove('hidden');
-                detailTab.classList.add('hidden');
-                btnBasic.classList.add('border-primary', 'text-primary');
-                btnBasic.classList.remove('border-transparent', 'text-gray-400');
-                btnDetail.classList.add('border-transparent', 'text-gray-400');
-                btnDetail.classList.remove('border-primary', 'text-primary');
-            } else {
-                basicTab.classList.add('hidden');
-                detailTab.classList.remove('hidden');
-                btnDetail.classList.add('border-primary', 'text-primary');
-                btnDetail.classList.remove('border-transparent', 'text-gray-400');
-                btnBasic.classList.add('border-transparent', 'text-gray-400');
-                btnBasic.classList.remove('border-primary', 'text-primary');
-            }
-        }
-
-        // Dynamic Form Logic
-        function addImageField(containerId, value = '') {
-            const container = document.getElementById(containerId);
-            const div = document.createElement('div');
-            div.className = 'relative group';
-            div.innerHTML = `
-                <input type="text" value="${value}" placeholder="Link ảnh..." 
-                    class="w-full p-2.5 rounded-lg border border-gray-100 text-[10px] outline-none focus:border-primary">
-                <button type="button" onclick="this.parentElement.remove()" 
-                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i data-lucide="x" class="w-3 h-3"></i>
-                </button>
-            `;
-            container.appendChild(div);
-            lucide.createIcons();
-        }
-
-        function addItineraryDay(data = { day: '', title: '', events: [] }) {
-            const container = document.getElementById('itinerary-days-container');
-            const dayIdx = container.children.length;
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'p-6 bg-gray-50 rounded-2xl border border-gray-100 space-y-4';
-            dayDiv.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div class="flex gap-4">
-                        <input type="text" placeholder="Ngày 0" value="${data.day || ''}" class="w-24 p-2 rounded-lg border font-bold text-sm bg-white tour-itinerary-day-label">
-                        <input type="text" placeholder="Tên ngày (VD: Khởi hành)" value="${data.title || ''}" class="w-64 p-2 rounded-lg border font-bold text-sm bg-white tour-itinerary-day-title">
-                    </div>
-                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
-                <div class="space-y-2 tour-day-events-container">
-                    <!-- Events will be added here -->
-                </div>
-                <button type="button" onclick="addItineraryEvent(this)" class="text-[10px] font-bold text-primary flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Thêm mốc thời gian</button>
-            `;
-            container.appendChild(dayDiv);
-
-            // Add existing events if editing
-            const eventsContainer = dayDiv.querySelector('.tour-day-events-container');
-            if (data.events && data.events.length > 0) {
-                data.events.forEach(evt => addItineraryEvent({ parentElement: { parentElement: dayDiv } }, evt));
-            } else {
-                // Default 2 empty rows as requested
-                addItineraryEvent({ parentElement: { parentElement: dayDiv } });
-                addItineraryEvent({ parentElement: { parentElement: dayDiv } });
-            }
-            lucide.createIcons();
-        }
-
-        function addItineraryEvent(btn, value = '') {
-            const row = document.createElement('div');
-            row.className = 'flex gap-2 group items-center';
-
-            // Split value into time and content if it contains ":"
-            let time = '', content = '';
-            if (value.includes(':')) {
-                const parts = value.split(':');
-                time = parts[0].trim();
-                content = parts.slice(1).join(':').trim();
-            } else {
-                content = value;
-            }
-
-            row.innerHTML = `
-                <input type="text" placeholder="21h45" value="${time}" class="w-20 p-2 rounded-lg border text-xs bg-white tour-event-time">
-                <input type="text" placeholder="Nội dung công việc..." value="${content}" class="flex-1 p-2 rounded-lg border text-xs bg-white tour-event-content">
-                <button type="button" onclick="this.parentElement.remove()" class="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-opacity"><i data-lucide="x" class="w-3 h-3"></i></button>
-            `;
-
-            // Support both direct parent (when adding) and delegated parent (when initial load)
-            const list = btn.querySelector ? btn.querySelector('.tour-day-events-container') : btn.closest('.p-6').querySelector('.tour-day-events-container');
-            list.appendChild(row);
-            lucide.createIcons();
-        }
-
-        function renderInclusionsGrid() {
-            const grid = document.getElementById('inclusions-grid');
-            grid.innerHTML = '';
-            DEFAULT_INCLUSIONS.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'inclusion-item p-3 border border-gray-100 rounded-xl flex items-start gap-3 bg-white hover:border-primary/30 transition-all cursor-pointer';
-                div.onclick = () => {
-                    const checkbox = div.querySelector('input');
-                    checkbox.checked = !checkbox.checked;
-                    div.classList.toggle('bg-primary/5', checkbox.checked);
-                    div.classList.toggle('border-primary/20', checkbox.checked);
-                    const icon = div.querySelector('.inclusion-icon');
-                    icon.classList.toggle('grayscale', !checkbox.checked);
-                    icon.classList.toggle('opacity-50', !checkbox.checked);
-                };
-                div.innerHTML = `
-                    <input type="checkbox" id="inc-${item.id}" value="${item.id}" class="mt-1 accent-primary" onclick="event.stopPropagation()">
-                    <div class="shrink-0 w-10 h-10 border border-gray-50 rounded-lg p-1">
-                        <img src="../${item.icon}" class="w-full h-full object-contain grayscale opacity-50 inclusion-icon">
-                    </div>
-                    <div>
-                        <h4 class="text-[10px] font-black uppercase text-gray-800">${item.title}</h4>
-                        <textarea class="w-full mt-1 p-1 text-[9px] text-gray-400 bg-transparent border-none outline-none resize-none font-medium h-10" onclick="event.stopPropagation()">${item.desc}</textarea>
-                    </div>
-                `;
-                grid.appendChild(div);
-
-                const cb = div.querySelector('input');
-                cb.addEventListener('change', () => {
-                    const icon = div.querySelector('.inclusion-icon');
-                    icon.classList.toggle('grayscale', !cb.checked);
-                    icon.classList.toggle('opacity-50', !cb.checked);
-                    div.classList.toggle('bg-primary/5', cb.checked);
-                    div.classList.toggle('border-primary/20', cb.checked);
-                });
-            });
-        }
-
-        function addExclusionRow(data = { title: '', content: '' }) {
-            const container = document.getElementById('exclusions-container');
-            const row = document.createElement('div');
-            row.className = 'flex gap-3 group items-start bg-red-50/30 p-3 rounded-xl border border-red-100';
-            row.innerHTML = `
-                <div class="flex-1 space-y-2">
-                    <input type="text" placeholder="Tiêu đề (VD: Gửi đồ lên bãi trại)" value="${data.title || ''}" class="w-full p-2 rounded-lg border text-xs font-bold tour-exclusion-title">
-                    <input type="text" placeholder="Mô tả (VD: Mức giá 100k / balo...)" value="${data.content || ''}" class="w-full p-2 rounded-lg border text-xs text-gray-500 tour-exclusion-content">
-                </div>
-                <button type="button" onclick="this.parentElement.remove()" class="text-gray-300 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            `;
-            container.appendChild(row);
-            lucide.createIcons();
-        }
-
-        // --- Core Logic ---
+        // Đồng bộ số lượng khách hàng
         function syncBadges() {
             const LEADS_KEY = 'cam_site_leads';
             const BOOKINGS_KEY = 'cam_site_bookings';
+
             const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
             const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+
             const pendingLeads = leads.filter(l => l.status === 'Chờ tư vấn').length;
+
             const lBadge = document.getElementById('leads-badge-count');
             if (lBadge) {
                 lBadge.textContent = pendingLeads;
                 lBadge.style.display = pendingLeads > 0 ? 'inline-block' : 'none';
             }
+
             const bBadge = document.getElementById('bookings-badge-count');
             if (bBadge) {
                 bBadge.textContent = bookings.length;
@@ -412,43 +354,67 @@
             }
         }
 
-        async function loadTours() {
+        function openAddTourModal(editData = null) {
+            const title = modal.querySelector('h2');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (editData) {
+                title.innerText = 'Chỉnh Sửa Tour';
+                submitBtn.innerText = 'Cập nhật';
+                document.getElementById('edit-id').value = editData.id;
+                document.getElementById('tour-name').value = editData.name;
+                document.getElementById('tour-image').value = editData.image;
+                document.getElementById('tour-image-2').value = editData.image2 || '';
+                document.getElementById('tour-image-3').value = editData.image3 || '';
+                document.getElementById('tour-image-4').value = editData.image4 || '';
+                document.getElementById('tour-short-desc').value = editData.shortDesc || '';
+                document.getElementById('tour-altitude').value = editData.altitude || '';
+                document.getElementById('tour-level').value = editData.level || 'Trung Bình';
+                document.getElementById('tour-region').value = editData.region;
+                document.getElementById('tour-type').value = editData.type;
+                document.getElementById('tour-duration').value = editData.duration;
+                document.getElementById('tour-price').value = editData.price;
+            } else {
+                title.innerText = 'Thêm Tour Mới';
+                submitBtn.innerText = 'Lưu Tour';
+                document.getElementById('addTourForm').reset();
+                document.getElementById('edit-id').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddTourModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function loadTours() {
             const tableBody = document.querySelector('tbody');
-            tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">Đang tải dữ liệu...</td></tr>';
+            tableBody.innerHTML = '';
+            const data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
 
-            try {
-                const response = await fetch(`/api/get-tours?t=${Date.now()}`);
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.details || data.error);
-                }
-
-                tableBody.innerHTML = '';
-                if (!Array.isArray(data) || data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">Chưa có tour nào.</td></tr>';
-                } else {
-                    data.sort((a, b) => b.id - a.id).forEach(item => renderRow(item));
-                }
-            } catch (error) {
-                console.error('Error loading tours:', error);
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-8 text-center">
-                            <p class="text-red-500 font-bold">Lỗi khi tải dữ liệu từ Database</p>
-                            <p class="text-[10px] text-gray-400 mt-1">${error.message}</p>
-                        </td>
-                    </tr>
-                `;
+            // Add default if empty for first time demo
+            if (data.length === 0) {
+                const defaultTours = [
+                    { id: 1, name: 'Tà Năng - Phan Dũng', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100', region: 'Miền Nam', type: 'TREKKING', duration: '2 Ngày 1 Đêm', price: 2690000 }
+                ];
+                localStorage.setItem(TOURS_KEY, JSON.stringify(defaultTours));
+                defaultTours.forEach(item => renderRow(item));
+            } else {
+                data.forEach(item => renderRow(item));
             }
         }
 
         function renderRow(item) {
             const tableBody = document.querySelector('tbody');
+
+            // Check Access
             let actionButtons = '';
             if (currentUser && currentUser.role === 'admin') {
                 actionButtons = `
-                    <button onclick="window.location.href='add-tour.html?id=${item.id}'" class="text-gray-400 hover:text-primary transition-colors">
+                    <button onclick='openAddTourModal(${JSON.stringify(item)})' class="text-gray-400 hover:text-primary transition-colors">
                         <i data-lucide="edit-3" class="w-4 h-4"></i>
                     </button>
                     <button onclick="deleteTour(${item.id})" class="text-gray-400 hover:text-red-500 transition-colors">
@@ -456,7 +422,9 @@
                     </button>
                 `;
             } else {
-                actionButtons = `<span class="text-gray-300 text-xs italic">Chỉ xem</span>`;
+                actionButtons = `
+                    <span class="text-gray-300 text-xs italic cursor-not-allowed">Chỉ xem</span>
+                `;
             }
 
             const newRow = `
@@ -466,21 +434,15 @@
                             <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
                                 <img src="${item.image}" class="w-full h-full object-cover">
                             </div>
-                            <div>
-                                <span class="text-sm font-bold block">${item.name}</span>
-                                <span class="text-[10px] text-gray-400 font-mono">/tour/${item.slug}</span>
-                            </div>
+                            <span class="text-sm font-bold">${item.name}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm">${item.duration}</td>
                     <td class="px-6 py-4 text-sm font-bold text-primary">${parseInt(item.price).toLocaleString('vi-VN')}đ</td>
                     <td class="px-6 py-4">
-                        <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hoạt động</span>
+                        <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hiển thị</span>
                     </td>
-                    <td class="px-6 py-4 flex items-center space-x-2">
-                        <a href="/tour/${item.slug}" class="text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-1 border border-gray-100 px-2 py-1 rounded-lg">
-                            <i data-lucide="external-link" class="w-3 h-3"></i> Chi tiết
-                        </a>
+                    <td class="px-6 py-4 space-x-2">
                         ${actionButtons}
                     </td>
                 </tr>
@@ -489,27 +451,45 @@
             lucide.createIcons();
         }
 
-        async function saveTour(event) {
-            // Placeholder potentially unused in this page now
+        function saveTour(event) {
+            event.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const tour = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('tour-name').value,
+                image: document.getElementById('tour-image').value,
+                image2: document.getElementById('tour-image-2').value,
+                image3: document.getElementById('tour-image-3').value,
+                image4: document.getElementById('tour-image-4').value,
+                shortDesc: document.getElementById('tour-short-desc').value,
+                altitude: document.getElementById('tour-altitude').value,
+                level: document.getElementById('tour-level').value,
+                region: document.getElementById('tour-region').value,
+                type: document.getElementById('tour-type').value,
+                duration: document.getElementById('tour-duration').value,
+                price: document.getElementById('tour-price').value
+            };
+
+            let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            if (id) {
+                data = data.map(d => d.id === parseInt(id) ? tour : d);
+            } else {
+                data.push(tour);
+            }
+
+            localStorage.setItem(TOURS_KEY, JSON.stringify(data));
+            loadTours();
+            closeAddTourModal();
         }
 
-        async function deleteTour(id) {
-            if (confirm('Bạn chắc chắn muốn xóa Tour này? Hành động này không thể hoàn tác.')) {
-                try {
-                    const response = await fetch(`/api/save-tour?id=${id}&t=${Date.now()}`, { method: 'DELETE' });
-                    if (!response.ok) throw new Error('Không thể xóa tour.');
-                    alert('Đã xóa dữ liệu thành công.');
-                    loadTours();
-                } catch (error) {
-                    alert('Lỗi: ' + error.message);
-                }
+        function deleteTour(id) {
+            if (confirm('Dữ liệu các lịch trình liên quan đến tour này có thể bị ảnh hưởng. Bạn vẫn muốn xóa?')) {
+                let data = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+                data = data.filter(d => d.id !== id);
+                localStorage.setItem(TOURS_KEY, JSON.stringify(data));
+                loadTours();
             }
         }
-        // Initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            syncBadges();
-            loadTours();
-        });
     </script>
 </body>
 
