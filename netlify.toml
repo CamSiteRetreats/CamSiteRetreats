@@ -5,6 +5,12 @@
   framework = "#static"
 
 [[redirects]]
+  from = "/tour/taotourmoi"
+  to = "/ADMIN/add-tour.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/tour/:slug"
   to = "/TOUR/detail.html?slug=:slug"
   status = 200
