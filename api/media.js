@@ -14,20 +14,20 @@ module.exports = async (req, res) => {
 
     try {
         if (method === 'GET') {
-            const { rows } = await db.query('SELECT * FROM media ORDER BY uploaded_at DESC');
+            const { rows } = await db.query('SELECT * FROM media ORDER BY created_at DESC');
             return res.status(200).json(rows);
         }
 
         if (method === 'POST') {
-            const { url, filename, size, type } = req.body;
+            const { url, filename } = req.body;
             if (!url) return res.status(400).json({ error: 'URL is required' });
 
             const query = `
-                INSERT INTO media (url, filename, size, type)
-                VALUES ($1, $2, $3, $4)
+                INSERT INTO media (url, filename)
+                VALUES ($1, $2)
                 RETURNING *;
             `;
-            const values = [url, filename, size, type];
+            const values = [url, filename];
             const { rows } = await db.query(query, values);
             return res.status(201).json(rows[0]);
         }
