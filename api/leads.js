@@ -19,27 +19,27 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, name, phone, tour, date, message, status, sale_id, sale_name } = req.body;
+            const { id, name, phone, tour, date, message, status, sale_id, sale_name, sale_avatar } = req.body;
 
             if (id) {
                 // Update
                 const query = `
                     UPDATE leads 
-                    SET name=$1, phone=$2, tour=$3, date=$4, message=$5, status=$6, sale_id=$7, sale_name=$8
-                    WHERE id=$9
+                    SET name=$1, phone=$2, tour=$3, date=$4, message=$5, status=$6, sale_id=$7, sale_name=$8, sale_avatar=$9
+                    WHERE id=$10
                     RETURNING *;
                 `;
-                const values = [name, phone, tour, date, message, status, sale_id, sale_name, id];
+                const values = [name, phone, tour, date, message, status, sale_id, sale_name, sale_avatar, id];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO leads (name, phone, tour, date, message, status, sale_id, sale_name)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    INSERT INTO leads (name, phone, tour, date, message, status, sale_id, sale_name, sale_avatar)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                     RETURNING *;
                 `;
-                const values = [name, phone, tour, date, message, status || 'Mới', sale_id, sale_name];
+                const values = [name, phone, tour, date, message, status || 'Mới', sale_id, sale_name, sale_avatar];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }

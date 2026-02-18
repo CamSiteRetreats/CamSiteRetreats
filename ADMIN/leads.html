@@ -384,6 +384,7 @@
 
         // API Endpoints
         const API_LEADS = '/api/leads';
+        const API_SAVE_LEAD = '/api/leads'; // Fixed undefined variable
         const API_BOOKINGS = '/api/bookings';
 
         let currentUser = null;
@@ -416,7 +417,7 @@
                 updateSaleFilterOptions(leads);
                 renderLeads(leads);
                 updateBadgeCount(leads);
-                updateBookingsBadge();
+                syncBadges(); // Use consistent sync logic
 
             } catch (error) {
                 console.error('Failed to load leads:', error);
@@ -432,7 +433,9 @@
             const sales = new Set();
 
             leads.forEach(l => {
-                if (l.saleName) sales.add(JSON.stringify({ id: l.saleId, name: l.saleName }));
+                const sName = l.sale_name || l.saleName;
+                const sId = l.sale_id || l.saleId;
+                if (sName) sales.add(JSON.stringify({ id: sId, name: sName }));
             });
 
             saleSelect.innerHTML = '<option value="">Tất cả</option>';
@@ -471,11 +474,11 @@
                 const matchStatus = !filterStatus || l.status === filterStatus;
 
                 let matchSale = true;
+                const sId = l.sale_id || l.saleId;
                 if (filterSale === 'unassigned') {
-                    matchSale = !l.saleId;
+                    matchSale = !sId;
                 } else if (filterSale) {
-                    // Start loose comparison just in case types differ
-                    matchSale = l.saleId == filterSale;
+                    matchSale = sId == filterSale;
                 }
 
                 return matchStatus && matchSale;
@@ -489,8 +492,10 @@
             filteredLeads.sort((a, b) => b.id - a.id);
 
             filteredLeads.forEach(lead => {
-                const date = new Date(lead.createdAt || lead.id);
-                const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                const date = new Date(lead.created_at || lead.createdAt || lead.id);
+                const formattedDate = lead.created_at || lead.createdAt
+                    ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+                    : '---';
 
                 const statusOptions = ['Chờ tư vấn', 'Đang liên hệ', 'Chờ cọc', 'Đã hủy'];
                 let statusOptionsHTML = '';
@@ -499,12 +504,16 @@
                 });
 
                 // Sale Column Logic
+                const sId = lead.sale_id || lead.saleId;
+                const sName = lead.sale_name || lead.saleName;
+                const sAvatar = lead.sale_avatar || lead.saleAvatar;
+
                 let saleHtml = '';
-                if (lead.saleId) {
+                if (sId) {
                     saleHtml = `
                         <div class="flex items-center space-x-2">
-                            <img src="${lead.saleAvatar || 'https://ui-avatars.com/api/?name=' + lead.saleName}" class="w-6 h-6 rounded-full border border-gray-200">
-                            <span class="text-xs font-bold text-gray-700">${lead.saleName}</span>
+                            <img src="${sAvatar || 'https://ui-avatars.com/api/?name=' + sName}" class="w-6 h-6 rounded-full border border-gray-200">
+                            <span class="text-xs font-bold text-gray-700">${sName}</span>
                         </div>
                     `;
                 } else {
@@ -630,14 +639,46 @@
             });
         }
 
-        function updateBookingsBadge() {
-            // Bookings are now in DB, need separate API call or assume badge update elsewhere?
-            // For now, let's just hide it or leave it as 0 unless we fetch bookings too.
-            // Or we can fetch bookings here briefly to count? 
-            // Better to skip or separate. Let's try to fetch if we really want to show count.
-            // Simplified:
-            const badge = document.getElementById('bookings-badge-count');
-            if (badge) badge.style.display = 'none';
+        // Đồng bộ số lượng khách hàng cho Sidebar
+        async function syncBadges() {
+            try {
+                let leadsCount = 0;
+                let bookingsCount = 0;
+
+                // Sync Leads Badge (Mới/Chờ tư vấn)
+                try {
+                    const lRes = await fetch(API_LEADS);
+                    const leads = await lRes.json();
+                    leadsCount = leads.filter(l => l.status === 'Mới' || l.status === 'Chờ tư vấn').length;
+                } catch (e) {
+                    const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+                    leadsCount = leads.filter(l => l.status === 'Mới' || l.status === 'Chờ tư vấn').length;
+                }
+
+                // Sync Bookings Badge
+                try {
+                    const bRes = await fetch(API_BOOKINGS);
+                    const bookings = await bRes.json();
+                    bookingsCount = bookings.length;
+                } catch (e) {
+                    const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+                    bookingsCount = bookings.length;
+                }
+
+                const lBadge = document.getElementById('leads-badge-count');
+                if (lBadge) {
+                    lBadge.textContent = leadsCount;
+                    lBadge.style.display = leadsCount > 0 ? 'inline-block' : 'none';
+                }
+
+                const bBadge = document.getElementById('bookings-badge-count');
+                if (bBadge) {
+                    bBadge.textContent = bookingsCount;
+                    bBadge.style.display = bookingsCount > 0 ? 'inline-block' : 'none';
+                }
+            } catch (err) {
+                console.warn('Sync badges failed:', err);
+            }
         }
 
         // Modal Logic
