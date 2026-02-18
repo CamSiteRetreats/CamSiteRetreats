@@ -405,10 +405,10 @@
             const startDate = new Date(item.start_date).toLocaleDateString('vi-VN');
             const endDate = new Date(item.end_date).toLocaleDateString('vi-VN');
 
-            // Calculate Real-time Availability
-            const availability = TourManager.getScheduleAvailability(item.tour_name, item.start_date, item.slots);
-            const booked = availability.booked;
-            const remaining = availability.remaining;
+            // Calculate Real-time Availability (Prioritize API data)
+            const booked = item.booked_count || 0;
+            const slots = parseInt(item.slots) || 0;
+            const remaining = Math.max(0, slots - booked);
 
             // Update Status based on availability
             let status = item.status || 'Đang mở';

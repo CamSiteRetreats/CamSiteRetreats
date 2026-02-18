@@ -645,14 +645,16 @@
                         formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
                     }
 
-                    const opacityClass = item.status === 'Hết chỗ' ? 'opacity-40 grayscale cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5';
-                    const statusClass = item.status === 'Hết chỗ' ? 'text-gray-400' : 'text-primary';
+                    const remaining = item.remaining;
+                    const statusText = item.calculatedStatus;
+                    const opacityClass = statusText === 'Hết chỗ' ? 'opacity-40 grayscale cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5';
+                    const statusClass = statusText === 'Hết chỗ' ? 'text-gray-400' : 'text-primary';
 
                     const html = `
                         <div class="home-date-option p-4 rounded-2xl border-2 border-gray-100 flex flex-col items-center justify-center gap-1 transition-all ${opacityClass}"
-                             onclick="${item.status !== 'Hết chỗ' ? `selectHomeDate(this, '${formattedDisplay}')` : ''}">
+                             onclick="${statusText !== 'Hết chỗ' ? `selectHomeDate(this, '${formattedDisplay}')` : ''}">
                             <span class="text-sm font-bold text-gray-700">${formattedDisplay}</span>
-                            <span class="text-[11px] font-bold ${statusClass}">${item.status === 'Hết chỗ' ? 'Hết chỗ' : `Còn ${item.slots} chỗ`}</span>
+                            <span class="text-[11px] font-bold ${statusClass}">${statusText === 'Hết chỗ' ? 'Hết chỗ' : `Còn ${remaining} chỗ`}</span>
                         </div>
                     `;
                     dateSelector.insertAdjacentHTML('beforeend', html);

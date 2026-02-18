@@ -86,13 +86,14 @@ const TourManager = {
                     endDate: s.end_date,
                     date: `${formatDate(s.start_date)} - ${formatDate(s.end_date)}`,
                     slots: s.slots,
+                    bookedCount: s.booked_count || 0, // NEW: from API
                     status: s.status
                 };
             });
 
             localStorage.setItem('cam_site_schedules', JSON.stringify(mappedSchedules));
             localStorage.setItem('cam_site_schedules_last_fetch', Date.now().toString());
-            console.log('Schedules updated from API');
+            console.log('Schedules updated from API with real booked counts');
 
             // Dispatch event
             window.dispatchEvent(new Event('schedules-updated'));
@@ -120,12 +121,22 @@ const TourManager = {
 
             // Calculate availability for each schedule
             tour.schedules = tourSchedules.map(sch => {
-                const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);
+                // Prioritize API data (bookedCount) if available, otherwise fallback to local calculation
+                let booked = sch.bookedCount;
+                let remaining = Math.max(0, (parseInt(sch.slots) || 0) - (parseInt(booked) || 0));
+
+                // If bookedCount is missing (legacy/fallback), try local calculation
+                if (booked === undefined) {
+                    const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);
+                    booked = availability.booked;
+                    remaining = availability.remaining;
+                }
+
                 return {
                     ...sch,
-                    booked: availability.booked,
-                    remaining: availability.remaining,
-                    calculatedStatus: availability.remaining <= 0 ? 'Hết chỗ' : (availability.remaining <= 3 ? 'Sắp hết' : 'Đang mở')
+                    booked: booked,
+                    remaining: remaining,
+                    calculatedStatus: remaining <= 0 ? 'Hết chỗ' : (remaining <= 3 ? 'Sắp hết' : 'Đang mở')
                 };
             });
         }

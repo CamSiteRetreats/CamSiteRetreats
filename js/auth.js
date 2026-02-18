@@ -14,7 +14,7 @@ function getApiUrl(endpoint) {
     // Actually, just use absolute path if possible, or relative to current page.
 
     // Easiest hack: checks if we are in 'ADMIN' directory
-    const isInAdmin = window.location.pathname.includes('/ADMIN/');
+    const isInAdmin = window.location.pathname.toUpperCase().includes('/ADMIN/');
     const apiBase = isInAdmin ? '../api/' : './api/';
 
     // But index.html is in root. login.html is in ADMIN.
@@ -57,7 +57,7 @@ function logout() {
     sessionStorage.removeItem(CURRENT_USER_KEY);
     // Redirect to login page
     // Check if we are in ADMIN or root to determine path to login.html
-    const isInAdmin = window.location.pathname.includes('/ADMIN/');
+    const isInAdmin = window.location.pathname.toUpperCase().includes('/ADMIN/');
     window.location.href = isInAdmin ? 'login.html' : 'ADMIN/login.html';
 }
 
@@ -79,8 +79,8 @@ function checkAuth() {
         // Wait, original checkAuth *did* redirect.
 
         // If we want consistent behavior:
-        const isInAdmin = window.location.pathname.includes('/ADMIN/');
-        if (isInAdmin && !window.location.pathname.includes('login.html')) {
+        const isInAdmin = window.location.pathname.toUpperCase().includes('/ADMIN/');
+        if (isInAdmin && !window.location.pathname.toLowerCase().includes('login.html')) {
             window.location.href = 'login.html';
         }
         return null; // Return null effectively
