@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
     try {
         if (method === 'GET') {
-            const { rows } = await db.query('SELECT * FROM bookings ORDER BY booking_date DESC');
+            const { rows } = await db.query('SELECT * FROM bookings ORDER BY created_at DESC');
             return res.status(200).json(rows);
         }
 
