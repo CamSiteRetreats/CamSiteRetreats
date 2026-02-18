@@ -14,32 +14,47 @@ module.exports = async (req, res) => {
 
     try {
         if (method === 'GET') {
-            const { rows } = await db.query('SELECT * FROM schedules ORDER BY start_date ASC');
+            const query = `
+                SELECT s.*, 
+                (SELECT COUNT(*) FROM bookings b 
+                 WHERE (b.tour = s.tour_name OR s.tour_name LIKE '%' || b.tour || '%') 
+                 AND b.status NOT IN ('Đã hủy', 'Cancelled')
+                 AND (
+                    b.date = TO_CHAR(s.start_date, 'DD/MM/YYYY') 
+                    OR b.date = TO_CHAR(s.start_date, 'FMDD/FMMM/YYYY')
+                    OR b.date LIKE TO_CHAR(s.start_date, 'DD/MM') || '%'
+                    OR b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || '%'
+                 )
+                ) as booked_count
+                FROM schedules s 
+                ORDER BY s.start_date ASC
+            `;
+            const { rows } = await db.query(query);
             return res.status(200).json(rows);
         }
 
         if (method === 'POST') {
-            const { id, tour_name, start_date, end_date, capacity, price, status } = req.body;
+            const { id, tour_name, start_date, end_date, slots, status } = req.body;
 
             if (id) {
                 // Update
                 const query = `
                     UPDATE schedules 
-                    SET tour_name=$1, start_date=$2, end_date=$3, capacity=$4, price=$5, status=$6
-                    WHERE id=$7
+                    SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5
+                    WHERE id=$6
                     RETURNING *;
                 `;
-                const values = [tour_name, start_date, end_date, capacity, price, status, id];
+                const values = [tour_name, start_date, end_date, slots, status, id];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO schedules (tour_name, start_date, end_date, capacity, price, status)
-                    VALUES ($1, $2, $3, $4, $5, $6)
+                    INSERT INTO schedules (tour_name, start_date, end_date, slots, status)
+                    VALUES ($1, $2, $3, $4, $5)
                     RETURNING *;
                 `;
-                const values = [tour_name, start_date, end_date, capacity, price, status || 'available'];
+                const values = [tour_name, start_date, end_date, slots, status || 'Đang mở'];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }

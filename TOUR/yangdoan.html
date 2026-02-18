@@ -1333,38 +1333,56 @@
             }
         }
 
-        function handleBookingSubmit(event) {
+        async function handleBookingSubmit(event) {
             event.preventDefault();
 
-            // Collect Data (Optional: can be saved to LocalStorage for Admin Leads page)
-            const LEADS_KEY = 'cam_site_leads';
+            // Show loading
+            const btn = event.target.querySelector('button[type="submit"]') || event.target.querySelector('button');
+            const originalText = btn.innerText;
+            if (btn) {
+                btn.innerText = 'ĐANG GỬI...';
+                btn.disabled = true;
+            }
+
             const newLead = {
-                id: Date.now(),
                 name: document.getElementById('cust-name').value,
                 phone: document.getElementById('cust-phone').value,
                 tour: document.getElementById('tour-select').value,
                 date: document.getElementById('selected-date-input').value,
                 message: document.getElementById('cust-message').value,
-                status: 'Chờ tư vấn',
-                createdAt: new Date().toISOString()
+                status: 'Chờ tư vấn'
             };
 
-            const leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-            leads.push(newLead);
-            localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+            try {
+                const response = await fetch('../api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newLead)
+                });
 
-            // Show Popup
-            document.getElementById('success-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+                if (!response.ok) throw new Error('Network response was not ok');
 
-            // Reset Form
-            document.getElementById('booking-form').reset();
-            document.getElementById('selected-date-input').value = '';
-            const allOptions = document.querySelectorAll('.date-option');
-            allOptions.forEach(opt => opt.classList.remove('selected'));
+                // Show Popup
+                document.getElementById('success-modal').classList.add('active');
+                document.body.style.overflow = 'hidden';
 
-            // Re-load default tour sequence if needed
-            filterSchedules();
+                // Reset Form
+                event.target.reset();
+                document.getElementById('selected-date-input').value = '';
+                const allOptions = document.querySelectorAll('.date-option');
+                allOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Re-load schedules
+                filterSchedules();
+            } catch (error) {
+                console.error('Error submitting lead:', error);
+                alert('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau!');
+            } finally {
+                if (btn) {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            }
         }
 
         function closeSuccessModal() {
