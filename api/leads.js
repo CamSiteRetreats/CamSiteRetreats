@@ -19,28 +19,27 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, tour_id, tour_name, schedule_id, schedule_date, customer_name, customer_phone, customer_email, num_people, status, note } = req.body;
+            const { id, name, phone, tour, date, message, status, sale_id, sale_name } = req.body;
 
             if (id) {
                 // Update
                 const query = `
                     UPDATE leads 
-                    SET tour_id=$1, tour_name=$2, schedule_id=$3, schedule_date=$4, customer_name=$5, 
-                        customer_phone=$6, customer_email=$7, num_people=$8, status=$9, note=$10
-                    WHERE id=$11
+                    SET name=$1, phone=$2, tour=$3, date=$4, message=$5, status=$6, sale_id=$7, sale_name=$8
+                    WHERE id=$9
                     RETURNING *;
                 `;
-                const values = [tour_id, tour_name, schedule_id, schedule_date, customer_name, customer_phone, customer_email, num_people, status, note, id];
+                const values = [name, phone, tour, date, message, status, sale_id, sale_name, id];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO leads (tour_id, tour_name, schedule_id, schedule_date, customer_name, customer_phone, customer_email, num_people, status, note)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                    INSERT INTO leads (name, phone, tour, date, message, status, sale_id, sale_name)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                     RETURNING *;
                 `;
-                const values = [tour_id, tour_name, schedule_id, schedule_date, customer_name, customer_phone, customer_email, num_people, status || 'new', note];
+                const values = [name, phone, tour, date, message, status || 'Mới', sale_id, sale_name];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }

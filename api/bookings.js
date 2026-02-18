@@ -19,29 +19,46 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, tour_id, schedule_id, customer_name, customer_email, customer_phone, num_people, total_price, deposit_paid, payment_status, status, member_list, note } = req.body;
+            const {
+                id, name, phone, tour, date, status, total_price, deposit,
+                sale_id, sale_name, customer_id, dob, gender, address,
+                id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+            } = req.body;
 
             if (id) {
                 // Update
                 const query = `
                     UPDATE bookings 
-                    SET tour_id=$1, schedule_id=$2, customer_name=$3, customer_email=$4, customer_phone=$5, 
-                        num_people=$6, total_price=$7, deposit_paid=$8, payment_status=$9, status=$10, 
-                        member_list=$11, note=$12
-                    WHERE id=$13
+                    SET name=$1, phone=$2, tour=$3, date=$4, status=$5, total_price=$6, deposit=$7, 
+                        sale_id=$8, sale_name=$9, customer_id=$10, dob=$11, gender=$12, address=$13, 
+                        id_card=$14, diet=$15, trekking_pole=$16, allergy=$17, special=$18, 
+                        medal_name=$19, commitments=$20
+                    WHERE id=$21
                     RETURNING *;
                 `;
-                const values = [tour_id, schedule_id, customer_name, customer_email, customer_phone, num_people, total_price, deposit_paid, payment_status, status, JSON.stringify(member_list), note, id];
+                const values = [
+                    name, phone, tour, date, status, total_price, deposit,
+                    sale_id, sale_name, customer_id, dob, gender, address,
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, id
+                ];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO bookings (tour_id, schedule_id, customer_name, customer_email, customer_phone, num_people, total_price, deposit_paid, payment_status, status, member_list, note)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                    INSERT INTO bookings (
+                        name, phone, tour, date, status, total_price, deposit, 
+                        sale_id, sale_name, customer_id, dob, gender, address, 
+                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
                     RETURNING *;
                 `;
-                const values = [tour_id, schedule_id, customer_name, customer_email, customer_phone, num_people, total_price, deposit_paid, payment_status, status || 'confirmed', JSON.stringify(member_list), note];
+                const values = [
+                    name, phone, tour, date, status || 'Chờ xác nhận cọc', total_price, deposit,
+                    sale_id, sale_name, customer_id, dob, gender, address,
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                ];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }

@@ -19,27 +19,27 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, tour_id, start_date, end_date, capacity, price, status } = req.body;
+            const { id, tour_name, start_date, end_date, capacity, price, status } = req.body;
 
             if (id) {
                 // Update
                 const query = `
                     UPDATE schedules 
-                    SET tour_id=$1, start_date=$2, end_date=$3, capacity=$4, price=$5, status=$6
+                    SET tour_name=$1, start_date=$2, end_date=$3, capacity=$4, price=$5, status=$6
                     WHERE id=$7
                     RETURNING *;
                 `;
-                const values = [tour_id, start_date, end_date, capacity, price, status, id];
+                const values = [tour_name, start_date, end_date, capacity, price, status, id];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO schedules (tour_id, start_date, end_date, capacity, price, status)
+                    INSERT INTO schedules (tour_name, start_date, end_date, capacity, price, status)
                     VALUES ($1, $2, $3, $4, $5, $6)
                     RETURNING *;
                 `;
-                const values = [tour_id, start_date, end_date, capacity, price, status || 'available'];
+                const values = [tour_name, start_date, end_date, capacity, price, status || 'available'];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }
