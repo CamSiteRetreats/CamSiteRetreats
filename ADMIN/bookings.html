@@ -465,10 +465,11 @@
 
                 updateSaleFilterOptions(bookings);
                 renderBookings(bookings);
-                updateBadges(bookings);
+                syncBadges(bookings); // Fixed ReferenceError
 
                 // Refresh Date Options after data load
                 loadDateOptions();
+                syncBadges(); // Sync badges for sidebar
 
             } catch (error) {
                 console.error('Failed to load bookings:', error);
@@ -520,6 +521,52 @@
             });
 
             saleSelect.value = currentVal;
+        }
+
+        // Đồng bộ số lượng khách hàng cho Sidebar
+        async function syncBadges(currentBookings = null) {
+            try {
+                // If we don't have currentBookings, fetch from API or Local (as fallback)
+                let leadsCount = 0;
+                let bookingsCount = currentBookings ? currentBookings.length : 0;
+
+                // Sync Leads Badge (Pending)
+                try {
+                    const lRes = await fetch('/api/leads');
+                    const leads = await lRes.json();
+                    leadsCount = leads.filter(l => l.status === 'Mới' || l.status === 'Chờ tư vấn').length;
+                } catch (e) {
+                    // Fallback to local
+                    const leads = JSON.parse(localStorage.getItem('cam_site_leads')) || [];
+                    leadsCount = leads.filter(l => l.status === 'Mới' || l.status === 'Chờ tư vấn').length;
+                }
+
+                // If bookingsCount is 0, fetch total bookings
+                if (bookingsCount === 0) {
+                    try {
+                        const bRes = await fetch('/api/bookings');
+                        const bks = await bRes.json();
+                        bookingsCount = bks.length;
+                    } catch (e) {
+                        const bks = JSON.parse(localStorage.getItem('cam_site_bookings')) || [];
+                        bookingsCount = bks.length;
+                    }
+                }
+
+                const lBadge = document.getElementById('leads-badge-count');
+                if (lBadge) {
+                    lBadge.textContent = leadsCount;
+                    lBadge.style.display = leadsCount > 0 ? 'inline-block' : 'none';
+                }
+
+                const bBadge = document.getElementById('bookings-badge-count');
+                if (bBadge) {
+                    bBadge.textContent = bookingsCount;
+                    bBadge.style.display = bookingsCount > 0 ? 'inline-block' : 'none';
+                }
+            } catch (err) {
+                console.warn('Sync badges failed:', err);
+            }
         }
 
         function migrateLegacyPrices() {
