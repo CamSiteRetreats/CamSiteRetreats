@@ -70,7 +70,7 @@
     <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
         <div class="p-6 border-b border-gray-100">
             <a href="../index.html" class="block">
-                <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
+                <img src="../logo.png" alt="CAM SITE RETREATS" loading="lazy" class="h-14 w-auto object-contain">
                 <span class="text-[10px] text-gray-400 block mt-1 font-bold uppercase tracking-widest">Admin
                     Panel</span>
             </a>
@@ -127,7 +127,7 @@
         <div class="p-6 border-t border-gray-100">
             <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
                 onclick="window.location.href='profile.html'">
-                <img id="sidebar-avatar" src="" class="w-8 h-8 rounded-full border border-gray-200">
+                <img id="sidebar-avatar" src="" loading="lazy" class="w-8 h-8 rounded-full border border-gray-200">
                 <div class="flex-1 min-w-0">
                     <p id="sidebar-name" class="text-xs font-bold text-gray-800 truncate">User</p>
                     <p id="sidebar-role" class="text-[10px] text-gray-500 uppercase">Role</p>
@@ -178,7 +178,7 @@
                                 <div class="flex items-center space-x-3">
                                     <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
                                         <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100"
-                                            class="w-full h-full object-cover">
+                                            loading="lazy" class="w-full h-full object-cover">
                                     </div>
                                     <span class="text-sm font-bold">Tà Năng - Phan Dũng</span>
                                 </div>
@@ -454,7 +454,7 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
-                                <img src="${item.image}" class="w-full h-full object-cover">
+                                <img src="${item.image}" loading="lazy" class="w-full h-full object-cover">
                             </div>
                             <span class="text-sm font-bold">${item.name}</span>
                         </div>

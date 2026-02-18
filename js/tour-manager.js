@@ -448,13 +448,13 @@ const TourManager = {
         };
 
         if (images.length <= 1) {
-            return `<img src="${resolvePath(tour.image)}" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
+            return `<img src="${resolvePath(tour.image)}" loading="lazy" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
         }
 
         let imgsHTML = '';
         images.forEach((img, index) => {
             const resolvedImg = resolvePath(img);
-            imgsHTML += `<img src="${resolvedImg}" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
+            imgsHTML += `<img src="${resolvedImg}" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
         });
 
         return `<div class="slideshow absolute inset-0">${imgsHTML}</div>`;
