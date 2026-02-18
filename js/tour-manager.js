@@ -318,7 +318,14 @@ const TourManager = {
     createTourCardHTML: function (tour, isCompact = false) {
         const priceStr = this.formatPrice(tour.price);
         const levelColor = tour.level === 'Dễ' ? 'bg-green-500' : (tour.level === 'Khó' ? 'bg-red-500' : 'bg-orange-500');
-        const tourUrl = tour.url || '#';
+
+        // Prioritize custom_domain if available
+        let tourUrl = tour.custom_domain || tour.url || '#';
+
+        // If it looks like a domain without protocol, add https://
+        if (tourUrl && !tourUrl.startsWith('http') && !tourUrl.startsWith('/') && !tourUrl.startsWith('.') && tourUrl.includes('.')) {
+            tourUrl = 'https://' + tourUrl;
+        }
 
         // CSS classes based on screen size/context
         const cardClass = isCompact
@@ -371,8 +378,16 @@ const TourManager = {
     // Create Recommendation Card HTML (Specially for "You might also like" section)
     createRecommendationCardHTML: function (tour, isSubfolder = false) {
         const priceStr = this.formatPrice(tour.price);
-        const tourUrl = tour.url || '#';
-        // Prefix with ../ only if we are in a subfolder and the URL is relative
+
+        // Prioritize custom_domain
+        let tourUrl = tour.custom_domain || tour.url || '#';
+
+        // If it looks like a domain without protocol, add https://
+        if (tourUrl && !tourUrl.startsWith('http') && !tourUrl.startsWith('/') && !tourUrl.startsWith('.') && tourUrl.includes('.')) {
+            tourUrl = 'https://' + tourUrl;
+        }
+
+        // Prefix with ../ only if we are in a subfolder and the URL is relative (and NOT a full domain)
         const finalUrl = (isSubfolder && tourUrl && !tourUrl.startsWith('http') && !tourUrl.startsWith('/'))
             ? '../' + tourUrl
             : tourUrl;
