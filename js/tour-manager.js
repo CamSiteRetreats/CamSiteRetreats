@@ -37,7 +37,7 @@ const TourManager = {
             if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
 
             // Vercel API endpoint
-            const response = await fetch('/api/get-tours');
+            const response = await fetch('/api/tours');
             if (!response.ok) throw new Error('API Network response was not ok');
 
             const tours = await response.json();
@@ -62,7 +62,7 @@ const TourManager = {
             const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
             if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return;
 
-            const res = await fetch('/api/get-schedules');
+            const res = await fetch('/api/schedules');
             if (!res.ok) throw new Error('Failed to fetch schedules');
 
             const schedules = await res.json();

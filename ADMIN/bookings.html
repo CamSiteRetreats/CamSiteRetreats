@@ -428,9 +428,7 @@
         const TOURS_KEY = 'cam_site_tours';
 
         // API Endpoints
-        const API_GET_BOOKINGS = '/api/get-bookings';
-        const API_SAVE_BOOKING = '/api/save-booking';
-        const API_DELETE_BOOKING = '/api/delete-booking';
+        const API_BOOKINGS = '/api/bookings';
 
         let currentUser = null;
         let currentFilteredBookings = [];
@@ -457,7 +455,7 @@
 
         async function loadBookings() {
             try {
-                const response = await fetch(API_GET_BOOKINGS);
+                const response = await fetch(API_BOOKINGS);
                 const bookings = await response.json();
 
                 // Process for Legacy Data (ID normalization handled by DB usually, but local data might be mixed if we migrate)
@@ -499,12 +497,6 @@
             }
         }
 
-        function loadBookings() {
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            updateSaleFilterOptions(bookings);
-            renderBookings(bookings);
-            updateBadges();
-        }
 
         function updateSaleFilterOptions(bookings) {
             const saleSelect = document.getElementById('filter-sale');
@@ -776,7 +768,7 @@
             booking.status = 'Đã cọc (Chờ đi)';
 
             try {
-                await fetch(API_SAVE_BOOKING, {
+                await fetch(API_BOOKINGS, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(booking)
@@ -825,9 +817,8 @@
         async function deleteBooking(id) {
             if (!confirm('Bạn có chắc muốn xóa khách hàng đã đăng ký này?')) return;
             try {
-                await fetch(API_DELETE_BOOKING, {
-                    method: 'DELETE',
-                    body: JSON.stringify({ id: id })
+                await fetch(`${API_BOOKINGS}?id=${id}`, {
+                    method: 'DELETE'
                 });
                 loadBookings();
             } catch (e) {
@@ -995,8 +986,9 @@
             }
 
             try {
-                await fetch(API_SAVE_BOOKING, {
+                await fetch(API_BOOKINGS, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bookingData)
                 });
                 alert('Lưu thành công!');
@@ -1036,8 +1028,9 @@
                     delete dbBooking.id;
                     delete dbBooking.createdAt;
 
-                    await fetch(API_SAVE_BOOKING, {
+                    await fetch(API_BOOKINGS, {
                         method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(dbBooking)
                     });
                     count++;

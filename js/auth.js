@@ -34,7 +34,7 @@ function initAuth() {
 // --- Auth Actions ---
 async function login(username, password) {
     try {
-        const response = await fetch(getApiUrl('auth-login.js'), {
+        const response = await fetch(getApiUrl('auth'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -106,7 +106,7 @@ function requireRole(allowedRoles) {
 
 async function getAllUsers() {
     try {
-        const response = await fetch(getApiUrl('get-users.js'));
+        const response = await fetch(getApiUrl('users'));
         if (!response.ok) throw new Error('Failed to fetch');
         return await response.json();
     } catch (error) {
@@ -117,7 +117,7 @@ async function getAllUsers() {
 
 async function saveUser(user) {
     try {
-        const response = await fetch(getApiUrl('save-user.js'), {
+        const response = await fetch(getApiUrl('users'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(user)
@@ -132,10 +132,8 @@ async function saveUser(user) {
 
 async function deleteUser(id) {
     try {
-        await fetch(getApiUrl('delete-user.js'), {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+        await fetch(`${getApiUrl('users')}?id=${id}`, {
+            method: 'DELETE'
         });
         return true;
     } catch (error) {

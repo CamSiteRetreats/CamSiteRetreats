@@ -313,9 +313,7 @@
     <script>
         lucide.createIcons();
         const TOURS_KEY = 'cam_site_tours'; // We'll still update this as cache
-        const API_GET_TOURS = '/api/get-tours';
-        const API_SAVE_TOUR = '/api/save-tour';
-        const API_DELETE_TOUR = '/api/delete-tour';
+        const API_TOURS = '/api/tours';
 
         const modal = document.getElementById('addTourModal');
         let currentUser = null;
@@ -405,7 +403,7 @@
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">Đang tải dữ liệu...</td></tr>';
 
             try {
-                const res = await fetch(API_GET_TOURS);
+                const res = await fetch(API_TOURS);
                 if (!res.ok) throw new Error('Failed to load tours');
                 const data = await res.json();
 
@@ -497,7 +495,7 @@
             };
 
             try {
-                const res = await fetch(API_SAVE_TOUR, {
+                const res = await fetch(API_TOURS, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(tour)
@@ -521,7 +519,7 @@
         async function deleteTour(id) {
             if (confirm('Dữ liệu các lịch trình liên quan đến tour này có thể bị ảnh hưởng. Bạn vẫn muốn xóa?')) {
                 try {
-                    const res = await fetch(`${API_DELETE_TOUR}?id=${id}`, { method: 'DELETE' });
+                    const res = await fetch(`${API_TOURS}?id=${id}`, { method: 'DELETE' });
                     if (!res.ok) throw new Error('Delete failed');
                     loadTours();
                 } catch (err) {

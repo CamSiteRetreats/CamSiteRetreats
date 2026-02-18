@@ -303,10 +303,8 @@
         lucide.createIcons();
 
         // API Endpoints
-        const API_GET = '/api/get-schedules';
-        const API_SAVE = '/api/save-schedule';
-        const API_DELETE = '/api/delete-schedule';
-        const API_TOURS = '/api/get-tours';
+        const API_SCHEDULES = '/api/schedules';
+        const API_TOURS = '/api/tours';
 
         let isEditing = false;
         let currentUser = null;
@@ -378,7 +376,7 @@
             tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Đang tải dữ liệu...</td></tr>';
 
             try {
-                const res = await fetch(API_GET);
+                const res = await fetch(API_SCHEDULES);
                 if (!res.ok) throw new Error('Failed to fetch schedules');
                 currentSchedules = await res.json();
 
@@ -538,7 +536,7 @@
             };
 
             try {
-                const res = await fetch(API_SAVE, {
+                const res = await fetch(API_SCHEDULES, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -559,7 +557,7 @@
             if (!confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) return;
 
             try {
-                const res = await fetch(`${API_DELETE}?id=${id}`, {
+                const res = await fetch(`${API_SCHEDULES}?id=${id}`, {
                     method: 'DELETE'
                 });
 

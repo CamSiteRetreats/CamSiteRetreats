@@ -383,10 +383,8 @@
         const BOOKINGS_KEY = 'cam_site_bookings';
 
         // API Endpoints
-        const API_GET_LEADS = '../api/get-leads.js';
-        const API_SAVE_LEAD = '../api/save-lead.js';
-        const API_DELETE_LEAD = '../api/delete-lead.js';
-        const API_SAVE_BOOKING = '../api/save-booking.js'; // For convertToBooking
+        const API_LEADS = '/api/leads';
+        const API_BOOKINGS = '/api/bookings';
 
         let currentUser = null;
         window.allLeads = [];
@@ -410,7 +408,7 @@
 
         async function loadLeads() {
             try {
-                const response = await fetch(API_GET_LEADS);
+                const response = await fetch(API_LEADS);
                 const leads = await response.json();
 
                 window.allLeads = leads;
@@ -710,16 +708,15 @@
 
             try {
                 // 1. Save Booking
-                await fetch(API_SAVE_BOOKING, {
+                await fetch(API_BOOKINGS, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newBooking)
                 });
 
                 // 2. Delete Lead
-                await fetch(API_DELETE_LEAD, {
-                    method: 'DELETE',
-                    body: JSON.stringify({ id: lead.id })
+                await fetch(`${API_LEADS}?id=${lead.id}`, {
+                    method: 'DELETE'
                 });
 
                 alert('Chốt đơn thành công! Đã chuyển khách hàng sang danh sách Đơn hàng chốt.');
@@ -734,9 +731,8 @@
         async function deleteLead(id) {
             if (confirm('Bạn có chắc chắn muốn xóa thông tin tư vấn này?')) {
                 try {
-                    await fetch(API_DELETE_LEAD, {
-                        method: 'DELETE',
-                        body: JSON.stringify({ id: id })
+                    await fetch(`${API_LEADS}?id=${id}`, {
+                        method: 'DELETE'
                     });
                     loadLeads();
                 } catch (e) {
@@ -920,7 +916,7 @@
             };
 
             try {
-                await fetch(API_SAVE_LEAD, { method: 'POST', body: JSON.stringify(newLead) });
+                await fetch(API_LEADS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newLead) });
                 alert('Thêm khách hàng thành công!');
                 closeAddModal();
                 loadLeads();
@@ -954,8 +950,9 @@
                     delete dbLead.id;
                     delete dbLead.createdAt;
 
-                    await fetch(API_SAVE_LEAD, {
+                    await fetch(API_LEADS, {
                         method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(dbLead)
                     });
                     count++;

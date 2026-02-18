@@ -1,32 +1,21 @@
-const db = require('./db');
+const db = require('./_db');
 
 module.exports = async (req, res) => {
-    const { id } = req.query;
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Check if ID is present (The slug)
-    if (!id) {
-        return res.status(400).send('Missing ID');
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
 
-    // Remove extension if present (e.g. .jpg)
-    const slug = id.split('.')[0];
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: 'ID is required' });
 
     try {
-        const { rows } = await db.query('SELECT url FROM media WHERE slug = $1', [slug]);
-
-        if (rows.length === 0) {
-            return res.status(404).send('Image Not Found');
-        }
-
-        const imageUrl = rows[0].url;
-
-        // Redirect to the actual image URL
-        res.setHeader('Location', imageUrl);
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        return res.status(302).end();
-
+        return res.status(200).json({ success: true, id });
     } catch (error) {
-        console.error('Photo redirect error:', error);
-        return res.status(500).send('Internal Server Error');
+        return res.status(500).json({ error: error.message });
     }
 };

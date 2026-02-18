@@ -350,8 +350,8 @@
             }
         }
 
-        function loadUsers() {
-            const users = getAllUsers();
+        async function loadUsers() {
+            const users = await getAllUsers();
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '';
 

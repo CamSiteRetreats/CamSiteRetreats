@@ -179,7 +179,7 @@
 
         async function checkBackendHealth() {
             try {
-                const res = await fetch('/api/get-media');
+                const res = await fetch('/api/media');
                 if (res.ok) console.log('Backend: OK');
                 else console.error('Backend: Request failed with status', res.status);
             } catch (err) {
@@ -255,8 +255,9 @@
                     console.log('Step 4: Saving link to Neon DB...');
 
                     // Step 2: Save to Neon DB via Backend Function
-                    const saveResponse = await fetch('/api/save-media', {
+                    const saveResponse = await fetch('/api/media', {
                         method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             url: result.data.url,
                             filename: file.name
@@ -299,7 +300,7 @@
         // 3. Fetch Gallery
         async function fetchMedia() {
             try {
-                const response = await fetch('/api/get-media');
+                const response = await fetch('/api/media');
                 const data = await response.json();
 
                 mediaGrid.innerHTML = data.map(item => {
