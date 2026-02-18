@@ -43,6 +43,6 @@ module.exports = async (req, res) => {
         }
     } catch (error) {
         console.error('Error saving tour:', error);
-        return res.status(500).json({ error: 'Failed to save tour' });
+        return res.status(500).json({ error: 'Failed to save tour', details: error.message });
     }
 };
