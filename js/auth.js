@@ -58,7 +58,7 @@ function logout() {
     // Redirect to login page
     // Check if we are in ADMIN or root to determine path to login.html
     const isInAdmin = window.location.pathname.toUpperCase().includes('/ADMIN/');
-    window.location.href = isInAdmin ? 'login.html' : 'ADMIN/login.html';
+    window.location.href = isInAdmin ? 'login' : 'admin/login';
 }
 
 function getCurrentUser() {
@@ -80,8 +80,8 @@ function checkAuth() {
 
         // If we want consistent behavior:
         const isInAdmin = window.location.pathname.toUpperCase().includes('/ADMIN/');
-        if (isInAdmin && !window.location.pathname.toLowerCase().includes('login.html')) {
-            window.location.href = 'login.html';
+        if (isInAdmin && !window.location.pathname.toLowerCase().includes('login')) {
+            window.location.href = 'login';
         }
         return null; // Return null effectively
     }
@@ -91,13 +91,13 @@ function checkAuth() {
 function requireRole(allowedRoles) {
     const user = getCurrentUser(); // Don't use checkAuth() to avoid auto-redirect loop if logic differs
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = 'login';
         return;
     }
 
     if (!allowedRoles.includes(user.role)) {
         alert('Bạn không có quyền truy cập trang này!');
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard';
     }
 }
 

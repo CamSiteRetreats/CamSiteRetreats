@@ -23,7 +23,7 @@ const TourManager = {
         // Ensure Tà Năng (ID 1) always has fixed URL if not set
         const taNang = tours.find(t => t.id == 1);
         if (taNang && !taNang.url) {
-            taNang.url = 'TOUR/tanangphandung.html';
+            taNang.url = 'tour/tanangphandung';
             localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
         }
         return tours;
@@ -212,9 +212,9 @@ const TourManager = {
             {
                 id: 1,
                 name: 'Tà Năng - Phan Dũng',
-                image: 'TOUR/Tanang/thumb1.png',
-                image2: 'TOUR/Tanang/thumb2.png',
-                image3: 'TOUR/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'TREKKING',
@@ -222,7 +222,7 @@ const TourManager = {
                 price: 3200000,
                 level: 'Trung Bình',
                 altitude: '1.100M',
-                url: 'TOUR/tanangphandung.html',
+                url: 'tour/tanangphandung',
                 shortDesc: 'Cung đường trekking đẹp nhất Việt Nam, đi qua 3 tỉnh Lâm Đồng, Ninh Thuận, Bình Thuận. Trải nghiệm đồi cỏ cháy ngút ngàn.',
                 defaultSchedules: [
                     { date: '20/03 - 21/03', slots: 12, status: 'Đang mở' },
@@ -233,9 +233,9 @@ const TourManager = {
             {
                 id: 2,
                 name: 'Bidoup - Tà Giang',
-                image: 'TOUR/Tanang/thumb1.png',
-                image2: 'TOUR/Tanang/thumb2.png',
-                image3: 'TOUR/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
                 image4: null,
                 region: 'Miền Trung',
                 type: 'TREKKING',
@@ -253,9 +253,9 @@ const TourManager = {
             {
                 id: 3,
                 name: 'Thác Liêng Ài',
-                image: 'TOUR/Tanang/thumb1.png',
-                image2: 'TOUR/Tanang/thumb2.png',
-                image3: 'TOUR/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'CANYONING',
@@ -271,9 +271,9 @@ const TourManager = {
             {
                 id: 4,
                 name: 'Núi Langbiang',
-                image: 'TOUR/Tanang/thumb1.png',
-                image2: 'TOUR/Tanang/thumb2.png',
-                image3: 'TOUR/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
                 image4: null,
                 region: 'Miền Trung',
                 type: 'HIKING',
@@ -289,9 +289,9 @@ const TourManager = {
             {
                 id: 5,
                 name: 'Mũi Kê Gà',
-                image: 'TOUR/Tanang/thumb1.png',
-                image2: 'TOUR/Tanang/thumb2.png',
-                image3: 'TOUR/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'CAMPING',
@@ -426,8 +426,8 @@ const TourManager = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        // Auto-detect if we are in a subfolder (checking for /TOUR/ in path)
-        const isSubfolder = window.location.pathname.includes('/TOUR/') || window.location.pathname.includes('/tour/');
+        // Auto-detect if we are in a subfolder (checking for /tour/ in path)
+        const isSubfolder = window.location.pathname.toLowerCase().includes('/tour/');
 
         const randomTours = this.getRandomTours(count, excludeId);
         if (randomTours.length === 0) {
@@ -454,7 +454,7 @@ const TourManager = {
         const images = [tour.image, tour.image2, tour.image3, tour.image4].filter(img => img);
 
         // Auto-detect if we are in a subfolder
-        const isSubfolder = window.location.pathname.includes('/TOUR/') || window.location.pathname.includes('/tour/');
+        const isSubfolder = window.location.pathname.toLowerCase().includes('/tour/');
         const resolvePath = (path) => {
             if (isSubfolder && path && !path.startsWith('http') && !path.startsWith('/') && !path.startsWith('../')) {
                 return '../' + path;

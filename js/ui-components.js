@@ -23,7 +23,7 @@ const UIComponents = {
             <nav class="fixed top-0 w-full z-30 glass-nav py-4 bg-white/90 backdrop-blur-md transition-all duration-300">
                 <div class="max-w-6xl mx-auto px-6 flex justify-between items-center w-full relative">
                     <div class="flex items-center">
-                        <a href="${prefix}index.html" class="block">
+                        <a href="${prefix}" class="block">
                             <img src="${prefix}logo.png" alt="CAM SITE RETREATS" class="h-10 w-auto object-contain">
                         </a>
                     </div>
@@ -34,24 +34,24 @@ const UIComponents = {
                     </button>
 
                     <div class="hidden md:flex space-x-6 font-medium text-sm tracking-wide uppercase">
-                        <a href="${prefix}index.html" class="hover:text-primary transition-colors">Trang chủ</a>
-                        <a href="${prefix}tour.html" class="hover:text-primary transition-colors">Tất cả Tour</a>
-                        <a href="${prefix}index.html#about" class="hover:text-primary transition-colors">Về chúng tôi</a>
-                        <a href="${prefix}index.html#contact" class="hover:text-primary transition-colors">Liên hệ</a>
+                        <a href="${prefix}" class="hover:text-primary transition-colors">Trang chủ</a>
+                        <a href="${prefix}tour" class="hover:text-primary transition-colors">Tất cả Tour</a>
+                        <a href="${prefix}#about" class="hover:text-primary transition-colors">Về chúng tôi</a>
+                        <a href="${prefix}#contact" class="hover:text-primary transition-colors">Liên hệ</a>
                     </div>
 
-                    <button onclick="window.location.href='${prefix}index.html#contact'"
+                    <button onclick="window.location.href='${prefix}#contact'"
                         class="hidden md:block bg-primary text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-opacity-90 transition-all transform hover:scale-105 active:scale-95 shadow-lg">
                         ĐĂNG KÝ NGAY
                     </button>
                     
                     <!-- Mobile Menu Dropdown -->
                     <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-xl border-t border-gray-100 flex flex-col p-6 space-y-4 md:hidden animate__animated animate__fadeInDown">
-                        <a href="${prefix}index.html" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Trang chủ</a>
-                        <a href="${prefix}tour.html" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Tất cả Tour</a>
-                        <a href="${prefix}index.html#about" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Về chúng tôi</a>
-                        <a href="${prefix}index.html#contact" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Liên hệ</a>
-                        <button onclick="window.location.href='${prefix}index.html#contact'" class="bg-primary text-white py-3 px-8 rounded-xl font-bold uppercase tracking-widest text-xs w-fit self-center shadow-lg shadow-primary/20">Đăng ký ngay</button>
+                        <a href="${prefix}" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Trang chủ</a>
+                        <a href="${prefix}tour" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Tất cả Tour</a>
+                        <a href="${prefix}#about" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Về chúng tôi</a>
+                        <a href="${prefix}#contact" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Liên hệ</a>
+                        <button onclick="window.location.href='${prefix}#contact'" class="bg-primary text-white py-3 px-8 rounded-xl font-bold uppercase tracking-widest text-xs w-fit self-center shadow-lg shadow-primary/20">Đăng ký ngay</button>
                     </div>
                 </div>
             </nav>
@@ -76,7 +76,7 @@ const UIComponents = {
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-sm text-gray-600">
                         <!-- Col 1: Brand -->
                         <div class="space-y-6">
-                            <a href="${prefix}index.html" class="block">
+                            <a href="${prefix}" class="block">
                                 <img src="${prefix}logo.png" alt="CAM SITE RETREATS" class="h-12 w-auto object-contain mb-4">
                             </a>
                             <p class="italic leading-relaxed font-medium">
