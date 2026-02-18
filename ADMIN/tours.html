@@ -503,14 +503,17 @@
                     body: JSON.stringify(tour)
                 });
 
-                if (!res.ok) throw new Error('Save failed');
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.details || 'Save failed');
+                }
 
                 closeAddTourModal();
                 loadTours(); // Refresh from DB
                 alert(id ? 'Cập nhật thành công!' : 'Thêm tour mới thành công!');
 
             } catch (err) {
-                console.error(err);
+                console.error('Error detail:', err);
                 alert('Lỗi khi lưu: ' + err.message);
             }
         }
