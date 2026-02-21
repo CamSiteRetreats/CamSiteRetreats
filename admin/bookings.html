@@ -1151,7 +1151,11 @@
             if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin inline mr-1"></i> Migrating...';
 
             try {
+                const migratedIds = [];
                 for (const b of localBookings) {
+                    // Skip if already has a DB ID
+                    if (b.dbId) continue;
+
                     const dbBooking = {
                         ...b,
                         id_card: b.idCard,
@@ -1165,14 +1169,29 @@
                     delete dbBooking.id;
                     delete dbBooking.createdAt;
 
-                    await fetch(API_BOOKINGS, {
+                    const response = await fetch(API_BOOKINGS, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(dbBooking)
                     });
-                    count++;
+
+                    if (response.ok) {
+                        const saved = await response.json();
+                        b.dbId = saved.id;
+                        migratedIds.push(b.id);
+                        count++;
+                    }
                 }
-                alert(`Đã chuyển thành công ${count} đơn hàng!`);
+
+                // Update LocalStorage to mark as migrated or remove them
+                // For safety, we'll mark them with dbId instead of deleting
+                localStorage.setItem(BOOKINGS_KEY, JSON.stringify(localBookings));
+
+                if (count > 0) {
+                    alert(`Đã chuyển thành công ${count} đơn hàng mới!`);
+                } else {
+                    alert('Không có đơn hàng mới nào cần chuyển.');
+                }
                 loadBookings();
             } catch (e) {
                 console.error(e);

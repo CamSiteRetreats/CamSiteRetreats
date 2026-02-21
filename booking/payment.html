@@ -64,56 +64,67 @@
         <!-- Payment Section -->
         <div id="payment-section"
             class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center animate__animated animate__fadeIn">
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền còn lại cần thanh toán</p>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Số tiền còn lại cần thanh toán</p>
             <div class="text-4xl font-black text-primary mb-2" id="amount-due">0đ</div>
             <p class="text-xs text-gray-500 italic mb-8">Vui lòng hoàn tất thanh toán trước ngày khởi hành</p>
 
             <div
-                class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
-                <!-- Similar to Deposit, but Transfer Content differs -->
+                class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
+                <!-- Dynamic QR -->
+                <div
+                    class="w-52 h-52 bg-white mx-auto border-4 border-primary/20 rounded-2xl overflow-hidden flex items-center justify-center mb-6 shadow-inner">
+                    <img id="payment-qr" src="" alt="QR Thanh toán" class="w-full h-full object-contain">
+                </div>
+
                 <div class="text-left space-y-3 text-sm">
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Ngân hàng:</span>
-                        <span class="font-bold">BIDV</span>
+                        <span class="font-bold text-gray-800">BIDV</span>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Số tài khoản:</span>
-                        <span class="font-bold text-lg tracking-wide">ORANGE</span>
+                        <span class="font-bold text-lg text-primary tracking-wider">ORANGE</span>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Chủ tài khoản:</span>
-                        <span class="font-bold uppercase">PHAM THIEN AN</span>
+                        <span class="font-bold text-gray-800 uppercase">PHAM THIEN AN</span>
                     </div>
-                    <div class="flex justify-between items-center bg-yellow-50 p-2 rounded-lg -mx-2">
-                        <span class="text-gray-500 text-xs">Nội dung CK:</span>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-primary font-mono" id="transfer-content">CAM XXXXX FULL</span>
-                            <button onclick="copyContent()" class="text-gray-400 hover:text-primary"><i
-                                    data-lucide="copy" class="w-4 h-4"></i></button>
+                    <div class="bg-primary/5 p-3 rounded-xl mt-4 border border-primary/10">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Nội dung chuyển
+                                khoản</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="font-bold text-primary text-base font-mono break-all"
+                                id="transfer-content">...</span>
+                            <button onclick="copyContent()"
+                                class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button onclick="confirmFinalPayment()"
-                class="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-green-600/30 hover:scale-[1.02] active:scale-95 transition-all">
-                Xác nhận đã thanh toán
+            <button id="confirm-btn" onclick="confirmFinalPayment()"
+                class="w-full bg-green-600 text-white font-bold text-lg py-5 rounded-2xl shadow-lg shadow-green-600/30 hover:shadow-green-600/40 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+                <span>Xác nhận đã thanh toán</span>
             </button>
         </div>
 
         <!-- Success Section -->
         <div id="success-section" class="hidden text-center py-10 animate__animated animate__fadeIn">
             <div
-                class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
-                <i data-lucide="check-circle" class="w-10 h-10 stroke-[3]"></i>
+                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600 shadow-xl shadow-green-100/50">
+                <i data-lucide="sparkles" class="w-12 h-12 stroke-[2.5]"></i>
             </div>
-            <h2 class="text-2xl font-black text-gray-800 mb-4">Thanh toán hoàn tất!</h2>
-            <p class="text-gray-500 max-w-md mx-auto leading-relaxed mb-8">
-                Cảm ơn bạn đã hoàn tất nghĩa vụ thanh toán. Chúng tôi rất mong chờ được đón tiếp bạn trong chuyến đi sắp
-                tới!
+            <h2 class="text-3xl font-black text-gray-800 mb-4">Tuyệt vời!</h2>
+            <p class="text-gray-600 max-w-sm mx-auto leading-relaxed mb-10 text-lg">
+                Hệ thống đã ghi nhận yêu cầu xác nhận thanh toán của bạn. Hẹn gặp bạn tại điểm khởi hành nhé!
             </p>
             <a href="../index.html"
-                class="inline-block px-8 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">
+                class="inline-block px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all">
                 Về trang chủ
             </a>
         </div>
@@ -170,35 +181,37 @@
         // Render Params
         document.getElementById('cust-name').textContent = name;
         document.getElementById('tour-name').textContent = tour;
-        document.getElementById('amount-due').textContent = remaining.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('amount-due').textContent = (remaining || 0).toLocaleString('vi-VN') + 'đ';
 
-        // Transfer Content
-        const transferCode = `CAM ${bookingId ? bookingId.toString().slice(-6) : 'XXXXX'} FULL`;
+        // Transfer Content: Tour - ID - FULL
+        const cleanedTourName = tour.includes('-') ? tour.split('-')[0].trim() : tour.trim();
+        const shortId = bookingId ? bookingId.toString().slice(-6) : 'XXXXX';
+        const transferCode = `${cleanedTourName} - ${shortId} - FULL`;
         document.getElementById('transfer-content').textContent = transferCode;
+
+        // Dynamic QR
+        const qrImg = document.getElementById('payment-qr');
+        if (remaining > 0) {
+            qrImg.src = `https://img.vietqr.io/image/bidv-orange-compact.jpg?amount=${remaining}&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+        } else {
+            qrImg.src = 'qr.jpg'; // Fallback
+        }
 
         function copyContent() {
             navigator.clipboard.writeText(transferCode);
-            alert('Đã copy nội dung!');
+            alert('Đã copy nội dung chuyển khoản!');
         }
 
         async function confirmFinalPayment() {
             if (!confirm('Bạn chắc chắn đã chuyển khoản phần còn lại?')) return;
 
-            // 1. Update LocalStorage (if on same device)
-            const BOOKINGS_KEY = 'cam_site_bookings';
-            let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            if (bookingId) {
-                bookings = bookings.map(b => {
-                    if (b.id == bookingId || b.dbId == bookingId) {
-                        b.status = 'Hoàn tất';
-                        b.remainingPaid = true;
-                    }
-                    return b;
-                });
-                localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-            }
+            const btn = document.getElementById('confirm-btn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> <span>Đang xác nhận...</span>';
+            lucide.createIcons();
 
-            // 2. Sync to Server API
+            // 1. Sync to Server API
             if (bookingId) {
                 try {
                     const response = await fetch('../api/bookings', {
@@ -212,16 +225,40 @@
 
                     if (response.ok) {
                         console.log('Payment updated on server');
+
+                        // 2. Update LocalStorage (Optional cleanup)
+                        const BOOKINGS_KEY = 'cam_site_bookings';
+                        let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+                        bookings = bookings.map(b => {
+                            if (b.id == bookingId || b.dbId == bookingId) {
+                                b.status = 'Hoàn tất';
+                                b.remainingPaid = true;
+                            }
+                            return b;
+                        });
+                        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+
+                        // Show Success
+                        document.getElementById('payment-section').classList.add('hidden');
+                        document.getElementById('success-section').classList.remove('hidden');
+                        window.scrollTo(0, 0);
+                    } else {
+                        const errData = await response.json();
+                        throw new Error(errData.error || 'Server error');
                     }
                 } catch (err) {
                     console.error('API Update Error:', err);
+                    alert('Lỗi khi cập nhật trạng thái: ' + err.message + '\nVui lòng thử lại hoặc liên hệ Admin.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    lucide.createIcons();
                 }
+            } else {
+                alert('Không tìm thấy mã đơn hàng! Vui lòng kiểm tra lại link.');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                lucide.createIcons();
             }
-
-            // Show Success
-            document.getElementById('payment-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-            window.scrollTo(0, 0);
         }
     </script>
 </body>
