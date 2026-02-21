@@ -44,6 +44,72 @@
                 font-size: 15px !important;
                 line-height: 1.4 !important;
             }
+
+            .sidebar {
+                left: -100%;
+                top: 0;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            main {
+                margin-left: 0 !important;
+                padding: 1.5rem !important;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                margin-bottom: 2rem !important;
+            }
+
+            header>div:first-child {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-toggle {
+                display: flex !important;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(4px);
+                z-index: 35;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            /* Table mobile fix */
+            .overflow-x-auto {
+                margin: 0 -1.5rem;
+                padding: 0 1.5rem;
+            }
+
+            table {
+                min-width: 800px;
+            }
+
+            td,
+            th {
+                padding: 0.75rem 1rem !important;
+                font-size: 12px !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
         }
 
         body {
@@ -67,7 +133,10 @@
 <body class="flex min-h-screen">
 
     <!-- Sidebar -->
-    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
         <div class="p-6 border-b border-gray-100">
             <a href="../" class="block">
                 <img src="../logo.png" alt="CAM SITE RETREATS" loading="lazy" class="h-14 w-auto object-contain">
@@ -144,9 +213,15 @@
     <!-- Main Content -->
     <main class="flex-1 ml-[260px] p-8">
         <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Quản lý Hành Trình</h1>
-                <p class="text-gray-500 text-sm">Cập nhật và chỉnh sửa thông tin các tour trekking.</p>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()"
+                    class="mobile-toggle p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Quản Lý Tour</h1>
+                    <p class="text-gray-500 text-sm">Xem và chỉnh sửa danh sách tour trên website.</p>
+                </div>
             </div>
             <button id="btn-add-tour" onclick="openAddTourModal()"
                 class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
@@ -328,6 +403,20 @@
 
     <script>
         lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Toggle body scroll
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
         const TOURS_KEY = 'cam_site_tours'; // We'll still update this as cache
         const API_TOURS = '/api/tours';
 

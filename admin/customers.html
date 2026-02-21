@@ -30,20 +30,83 @@
             --sidebar-width: 260px;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dashboard);
+        @media (max-width: 768px) {
+            html {
+                font-size: 13px !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                font-size: 15px !important;
+                line-height: 1.4 !important;
+            }
+
+            .sidebar {
+                left: -100% !important;
+                top: 0;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.active {
+                left: 0 !important;
+            }
+
+            main {
+                margin-left: 0 !important;
+                padding: 1.5rem !important;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                margin-bottom: 2rem !important;
+            }
+
+            header>div:first-child {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-toggle {
+                display: flex !important;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(4px);
+                z-index: 35;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            /* Table mobile fix */
+            .overflow-x-auto {
+                margin: 0 -1.5rem;
+                padding: 0 1.5rem;
+            }
+
+            table {
+                min-width: 800px;
+            }
+
+            td,
+            th {
+                padding: 0.75rem 1rem !important;
+                font-size: 12px !important;
+            }
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            transition: all 0.3s ease;
-        }
-
-        .nav-link.active {
-            background-color: rgba(232, 93, 4, 0.1);
-            color: var(--primary);
-            border-left: 4px solid var(--primary);
+        .mobile-toggle {
+            display: none;
         }
 
         .modal {
@@ -90,8 +153,10 @@
 
 <body class="flex min-h-screen">
 
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+    <aside id="sidebar" class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
         <div class="p-6 border-b border-gray-100">
             <a href="../" class="block">
                 <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
@@ -168,10 +233,17 @@
     <!-- Main Content -->
     <main class="flex-1 ml-[260px] p-8">
         <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Cơ sở dữ liệu Khách hàng</h1>
-                <p class="text-gray-500 text-sm">Danh sách tất cả các thành viên đã từng tham gia hành trình cùng Cam.
-                </p>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()"
+                    class="mobile-toggle p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Cơ sở dữ liệu Khách hàng</h1>
+                    <p class="text-gray-500 text-sm">Danh sách tất cả các thành viên đã từng tham gia hành trình cùng
+                        Cam.
+                    </p>
+                </div>
             </div>
 
             <div class="flex items-center gap-3">
@@ -225,6 +297,20 @@
 
     <script>
         lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Toggle body scroll
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Check Auth

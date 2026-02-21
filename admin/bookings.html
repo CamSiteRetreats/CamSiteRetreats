@@ -45,6 +45,72 @@
                 font-size: 15px !important;
                 line-height: 1.4 !important;
             }
+
+            .sidebar {
+                left: -100% !important;
+                top: 0;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.active {
+                left: 0 !important;
+            }
+
+            main {
+                margin-left: 0 !important;
+                padding: 1.5rem !important;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                margin-bottom: 2rem !important;
+            }
+
+            header>div:first-child {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-toggle {
+                display: flex !important;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(4px);
+                z-index: 35;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            /* Table mobile fix */
+            .overflow-x-auto {
+                margin: 0 -1.5rem;
+                padding: 0 1.5rem;
+            }
+
+            table {
+                min-width: 1100px;
+            }
+
+            td,
+            th {
+                padding: 0.75rem 1rem !important;
+                font-size: 12px !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
         }
 
         body {
@@ -67,8 +133,10 @@
 
 <body class="flex min-h-screen">
 
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
+    <aside id="sidebar" class="sidebar fixed h-full bg-white border-r border-gray-100 flex flex-col z-40">
         <div class="p-6 border-b border-gray-100">
             <a href="../" class="block">
                 <img src="../logo.png" alt="CAM SITE RETREATS" class="h-14 w-auto object-contain">
@@ -145,13 +213,19 @@
     <!-- Main Content -->
     <main class="flex-1 ml-[260px] p-8">
         <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Khách hàng đã đăng ký</h1>
-                <p class="text-gray-500 text-sm">Danh sách khách hàng đã hoàn thành đăng ký và thanh toán.</p>
-                <button onclick="migrateLocalToDB()"
-                    class="mt-2 text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition-colors">
-                    <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Migrate Local to DB
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()"
+                    class="mobile-toggle p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Khách hàng đã đăng ký</h1>
+                    <p class="text-gray-500 text-sm">Danh sách khách hàng đã hoàn thành đăng ký và thanh toán.</p>
+                    <button onclick="migrateLocalToDB()"
+                        class="mt-2 text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition-colors">
+                        <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Migrate Local to DB
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -421,6 +495,20 @@
 
     <script>
         lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Toggle body scroll
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
 
         const BOOKINGS_KEY = 'cam_site_bookings';
         const LEADS_KEY = 'cam_site_leads';
