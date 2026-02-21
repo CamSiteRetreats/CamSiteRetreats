@@ -239,7 +239,7 @@ const TourManager = {
                 image2: 'tour/Tanang/thumb2.png',
                 image3: 'tour/Tanang/thumb3.png',
                 image4: null,
-                region: 'Miền Trung',
+                region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
                 price: 'Update',
