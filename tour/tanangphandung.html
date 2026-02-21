@@ -7,19 +7,21 @@
     <title>Tà Năng - Phan Dũng | CAM SITE RETREATS</title>
     <meta name="description"
         content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS. Tour 2 ngày 1 đêm trải nghiệm đồi cỏ cháy, biển mây và tiệc BBQ giữa đại ngàn.">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://camsiteretreats.com/tour/tanangphandung">
     <meta property="og:title" content="Tà Năng - Phan Dũng | CAM SITE RETREATS">
-    <meta property="og:description" content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS. Trải nghiệm đồi cỏ cháy, biển mây và tiệc BBQ giữa đại ngàn.">
+    <meta property="og:description"
+        content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS. Trải nghiệm đồi cỏ cháy, biển mây và tiệc BBQ giữa đại ngàn.">
     <meta property="og:image" content="https://camsiteretreats.com/tour/hero.jpg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://camsiteretreats.com/tour/tanangphandung">
     <meta property="twitter:title" content="Tà Năng - Phan Dũng | CAM SITE RETREATS">
-    <meta property="twitter:description" content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS.">
+    <meta property="twitter:description"
+        content="Khám phá cung đường trekking đẹp nhất Việt Nam Tà Năng - Phan Dũng cùng CAM SITE RETREATS.">
     <meta property="twitter:image" content="https://camsiteretreats.com/tour/hero.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -1301,21 +1303,28 @@
         function loadTourOptions() {
             const tourSelect = document.getElementById('tour-select');
             const TOURS_KEY = 'cam_site_tours';
-            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            let tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
 
             tourSelect.innerHTML = '';
 
-            // If no tours in local storage, add default Tà Năng for safety
-            if (tours.length === 0) {
-                tours.push({ name: 'Tà Năng - Phan Dũng' });
+            // Sắp xếp đưa tour hiện tại lên đầu
+            const currentTourName = 'Tà Năng - Phan Dũng';
+            const currentIndex = tours.findIndex(t => t.name === currentTourName);
+            if (currentIndex > -1) {
+                const currentTour = tours.splice(currentIndex, 1)[0];
+                tours.unshift(currentTour);
             }
 
-            tours.forEach(tour => {
+            // Nếu không có tour nào trong local storage, thêm tour này vào để an toàn
+            if (tours.length === 0) {
+                tours.push({ name: currentTourName });
+            }
+
+            tours.forEach((tour, index) => {
                 const option = document.createElement('option');
                 option.value = tour.name;
                 option.textContent = tour.name;
-                // Auto select Tà Năng if on this page
-                if (tour.name === 'Tà Năng - Phan Dũng') option.selected = true;
+                if (index === 0) option.selected = true;
                 tourSelect.appendChild(option);
             });
         }

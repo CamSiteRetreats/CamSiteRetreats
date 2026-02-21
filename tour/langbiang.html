@@ -1287,21 +1287,28 @@
         function loadTourOptions() {
             const tourSelect = document.getElementById('tour-select');
             const TOURS_KEY = 'cam_site_tours';
-            const tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
+            let tours = JSON.parse(localStorage.getItem(TOURS_KEY)) || [];
 
             tourSelect.innerHTML = '';
 
-            // If no tours in local storage, add default Tà Năng for safety
-            if (tours.length === 0) {
-                tours.push({ name: 'Tà Năng - Phan Dũng' });
+            // Sắp xếp đưa tour hiện tại lên đầu
+            const currentTourName = 'Langbiang';
+            const currentIndex = tours.findIndex(t => t.name === currentTourName);
+            if (currentIndex > -1) {
+                const currentTour = tours.splice(currentIndex, 1)[0];
+                tours.unshift(currentTour);
             }
 
-            tours.forEach(tour => {
+            // Nếu không có tour nào trong local storage, thêm tour này vào để an toàn
+            if (tours.length === 0) {
+                tours.push({ name: currentTourName });
+            }
+
+            tours.forEach((tour, index) => {
                 const option = document.createElement('option');
                 option.value = tour.name;
                 option.textContent = tour.name;
-                // Auto select Tà Năng if on this page
-                if (tour.name === 'Langbiang') option.selected = true;
+                if (index === 0) option.selected = true;
                 tourSelect.appendChild(option);
             });
         }

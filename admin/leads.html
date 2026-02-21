@@ -678,6 +678,7 @@
             try {
                 await fetch(API_SAVE_LEAD, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(lead)
                 });
                 loadLeads();
@@ -707,6 +708,7 @@
             try {
                 await fetch(API_SAVE_LEAD, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(lead)
                 });
                 alert(`Đã phân công ${currentUser.fullName} phụ trách!`);
@@ -938,7 +940,11 @@
             lead.message = document.getElementById('edit-message').value;
 
             try {
-                await fetch(API_SAVE_LEAD, { method: 'POST', body: JSON.stringify(lead) });
+                await fetch(API_SAVE_LEAD, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lead)
+                });
                 alert('Cập nhật thành công!');
                 closeEditModal();
                 loadLeads();
