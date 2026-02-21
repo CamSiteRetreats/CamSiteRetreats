@@ -400,7 +400,7 @@ const TourManager = {
                             ${tour.name}
                         </h3>
                         <p class="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
-                            ${tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
+                            ${tour.short_desc || tour.shortDesc || 'Trải nghiệm hành trình khám phá thiên nhiên tuyệt vời cùng Cam Site Retreats.'}
                         </p>
                     </div>
 
