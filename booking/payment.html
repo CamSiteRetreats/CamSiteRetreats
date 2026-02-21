@@ -181,23 +181,41 @@
             alert('Đã copy nội dung!');
         }
 
-        function confirmFinalPayment() {
+        async function confirmFinalPayment() {
             if (!confirm('Bạn chắc chắn đã chuyển khoản phần còn lại?')) return;
 
-            // Try to update LocalStorage (if on same device)
+            // 1. Update LocalStorage (if on same device)
             const BOOKINGS_KEY = 'cam_site_bookings';
             let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-            // If bookingId exists
             if (bookingId) {
                 bookings = bookings.map(b => {
-                    // bookingId might be string from URL, ensure comparison is correct
-                    if (b.id == bookingId) {
+                    if (b.id == bookingId || b.dbId == bookingId) {
                         b.status = 'Hoàn tất';
                         b.remainingPaid = true;
                     }
                     return b;
                 });
                 localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+            }
+
+            // 2. Sync to Server API
+            if (bookingId) {
+                try {
+                    const response = await fetch('../api/bookings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: bookingId,
+                            status: 'Hoàn tất'
+                        })
+                    });
+
+                    if (response.ok) {
+                        console.log('Payment updated on server');
+                    }
+                } catch (err) {
+                    console.error('API Update Error:', err);
+                }
             }
 
             // Show Success

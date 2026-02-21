@@ -463,7 +463,7 @@
         }
 
         // 3. Submit Logic
-        function confirmTransfer() {
+        async function confirmTransfer() {
             if (!confirm('Bạn chắc chắn đã chuyển khoản và muốn hoàn tất đăng ký?')) return;
 
             // Gather Data
@@ -506,11 +506,43 @@
                 createdAt: new Date().toISOString()
             };
 
-            // Save to LocalStorage
+            // Save to LocalStorage (Legacy / Fallback)
             const BOOKINGS_KEY = 'cam_site_bookings';
             let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
             bookings.push(bookingData);
             localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+
+            // Sync to Server API
+            try {
+                // Map fields to snake_case for DB
+                const dbBooking = {
+                    ...bookingData,
+                    id_card: bookingData.idCard,
+                    medal_name: bookingData.medalName,
+                    total_price: bookingData.totalPrice,
+                    sale_id: bookingData.saleId,
+                    sale_name: bookingData.saleName,
+                    trekking_pole: bookingData.trekkingPole
+                };
+                delete dbBooking.id; // Let DB generate Serial ID
+                delete dbBooking.createdAt;
+
+                const response = await fetch('../api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dbBooking)
+                });
+
+                if (response.ok) {
+                    const savedBooking = await response.json();
+                    console.log('Synced to Server:', savedBooking);
+                    // Update local with DB ID if needed
+                    bookings[bookings.length - 1].dbId = savedBooking.id;
+                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+                }
+            } catch (err) {
+                console.error('API Sync Error:', err);
+            }
 
             // Sync to Customer DB & Update Booking with Customer ID
             try {
