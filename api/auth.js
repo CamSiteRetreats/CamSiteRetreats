@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
         }
 
         const { rows } = await db.query(
-            'SELECT * FROM users WHERE username = $1 AND password = $2 AND status = $3',
+            'SELECT * FROM users WHERE LOWER(username) = LOWER($1) AND password = $2 AND status = $3',
             [username, password, 'active']
         );
 
