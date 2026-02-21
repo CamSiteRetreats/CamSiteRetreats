@@ -3,10 +3,10 @@ const db = require('../api/_db');
 async function updateTourImages() {
     const tourId = 9;
     const images = {
-        image: 'tour/yangdoan/yangdoan (6).jpg',
-        image2: 'tour/yangdoan/yangdoan (7).jpg',
-        image3: 'tour/yangdoan/yangdoan (12).jpg',
-        image4: 'tour/yangdoan/yangdoan (5).jpg'
+        image: 'tour/Yangdoan/yangdoan (6).jpg',
+        image2: 'tour/Yangdoan/yangdoan (7).jpg',
+        image3: 'tour/Yangdoan/yangdoan (12).jpg',
+        image4: 'tour/Yangdoan/yangdoan (5).jpg'
     };
 
     try {
