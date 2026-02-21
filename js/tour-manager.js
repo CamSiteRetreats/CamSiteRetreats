@@ -342,6 +342,26 @@ const TourManager = {
                 defaultSchedules: [
                     { date: '25/03 - 28/03', slots: 12, status: 'Đang mở' }
                 ]
+            },
+            {
+                id: 8,
+                name: 'Yang Đoan',
+                image: 'tour/Yangdoan/yangdoan (4).jpg',
+                image2: 'tour/Yangdoan/yangdoan (1).jpg',
+                image3: 'tour/Yangdoan/yangdoan (2).jpg',
+                image4: 'tour/Yangdoan/yangdoan (3).jpg',
+                region: 'Miền Nam',
+                type: 'TREKKING',
+                duration: '1 Ngày 1 Đêm',
+                price: 1100000,
+                level: 'Trung Bình',
+                altitude: '1.812M',
+                url: 'tour/yangdoan',
+                shortDesc: 'Chinh phục đỉnh Yang Đoan - nóc nhà Di Linh. Hành trình trekking rừng già rêu phong, ngắm hoàng hôn triệu đô trên hồ Kala.',
+                defaultSchedules: [
+                    { date: '15/03 - 16/03', slots: 13, status: 'Đang mở' },
+                    { date: '29/03 - 30/03', slots: 13, status: 'Đang mở' }
+                ]
             }
         ];
         localStorage.setItem(TOURS_KEY, JSON.stringify(defaults));
