@@ -305,6 +305,13 @@
                                 <p class="text-[10px] text-gray-400 mt-1 italic">* Bỏ trống nếu muốn dùng trang mặc định
                                     của hệ thống.</p>
                             </div>
+                            <div class="col-span-2">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="tour-is-visible" checked
+                                        class="w-5 h-5 rounded border-gray-100 text-primary focus:ring-primary transition-all">
+                                    <span class="text-sm font-bold text-gray-700">Hiển thị tour này trên website</span>
+                                </label>
+                            </div>
                         </div>
                         <div class="p-8 bg-gray-50 flex space-x-4">
                             <button type="button" onclick="closeAddTourModal()"
@@ -392,11 +399,13 @@
                 document.getElementById('tour-price').value = editData.price;
                 document.getElementById('tour-sort-order').value = editData.sort_order || 0;
                 document.getElementById('tour-custom-domain').value = editData.custom_domain || '';
+                document.getElementById('tour-is-visible').checked = editData.is_visible !== false;
             } else {
                 title.innerText = 'Thêm Tour Mới';
                 submitBtn.innerText = 'Lưu Tour';
                 document.getElementById('addTourForm').reset();
                 document.getElementById('edit-id').value = '';
+                document.getElementById('tour-is-visible').checked = true;
                 // Pre-fill custom domain for new tour
                 document.getElementById('tour-custom-domain').value = 'https://camsiteretreats.com/tour/';
             }
@@ -475,7 +484,10 @@
                     <td class="px-6 py-4 text-sm">${item.duration}</td>
                     <td class="px-6 py-4 text-sm font-bold text-primary">${parseInt(item.price).toLocaleString('vi-VN')}đ</td>
                     <td class="px-6 py-4">
-                        <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hiển thị</span>
+                        ${item.is_visible !== false
+                    ? '<span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">Hiển thị</span>'
+                    : '<span class="bg-gray-100 text-gray-400 text-[10px] px-2 py-1 rounded-full font-bold border border-gray-200">Đã ẩn</span>'
+                }
                     </td>
                     <td class="px-6 py-4 space-x-2">
                         ${actionButtons}
@@ -504,7 +516,8 @@
                 duration: document.getElementById('tour-duration').value,
                 price: document.getElementById('tour-price').value,
                 sort_order: parseInt(document.getElementById('tour-sort-order').value) || 0,
-                custom_domain: document.getElementById('tour-custom-domain').value.trim() || null
+                custom_domain: document.getElementById('tour-custom-domain').value.trim() || null,
+                is_visible: document.getElementById('tour-is-visible').checked
             };
 
             try {

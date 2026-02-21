@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, name, image, image2, image3, image4, shortDesc, altitude, level, region, type, duration, price, sort_order, custom_domain } = req.body;
+            const { id, name, image, image2, image3, image4, shortDesc, altitude, level, region, type, duration, price, sort_order, custom_domain, is_visible } = req.body;
             if (!name || !price) {
                 return res.status(400).json({ error: 'Name and Price are required' });
             }
@@ -31,21 +31,34 @@ module.exports = async (req, res) => {
                     SET name = $1, image = $2, image2 = $3, image3 = $4, image4 = $5, 
                         short_desc = $6, altitude = $7, level = $8, region = $9, 
                         type = $10, duration = $11, price = $12, sort_order = $13,
-                        custom_domain = $14
-                    WHERE id = $15
+                        custom_domain = $14, is_visible = $15
+                    WHERE id = $16
                     RETURNING *;
                 `;
-                const values = [name, image, image2, image3, image4, shortDesc, altitude, level, region, type, duration, price, sort_order || 0, custom_domain || null, id];
+                const values = [
+                    name, image, image2, image3, image4,
+                    shortDesc, altitude, level, region,
+                    type, duration, price, sort_order || 0,
+                    custom_domain || null,
+                    is_visible !== undefined ? is_visible : true,
+                    id
+                ];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
                 const query = `
-                    INSERT INTO tours (name, image, image2, image3, image4, short_desc, altitude, level, region, type, duration, price, sort_order, custom_domain)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                    INSERT INTO tours (name, image, image2, image3, image4, short_desc, altitude, level, region, type, duration, price, sort_order, custom_domain, is_visible)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
                     RETURNING *;
                 `;
-                const values = [name, image, image2, image3, image4, shortDesc, altitude, level, region, type, duration, price, sort_order || 0, custom_domain || null];
+                const values = [
+                    name, image, image2, image3, image4,
+                    shortDesc, altitude, level, region,
+                    type, duration, price, sort_order || 0,
+                    custom_domain || null,
+                    is_visible !== undefined ? is_visible : true
+                ];
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }

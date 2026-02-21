@@ -26,7 +26,9 @@ const TourManager = {
             taNang.url = 'tour/tanangphandung';
             localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
         }
-        return tours;
+
+        // Filter out hidden tours for public view
+        return tours.filter(t => t.is_visible !== false);
     },
 
     // NEW: Fetch from Backend API
@@ -199,7 +201,7 @@ const TourManager = {
 
     // Get random tours (excluding current)
     getRandomTours: function (count, excludeId) {
-        const allTours = this.getAllTours();
+        const allTours = this.getAllTours(); // Already filtered by is_visible in getAllTours()
         const filtered = allTours.filter(t => t.id != excludeId);
         // Shuffle
         const shuffled = filtered.sort(() => 0.5 - Math.random());
