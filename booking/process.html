@@ -513,6 +513,12 @@
             localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
 
             // Sync to Server API
+            const btn = document.querySelector('button[onclick="confirmTransfer()"]');
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-white"></i> Đang gửi...';
+            lucide.createIcons();
+
             try {
                 // Map fields to snake_case for DB
                 const dbBooking = {
@@ -552,26 +558,36 @@
                             console.warn('Failed to delete lead:', err);
                         }
                     }
+
+                    // Show Success only on positive API response
+                    document.getElementById('booking-form').classList.add('hidden');
+                    document.getElementById('success-section').classList.remove('hidden');
+                    window.scrollTo(0, 0);
+
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
                 }
             } catch (err) {
                 console.error('API Sync Error:', err);
+                alert('Có lỗi xảy ra khi nộp đơn: ' + err.message + '\nVui lòng kiểm tra kết nối mạng và thử lại, hoặc chụp màn hình lỗi cho Admin.');
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+                lucide.createIcons();
+                return; // Stop here
             }
 
-            // Sync to Customer DB & Update Booking with Customer ID
+            // Sync to Customer DB (Legacy / CRM local logic)
             try {
                 const customerId = syncCustomerFromBooking(bookingData);
                 if (customerId) {
-                    bookings[bookings.length - 1].customerId = customerId;
-                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+                    const bks = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+                    bks[bks.length - 1].customerId = customerId;
+                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bks));
                 }
             } catch (e) {
                 console.error('CRM Sync Error:', e);
             }
-
-            // Show Success
-            document.getElementById('booking-form').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-            window.scrollTo(0, 0);
         }
     </script>
 </body>

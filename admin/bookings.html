@@ -895,12 +895,14 @@
         }
 
         async function confirmDeposit(id) {
-            if (!confirm('Xác nhận đã nhận 500.000đ tiền cọc từ khách hàng này?')) return;
-
             const booking = window.allBookings.find(b => b.id == id);
             if (!booking) return;
 
+            const currentDeposit = Number(booking.deposit) || 1000000;
+            if (!confirm(`Xác nhận đã nhận ${currentDeposit.toLocaleString('vi-VN')}đ tiền cọc từ khách hàng này?`)) return;
+
             booking.status = 'Đã cọc (Chờ đi)';
+            booking.deposit = currentDeposit; // Ensure it's recorded if it was 0
 
             try {
                 await fetch(API_BOOKINGS, {
