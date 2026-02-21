@@ -300,30 +300,28 @@
                 <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền cọc cần thanh toán
                     </p>
-                    <div class="text-4xl font-black text-primary mb-2">500.000đ</div>
+                    <div class="text-4xl font-black text-primary mb-2">1.000.000đ</div>
                     <p class="text-xs text-gray-500 italic mb-8">Vui lòng chuyển khoản để giữ chỗ</p>
 
                     <div
                         class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
-                        <div class="scale-90 origin-center mb-4">
-                            <!-- Placeholder QR -->
-                            <div
-                                class="w-48 h-48 bg-white mx-auto border-2 border-primary rounded-xl flex items-center justify-center">
-                                <span class="text-gray-300 font-bold">QR CODE</span>
-                            </div>
+                        <!-- QR Image -->
+                        <div
+                            class="w-48 h-48 bg-white mx-auto border-2 border-primary rounded-xl overflow-hidden flex items-center justify-center">
+                            <img src="qr.jpg" alt="QR Code" class="w-full h-full object-cover">
                         </div>
                         <div class="text-left space-y-3 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Ngân hàng:</span>
-                                <span class="font-bold">Vietcombank</span>
+                                <span class="font-bold">BIDV</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Số tài khoản:</span>
-                                <span class="font-bold text-lg tracking-wide">0123 456 789</span>
+                                <span class="font-bold text-lg tracking-wide">ORANGE</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Chủ tài khoản:</span>
-                                <span class="font-bold uppercase">NGUYEN VAN CAM</span>
+                                <span class="font-bold uppercase">PHAM THIEN AN</span>
                             </div>
                             <div class="flex justify-between items-center bg-yellow-50 p-2 rounded-lg -mx-2">
                                 <span class="text-gray-500 text-xs">Nội dung CK:</span>
@@ -398,8 +396,9 @@
         document.getElementById('cust-name').value = leadData.name;
         document.getElementById('cust-phone').value = leadData.phone;
 
-        // Generate Transfer Code
-        const transferCode = `CAM ${leadData.id.toString().slice(-6)}`;
+        // Generate Transfer Code: Tên Tour - Mã Đơn - Ngày
+        const cleanedTourName = leadData.tour.split('-')[0].trim();
+        const transferCode = `${cleanedTourName} - ${leadData.id.toString().slice(-6)} - ${leadData.date}`;
         document.getElementById('transfer-content').textContent = transferCode;
 
         function copyContent() {
@@ -492,7 +491,7 @@
                 commitments: true,
 
                 // Step 4: Payment
-                deposit: 500000,
+                deposit: 1000000,
                 totalPrice: (function () {
                     const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
                     const found = tours.find(t => t.name === leadData.tour);
