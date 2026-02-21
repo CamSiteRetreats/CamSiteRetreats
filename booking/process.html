@@ -539,6 +539,19 @@
                     // Update local with DB ID if needed
                     bookings[bookings.length - 1].dbId = savedBooking.id;
                     localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+
+                    // 1.2 Delete Lead from DB if exists
+                    const leadId = params.get('leadId');
+                    if (leadId) {
+                        try {
+                            await fetch(`../api/leads?id=${leadId}`, {
+                                method: 'DELETE'
+                            });
+                            console.log('Lead deleted after conversion');
+                        } catch (err) {
+                            console.warn('Failed to delete lead:', err);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error('API Sync Error:', err);
