@@ -169,9 +169,10 @@
         lucide.createIcons();
         document.getElementById('gen-time').textContent = new Date().toLocaleString('vi-VN');
 
-        const BOOKINGS_KEY = 'cam_site_bookings';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const API_BOOKINGS = '/api/bookings';
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
             const tourName = params.get('tour');
             const tourDateStr = params.get('date');
@@ -190,30 +191,40 @@
             } catch (e) { }
             document.getElementById('tour-date').textContent = displayDate;
 
-            const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '<tr><td colspan="12" class="text-center py-8 text-gray-400 italic">Đang tải danh sách thành viên...</td></tr>';
 
-            const filtered = bookings.filter(b => {
-                const isTourMatch = b.tour === tourName;
+            try {
+                const res = await fetch(API_BOOKINGS);
+                if (!res.ok) throw new Error('Không thể tải dữ liệu từ server');
+                const bookings = await res.json();
 
-                // Fuzzy Date Matching
-                let dateMatch = false;
-                if (b.date) {
-                    if (b.date.includes(tourDateStr)) dateMatch = true;
+                const filtered = bookings.filter(b => {
+                    const isTourMatch = b.tour === tourName;
 
-                    const d = new Date(tourDateStr);
-                    const dd = d.getDate().toString().padStart(2, '0');
-                    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const shortDate = `${dd}/${mm}`; // 15/03
-                    const shortDate2 = `${d.getDate()}/${d.getMonth() + 1}`; // 15/3
+                    // Fuzzy Date Matching
+                    let dateMatch = false;
+                    if (b.date) {
+                        if (b.date.includes(tourDateStr)) dateMatch = true;
 
-                    if (b.date.includes(shortDate) || b.date.includes(shortDate2)) dateMatch = true;
-                }
+                        const d = new Date(tourDateStr);
+                        const dd = d.getDate().toString().padStart(2, '0');
+                        const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+                        const shortDate = `${dd}/${mm}`; // 15/03
+                        const shortDate2 = `${d.getDate()}/${d.getMonth() + 1}`; // 15/3
 
-                const isNotCancelled = b.status !== 'Đã hủy';
-                return isTourMatch && dateMatch && isNotCancelled;
-            });
+                        if (b.date.includes(shortDate) || b.date.includes(shortDate2)) dateMatch = true;
+                    }
 
-            renderTable(filtered);
+                    const isNotCancelled = b.status !== 'Đã hủy';
+                    return isTourMatch && dateMatch && isNotCancelled;
+                });
+
+                renderTable(filtered);
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-red-500 font-bold">Lỗi: ${err.message}</td></tr>`;
+            }
         });
 
         function renderTable(data) {
@@ -228,8 +239,26 @@
                 return;
             }
 
+            emptyState.classList.add('hidden');
+            document.getElementById('members-table').classList.remove('hidden');
+
             data.forEach((member, index) => {
-                let dob = member.dob;
+                const m = {
+                    name: member.name,
+                    dob: member.dob,
+                    idCard: member.id_card || member.idCard,
+                    phone: member.phone,
+                    gender: member.gender,
+                    address: member.address,
+                    medalName: member.medal_name || member.medalName,
+                    trekkingPole: member.trekking_pole || member.trekkingPole,
+                    diet: member.diet,
+                    allergy: member.allergy,
+                    special: member.special,
+                    commitments: member.commitments
+                };
+
+                let dob = m.dob;
                 try {
                     const d = new Date(dob);
                     if (!isNaN(d)) dob = d.toLocaleDateString('vi-VN');
@@ -240,25 +269,25 @@
 
                 // Combine Notes
                 const notes = [];
-                if (member.allergy) notes.push(`Dị ứng: ${member.allergy}`);
-                if (member.special) notes.push(`YC khác: ${member.special}`);
+                if (m.allergy) notes.push(`Dị ứng: ${m.allergy}`);
+                if (m.special) notes.push(`YC khác: ${m.special}`);
                 const noteHtml = notes.length > 0 ? notes.join('<br>') : dash;
 
                 const row = `
                     <tr>
                         <td class="text-center font-bold text-gray-500">${index + 1}</td>
-                        <td class="font-bold text-gray-800 uppercase text-xs">${member.name || '-'}</td>
+                        <td class="font-bold text-gray-800 uppercase text-xs">${m.name || '-'}</td>
                         <td>${dob || '-'}</td>
-                        <td class="font-mono text-xs">${member.idCard || '-'}</td>
-                        <td class="font-mono text-xs">${member.phone || '-'}</td>
-                        <td class="text-center">${member.gender || '-'}</td>
-                        <td class="text-xs break-words max-w-[200px]">${member.address || '-'}</td>
-                        <td class="font-bold text-primary uppercase text-xs">${member.medalName || member.name || '-'}</td>
-                        <td class="text-center">${(member.trekkingPole === 'Có' || member.trekkingPole === true) ? checkIcon : dash}</td>
-                        <td class="text-center">${(member.diet === 'Ăn chay' || member.diet === true) ? checkIcon : dash}</td>
+                        <td class="font-mono text-xs">${m.idCard || '-'}</td>
+                        <td class="font-mono text-xs">${m.phone || '-'}</td>
+                        <td class="text-center">${m.gender || '-'}</td>
+                        <td class="text-xs break-words max-w-[200px]">${m.address || '-'}</td>
+                        <td class="font-bold text-primary uppercase text-xs">${m.medalName || m.name || '-'}</td>
+                        <td class="text-center">${(m.trekkingPole === 'Có' || m.trekkingPole === true || m.trekkingPole === 'true') ? checkIcon : dash}</td>
+                        <td class="text-center">${(m.diet === 'Ăn chay' || m.diet === true || m.diet === 'true') ? checkIcon : dash}</td>
                         <td class="text-xs italic text-gray-500">${noteHtml}</td>
                         <td class="text-center text-xs text-gray-400 italic">
-                             ${(member.commitments) ? checkIcon : dash}
+                             ${(m.commitments) ? checkIcon : dash}
                         </td>
                     </tr>
                 `;
