@@ -232,7 +232,7 @@ const TourManager = {
             },
             {
                 id: 2,
-                name: 'Bidoup - Tà Giang',
+                name: 'Bidoup Tà Giang',
                 image: 'tour/Tanang/thumb1.png',
                 image2: 'tour/Tanang/thumb2.png',
                 image3: 'tour/Tanang/thumb3.png',
@@ -240,10 +240,10 @@ const TourManager = {
                 region: 'Miền Trung',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
-                price: 3550000,
+                price: 'Update',
                 level: 'Khó',
                 altitude: '2.287M',
-                url: '#',
+                url: 'tour/bidouptagiang',
                 shortDesc: 'Chinh phục nóc nhà tỉnh Lâm Đồng và băng qua những cánh rừng thông nguyên sinh tuyệt đẹp.',
                 defaultSchedules: [
                     { date: '15/03 - 16/03', slots: 10, status: 'Đang mở' },
@@ -270,7 +270,7 @@ const TourManager = {
             },
             {
                 id: 4,
-                name: 'Núi Langbiang',
+                name: 'Langbiang',
                 image: 'tour/Tanang/thumb1.png',
                 image2: 'tour/Tanang/thumb2.png',
                 image3: 'tour/Tanang/thumb3.png',
@@ -278,9 +278,9 @@ const TourManager = {
                 region: 'Miền Trung',
                 type: 'HIKING',
                 duration: 'Trong ngày',
-                price: 1100000,
+                price: 'Update',
                 level: 'Dễ',
-                url: '#',
+                url: 'tour/langbiang',
                 shortDesc: 'Hành trình nhẹ nhàng ngắm nhìn toàn cảnh thành phố Đà Lạt mộng mơ từ trên cao.',
                 defaultSchedules: [
                     { date: 'Mỗi ngày', slots: 20, status: 'Đang mở' }
@@ -303,6 +303,43 @@ const TourManager = {
                 defaultSchedules: [
                     { date: '12/03 - 13/03', slots: 15, status: 'Đang mở' }
                 ]
+            },
+            {
+                id: 6,
+                name: 'Thác Mưa Bay',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
+                image4: null,
+                region: 'Miền Nam',
+                type: 'TREKKING',
+                duration: '2 Ngày 1 Đêm',
+                price: 'Update',
+                level: 'Trung Bình',
+                url: 'tour/thacmuabay',
+                shortDesc: 'Khám phá cung đường trekking Thác Mưa Bay, đi qua những cánh rừng thông và thác tuyệt đẹp.',
+                defaultSchedules: [
+                    { date: '21/03 - 22/03', slots: 10, status: 'Đang mở' }
+                ]
+            },
+            {
+                id: 7,
+                name: 'Ky Quan San',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
+                image4: null,
+                region: 'Miền Bắc',
+                type: 'TREKKING',
+                duration: '3 Ngày 2 Đêm',
+                price: 'Update',
+                level: 'Khó',
+                altitude: '3.046M',
+                url: 'tour/kyquansan',
+                shortDesc: 'Hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan San, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m.',
+                defaultSchedules: [
+                    { date: '25/03 - 28/03', slots: 12, status: 'Đang mở' }
+                ]
             }
         ];
         localStorage.setItem(TOURS_KEY, JSON.stringify(defaults));
@@ -311,7 +348,12 @@ const TourManager = {
 
     // Format price to Vietnamese currency
     formatPrice: function (price) {
-        return parseInt(price).toLocaleString('vi-VN') + 'đ';
+        if (!price || price === 'Update' || (typeof price === 'string' && price.toLowerCase().includes('update'))) {
+            return 'Update...';
+        }
+        const numericPrice = parseInt(price);
+        if (isNaN(numericPrice) || numericPrice === 0) return 'Update...';
+        return numericPrice.toLocaleString('vi-VN') + 'đ';
     },
 
     // Create a Tour Card HTML (Generic for Home and Tour List)

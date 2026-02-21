@@ -1322,7 +1322,7 @@
             const currentTour = toursData.find(t => t.name === selectedTour);
             if (currentTour && currentTour.price) {
                 // Format price with dots (e.g., 3.200.000)
-                const formattedPrice = Number(currentTour.price).toLocaleString('vi-VN') + 'đ';
+                const formattedPrice = TourManager.formatPrice(currentTour.price);
                 priceDisplay.textContent = formattedPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
             } else if (selectedTour === 'Tà Năng - Phan Dũng') {
