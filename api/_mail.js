@@ -27,7 +27,7 @@ async function sendEmail({ to, subject, html }) {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'Content-Length': data.length
+            'Content-Length': Buffer.byteLength(data)
         }
     };
 
