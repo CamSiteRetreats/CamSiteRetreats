@@ -24,7 +24,7 @@ const UIComponents = {
                 <div class="max-w-6xl mx-auto px-6 flex justify-between items-center w-full relative">
                     <div class="flex items-center">
                         <a href="${prefix}" class="block">
-                            <img src="${prefix}logo.png" alt="CAM SITE RETREATS" class="h-10 w-auto object-contain">
+                            <img src="${prefix}logo-camsite-01.png" alt="CAM SITE RETREATS" class="h-10 w-auto object-contain">
                         </a>
                     </div>
                     
@@ -77,7 +77,7 @@ const UIComponents = {
                         <!-- Col 1: Brand -->
                         <div class="space-y-6">
                             <a href="${prefix}" class="block">
-                                <img src="${prefix}logo.png" alt="CAM SITE RETREATS" class="h-12 w-auto object-contain mb-4">
+                                <img src="${prefix}logo-camsite-01.png" alt="CAM SITE RETREATS" class="h-12 w-auto object-contain mb-4">
                             </a>
                             <p class="italic leading-relaxed font-medium">
                                 CAM SITE RETREATS là một đội ngũ trẻ trung, với mong muốn mang đến những tinh thần tràn đầy
