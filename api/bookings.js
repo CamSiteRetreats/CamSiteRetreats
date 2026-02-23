@@ -57,6 +57,12 @@ module.exports = async (req, res) => {
                 return res.status(200).json(rows[0]);
             } else {
                 // Insert
+                const {
+                    name, phone, tour, date, status, total_price, deposit,
+                    sale_id, sale_name, customer_id, dob, gender, address,
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                } = body;
+
                 const query = `
                     INSERT INTO bookings (
                         name, phone, tour, date, status, total_price, deposit, 
