@@ -45,11 +45,11 @@ module.exports = async (req, res) => {
                 const newLead = rows[0];
 
                 // --- Send Email Notification ---
-                const adminEmail = process.env.ADMIN_EMAIL;
-                if (adminEmail && newLead) {
+                if (newLead) {
                     try {
+                        const adminEmail = process.env.ADMIN_EMAIL; // Might be empty, that's okay
                         await sendEmail({
-                            to: adminEmail,
+                            to: adminEmail, // If empty, _mail.js will use fallback
                             subject: `🍀 Khách hàng mới: ${newLead.name}`,
                             html: `
                                 <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">

@@ -82,14 +82,14 @@ module.exports = async (req, res) => {
                 const newBooking = rows[0];
 
                 // --- Send Email Notification ---
-                const adminEmail = process.env.ADMIN_EMAIL;
-                if (adminEmail && newBooking) {
+                if (newBooking) {
                     try {
+                        const adminEmail = process.env.ADMIN_EMAIL; // Might be empty, that's okay
                         const formattedPrice = (newBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
                         const formattedDeposit = (newBooking.deposit || 0).toLocaleString('vi-VN') + 'đ';
 
                         await sendEmail({
-                            to: adminEmail,
+                            to: adminEmail, // If empty, _mail.js will use fallback
                             subject: `🔥 ĐƠN ĐẶT TOUR MỚI: ${newBooking.name}`,
                             html: `
                                 <div style="font-family: sans-serif; padding: 25px; border: 2px solid #E85D04; border-radius: 15px; max-width: 600px;">
