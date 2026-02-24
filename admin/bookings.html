@@ -2,133 +2,133 @@
 <html lang="vi">
 
 
-    <link rel="icon" type="image/png" href="../favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng chốt - CAM SITE RETREATS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="../js/auth.js"></script> <!-- Auth Logic -->
-    <script src="../js/crm.js"></script> <!-- CRM Logic -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#E85D04',
-                        secondary: '#FFF8F0',
-                    }
+<link rel="icon" type="image/png" href="../favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đơn hàng chốt - CAM SITE RETREATS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="../js/auth.js"></script> <!-- Auth Logic -->
+<script src="../js/crm.js"></script> <!-- CRM Logic -->
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#E85D04',
+                    secondary: '#FFF8F0',
                 }
             }
         }
-    </script>
-    <style>
-        :root {
-            --primary: #E85D04;
-            --bg-dashboard: #F8F9FA;
-            --sidebar-width: 260px;
-        }
+    }
+</script>
+<style>
+    :root {
+        --primary: #E85D04;
+        --bg-dashboard: #F8F9FA;
+        --sidebar-width: 260px;
+    }
 
+    html {
+        font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
         html {
-            font-size: 18px;
+            font-size: 13px !important;
         }
 
-        @media (max-width: 768px) {
-            html {
-                font-size: 13px !important;
-            }
-
-            h1,
-            h2,
-            h3 {
-                font-size: 15px !important;
-                line-height: 1.4 !important;
-            }
-
-            .sidebar {
-                left: -100% !important;
-                top: 0;
-                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
-            }
-
-            .sidebar.active {
-                left: 0 !important;
-            }
-
-            main {
-                margin-left: 0 !important;
-                padding: 1.5rem !important;
-            }
-
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.5rem;
-                margin-bottom: 2rem !important;
-            }
-
-            header>div:first-child {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .mobile-toggle {
-                display: flex !important;
-            }
-
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.3);
-                backdrop-filter: blur(4px);
-                z-index: 35;
-            }
-
-            .sidebar-overlay.active {
-                display: block;
-            }
-
-            /* Table mobile fix */
-            .overflow-x-auto {
-                margin: 0 -1.5rem;
-                padding: 0 1.5rem;
-            }
-
-            table {
-                min-width: 1100px;
-            }
-
-            td,
-            th {
-                padding: 0.75rem 1rem !important;
-                font-size: 12px !important;
-            }
-        }
-
-        .mobile-toggle {
-            display: none;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dashboard);
+        h1,
+        h2,
+        h3 {
+            font-size: 15px !important;
+            line-height: 1.4 !important;
         }
 
         .sidebar {
-            width: var(--sidebar-width);
-            transition: all 0.3s ease;
+            left: -100% !important;
+            top: 0;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-link.active {
-            background-color: rgba(232, 93, 4, 0.1);
-            color: var(--primary);
-            border-left: 4px solid var(--primary);
+        .sidebar.active {
+            left: 0 !important;
         }
-    </style>
+
+        main {
+            margin-left: 0 !important;
+            padding: 1.5rem !important;
+        }
+
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem !important;
+        }
+
+        header>div:first-child {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-toggle {
+            display: flex !important;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 35;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Table mobile fix */
+        .overflow-x-auto {
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        table {
+            min-width: 1100px;
+        }
+
+        td,
+        th {
+            padding: 0.75rem 1rem !important;
+            font-size: 12px !important;
+        }
+    }
+
+    .mobile-toggle {
+        display: none;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--bg-dashboard);
+    }
+
+    .sidebar {
+        width: var(--sidebar-width);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link.active {
+        background-color: rgba(232, 93, 4, 0.1);
+        color: var(--primary);
+        border-left: 4px solid var(--primary);
+    }
+</style>
 </head>
 
 <body class="flex min-h-screen">
@@ -243,9 +243,7 @@
                 <select id="filter-tour" onchange="onTourChange()"
                     class="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium text-gray-600 appearance-none">
                     <option value="">Tất cả Tour</option>
-                    <option value="Tà Năng - Phan Dũng">Tà Năng - Phan Dũng</option>
-                    <option value="Tà Năng - Phan Dũng">Tà Năng - Phan Dũng</option>
-                    <!-- Add more tours dynamically if needed -->
+                    <!-- Options populated dynamically from LocalStorage/API -->
                 </select>
             </div>
 
@@ -539,6 +537,16 @@
 
             // Initial Data Load
             loadBookings();
+
+            // Sync tours with API to get latest prices
+            if (window.TourManager) {
+                TourManager.fetchToursFromAPI();
+            }
+
+            // Update tour filter when tours are fetched from API
+            window.addEventListener('tours-updated', () => {
+                loadTourOptions();
+            });
         });
 
         async function loadBookings() {

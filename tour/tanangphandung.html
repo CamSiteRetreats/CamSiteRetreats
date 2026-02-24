@@ -1434,13 +1434,13 @@
             };
 
             try {
-                const response = await fetch('../api/leads', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newLead)
-                });
-
                 if (!response.ok) throw new Error('Network response was not ok');
+
+                const result = await response.json();
+                console.log('Lead submitted Successfully:', result);
+                if (result._mailStatus) {
+                    console.log('[Mail Diagnostic]', result._mailStatus);
+                }
 
                 // Show Popup
                 document.getElementById('success-modal').classList.add('active');
