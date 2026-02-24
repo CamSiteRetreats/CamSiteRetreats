@@ -82,11 +82,12 @@ module.exports = async (req, res) => {
                 const newBooking = rows[0];
 
                 // --- Send Email Notification ---
+                let mailStatus = null;
                 if (newBooking) {
                     const formattedPrice = (newBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
                     const formattedDeposit = (newBooking.deposit || 0).toLocaleString('vi-VN') + 'đ';
 
-                    await sendEmail({
+                    mailStatus = await sendEmail({
                         subject: `🔥 ĐƠN ĐẶT TOUR MỚI: ${newBooking.name}`,
                         html: `
                             <div style="font-family: sans-serif; padding: 25px; border: 2px solid #E85D04; border-radius: 15px; max-width: 600px;">
@@ -118,7 +119,7 @@ module.exports = async (req, res) => {
                     });
                 }
 
-                return res.status(201).json(newBooking);
+                return res.status(201).json({ ...newBooking, _mailStatus: mailStatus });
             }
         }
 

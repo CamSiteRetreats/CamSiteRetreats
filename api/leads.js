@@ -45,8 +45,9 @@ module.exports = async (req, res) => {
                 const newLead = rows[0];
 
                 // --- Send Email Notification ---
+                let mailStatus = null;
                 if (newLead) {
-                    await sendEmail({
+                    mailStatus = await sendEmail({
                         subject: `🍀 Khách hàng mới: ${newLead.name}`,
                         html: `
                             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -64,7 +65,7 @@ module.exports = async (req, res) => {
                     });
                 }
 
-                return res.status(201).json(newLead);
+                return res.status(201).json({ ...newLead, _mailStatus: mailStatus });
             }
         }
 
