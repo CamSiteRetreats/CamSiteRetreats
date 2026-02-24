@@ -293,11 +293,26 @@
 </head>
 
 <body class="overflow-x-hidden">
-    <h1
-        class="hero-title text-5xl md:text-7xl font-black text-white uppercase animate__animated animate__fadeInUp animate__delay-1s">
-        THÁC MƯA BAY
-    </h1>
-    </div>
+
+    <!-- Navigation Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- SECTION 1: HERO -->
+    <section
+        class="relative h-[60vh] md:h-[75vh] w-full flex items-end justify-center overflow-hidden mt-0 pb-16 md:pb-24">
+        <img src="../tour/thacmuabay/muabay (3).png" class="absolute inset-0 w-full h-full object-cover object-center"
+            alt="Thác Mưa Bay Hero">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative z-10 text-center px-6">
+            <span
+                class="bg-primary text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 inline-block animate__animated animate__fadeInUp">
+                Trekking | Miền Nam
+            </span>
+            <h1
+                class="hero-title text-5xl md:text-7xl font-black text-white uppercase animate__animated animate__fadeInUp animate__delay-1s">
+                THÁC MƯA BAY
+            </h1>
+        </div>
     </section>
 
     <!-- Main Content Layout -->
@@ -311,14 +326,10 @@
                 <div class="content-card p-8 md:p-12">
                     <h2 class="text-2xl font-black uppercase text-primary mb-6">Giới thiệu chung</h2>
                     <p class="text-gray-600 leading-relaxed text-justify mb-6">
-                        Được mệnh danh là cung đường trekking đẹp nhất miền Nam, Tà Năng - Phan Dũng dài khoảng 30km nối
-                        liền Lâm Đồng và Bình Thuận.
-                        Hành trình đưa bạn băng qua những đồi cỏ xanh mướt, những rừng thông reo vi vu và đón bình minh
-                        rực rỡ trên đỉnh đồi lộng gió.
-                    </p>
-                    <p class="text-gray-600 leading-relaxed text-justify">
-                        Đây không chỉ là một chuyến đi, mà là hành trình chữa lành, tìm về với thiên nhiên nguyên bản để
-                        tái tạo năng lượng sau những ngày làm việc căng thẳng.
+                        Thác Mưa Bay (hay thác Tà Pứa) nằm tại xã Đức Phú, huyện Tánh Linh, Bình Thuận, là một địa danh
+                        du lịch hoang sơ nổi tiếng với dòng nước đổ từ độ cao 100m, tạo nên những màn bụi nước li ti như
+                        mưa phùn bao phủ không gian. Nơi đây là điểm đến hấp dẫn cho những người yêu thiên nhiên và
+                        trekking khi khám phá vùng giáp ranh Lâm Đồng - Bình Thuận.
                     </p>
                 </div>
 
@@ -348,7 +359,7 @@
                         <div class="spec-item"><i data-lucide="footprints" class="w-5 h-5 text-primary"></i></div>
                         <div>
                             <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ dài</h4>
-                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">14 KM</p>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">15Km / Chiều</p>
                         </div>
                     </div>
                     <!-- Spec 4: Elevation -->
@@ -357,7 +368,7 @@
                         <div class="spec-item"><i data-lucide="mountain" class="w-5 h-5 text-primary"></i></div>
                         <div>
                             <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ cao</h4>
-                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">100M</p>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">50m</p>
                         </div>
                     </div>
                     <!-- Spec 5: Level (Difficulty) -->
@@ -366,7 +377,7 @@
                         <div class="spec-item"><i data-lucide="dumbbell" class="w-5 h-5 text-primary"></i></div>
                         <div>
                             <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ khó</h4>
-                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Trung bình</p>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Vừa phải</p>
                         </div>
                     </div>
                     <!-- Spec 6: Transport -->
@@ -375,7 +386,7 @@
                         <div class="spec-item"><i data-lucide="bus" class="w-5 h-5 text-primary"></i></div>
                         <div>
                             <h4 class="text-[10px] font-bold uppercase text-gray-400">Phương tiện</h4>
-                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Xe 16 Chỗ</p>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Xe đưa đón</p>
                         </div>
                     </div>
                     <!-- Spec 7: Quantity (Group Size) -->
@@ -384,7 +395,7 @@
                         <div class="spec-item"><i data-lucide="users" class="w-5 h-5 text-primary"></i></div>
                         <div>
                             <h4 class="text-[10px] font-bold uppercase text-gray-400">Số lượng</h4>
-                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">Tối đa 13 khách</p>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">10 - 15 Khách</p>
                         </div>
                     </div>
                     <!-- Spec 8: Guide Ratio -->
@@ -502,114 +513,72 @@
                             <!-- Image 1 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide1.png" loading="lazy"
+                                <img src="../tour/thacmuabay/muabay (1).png" loading="lazy"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 1">
+                                    alt="Thác Mưa Bay 1">
                             </div>
                             <!-- Image 2 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(1).png" loading="lazy"
+                                <img src="../tour/thacmuabay/muabay (2).png" loading="lazy"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 2">
+                                    alt="Thác Mưa Bay 2">
                             </div>
                             <!-- Image 3 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(2).png" loading="lazy"
+                                <img src="../tour/thacmuabay/muabay (3).png" loading="lazy"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 3">
+                                    alt="Thác Mưa Bay 3">
                             </div>
                             <!-- Image 4 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(3).png"
+                                <img src="../tour/thacmuabay/muabay (4).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 4">
+                                    alt="Thác Mưa Bay 4">
                             </div>
                             <!-- Image 5 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(4).png"
+                                <img src="../tour/thacmuabay/muabay (5).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 5">
+                                    alt="Thác Mưa Bay 5">
                             </div>
                             <!-- Image 6 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(5).png"
+                                <img src="../tour/thacmuabay/muabay (6).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 6">
+                                    alt="Thác Mưa Bay 6">
                             </div>
                             <!-- Image 7 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(6).png"
+                                <img src="../tour/thacmuabay/muabay (7).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 7">
+                                    alt="Thác Mưa Bay 7">
                             </div>
                             <!-- Image 8 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(7).png"
+                                <img src="../tour/thacmuabay/muabay (8).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 8">
+                                    alt="Thác Mưa Bay 8">
                             </div>
                             <!-- Image 9 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(8).png"
+                                <img src="../tour/thacmuabay/muabay (9).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 9">
+                                    alt="Thác Mưa Bay 9">
                             </div>
                             <!-- Image 10 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(9).png"
+                                <img src="../tour/thacmuabay/muabay (10).png"
                                     class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 10">
-                            </div>
-                            <!-- Image 11 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(10).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 11">
-                            </div>
-                            <!-- Image 12 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(11).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 12">
-                            </div>
-                            <!-- Image 13 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(12).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 13">
-                            </div>
-                            <!-- Image 14 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(13).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 14">
-                            </div>
-                            <!-- Image 15 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(14).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 15">
-                            </div>
-                            <!-- Image 16 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(15).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 16">
+                                    alt="Thác Mưa Bay 10">
                             </div>
                         </div>
                     </div>
@@ -732,7 +701,7 @@
                                         class="text-xs md:text-base font-black text-primary uppercase mb-1 whitespace-normal md:whitespace-nowrap">
                                         Huy chương</h4>
                                     <p class="text-[10px] md:text-[13.5px] text-gray-500 leading-relaxed font-medium">
-                                        Huy chương được thiết kế đặc biệt, in theo tên, lưu giữ kỷ niệm.</p>
+                                        Huy chương được thiết kế đặc biệt, in theo tên, ngày lưu giữ kỷ niệm.</p>
                                 </div>
                             </div>
                             <!-- Item 8 -->
@@ -764,7 +733,7 @@
                                         class="text-xs md:text-base font-black text-primary uppercase mb-1 whitespace-normal md:whitespace-nowrap">
                                         Bảo hiểm</h4>
                                     <p class="text-[10px] md:text-[13.5px] text-gray-500 leading-relaxed font-medium">
-                                        Bảo hiểm du lịch trị giá 50.000.000 đồng.</p>
+                                        Bảo hiểm du lịch trị giá 50 triệu đồng.</p>
                                 </div>
                             </div>
                             <!-- Item 10 -->
@@ -1014,107 +983,6 @@
                 </div>
             </div>
 
-        </div>
-    </section>
-
-    <!-- SECTION: GALLERY -->
-    <section class="py-20 bg-white border-t border-gray-100 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6 mb-12 text-center">
-            <h2 class="text-3xl font-black uppercase text-primary tracking-tight">CẢM XÚC HÀNH TRÌNH</h2>
-            <p class="text-gray-500 mt-2">Ghi lại những khoảnh khắc tuyệt vời nhất cùng thiên nhiên</p>
-        </div>
-        <div class="max-w-7xl mx-auto px-4 md:px-6">
-            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                <!-- Item 1 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (1).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 2 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (2).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (3).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 4 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (4).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 5 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (5).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 6 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (6).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 7 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (7).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 8 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (8).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 9 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (9).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-
-                <!-- Item 10 -->
-                <div class="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-sm">
-                    <img src="../tour/thacmuabay/muabay (10).png" alt="Thác Mưa Bay"
-                        class="w-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 

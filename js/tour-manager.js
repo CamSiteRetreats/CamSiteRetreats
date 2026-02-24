@@ -214,10 +214,10 @@ const TourManager = {
             {
                 id: 1,
                 name: 'Tà Năng - Phan Dũng',
-                image: 'tour/thacmuabay/muabay (10).png',
-                image2: 'tour/thacmuabay/muabay (9).png',
-                image3: 'tour/thacmuabay/muabay (1).png',
-                image4: 'tour/thacmuabay/muabay (2).png',
+                image: 'tour/Tanang/thumb1.png',
+                image2: 'tour/Tanang/thumb2.png',
+                image3: 'tour/Tanang/thumb3.png',
+                image4: null,
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
@@ -309,20 +309,20 @@ const TourManager = {
             {
                 id: 6,
                 name: 'Thác Mưa Bay',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
-                image4: null,
+                image: 'tour/thacmuabay/muabay (3).png',
+                image2: 'tour/thacmuabay/muabay (10).png',
+                image3: 'tour/thacmuabay/muabay (8).png',
+                image4: 'tour/thacmuabay/muabay (2).png',
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '1 Ngày 1 Đêm',
-                price: 1100000,
-                level: 'Trung Bình',
-                altitude: '100M',
+                price: 'Update',
+                level: 'Vừa phải',
+                altitude: '50m',
                 url: 'tour/thacmuabay',
                 shortDesc: 'Khám phá cung đường trekking Thác Mưa Bay, đi qua những cánh rừng thông và thác tuyệt đẹp.',
                 defaultSchedules: [
-                    { date: '21/03 - 22/03', slots: 13, status: 'Đang mở' }
+                    { date: '21/03 - 22/03', slots: 10, status: 'Đang mở' }
                 ]
             },
             {
