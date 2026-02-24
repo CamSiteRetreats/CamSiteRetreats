@@ -110,9 +110,9 @@ const UIComponents = {
                         <div>
                             <h3 class="text-primary font-bold uppercase mb-6 text-base tracking-wide">CHÍNH SÁCH</h3>
                             <ul class="space-y-4 font-medium">
-                                <li><a href="#" class="hover:text-primary transition-colors">Bảo mật thông tin</a></li>
-                                <li><a href="#" class="hover:text-primary transition-colors">Hướng dẫn đặt tour</a></li>
-                                <li><a href="#" class="hover:text-primary transition-colors">Chính sách hoàn / hủy tour</a></li>
+                                <li><a href="${prefix}chinh-sach.html#an-toan" class="hover:text-primary transition-colors">Quy định an toàn</a></li>
+                                <li><a href="${prefix}chinh-sach.html#mien-tru" class="hover:text-primary transition-colors">Miễn trừ trách nhiệm</a></li>
+                                <li><a href="${prefix}chinh-sach.html#hoan-huy" class="hover:text-primary transition-colors">Chính sách hoàn / hủy tour</a></li>
                             </ul>
                         </div>
                     </div>
