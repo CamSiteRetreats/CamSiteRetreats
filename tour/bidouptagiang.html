@@ -1339,7 +1339,10 @@
                     body: JSON.stringify(newLead)
                 });
 
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Network response was not ok');
+                }
 
                 const result = await response.json();
                 console.log('Lead submitted Successfully:', result);
@@ -1361,7 +1364,7 @@
                 filterSchedules();
             } catch (error) {
                 console.error('Error submitting lead:', error);
-                alert('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau!');
+                alert('Có lỗi xảy ra khi gửi yêu cầu:\n' + error.message + '\nVui lòng thử lại sau hoặc liên hệ Hotline!');
             } finally {
                 if (btn) {
                     btn.innerText = originalText;
