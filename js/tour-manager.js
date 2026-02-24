@@ -307,7 +307,7 @@ const TourManager = {
                 ]
             },
             {
-                id: 6,
+                id: 14,
                 name: 'Thác Mưa Bay',
                 image: 'tour/thacmuabay/muabay (3).png',
                 image2: 'tour/thacmuabay/muabay (10).png',
