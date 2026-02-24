@@ -83,46 +83,39 @@ module.exports = async (req, res) => {
 
                 // --- Send Email Notification ---
                 if (newBooking) {
-                    try {
-                        const adminEmail = process.env.ADMIN_EMAIL; // Might be empty, that's okay
-                        const formattedPrice = (newBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
-                        const formattedDeposit = (newBooking.deposit || 0).toLocaleString('vi-VN') + 'đ';
+                    const formattedPrice = (newBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
+                    const formattedDeposit = (newBooking.deposit || 0).toLocaleString('vi-VN') + 'đ';
 
-                        await sendEmail({
-                            to: adminEmail, // If empty, _mail.js will use fallback
-                            subject: `🔥 ĐƠN ĐẶT TOUR MỚI: ${newBooking.name}`,
-                            html: `
-                                <div style="font-family: sans-serif; padding: 25px; border: 2px solid #E85D04; border-radius: 15px; max-width: 600px;">
-                                    <h2 style="color: #E85D04; margin-top: 0;">🎉 Có đơn đặt tour mới từ Website!</h2>
-                                    <div style="background: #FFF8F0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                                        <p style="margin: 5px 0;"><b>Tour:</b> ${newBooking.tour}</p>
-                                        <p style="margin: 5px 0;"><b>Ngày khởi hành:</b> ${newBooking.date}</p>
-                                        <p style="margin: 5px 0;"><b>Tổng tiền:</b> <span style="color: #E85D04; font-size: 18px;">${formattedPrice}</span></p>
-                                        <p style="margin: 5px 0;"><b>Đã cọc:</b> ${formattedDeposit}</p>
-                                    </div>
-                                    
-                                    <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Thông tin khách hàng</h3>
-                                    <p><b>Họ và tên:</b> ${newBooking.name}</p>
-                                    <p><b>Số điện thoại:</b> ${newBooking.phone}</p>
-                                    <p><b>Link Zalo:</b> <a href="https://zalo.me/${newBooking.phone}">https://zalo.me/${newBooking.phone}</a></p>
-                                    <p><b>CCCD:</b> ${newBooking.id_card || '(Chưa cung cấp)'}</p>
-                                    <p><b>Địa chỉ:</b> ${newBooking.address || '(Chưa cung cấp)'}</p>
-                                    
-                                    <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Yêu cầu đặc biệt</h3>
-                                    <p><b>Ăn uống:</b> ${newBooking.diet || 'Bình thường'}</p>
-                                    <p><b>Gậy trekking:</b> ${newBooking.trekking_pole || 'Không'}</p>
-                                    <p><b>Dị ứng/Lưu ý:</b> ${newBooking.allergy || 'Không'}</p>
-                                    <p><b>Thông tin thêm:</b> ${newBooking.special || '(Không có)'}</p>
-                                    
-                                    <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-                                    <p style="font-size: 11px; color: #999; text-align: center;">Hệ thống CAM SITE RETREATS - Tự động thông báo</p>
+                    await sendEmail({
+                        subject: `🔥 ĐƠN ĐẶT TOUR MỚI: ${newBooking.name}`,
+                        html: `
+                            <div style="font-family: sans-serif; padding: 25px; border: 2px solid #E85D04; border-radius: 15px; max-width: 600px;">
+                                <h2 style="color: #E85D04; margin-top: 0;">🎉 Có đơn đặt tour mới từ Website!</h2>
+                                <div style="background: #FFF8F0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                    <p style="margin: 5px 0;"><b>Tour:</b> ${newBooking.tour}</p>
+                                    <p style="margin: 5px 0;"><b>Ngày khởi hành:</b> ${newBooking.date}</p>
+                                    <p style="margin: 5px 0;"><b>Tổng tiền:</b> <span style="color: #E85D04; font-size: 18px;">${formattedPrice}</span></p>
+                                    <p style="margin: 5px 0;"><b>Đã cọc:</b> ${formattedDeposit}</p>
                                 </div>
-                            `
-                        });
-                        console.log('Booking notification email sent to Admin');
-                    } catch (mailErr) {
-                        console.error('Failed to send booking notification email:', mailErr);
-                    }
+                                
+                                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Thông tin khách hàng</h3>
+                                <p><b>Họ và tên:</b> ${newBooking.name}</p>
+                                <p><b>Số điện thoại:</b> ${newBooking.phone}</p>
+                                <p><b>Link Zalo:</b> <a href="https://zalo.me/${newBooking.phone}">https://zalo.me/${newBooking.phone}</a></p>
+                                <p><b>CCCD:</b> ${newBooking.id_card || '(Chưa cung cấp)'}</p>
+                                <p><b>Địa chỉ:</b> ${newBooking.address || '(Chưa cung cấp)'}</p>
+                                
+                                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Yêu cầu đặc biệt</h3>
+                                <p><b>Ăn uống:</b> ${newBooking.diet || 'Bình thường'}</p>
+                                <p><b>Gậy trekking:</b> ${newBooking.trekking_pole || 'Không'}</p>
+                                <p><b>Dị ứng/Lưu ý:</b> ${newBooking.allergy || 'Không'}</p>
+                                <p><b>Thông tin thêm:</b> ${newBooking.special || '(Không có)'}</p>
+                                
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+                                <p style="font-size: 11px; color: #999; text-align: center;">Hệ thống CAM SITE RETREATS - Tự động thông báo</p>
+                            </div>
+                        `
+                    });
                 }
 
                 return res.status(201).json(newBooking);

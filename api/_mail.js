@@ -6,15 +6,19 @@ const https = require('https');
  */
 async function sendEmail({ to, subject, html }) {
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    const FALLBACK_EMAIL = 'chuyencaiom@gmail.com';
+    const recipient = to || process.env.ADMIN_EMAIL || FALLBACK_EMAIL;
 
     if (!RESEND_API_KEY) {
         console.warn('RESEND_API_KEY is not set in environment variables. Email will not be sent.');
-        return;
+        return { success: false, error: 'MISSING_API_KEY' };
     }
+
+    console.log(`[Mail] Sending email to: ${recipient} | Subject: ${subject}`);
 
     const data = JSON.stringify({
         from: 'Cam Site Retreats <onboarding@resend.dev>', // Use verified domain later if available
-        to: to,
+        to: recipient,
         subject: subject,
         html: html
     });
@@ -39,18 +43,23 @@ async function sendEmail({ to, subject, html }) {
                 try {
                     const parsed = JSON.parse(body);
                     if (res.statusCode >= 200 && res.statusCode < 300) {
-                        resolve(parsed);
+                        console.log(`[Mail] Success! Message ID: ${parsed.id}`);
+                        resolve({ success: true, ...parsed });
                     } else {
-                        reject(new Error(parsed.message || `Resend API error: ${res.statusCode}`));
+                        const errMsg = parsed.message || `Resend API error: ${res.statusCode}`;
+                        console.error(`[Mail] Resend Error: ${errMsg}`);
+                        resolve({ success: false, error: errMsg });
                     }
                 } catch (e) {
-                    reject(new Error(`Failed to parse Resend response: ${body}`));
+                    console.error(`[Mail] Parse Error: ${body}`);
+                    resolve({ success: false, error: 'PARSE_ERROR' });
                 }
             });
         });
 
         req.on('error', (error) => {
-            reject(error);
+            console.error(`[Mail] HTTPS Request Error: ${error.message}`);
+            resolve({ success: false, error: error.message });
         });
 
         req.write(data);

@@ -46,30 +46,22 @@ module.exports = async (req, res) => {
 
                 // --- Send Email Notification ---
                 if (newLead) {
-                    try {
-                        const adminEmail = process.env.ADMIN_EMAIL; // Might be empty, that's okay
-                        await sendEmail({
-                            to: adminEmail, // If empty, _mail.js will use fallback
-                            subject: `🍀 Khách hàng mới: ${newLead.name}`,
-                            html: `
-                                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                                    <h2 style="color: #E85D04;">Có khách hàng mới đăng kỹ tư vấn!</h2>
-                                    <p><b>Họ và tên:</b> ${newLead.name}</p>
-                                    <p><b>Số điện thoại:</b> ${newLead.phone}</p>
-                                    <p><b>Link Zalo:</b> <a href="https://zalo.me/${newLead.phone}">https://zalo.me/${newLead.phone}</a></p>
-                                    <p><b>Tour quan tâm:</b> ${newLead.tour}</p>
-                                    <p><b>Ngày dự kiến:</b> ${newLead.date}</p>
-                                    <p><b>Lời nhắn:</b> ${newLead.message || '(Không có)'}</p>
-                                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                                    <p style="font-size: 12px; color: #999;">Email được gửi tự động từ hệ thống CAM SITE RETREATS.</p>
-                                </div>
-                            `
-                        });
-                        console.log('Notification email sent to Admin');
-                    } catch (mailErr) {
-                        console.error('Failed to send notification email:', mailErr);
-                        // Don't fail the whole request if email fails
-                    }
+                    await sendEmail({
+                        subject: `🍀 Khách hàng mới: ${newLead.name}`,
+                        html: `
+                            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                <h2 style="color: #E85D04;">Có khách hàng mới đăng kỹ tư vấn!</h2>
+                                <p><b>Họ và tên:</b> ${newLead.name}</p>
+                                <p><b>Số điện thoại:</b> ${newLead.phone}</p>
+                                <p><b>Link Zalo:</b> <a href="https://zalo.me/${newLead.phone}">https://zalo.me/${newLead.phone}</a></p>
+                                <p><b>Tour quan tâm:</b> ${newLead.tour}</p>
+                                <p><b>Ngày dự kiến:</b> ${newLead.date}</p>
+                                <p><b>Lời nhắn:</b> ${newLead.message || '(Không có)'}</p>
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                                <p style="font-size: 12px; color: #999;">Email được gửi tự động từ hệ thống CAM SITE RETREATS.</p>
+                            </div>
+                        `
+                    });
                 }
 
                 return res.status(201).json(newLead);

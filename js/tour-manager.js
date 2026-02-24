@@ -223,7 +223,7 @@ const TourManager = {
                 duration: '2 Ngày 1 Đêm',
                 price: 3200000,
                 level: 'Trung Bình',
-                altitude: '1.100M',
+                altitude: '1.168M',
                 url: 'tour/tanangphandung',
                 shortDesc: 'Cung đường trekking đẹp nhất Việt Nam, đi qua 3 tỉnh Lâm Đồng, Ninh Thuận, Bình Thuận. Trải nghiệm đồi cỏ cháy ngút ngàn.',
                 defaultSchedules: [
