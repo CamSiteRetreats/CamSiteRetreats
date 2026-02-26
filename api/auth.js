@@ -1,4 +1,5 @@
 const db = require('./_db');
+const crypto = require('crypto'); // Dummy token generator for now
 
 module.exports = async (req, res) => {
     const { method } = req;
@@ -18,34 +19,69 @@ module.exports = async (req, res) => {
 
     try {
         const { username, password } = req.body;
+        const isAdminSession = req.query.role === 'admin';
 
         if (!username || !password) {
             return res.status(400).json({ error: 'Missing username or password' });
         }
 
-        const { rows } = await db.query(
-            'SELECT * FROM users WHERE LOWER(username) = LOWER($1) AND password = $2 AND status = $3',
-            [username, password, 'active']
-        );
+        if (isAdminSession) {
+            // ==========================================
+            // LOGIC DÀNH CHO ADMIN V2 (Sử dụng bảng admins)
+            // ==========================================
+            const { rows } = await db.query(
+                'SELECT * FROM admins WHERE LOWER(username) = LOWER($1) AND password = $2 AND status = $3',
+                [username, password, 'active']
+            );
 
-        if (rows.length > 0) {
-            const user = rows[0];
-            delete user.password;
+            if (rows.length > 0) {
+                const user = rows[0];
+                delete user.password;
+                const token = crypto.randomBytes(32).toString('hex');
+                const frontendUser = {
+                    id: user.id,
+                    username: user.username,
+                    fullName: user.full_name,
+                    role: user.role,
+                    phone: user.phone,
+                    email: user.email,
+                    avatar: user.avatar,
+                    bank_info: user.bank_info,
+                    status: user.status
+                };
+                return res.status(200).json({ success: true, token: token, user: frontendUser });
+            } else {
+                return res.status(401).json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu quản trị!' });
+            }
+        }
+        else {
+            // ==========================================
+            // LOGIC DÀNH CHO SYSTEM USERS V1 (Bảng users)
+            // ==========================================
+            const { rows } = await db.query(
+                'SELECT * FROM users WHERE LOWER(username) = LOWER($1) AND password = $2 AND status = $3',
+                [username, password, 'active']
+            );
 
-            const frontendUser = {
-                id: user.id,
-                username: user.username,
-                fullName: user.full_name,
-                role: user.role,
-                phone: user.phone,
-                email: user.email,
-                avatar: user.avatar,
-                status: user.status
-            };
+            if (rows.length > 0) {
+                const user = rows[0];
+                delete user.password;
 
-            return res.status(200).json({ success: true, user: frontendUser });
-        } else {
-            return res.status(401).json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu!' });
+                const frontendUser = {
+                    id: user.id,
+                    username: user.username,
+                    fullName: user.full_name,
+                    role: user.role,
+                    phone: user.phone,
+                    email: user.email,
+                    avatar: user.avatar,
+                    status: user.status
+                };
+
+                return res.status(200).json({ success: true, user: frontendUser });
+            } else {
+                return res.status(401).json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu!' });
+            }
         }
     } catch (error) {
         console.error('Login error:', error);

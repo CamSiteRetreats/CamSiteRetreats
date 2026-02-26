@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (method === 'OPTIONS') {
@@ -62,6 +62,26 @@ module.exports = async (req, res) => {
                 const { rows } = await db.query(query, values);
                 return res.status(201).json(rows[0]);
             }
+        }
+
+        if (method === 'PUT') {
+            const { id } = req.query;
+            const { commission_rate } = req.body;
+
+            if (!id || commission_rate === undefined) {
+                return res.status(400).json({ error: 'ID and commission_rate are required' });
+            }
+
+            const { rows } = await db.query(
+                'UPDATE tours SET commission_rate = $1 WHERE id = $2 RETURNING *',
+                [commission_rate, id]
+            );
+
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Tour not found' });
+            }
+
+            return res.status(200).json(rows[0]);
         }
 
         if (method === 'DELETE') {

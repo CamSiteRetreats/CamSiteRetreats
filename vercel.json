@@ -10,6 +10,10 @@
     {
       "source": "/photo/:slug",
       "destination": "/api/photo?id=:slug"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/admin/index.html"
     }
   ],
   "headers": [

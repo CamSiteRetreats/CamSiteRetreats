@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-csr-orange: #E85D04;
+  --color-csr-light: #F48C06;
+  --color-csr-dark: #DC2F02;
+  --color-csr-bg: #FFF8F0;
+  --color-csr-darkBg: #FAFAFA;
+  /* Đổi thành nền trắng kem */
+  --color-csr-card: #FFFFFF;
+  /* Thẻ Card màu trắng */
+  --color-csr-border: #E5E7EB;
+  /* Border xám nhạt */
+  --font-sans: 'Montserrat', sans-serif;
+}
+
+body {
+  @apply bg-csr-darkBg text-gray-800 font-sans antialiased;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-csr-orange hover:bg-csr-light text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-csr-light/50;
+  }
+
+  .input-field {
+    @apply w-full bg-white border border-csr-border rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:border-csr-orange focus:ring-1 focus:ring-csr-orange transition-colors shadow-sm;
+  }
+
+  .glass-panel {
+    @apply bg-white/90 backdrop-blur-md border border-csr-border rounded-xl shadow-sm text-gray-800;
+  }
+}

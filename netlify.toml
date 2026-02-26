@@ -9,3 +9,8 @@
   to = "/.netlify/functions/photo?id=:slug"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200

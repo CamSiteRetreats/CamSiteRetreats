@@ -1,0 +1,377 @@
+import { Sidebar } from '../components/Sidebar.js';
+import { Header } from '../components/Header.js';
+
+export const render = () => {
+    return `
+      <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
+        ${Sidebar()}
+        
+        <div class="flex flex-col flex-1 w-full overflow-hidden">
+          ${Header()}
+          
+          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+               <div class="max-w-7xl mx-auto space-y-6">
+                  
+                  <div class="flex justify-between items-end">
+                      <div>
+                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Tour</h1>
+                          <p class="text-gray-500 text-sm">Thêm, sửa, xóa các tuyến trekking. Đồng bộ trực tiếp lên Website.</p>
+                      </div>
+                      <button id="addTourBtn" class="btn-primary flex items-center gap-2">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                          Thêm Tour Mới
+                      </button>
+                  </div>
+
+                  <!-- Table -->
+                  <div class="glass-panel overflow-hidden">
+                      <div class="overflow-x-auto">
+                          <table class="w-full text-left border-collapse">
+                              <thead>
+                                  <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
+                                      <th class="p-4 font-medium">Tour</th>
+                                      <th class="p-4 font-medium">Vùng / Loại</th>
+                                      <th class="p-4 font-medium">Thời Lượng</th>
+                                      <th class="p-4 font-medium">Độ Khó</th>
+                                      <th class="p-4 font-medium">Giá</th>
+                                      <th class="p-4 font-medium text-center">Hiển Thị</th>
+                                      <th class="p-4 font-medium text-right">Thao Tác</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="toursTableBody" class="divide-y divide-csr-border">
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+               </div>
+          </main>
+        </div>
+      </div>
+
+      <!-- Add/Edit Tour Modal -->
+      <div id="tourModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform relative" id="tourModalContent">
+              <button id="closeTourModalBtn" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors z-20">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+              <div class="p-8">
+                  <h2 id="tourModalTitle" class="text-2xl font-bold text-gray-800 mb-6">Thêm Tour Mới</h2>
+                  <form id="tourForm" class="space-y-5">
+                      <input type="hidden" id="tour-edit-id">
+                      
+                      <!-- Tên & Mô tả -->
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên Tour *</label>
+                          <input type="text" id="tour-name" class="input-field bg-gray-50" placeholder="VD: Tà Năng - Phan Dũng" required>
+                      </div>
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mô tả ngắn</label>
+                          <textarea id="tour-short-desc" class="input-field bg-gray-50 h-20 resize-none" placeholder="Mô tả ngắn hiển thị trên card tour..."></textarea>
+                      </div>
+
+                      <!-- Ảnh -->
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính (URL) *</label>
+                          <input type="text" id="tour-image" class="input-field bg-gray-50" placeholder="tour/Tanang/thumb1.png" required>
+                      </div>
+                      <div class="grid grid-cols-3 gap-3">
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 1</label>
+                              <input type="text" id="tour-image2" class="input-field bg-gray-50 text-xs" placeholder="URL...">
+                          </div>
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 2</label>
+                              <input type="text" id="tour-image3" class="input-field bg-gray-50 text-xs" placeholder="URL...">
+                          </div>
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 3</label>
+                              <input type="text" id="tour-image4" class="input-field bg-gray-50 text-xs" placeholder="URL...">
+                          </div>
+                      </div>
+
+                      <!-- Thông số -->
+                      <div class="grid grid-cols-2 gap-5">
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thời lượng *</label>
+                              <input type="text" id="tour-duration" class="input-field bg-gray-50" placeholder="2 Ngày 1 Đêm" required>
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá (VNĐ) *</label>
+                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold" placeholder="3200000" required>
+                          </div>
+                      </div>
+                      <div class="grid grid-cols-3 gap-4">
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ khó</label>
+                              <select id="tour-level" class="input-field bg-gray-50">
+                                  <option value="Dễ">Dễ</option>
+                                  <option value="Trung Bình" selected>Trung Bình</option>
+                                  <option value="Khó">Khó</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Vùng miền</label>
+                              <select id="tour-region" class="input-field bg-gray-50">
+                                  <option value="Miền Nam">Miền Nam</option>
+                                  <option value="Miền Bắc">Miền Bắc</option>
+                                  <option value="Miền Trung">Miền Trung</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Loại hình</label>
+                              <select id="tour-type" class="input-field bg-gray-50">
+                                  <option value="TREKKING">TREKKING</option>
+                                  <option value="CAMPING">CAMPING</option>
+                                  <option value="CANYONING">CANYONING</option>
+                                  <option value="HIKING">HIKING</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="grid grid-cols-2 gap-5">
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ cao</label>
+                              <input type="text" id="tour-altitude" class="input-field bg-gray-50" placeholder="VD: 2.287M">
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thứ tự hiển thị</label>
+                              <input type="number" id="tour-sort-order" class="input-field bg-gray-50" value="0" placeholder="0">
+                          </div>
+                      </div>
+
+                      <!-- Domain & Visibility -->
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên miền riêng (Custom Domain)</label>
+                          <input type="text" id="tour-custom-domain" class="input-field bg-gray-50" placeholder="https://camsiteretreats.com/tour/tanangphandung">
+                          <p class="text-[10px] text-gray-400 mt-1 italic">Bỏ trống nếu dùng trang mặc định hệ thống.</p>
+                      </div>
+                      <div>
+                          <label class="flex items-center gap-3 cursor-pointer">
+                              <input type="checkbox" id="tour-is-visible" checked class="w-5 h-5 rounded border-gray-200 text-csr-orange focus:ring-csr-orange">
+                              <span class="text-sm font-bold text-gray-700">Hiển thị tour này trên website</span>
+                          </label>
+                      </div>
+
+                      <!-- Buttons -->
+                      <div class="pt-3 flex gap-3">
+                          <button type="button" id="cancelTourBtn" class="flex-1 px-6 py-3 border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-all">Hủy</button>
+                          <button type="submit" class="flex-1 px-6 py-3 bg-csr-orange text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all">Lưu Tour</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+    `;
+};
+
+export const afterRender = () => {
+    const tableBody = document.getElementById('toursTableBody');
+    const modal = document.getElementById('tourModal');
+    const modalContent = document.getElementById('tourModalContent');
+    const form = document.getElementById('tourForm');
+
+    let tours = [];
+    const API_TOURS = '/api/tours';
+
+    // --- MODAL LOGIC ---
+    const openModal = (editData = null) => {
+        const title = document.getElementById('tourModalTitle');
+        if (editData) {
+            title.textContent = 'Chỉnh Sửa Tour';
+            document.getElementById('tour-edit-id').value = editData.id;
+            document.getElementById('tour-name').value = editData.name || '';
+            document.getElementById('tour-short-desc').value = editData.short_desc || editData.shortDesc || '';
+            document.getElementById('tour-image').value = editData.image || '';
+            document.getElementById('tour-image2').value = editData.image2 || '';
+            document.getElementById('tour-image3').value = editData.image3 || '';
+            document.getElementById('tour-image4').value = editData.image4 || '';
+            document.getElementById('tour-duration').value = editData.duration || '';
+            document.getElementById('tour-price').value = editData.price || '';
+            document.getElementById('tour-level').value = editData.level || 'Trung Bình';
+            document.getElementById('tour-region').value = editData.region || 'Miền Nam';
+            document.getElementById('tour-type').value = editData.type || 'TREKKING';
+            document.getElementById('tour-altitude').value = editData.altitude || '';
+            document.getElementById('tour-sort-order').value = editData.sort_order || 0;
+            document.getElementById('tour-custom-domain').value = editData.custom_domain || '';
+            document.getElementById('tour-is-visible').checked = editData.is_visible !== false;
+        } else {
+            title.textContent = 'Thêm Tour Mới';
+            form.reset();
+            document.getElementById('tour-edit-id').value = '';
+            document.getElementById('tour-is-visible').checked = true;
+            document.getElementById('tour-custom-domain').value = 'https://camsiteretreats.com/tour/';
+        }
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.add('opacity-100');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }, 10);
+    };
+
+    const closeModal = () => {
+        modal.classList.remove('opacity-100');
+        modalContent.classList.remove('scale-100');
+        modalContent.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 200);
+    };
+
+    document.getElementById('addTourBtn').addEventListener('click', () => openModal());
+    document.getElementById('closeTourModalBtn').addEventListener('click', closeModal);
+    document.getElementById('cancelTourBtn').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // --- LOAD TOURS ---
+    const loadTours = async () => {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Đang tải danh sách tour...</td></tr>`;
+        try {
+            const res = await fetch(API_TOURS);
+            if (!res.ok) throw new Error('Failed to load tours');
+            tours = await res.json();
+            renderTable();
+        } catch (err) {
+            console.error('Error loading tours:', err);
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-500">Lỗi kết nối server.</td></tr>`;
+        }
+    };
+
+    // --- RENDER TABLE ---
+    const renderTable = () => {
+        if (tours.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Chưa có tour nào.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = tours.map(t => {
+            const priceDisplay = (!t.price || t.price === 'Update' || t.price === '0' || parseInt(t.price) === 0)
+                ? '<span class="text-gray-400 italic">Update...</span>'
+                : `<span class="font-bold text-csr-orange">${parseInt(t.price).toLocaleString('vi-VN')}đ</span>`;
+
+            const levelColor = t.level === 'Dễ' ? 'bg-green-100 text-green-700'
+                : t.level === 'Khó' ? 'bg-red-100 text-red-600'
+                    : 'bg-orange-100 text-orange-700';
+
+            const visibleBadge = t.is_visible !== false
+                ? '<span class="bg-green-100 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold">Hiển thị</span>'
+                : '<span class="bg-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold">Đã ẩn</span>';
+
+            return `
+                <tr class="hover:bg-gray-50 transition-colors group" data-tour-id="${t.id}">
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden border border-gray-200 shrink-0">
+                                <img src="${t.image || ''}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/f3f4f6/9ca3af?text=No+Img'" loading="lazy">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-bold text-gray-900 group-hover:text-csr-orange transition-colors truncate">${t.name}</div>
+                                <div class="text-[10px] text-gray-400 truncate max-w-[200px]">${t.short_desc || t.shortDesc || ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-sm text-gray-500">
+                        <div>${t.region || '-'}</div>
+                        <div class="text-[10px] uppercase font-bold text-gray-400">${t.type || '-'}</div>
+                    </td>
+                    <td class="p-4 text-sm text-gray-600">${t.duration || '-'}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 ${levelColor} rounded text-[10px] font-bold uppercase">${t.level || '-'}</span>
+                    </td>
+                    <td class="p-4">${priceDisplay}</td>
+                    <td class="p-4 text-center">${visibleBadge}</td>
+                    <td class="p-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="tour-edit-btn p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" data-id="${t.id}" title="Sửa">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <button class="tour-delete-btn p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-id="${t.id}" title="Xóa">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    };
+
+    // --- TABLE ACTION HANDLER (Event Delegation) ---
+    tableBody.addEventListener('click', async (e) => {
+        const editBtn = e.target.closest('.tour-edit-btn');
+        const deleteBtn = e.target.closest('.tour-delete-btn');
+
+        if (editBtn) {
+            const id = parseInt(editBtn.getAttribute('data-id'));
+            const t = tours.find(x => x.id === id);
+            if (t) openModal(t);
+        }
+
+        if (deleteBtn) {
+            const id = deleteBtn.getAttribute('data-id');
+            if (confirm('Dữ liệu lịch trình liên quan có thể bị ảnh hưởng. Bạn vẫn muốn xóa tour này?')) {
+                try {
+                    const res = await fetch(`${API_TOURS}?id=${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        loadTours();
+                    } else {
+                        throw new Error('Delete failed');
+                    }
+                } catch (err) {
+                    alert('Lỗi khi xóa: ' + err.message);
+                }
+            }
+        }
+    });
+
+    // --- SAVE TOUR (Create / Update) ---
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+
+        const id = document.getElementById('tour-edit-id').value;
+        const payload = {
+            id: id ? parseInt(id) : null,
+            name: document.getElementById('tour-name').value,
+            image: document.getElementById('tour-image').value,
+            image2: document.getElementById('tour-image2').value || null,
+            image3: document.getElementById('tour-image3').value || null,
+            image4: document.getElementById('tour-image4').value || null,
+            shortDesc: document.getElementById('tour-short-desc').value,
+            altitude: document.getElementById('tour-altitude').value || null,
+            level: document.getElementById('tour-level').value,
+            region: document.getElementById('tour-region').value,
+            type: document.getElementById('tour-type').value,
+            duration: document.getElementById('tour-duration').value,
+            price: document.getElementById('tour-price').value,
+            sort_order: parseInt(document.getElementById('tour-sort-order').value) || 0,
+            custom_domain: document.getElementById('tour-custom-domain').value.trim() || null,
+            is_visible: document.getElementById('tour-is-visible').checked
+        };
+
+        try {
+            const res = await fetch(API_TOURS, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Save failed');
+            }
+
+            closeModal();
+            loadTours();
+            alert(id ? '✅ Cập nhật tour thành công!' : '✅ Thêm tour mới thành công! Website sẽ tự đồng bộ trong vài giây.');
+        } catch (err) {
+            alert('❌ Lỗi: ' + err.message);
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // --- INIT ---
+    loadTours();
+};

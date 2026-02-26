@@ -126,7 +126,38 @@ module.exports = async (req, res) => {
         if (method === 'DELETE') {
             const { id } = req.query;
             if (!id) return res.status(400).json({ error: 'ID is required' });
+
+            // Lấy thông tin booking trước khi xóa (để biết phone)
+            const { rows: bookingRows } = await db.query('SELECT phone, name FROM bookings WHERE id = $1', [id]);
+            const deletedBooking = bookingRows[0];
+
+            // Xóa booking
             await db.query('DELETE FROM bookings WHERE id = $1', [id]);
+
+            // Kiểm tra CRM: nếu khách KHÔNG có booking "Hoàn thành" nào khác → xóa khỏi CRM
+            if (deletedBooking && deletedBooking.phone) {
+                const { rows: completedBookings } = await db.query(
+                    `SELECT id FROM bookings WHERE phone = $1 AND status IN ('Hoàn thành', 'Đã hoàn thành')`,
+                    [deletedBooking.phone]
+                );
+
+                if (completedBookings.length === 0) {
+                    // Kiểm tra xem còn booking nào đã cọc không
+                    const { rows: otherBookings } = await db.query(
+                        `SELECT id FROM bookings WHERE phone = $1 AND status NOT IN ('Đã hủy')`,
+                        [deletedBooking.phone]
+                    );
+
+                    if (otherBookings.length === 0) {
+                        // Không còn booking nào → xóa khỏi CRM
+                        await db.query('DELETE FROM crm_customers WHERE phone = $1', [deletedBooking.phone]);
+                        console.log(`🗑️ Đã xóa khách ${deletedBooking.name} (${deletedBooking.phone}) khỏi CRM vì không còn booking nào.`);
+                    }
+                } else {
+                    console.log(`🔒 Giữ khách ${deletedBooking.name} trong CRM vì đã hoàn thành tour trước đó.`);
+                }
+            }
+
             return res.status(200).json({ success: true });
         }
 
