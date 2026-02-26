@@ -71,7 +71,7 @@ export const afterRender = () => {
 
         try {
             // Vite Proxy Server sẽ tự động forward route /api tới Backend 8889
-            const apiUrl = '/api/_auth_v2';
+            const apiUrl = '/api/auth_v2';
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -79,33 +79,41 @@ export const afterRender = () => {
                 body: JSON.stringify({ username, password })
             });
 
-            const data = await response.json();
+            // Kiểm tra Content-Type trước khi parse
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    // Backend trả về Auth Token
+                    localStorage.setItem('csr_admin_token', data.token);
+                    localStorage.setItem('csr_user', JSON.stringify({
+                        id: data.user.id,
+                        role: data.user.role,
+                        fullName: data.user.fullName,
+                        avatar: data.user.avatar || `https://ui-avatars.com/api/?name=${data.user.fullName.replace(' ', '+')}&background=E85D04&color=fff`,
+                        phone: data.user.phone,
+                        email: data.user.email,
+                        bank_info: data.user.bank_info
+                    }));
 
-            if (response.ok && data.success) {
-                // Backend trả về Auth Token
-                localStorage.setItem('csr_admin_token', data.token);
-                localStorage.setItem('csr_user', JSON.stringify({
-                    id: data.user.id,
-                    role: data.user.role,
-                    fullName: data.user.fullName,
-                    avatar: data.user.avatar || `https://ui-avatars.com/api/?name=${data.user.fullName.replace(' ', '+')}&background=E85D04&color=fff`,
-                    phone: data.user.phone,
-                    email: data.user.email,
-                    bank_info: data.user.bank_info
-                }));
+                    // Handle Remember Me
+                    if (rememberMe.checked) {
+                        const authStr = btoa(JSON.stringify({ username, password }));
+                        localStorage.setItem('csr_remembered_user', authStr);
+                    } else {
+                        localStorage.removeItem('csr_remembered_user');
+                    }
 
-                // Handle Remember Me
-                if (rememberMe.checked) {
-                    const authStr = btoa(JSON.stringify({ username, password }));
-                    localStorage.setItem('csr_remembered_user', authStr);
+                    // Refresh UI Dashboard
+                    window.location.href = '/admin/';
                 } else {
-                    localStorage.removeItem('csr_remembered_user');
+                    throw new Error(data.message || data.error || "Lỗi đăng nhập từ hệ thống.");
                 }
-
-                // Refresh UI Dashboard
-                window.location.href = '/admin/';
             } else {
-                throw new Error(data.message || data.error || "Lỗi đăng nhập từ hệ thống.");
+                // Nếu không phải JSON, đọc dưới dạng text để xem lỗi gì (ví dụ trang 404 HTML)
+                const errorText = await response.text();
+                console.error("Server returned non-JSON response:", errorText);
+                throw new Error(`Server Error (${response.status}): ${errorText.substring(0, 50)}...`);
             }
         } catch (err) {
             errorMsg.textContent = err.message;
