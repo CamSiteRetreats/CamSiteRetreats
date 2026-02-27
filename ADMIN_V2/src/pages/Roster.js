@@ -133,8 +133,12 @@ export const render = () => {
           .nowrap { white-space: nowrap; }
 
           @media print {
-              @page { size: landscape; margin: 10mm; }
-              body { font-family: 'Times New Roman', serif; background: white; }
+              @page { size: landscape; margin: 0; }
+              body { 
+                  font-family: 'Times New Roman', serif; 
+                  background: white; 
+                  margin: 1.5cm; /* Re-add margin to content to avoid browser headers/footers */
+              }
               table { width: 100%; border-collapse: collapse; }
               th, td { border: 1px solid #ccc; padding: 6px 8px !important; color: black !important; }
               th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
