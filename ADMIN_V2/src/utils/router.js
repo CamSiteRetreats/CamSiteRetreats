@@ -9,6 +9,7 @@ export const initRouter = () => {
         '/admin/schedules': () => import('../pages/Schedules.js'),
         '/admin/reports': () => import('../pages/Reports.js'),
         '/admin/users': () => import('../pages/Users.js'),
+        '/admin/roster': () => import('../pages/Roster.js'),
     };
 
     const navigateTo = async (url) => {

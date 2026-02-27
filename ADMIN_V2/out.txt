@@ -1,0 +1,25 @@
+
+> admin-v2@0.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 15 modules transformed.
+[31m✗[39m Build failed in 140ms
+[31merror during build:
+[31msrc/pages/Roster.js (139:43): Expected unicode escape[31m
+file: [36mE:/UIUX/ui-ux-pro-max-skill-main/CAM SITE RETREATS/ADMIN_V2/src/pages/Roster.js:139:43[31m
+[33m
+137:                 if (!b.dob) return '-';
+138:                 const parts = b.dob.split('-');
+139:                 return parts.length === 3 ?\`\${parts[2]}/\${parts[1]}/\${parts[0]}\` : b.dob;
+                                                ^
+140:         }},
+141:         { id: 'col-phone', label: 'SĐT', default: true, render: (b) => `< div class="font-medium text-gray-700" > ${ ...
+[31m
+    at getRollupError (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+    at ParseError.initialise (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/node-entry.js:14465:28)
+    at convertNode (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/node-entry.js:16437:10)
+    at convertProgram (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/node-entry.js:15677:12)
+    at Module.setSource (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/node-entry.js:17392:24)
+    at async ModuleLoader.addModuleSource (file:///E:/UIUX/ui-ux-pro-max-skill-main/CAM%20SITE%20RETREATS/ADMIN_V2/node_modules/rollup/dist/es/shared/node-entry.js:21497:13)[39m
