@@ -20,14 +20,21 @@ export const render = () => {
                   <!-- Top Bar (Hidden on Print) -->
                   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
                       <div>
-                          <div class="flex items-center gap-2 mb-2">
-                              <a href="/admin/schedules" data-link class="text-sm font-medium text-gray-500 hover:text-csr-orange transition-colors flex items-center gap-1">
+                          <div class="flex items-center gap-2 mb-4">
+                              <a href="/admin/schedules" data-link class="text-sm font-medium text-gray-400 hover:text-csr-orange transition-colors flex items-center gap-1">
                                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                                   Quay lại Lịch Trình
                               </a>
                           </div>
-                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1" id="roster-title">Danh Sách Đoàn</h1>
-                          <p class="text-gray-500 text-sm" id="roster-subtitle">Đang tải thông tin...</p>
+                          
+                          <div class="flex items-center gap-4 mb-2">
+                              <img src="/logo-camsite-01.png" alt="CAM SITE RETREATS" class="h-14 md:h-16 object-contain">
+                              <div class="h-10 border-l border-gray-300"></div>
+                              <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">DANH SÁCH ĐOÀN</span>
+                          </div>
+
+                          <h1 class="text-3xl font-black tracking-tight text-gray-800 mb-1" id="roster-title">Đang tải tên tour...</h1>
+                          <p class="text-gray-500 text-sm" id="roster-subtitle">Đang tải ngày khởi hành...</p>
                       </div>
                       
                       <div class="flex items-center gap-3">
@@ -43,12 +50,21 @@ export const render = () => {
                   </div>
 
                   <!-- Print Header (Only visible on Print) -->
-                  <div class="hidden print:block text-center border-b-2 border-gray-800 pb-4 mb-6">
-                      <h1 class="text-2xl font-bold uppercase tracking-widest text-gray-900 mb-2" id="print-title">DANH SÁCH ĐOÀN</h1>
-                      <div class="text-sm text-gray-700 flex justify-center gap-8 font-medium">
-                          <span id="print-tour-name">Tuyến: ...</span>
-                          <span id="print-tour-date">Ngày: ...</span>
-                          <span id="print-total">Tổng khách: 0</span>
+                  <div class="hidden print:flex text-left border-b-4 border-csr-orange pb-4 mb-6 items-center justify-between">
+                      <div class="flex items-center gap-6">
+                            <img src="/logo-camsite-01.png" alt="CAM SITE RETREATS" class="h-20 object-contain">
+                            <div>
+                                <h1 class="text-3xl font-black uppercase tracking-widest text-[#1A202C] mb-1">DANH SÁCH ĐOÀN</h1>
+                                <div class="text-[16px] text-gray-800 font-bold flex items-center gap-4">
+                                    <span class="text-csr-orange text-xl" id="print-tour-name">Tuyến: ...</span>
+                                    <span class="text-gray-300">|</span>
+                                    <span id="print-tour-date">Ngày: ...</span>
+                                </div>
+                            </div>
+                      </div>
+                      <div class="text-right">
+                          <span class="text-sm font-bold text-gray-500 uppercase tracking-wider block mb-1">Tổng Số Khách</span>
+                          <span class="text-4xl font-black text-csr-orange" id="print-total">0</span>
                       </div>
                   </div>
 
@@ -189,12 +205,12 @@ export const afterRender = async () => {
 
     // Update Titles
     if (targetTour) {
-        titleEl.textContent = `DS Đoàn: ${targetTour}`;
-        pTourEl.textContent = `Tuyến: ${targetTour}`;
+        titleEl.textContent = targetTour;
+        pTourEl.textContent = targetTour;
     }
     if (targetDateFormated) {
-        subtitleEl.innerHTML = `<span class="font-semibold text-gray-700">Khởi hành:</span> ${targetDateFormated}`;
-        pDateEl.textContent = `Ngày: ${targetDateFormated}`;
+        subtitleEl.innerHTML = `Ngày khởi hành: <span class="font-bold text-csr-orange">${targetDateFormated}</span>`;
+        pDateEl.textContent = targetDateFormated;
     }
 
     // --- 2. Build Toggles & Header ---
@@ -288,7 +304,7 @@ export const afterRender = async () => {
         });
 
         document.getElementById('text-visible-count').textContent = filtered.length;
-        pTotalEl.textContent = `Tổng khách: ${filtered.length}`;
+        pTotalEl.textContent = filtered.length;
 
         if (filtered.length === 0) {
             tbody.innerHTML = '<tr><td colspan="12" class="p-12 text-center text-gray-500 bg-gray-50">Không tìm thấy khách hàng nào khớp với điều kiện lọc.</td></tr>';
