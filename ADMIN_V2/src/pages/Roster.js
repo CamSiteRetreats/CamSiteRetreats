@@ -156,10 +156,21 @@ export const afterRender = async () => {
     const targetDateStr = params.get('date') || ''; // Ex: 2025-03-01
     let targetDateFormated = targetDateStr;
 
-    // Convert to DD/MM/YYYY for title
-    if (targetDateStr && targetDateStr.includes('-')) {
-        const parts = targetDateStr.split('-');
-        if (parts.length === 3) targetDateFormated = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    // Convert to DD/MM/YYYY for title and robust comparison
+    const normalizeDate = (d) => {
+        if (!d) return '';
+        const parts = d.split(/[-/]/);
+        if (parts.length !== 3) return d;
+        // If it was YYYY-MM-DD
+        if (parts[0].length === 4) {
+            return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        }
+        // If it was D/M/YYYY or DD/MM/YYYY
+        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+    };
+
+    if (targetDateStr) {
+        targetDateFormated = normalizeDate(targetDateStr);
     }
 
     // UI Elements
@@ -238,11 +249,13 @@ export const afterRender = async () => {
             const res = await fetch('/api/bookings');
             const data = await res.json();
 
-            // Lọc theo Tour và Ngày (khớp y chang)
+            // Lọc theo Tour và Ngày (khớp y chang hoặc normalize về DD/MM/YYYY)
             allBookings = data.filter(b => {
                 let mTour = true, mDate = true;
                 if (targetTour) mTour = (b.tour === targetTour || (b.tour && b.tour.startsWith(targetTour)));
-                if (targetDateFormated) mDate = (b.date === targetDateFormated);
+                if (targetDateFormated) {
+                    mDate = (normalizeDate(b.date) === targetDateFormated);
+                }
                 return mTour && mDate;
             });
 
