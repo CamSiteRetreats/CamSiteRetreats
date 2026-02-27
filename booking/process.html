@@ -688,8 +688,38 @@
                     trekking_pole: bookingData.trekkingPole,
                     deposit_required: bookingData.depositRequired
                 };
-                delete dbBooking.id; // Let DB generate Serial ID
+                // If it's a numeric ID (from DB), keep it for UPDATE, else delete it (like timestamp ID) for INSERT
+                if (!Number.isInteger(Number(dbBooking.id)) || Number(dbBooking.id) > 1000000000000) {
+                    delete dbBooking.id;
+                }
                 delete dbBooking.createdAt;
+
+                // Sync Customer to CRM first to get Customer ID
+                try {
+                    const crmRes = await fetch('../api/admin_customers?action=create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            full_name: dbBooking.name,
+                            phone: dbBooking.phone,
+                            cccd: dbBooking.id_card || '',
+                            dob: dbBooking.dob || null,
+                            gender: dbBooking.gender || 'Khác',
+                            medical_notes: dbBooking.allergy || '',
+                            dietary: dbBooking.diet || ''
+                        })
+                    });
+                    const crmData = await crmRes.json();
+                    if (crmData.success && crmData.csr_code) {
+                        dbBooking.customer_id = crmData.csr_code;
+                        console.log('CRM Code Generated:', crmData.csr_code);
+                    }
+                } catch (e) {
+                    console.warn('CRM Sync Error:', e);
+                }
+
+                // Force status to "Chờ xác nhận cọc" which will show the "Xác nhận cọc" button in Admin Upcoming tab
+                dbBooking.status = 'Chờ xác nhận cọc';
 
                 const response = await fetch('../api/bookings', {
                     method: 'POST',
@@ -741,17 +771,8 @@
                 return; // Stop here
             }
 
-            // Sync to Customer DB (Legacy / CRM local logic)
-            try {
-                const customerId = syncCustomerFromBooking(bookingData);
-                if (customerId) {
-                    const bks = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-                    bks[bks.length - 1].customerId = customerId;
-                    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bks));
-                }
-            } catch (e) {
-                console.error('CRM Sync Error:', e);
-            }
+            // Remove legacy Customer CRM LocalStorage sync
+            console.log('Completed processing order flow!');
         }
     </script>
 </body>
