@@ -325,7 +325,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Số tài khoản:</span>
-                                <span class="font-bold text-lg text-primary tracking-wider">1490294222</span>
+                                <span class="font-bold text-lg text-primary tracking-wider">96247CAMSITERETREAT</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Chủ tài khoản:</span>
@@ -501,7 +501,7 @@
 
         // Generate Dynamic QR
         function updateDepositQR() {
-            const qrUrl = `https://img.vietqr.io/image/bidv-1490294222-compact.jpg?amount=1000000&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+            const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=1000000&des=${encodeURIComponent(transferCode)}`;
             const qrImg = document.getElementById('deposit-qr');
             if (qrImg) qrImg.src = qrUrl;
         }

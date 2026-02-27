@@ -196,7 +196,7 @@
                     </div>
                     <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Số tài khoản:</span>
-                        <span class="font-bold text-lg text-primary tracking-wider">1490294222</span>
+                        <span class="font-bold text-lg text-primary tracking-wider">96247CAMSITERETREAT</span>
                     </div>
                     <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Chủ tài khoản:</span>
@@ -392,7 +392,7 @@
                 document.getElementById('transfer-content').textContent = transferCode;
 
                 // QR Code - VietQR
-                const qrUrl = `https://img.vietqr.io/image/bidv-1490294222-compact.jpg?amount=${data.amountDue}&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+                const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=${data.amountDue}&des=${encodeURIComponent(transferCode)}`;
                 document.getElementById('payment-qr').src = qrUrl;
 
                 // Show payment section
