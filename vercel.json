@@ -20,12 +20,8 @@
       "destination": "/api/photo?id=:slug"
     },
     {
-      "source": "/admin/roster",
-      "destination": "/admin/index.html"
-    },
-    {
       "source": "/admin/(.*)",
-      "destination": "/admin/index.html"
+      "destination": "/admin/"
     }
   ],
   "headers": [
