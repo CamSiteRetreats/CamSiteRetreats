@@ -175,14 +175,23 @@ export const afterRender = async () => {
     // Convert to DD/MM/YYYY for title and robust comparison
     const normalizeDate = (d) => {
         if (!d) return '';
-        const parts = d.split(/[-/]/);
+        const parts = d.split(/[-/.]/); // Support dots too
         if (parts.length !== 3) return d;
-        // If it was YYYY-MM-DD
-        if (parts[0].length === 4) {
-            return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        let day, month, year;
+        if (parts[0].length === 4) { // YYYY-MM-DD
+            [year, month, day] = parts;
+        } else { // DD/MM/YYYY
+            [day, month, year] = parts;
         }
-        // If it was D/M/YYYY or DD/MM/YYYY
-        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+        return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+    };
+
+    const normalizeText = (text) => {
+        return (text || '').toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+            .replace(/[-_]/g, ' ') // Replace dashes with spaces
+            .replace(/\s+/g, ' ') // Collapse spaces
+            .trim();
     };
 
     if (targetDateStr) {
@@ -268,7 +277,11 @@ export const afterRender = async () => {
             // Lọc theo Tour và Ngày (khớp y chang hoặc normalize về DD/MM/YYYY)
             allBookings = data.filter(b => {
                 let mTour = true, mDate = true;
-                if (targetTour) mTour = (b.tour === targetTour || (b.tour && b.tour.startsWith(targetTour)));
+                if (targetTour) {
+                    const normB = normalizeText(b.tour);
+                    const normT = normalizeText(targetTour);
+                    mTour = (normB === normT || normB.includes(normT) || normT.includes(normB));
+                }
                 if (targetDateFormated) {
                     mDate = (normalizeDate(b.date) === targetDateFormated);
                 }
@@ -295,11 +308,14 @@ export const afterRender = async () => {
         const sGender = filterGender.value.toLowerCase();
 
         const filtered = allBookings.filter(b => {
+            const bStatus = (b.status || '').toLowerCase();
             const statusMatch = sStatus === '' ||
-                (sStatus === 'chờ cọc' && (b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc')) ||
-                (sStatus === 'đã cọc' && (b.status === 'Đã cọc' || b.status === 'Hoàn tất' || b.status === 'Hoàn thành')) ||
-                (sStatus === 'đã hủy' && b.status === 'Đã hủy');
-            const genderMatch = sGender === '' || (b.gender && b.gender.toLowerCase() === sGender);
+                (sStatus === 'chờ cọc' && (bStatus.includes('chờ cọc') || bStatus.includes('chờ xác nhận'))) ||
+                (sStatus === 'đã cọc' && (bStatus.includes('đã cọc') || bStatus.includes('hoàn tất') || bStatus.includes('hoàn thành'))) ||
+                (sStatus === 'đã hủy' && bStatus.includes('hủy'));
+
+            const bGender = (b.gender || '').toLowerCase();
+            const genderMatch = sGender === '' || bGender === sGender;
             return statusMatch && genderMatch;
         });
 
