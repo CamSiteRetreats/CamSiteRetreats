@@ -159,8 +159,8 @@ export const afterRender = async () => {
         { id: 'col-gender', label: 'Giới tính', default: true, render: (b) => b.gender || '-' },
         { id: 'col-cccd', label: 'CCCD / Passport', default: true, render: (b) => b.id_card || b.cccd || '-' },
         { id: 'col-address', label: 'Địa chỉ', default: true, render: (b) => `<div class="max-w-[200px] truncate print:max-w-none print:whitespace-normal" title="${b.address || ''}">${b.address || '-'}</div>` },
-        { id: 'col-diet', label: 'Ăn chay', default: true, render: (b) => b.diet === 'Chay' || b.diet === 'Có' ? '<span class="text-green-600 font-bold">Có</span>' : 'Không' },
-        { id: 'col-pole', label: 'Gậy Trekking', default: true, render: (b) => b.trekking_pole === 'Có' ? '<span class="text-orange-600 font-bold">Có</span>' : 'Không' },
+        { id: 'col-diet', label: 'Ăn chay', default: false, render: (b) => b.diet === 'Chay' || b.diet === 'Có' ? '<span class="text-green-600 font-bold">Có</span>' : 'Không' },
+        { id: 'col-pole', label: 'Gậy Trekking', default: false, render: (b) => b.trekking_pole === 'Có' ? '<span class="text-orange-600 font-bold">Có</span>' : 'Không' },
         { id: 'col-allergy', label: 'Dị ứng', default: false, render: (b) => b.medical_notes || b.allergy || '-' },
         { id: 'col-special', label: 'Yêu cầu ĐB', default: false, render: (b) => b.special_notes || b.special || '-' },
         { id: 'col-medal', label: 'Tên Huy Chương', default: false, render: (b) => b.medal_name || b.name || '-' }
