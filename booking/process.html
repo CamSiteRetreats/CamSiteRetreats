@@ -458,7 +458,7 @@
 
         // If opened via ?id=XX, load data from API
         if (bookingDbId && !params.get('name')) {
-            fetch(`../api/payment?action=link&id=${bookingDbId}`)
+            fetch(`/api/payment?action=link&id=${bookingDbId}`)
                 .then(r => r.json())
                 .then(data => {
                     leadData.name = data.name || '';
@@ -543,7 +543,7 @@
             if (depositPollInterval) return;
             depositPollInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`../api/payment?action=status&id=${bId}`);
+                    const res = await fetch(`/api/payment?action=status&id=${bId}`);
                     const data = await res.json();
                     if (data.isPaid) {
                         clearInterval(depositPollInterval);
@@ -699,7 +699,7 @@
 
                 // Sync Customer to CRM first to get Customer ID
                 try {
-                    const crmRes = await fetch('../api/admin_customers?action=create', {
+                    const crmRes = await fetch('/api/admin_customers?action=create', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -724,7 +724,7 @@
                 // Force status to "Chờ xác nhận cọc" which will show the "Xác nhận cọc" button in Admin Upcoming tab
                 dbBooking.status = 'Chờ xác nhận cọc';
 
-                const response = await fetch('../api/bookings', {
+                const response = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dbBooking)
@@ -741,7 +741,7 @@
                     const leadId = params.get('leadId');
                     if (leadId) {
                         try {
-                            await fetch(`../api/leads?id=${leadId}`, {
+                            await fetch(`/api/leads?id=${leadId}`, {
                                 method: 'DELETE'
                             });
                             console.log('Lead deleted after conversion');
