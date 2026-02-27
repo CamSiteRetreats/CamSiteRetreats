@@ -11,5 +11,9 @@ export default defineConfig({
                 changeOrigin: true,
             }
         }
+    },
+    build: {
+        outDir: '../admin',
+        emptyOutDir: true
     }
 });
