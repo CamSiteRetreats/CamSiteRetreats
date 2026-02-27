@@ -545,7 +545,7 @@
                     if (data.isPaid) {
                         clearInterval(depositPollInterval);
                         // Auto redirect to invoice
-                        window.location.href = `/invoice.html?id=${bId}`;
+                        window.location.href = window.location.origin + `/invoice.html?id=${bId}`;
                     }
                 } catch (err) { console.warn('Poll error:', err); }
             }, 5000);
