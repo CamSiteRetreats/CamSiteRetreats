@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
                 const possibleFields = [
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
-                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments'
+                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required'
                 ];
 
                 for (const field of possibleFields) {
@@ -61,22 +61,22 @@ module.exports = async (req, res) => {
                 const {
                     name, phone, tour, date, status, total_price, deposit,
                     sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
                 } = body;
 
                 const query = `
                     INSERT INTO bookings (
                         name, phone, tour, date, status, total_price, deposit, 
                         sale_id, sale_name, customer_id, dob, gender, address, 
-                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
                     RETURNING *;
                 `;
                 const values = [
                     name, phone, tour, date, status || 'Chờ xác nhận cọc', total_price, deposit,
                     sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required || 1000000
                 ];
                 const { rows } = await db.query(query, values);
                 const newBooking = rows[0];

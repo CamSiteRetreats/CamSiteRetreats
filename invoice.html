@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn Điện Tử - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E85D04',
+                        secondary: '#FFF8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .invoice-card {
+            background: url('https://www.transparenttextures.com/patterns/cubes.png');
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-shadow-none {
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-10 px-4 flex justify-center items-start">
+
+    <!-- Loading UI -->
+    <div id="loading" class="text-center py-20 w-full max-w-2xl">
+        <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-gray-500 font-medium">Đang tải hóa đơn...</p>
+    </div>
+
+    <!-- Error UI -->
+    <div id="error"
+        class="hidden text-center py-20 w-full max-w-2xl bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i data-lucide="alert-circle" class="w-10 h-10 text-red-500"></i>
+        </div>
+        <h2 class="text-2xl font-black text-gray-800 mb-2">Không tìm thấy Hóa Đơn</h2>
+        <p class="text-gray-500 mb-8" id="error-message">Liên kết không hợp lệ hoặc đơn hàng không tồn tại.</p>
+        <a href="/index.html"
+            class="inline-block px-8 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">Về
+            trang chủ</a>
+    </div>
+
+    <!-- Invoice UI -->
+    <div id="invoice-container" class="hidden w-full max-w-2xl flex flex-col gap-6">
+
+        <!-- Actions (No Print) -->
+        <div class="flex justify-between items-center no-print">
+            <a href="/index.html"
+                class="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors font-medium text-sm bg-white px-4 py-2 rounded-full shadow-sm">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Trang Chủ
+            </a>
+            <div class="flex items-center gap-3">
+                <button onclick="downloadAsImage()"
+                    class="flex items-center gap-2 bg-white text-gray-700 hover:text-primary px-4 py-2 rounded-full shadow-sm font-bold text-sm transition-all border border-gray-100">
+                    <i data-lucide="download" class="w-4 h-4"></i> Lưu Ảnh
+                </button>
+                <button onclick="window.print()"
+                    class="flex items-center gap-2 bg-primary text-white hover:bg-orange-600 px-5 py-2 rounded-full shadow-md shadow-primary/20 font-bold text-sm transition-all">
+                    <i data-lucide="printer" class="w-4 h-4"></i> In Hóa Đơn
+                </button>
+            </div>
+        </div>
+
+        <!-- The Invoice Card to Print/Snapshot -->
+        <div id="capture-area"
+            class="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 print-shadow-none overflow-hidden relative invoice-card">
+
+            <!-- Orange Header Banner -->
+            <div class="bg-primary px-8 py-6 text-white flex justify-between items-start relative overflow-hidden">
+                <!-- Abstract curves in header -->
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+                <div class="absolute right-20 -bottom-20 w-32 h-32 bg-black/10 rounded-full blur-xl"></div>
+
+                <div class="relative z-10">
+                    <img src="/logo-white.png"
+                        onerror="this.src='/logo.png'; this.classList.add('brightness-0', 'invert')"
+                        alt="CAM SITE RETREATS" class="h-12 w-auto mb-4">
+                    <h1 class="text-3xl font-black tracking-tight opacity-90">HÓA ĐƠN</h1>
+                    <p class="text-primary-100 mt-1 font-medium opacity-80" id="inv-date">Ngày phát hành: ...</p>
+                </div>
+
+                <div class="relative z-10 text-right">
+                    <div
+                        class="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20 mb-3">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-white mr-2"></i>
+                        <span class="font-bold tracking-wider text-sm">ĐÃ THANH TOÁN</span>
+                    </div>
+                    <div class="opacity-80 text-sm font-medium">Mã Đơn Hàng</div>
+                    <div class="font-mono text-xl font-bold tracking-widest" id="inv-no">#CSR...</div>
+                </div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="p-8 sm:p-10 space-y-8 relative bg-white/95">
+
+                <!-- Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+                    <img src="/logo.png" class="w-96 grayscale">
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Thông tin Khách hàng
+                        </p>
+                        <p class="font-bold text-xl text-gray-800 mb-1" id="cust-name">...</p>
+                        <p class="text-gray-600 flex items-center gap-2 mb-1"><i data-lucide="phone"
+                                class="w-4 h-4 text-gray-400"></i> <span id="cust-phone">...</span></p>
+                        <p class="text-gray-600 flex items-center gap-2"><i data-lucide="user"
+                                class="w-4 h-4 text-gray-400"></i> Mã CRM: <span class="font-mono font-medium"
+                                id="cust-crm">...</span></p>
+                    </div>
+                    <div class="sm:text-right">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nhà Giao Dịch</p>
+                        <p class="font-bold text-lg text-gray-800">CÔNG TY TNHH CAM SITE RETREATS</p>
+                        <p class="text-gray-600 text-sm mt-1">MST: Chưa cập nhật</p>
+                        <p class="text-gray-600 text-sm mt-1">Hotline: 096 963 XXXX</p>
+                    </div>
+                </div>
+
+                <!-- Item Details -->
+                <div class="relative z-10 mt-10">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b-2 border-gray-100 text-xs text-gray-400 uppercase tracking-widest">
+                                <th class="pb-3 font-bold w-2/3">Chi Tiết Dịch Vụ Tour</th>
+                                <th class="pb-3 font-bold text-right">Thành Tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            <tr class="border-b border-gray-50">
+                                <td class="py-5">
+                                    <p class="font-bold text-lg text-gray-800 mb-1" id="tour-name">...</p>
+                                    <p class="text-sm text-gray-500 italic flex items-center gap-2"><i
+                                            data-lucide="calendar" class="w-4 h-4"></i> Lịch khởi hành: <span
+                                            id="tour-date" class="font-medium text-primary">...</span></p>
+                                </td>
+                                <td class="py-5 text-right font-bold text-lg" id="tour-price">...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals section -->
+                <div class="relative z-10 flex flex-col sm:flex-row justify-between items-end gap-6 pt-4">
+
+                    <!-- QR Code to check invoice online -->
+                    <div class="text-center bg-gray-50 p-4 rounded-2xl border border-gray-100 w-full sm:w-auto">
+                        <div class="w-24 h-24 mx-auto bg-white rounded-xl p-2 shadow-sm border border-gray-100 mb-2">
+                            <img id="invoice-qr" src="" alt="QR"
+                                class="w-full h-full object-contain opacity-50 transition-opacity duration-300"
+                                onload="this.classList.remove('opacity-50')">
+                        </div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Quét để xem lại</p>
+                    </div>
+
+                    <!-- Money breakdown -->
+                    <div class="w-full sm:w-80 space-y-3">
+                        <div class="flex justify-between items-center text-gray-500">
+                            <span>Tổng tiền vé:</span>
+                            <span class="font-bold text-gray-700" id="total-price">...</span>
+                        </div>
+                        <div class="flex justify-between items-center text-primary">
+                            <span>Đã thanh toán (Cọc):</span>
+                            <span class="font-bold" id="deposit-paid">- ...</span>
+                        </div>
+                        <div class="border-t-2 border-dashed border-gray-200 pt-3 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 uppercase tracking-wide">Còn Lại:</span>
+                            <span class="text-3xl font-black text-gray-900" id="remaining-price">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer note -->
+                <div class="relative z-10 pt-8 border-t border-gray-100 text-center">
+                    <p class="text-sm text-gray-500 font-medium italic">Cảm ơn quý khách đã tin tưởng và lựa chọn CAM
+                        SITE RETREATS.</p>
+                    <p class="text-xs text-gray-400 mt-1">Hóa đơn điện tử có giá trị lưu hành nội bộ.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get('id');
+
+        function formatVND(n) { return (parseInt(n) || 0).toLocaleString('vi-VN') + 'đ'; }
+
+        async function loadInvoice() {
+            if (!bookingId) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Fetch direct from bookings API since payment status might not give all info
+                const res = await fetch(`/api/bookings?id=${bookingId}&cache=${Date.now()}`); // Bypass cache
+                if (!res.ok) throw new Error('Không tìm thấy thông tin');
+
+                const data = await res.json();
+
+                // data could be an array or object depending on API. Let's assume array of 1 object based layout
+                const b = Array.isArray(data) ? data.find(x => String(x.id) === bookingId) : data;
+                if (!b) throw new Error('Không tìm thấy đơn hàng trong hệ thống');
+
+                // Populate UI
+                document.getElementById('inv-no').textContent = `#CSR${b.id}`;
+                document.getElementById('inv-date').textContent = `Ngày in: ${new Date().toLocaleDateString('vi-VN')}`;
+
+                document.getElementById('cust-name').textContent = b.name || 'Khách Hàng';
+
+                // Mask phone for privacy in receipt
+                let phone = b.phone || '';
+                if (phone.length > 4) phone = phone.substring(0, 4) + ' ••• •••';
+                document.getElementById('cust-phone').textContent = phone;
+
+                document.getElementById('cust-crm').textContent = b.customer_id || 'Chưa cấp';
+
+                document.getElementById('tour-name').textContent = b.tour || 'Tour Sinh Tồn / Trekking';
+                document.getElementById('tour-date').textContent = b.date || 'Đang cập nhật';
+
+                const total = parseInt(b.total_price) || 0;
+                const deposit = parseInt(b.deposit) || 0;
+                const remain = total - deposit;
+
+                document.getElementById('tour-price').textContent = formatVND(total);
+                document.getElementById('total-price').textContent = formatVND(total);
+                document.getElementById('deposit-paid').textContent = '- ' + formatVND(deposit);
+                document.getElementById('remaining-price').textContent = remain > 0 ? formatVND(remain) : '0đ';
+
+                // Gen QR code to self URL
+                const selfUrl = window.location.origin + `/invoice.html?id=${bookingId}`;
+                document.getElementById('invoice-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selfUrl)}`;
+
+                // Show UI
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('invoice-container').classList.remove('hidden');
+
+                // Optional: Update title
+                document.title = `Hóa Đơn #${b.id} - ${b.name}`;
+
+            } catch (err) {
+                console.error('Invoice Error:', err);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-message').textContent = err.message;
+            }
+            lucide.createIcons();
+        }
+
+        function downloadAsImage() {
+            const node = document.getElementById('capture-area');
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang tạo ảnh...`;
+            lucide.createIcons();
+
+            // Add a small delay to ensure rendering is complete (fonts/images)
+            setTimeout(() => {
+                html2canvas(node, {
+                    scale: 2, // Higher resolution
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `HoaDon_CSR${bookingId}_${new Date().toISOString().slice(0, 10)}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.click();
+
+                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-green-500"></i> Đã Lưu!`;
+                    lucide.createIcons();
+                    setTimeout(() => {
+                        btn.innerHTML = originalContent;
+                        lucide.createIcons();
+                    }, 2000);
+                }).catch(err => {
+                    console.error("Lỗi xuất ảnh:", err);
+                    alert("Không thể lưu ảnh lúc này, xin thử l In Hóa Đơn (Mục PDF)");
+                    btn.innerHTML = originalContent;
+                    lucide.createIcons();
+                });
+            }, 500);
+        }
+
+        // Init
+        loadInvoice();
+    </script>
+</body>
+
+</html>

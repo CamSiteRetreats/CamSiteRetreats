@@ -54,10 +54,11 @@ async function handlePaymentLink(req, res) {
     const totalPrice = parseInt(booking.total_price) || 0;
     const deposit = parseInt(booking.deposit) || 0;
     const remaining = totalPrice - deposit;
+    const depositRequired = parseInt(booking.deposit_required) || 1000000;
 
     const needsDeposit = deposit === 0 || booking.status === 'Chờ cọc' || booking.status === 'Chờ xác nhận cọc';
     const paymentType = needsDeposit ? 'deposit' : 'remaining';
-    const amountDue = needsDeposit ? 1000000 : remaining;
+    const amountDue = needsDeposit ? depositRequired : remaining;
 
     // Build transfer content: tour date name coc/full (lowercase, no diacritics)
     const cleanTour = normalizeVN((booking.tour || 'Tour').split('-')[0].trim());
@@ -79,6 +80,7 @@ async function handlePaymentLink(req, res) {
         deposit,
         remaining,
         amountDue,
+        depositRequired,
         paymentType,
         transferContent,
         isPaid

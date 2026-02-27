@@ -235,11 +235,8 @@
 
         function showSuccess() {
             if (pollInterval) clearInterval(pollInterval);
-            document.getElementById('payment-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-            showConfetti();
-            lucide.createIcons();
-            window.scrollTo(0, 0);
+            // Redirect to professional invoice page
+            window.location.href = `/invoice.html?id=${bookingId}`;
         }
 
         function startPolling(bId) {
@@ -260,9 +257,7 @@
                 const data = await res.json();
 
                 if (data.isPaid) {
-                    document.getElementById('loading-state').classList.add('hidden');
-                    document.getElementById('payment-main').classList.remove('hidden');
-                    showSuccess();
+                    window.location.href = `/invoice.html?id=${id}`;
                     return;
                 }
 

@@ -260,8 +260,12 @@ export const render = () => {
                                   <textarea id="addNote" rows="1" class="input-field resize-none text-sm" placeholder="VD: Khách chốt qua zalo, giá ưu đãi..."></textarea>
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Tên In Huy Chương</label>
-                                  <input type="text" id="addMedalName" class="input-field text-sm font-bold bg-orange-50/50" placeholder="Mặc định ghi Tên Thật">
+                                  <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
+                                  <input type="number" id="addDepositRequired" class="input-field text-sm font-bold bg-orange-50/50" value="1000000" placeholder="1000000">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">Tên In Huy Chương</label>
+                                  <input type="text" id="addMedalName" class="input-field text-sm font-bold bg-blue-50/50" placeholder="Mặc định ghi Tên Thật">
                               </div>
                           </div>
                       </div>
@@ -397,10 +401,14 @@ export const render = () => {
                           <label for="edit-commitments" class="text-xs font-bold text-gray-600 uppercase">Khách đã đồng ý Cam kết sức khỏe & Nội quy</label>
                       </div>
 
-                      <div class="grid grid-cols-1 gap-5 pt-2">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                           <div>
                               <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú Đơn Hàng (Sale Note)</label>
                               <input type="text" id="edit-special" class="input-field bg-gray-50 text-sm text-blue-600 font-medium">
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
+                              <input type="number" id="edit-deposit-required" class="input-field bg-orange-50/50 font-bold text-csr-orange" placeholder="1000000">
                           </div>
                       </div>
 
@@ -1450,6 +1458,8 @@ export const afterRender = () => {
                 const diet = document.getElementById('addDiet').value || 'Bình Thường';
                 const trekkingPole = document.getElementById('addTrekkingPole').value || 'Không';
                 const allergy = document.getElementById('addAllergy').value || '';
+                const depositRequiredInput = document.getElementById('addDepositRequired');
+                const depositRequired = depositRequiredInput ? parseInt(depositRequiredInput.value) : 1000000;
                 const medalName = document.getElementById('addMedalName') ? document.getElementById('addMedalName').value : '';
 
                 // Lấy profile Sale hiện tại
@@ -1486,7 +1496,8 @@ export const afterRender = () => {
                     trekking_pole: trekkingPole,
                     allergy: allergy,
                     special: saleTag,
-                    medal_name: medalName
+                    medal_name: medalName,
+                    deposit_required: depositRequired
                 };
 
                 // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads
@@ -1563,8 +1574,10 @@ export const afterRender = () => {
                 const special = document.getElementById('edit-special').value;
                 const totalText = document.getElementById('edit-total').value;
                 const depositText = document.getElementById('edit-deposit').value;
+                const depositRequiredText = document.getElementById('edit-deposit-required') ? document.getElementById('edit-deposit-required').value : '';
                 const total_price = totalText ? parseInt(totalText) : 0;
                 const deposit = depositText ? parseInt(depositText) : 0;
+                const deposit_required = depositRequiredText ? parseInt(depositRequiredText) : 1000000;
 
                 const bookingPayload = {
                     id: bookingId,
@@ -1583,7 +1596,8 @@ export const afterRender = () => {
                     commitments: commitments,
                     special: special,
                     total_price: total_price,
-                    deposit: deposit
+                    deposit: deposit,
+                    deposit_required: deposit_required
                 };
 
                 // Chỉ Call Update API Bookings
