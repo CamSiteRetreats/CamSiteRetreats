@@ -1296,31 +1296,28 @@ export const afterRender = () => {
                     alert('Lỗi khi Copy Clipboard. Link là: ' + url);
                 });
             }
-            // GỬI LINK CỌC
+            // GỬI LINK CỌC (SHORT URL)
             else if (btn.classList.contains('send-btn')) {
-                // Điểu chỉnh đường dẫn trỏ đúng vào thư mục booking/
-                // Note: Đã bật tính năng host static web bằng dev-server.js trên port 8888
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 const baseUrl = isLocal
                     ? 'http://localhost:8888'
                     : window.location.origin;
 
-                const url = baseUrl + `/booking/payment.html?id=${bookingId}`;
+                const url = baseUrl + `/pay/${bookingId}`;
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('📋 Đã sao chép Link Form Đăng Ký Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
+                    alert('📋 Đã sao chép Link Thanh Toán Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
                 }).catch(err => {
                     alert('Lỗi khi Copy Clipboard. Link là: ' + url);
                 });
             }
-            // NÚT THANH TOÁN (PAYMENT)
+            // NÚT THANH TOÁN (SHORT URL)
             else if (btn.classList.contains('payment-btn')) {
-                // Link tới Form Cọc / Thanh toán Online
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 const baseUrl = isLocal
                     ? 'http://localhost:8888'
                     : window.location.origin;
 
-                const url = baseUrl + `/booking/payment.html?id=${bookingId}`;
+                const url = baseUrl + `/pay/${bookingId}`;
                 window.open(url, '_blank');
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)

@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
 
-
+<head>
+    <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="../favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh toán còn lại - CAM SITE RETREATS</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Thanh toán Tour - CAM SITE RETREATS">
+    <meta property="og:description" content="Thanh toán còn lại Tour cùng CAM SITE RETREATS 🏔️">
+    <meta property="og:image" content="https://camsiteretreats.com/og-payment.jpg">
+    <meta property="og:type" content="website">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -25,6 +33,60 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .5;
+                transform: scale(.8)
+            }
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            top: -20px;
+            animation: confetti-fall 3s ease-in forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes check-bounce {
+            0% {
+                transform: scale(0);
+                opacity: 0
+            }
+
+            50% {
+                transform: scale(1.2)
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .success-check {
+            animation: check-bounce 0.6s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -42,7 +104,13 @@
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 py-8">
+    <!-- Loading State -->
+    <main id="loading-state" class="max-w-2xl mx-auto px-6 py-16 text-center">
+        <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-gray-400 font-medium">Đang tải thông tin...</p>
+    </main>
+
+    <main id="payment-main" class="max-w-2xl mx-auto px-6 py-8 hidden">
 
         <!-- Info Card -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
@@ -62,8 +130,7 @@
         </div>
 
         <!-- Payment Section -->
-        <div id="payment-section"
-            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center animate__animated animate__fadeIn">
+        <div id="payment-section" class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Số tiền còn lại cần thanh toán</p>
             <div class="text-4xl font-black text-primary mb-2" id="amount-due">0đ</div>
             <p class="text-xs text-gray-500 italic mb-8">Vui lòng hoàn tất thanh toán trước ngày khởi hành</p>
@@ -83,7 +150,7 @@
                     </div>
                     <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Số tài khoản:</span>
-                        <span class="font-bold text-lg text-primary tracking-wider">ORANGE</span>
+                        <span class="font-bold text-lg text-primary tracking-wider">1490294222</span>
                     </div>
                     <div class="flex justify-between items-center py-1 border-b border-gray-200/50">
                         <span class="text-gray-500">Chủ tài khoản:</span>
@@ -98,7 +165,7 @@
                             <span class="font-bold text-primary text-base font-mono break-all"
                                 id="transfer-content">...</span>
                             <button onclick="copyContent()"
-                                class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors">
+                                class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors shrink-0">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -106,22 +173,23 @@
                 </div>
             </div>
 
-            <button id="confirm-btn" onclick="confirmFinalPayment()"
-                class="w-full bg-green-600 text-white font-bold text-lg py-5 rounded-2xl shadow-lg shadow-green-600/30 hover:shadow-green-600/40 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2">
-                <i data-lucide="check-circle" class="w-6 h-6"></i>
-                <span>Xác nhận đã thanh toán</span>
-            </button>
+            <!-- Listening Status -->
+            <div class="flex items-center justify-center gap-2 mb-4 text-sm text-gray-500" id="listening-status">
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite">
+                </div>
+                <span>Đang chờ thanh toán... Hệ thống sẽ tự động xác nhận</span>
+            </div>
         </div>
 
         <!-- Success Section -->
-        <div id="success-section" class="hidden text-center py-10 animate__animated animate__fadeIn">
+        <div id="success-section" class="hidden text-center py-10">
             <div
-                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600 shadow-xl shadow-green-100/50">
+                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600 shadow-xl shadow-green-100/50 success-check">
                 <i data-lucide="sparkles" class="w-12 h-12 stroke-[2.5]"></i>
             </div>
-            <h2 class="text-3xl font-black text-gray-800 mb-4">Tuyệt vời!</h2>
+            <h2 class="text-3xl font-black text-gray-800 mb-4">Thanh toán thành công! 🎉</h2>
             <p class="text-gray-600 max-w-sm mx-auto leading-relaxed mb-10 text-lg">
-                Hệ thống đã ghi nhận yêu cầu xác nhận thanh toán của bạn. Hẹn gặp bạn tại điểm khởi hành nhé!
+                Hệ thống đã xác nhận thanh toán của bạn. Hẹn gặp bạn tại điểm khởi hành nhé!
             </p>
             <a href="../index.html"
                 class="inline-block px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all">
@@ -134,131 +202,133 @@
     <script>
         lucide.createIcons();
 
-        // Parse Params
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('code');
+        const bookingId = params.get('id');
+        const legacyToken = params.get('code');
 
-        let bookingId = '';
-        let name = '...';
-        let tour = '...';
-        let remaining = 0;
+        let transferCode = '';
+        let pollInterval = null;
 
-        if (token) {
-            try {
-                // Decode Base64 Token with UTF-8 support
-                const jsonStr = decodeURIComponent(atob(token).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-
-                const data = JSON.parse(jsonStr);
-
-                bookingId = data.i;
-                name = data.n;
-                tour = data.t;
-                remaining = Number(data.r) || 0;
-            } catch (e) {
-                console.error('Invalid Token', e);
-                // Fallback for old simple base64
-                try {
-                    const jsonStr = decodeURIComponent(atob(token));
-                    const data = JSON.parse(jsonStr);
-                    bookingId = data.i;
-                    name = data.n;
-                    tour = data.t;
-                    remaining = Number(data.r) || 0;
-                } catch (e2) {
-                    alert('Mã thanh toán không hợp lệ hoặc bị lỗi!');
-                }
-            }
-        } else {
-            // Fallback old params (optional)
-            bookingId = params.get('bookingId');
-            name = params.get('name') || '';
-            tour = params.get('tour') || '';
-            remaining = Number(params.get('remaining')) || 0;
-        }
-
-        // Render Params
-        document.getElementById('cust-name').textContent = name;
-        document.getElementById('tour-name').textContent = tour;
-        document.getElementById('amount-due').textContent = (remaining || 0).toLocaleString('vi-VN') + 'đ';
-
-        // Transfer Content: Tour - ID - FULL
-        const cleanedTourName = tour.includes('-') ? tour.split('-')[0].trim() : tour.trim();
-        const shortId = bookingId ? bookingId.toString().slice(-6) : 'XXXXX';
-        const transferCode = `${cleanedTourName} - ${shortId} - FULL`;
-        document.getElementById('transfer-content').textContent = transferCode;
-
-        // Dynamic QR
-        const qrImg = document.getElementById('payment-qr');
-        if (remaining > 0) {
-            qrImg.src = `https://img.vietqr.io/image/bidv-orange-compact.jpg?amount=${remaining}&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
-        } else {
-            qrImg.src = 'qr.jpg'; // Fallback
-        }
+        function formatVND(n) { return (n || 0).toLocaleString('vi-VN') + 'đ'; }
 
         function copyContent() {
-            navigator.clipboard.writeText(transferCode);
-            alert('Đã copy nội dung chuyển khoản!');
+            navigator.clipboard.writeText(transferCode).then(() => {
+                alert('Đã copy nội dung chuyển khoản!');
+            }).catch(() => { prompt('Copy:', transferCode); });
         }
 
-        async function confirmFinalPayment() {
-            if (!confirm('Bạn chắc chắn đã chuyển khoản phần còn lại?')) return;
-
-            const btn = document.getElementById('confirm-btn');
-            const originalContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> <span>Đang xác nhận...</span>';
-            lucide.createIcons();
-
-            // 1. Sync to Server API
-            if (bookingId) {
-                try {
-                    const response = await fetch('../api/bookings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            id: bookingId,
-                            status: 'Hoàn tất'
-                        })
-                    });
-
-                    if (response.ok) {
-                        console.log('Payment updated on server');
-
-                        // 2. Update LocalStorage (Optional cleanup)
-                        const BOOKINGS_KEY = 'cam_site_bookings';
-                        let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-                        bookings = bookings.map(b => {
-                            if (b.id == bookingId || b.dbId == bookingId) {
-                                b.status = 'Hoàn tất';
-                                b.remainingPaid = true;
-                            }
-                            return b;
-                        });
-                        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-
-                        // Show Success
-                        document.getElementById('payment-section').classList.add('hidden');
-                        document.getElementById('success-section').classList.remove('hidden');
-                        window.scrollTo(0, 0);
-                    } else {
-                        const errData = await response.json();
-                        throw new Error(errData.error || 'Server error');
-                    }
-                } catch (err) {
-                    console.error('API Update Error:', err);
-                    alert('Lỗi khi cập nhật trạng thái: ' + err.message + '\nVui lòng thử lại hoặc liên hệ Admin.');
-                    btn.disabled = false;
-                    btn.innerHTML = originalContent;
-                    lucide.createIcons();
-                }
-            } else {
-                alert('Không tìm thấy mã đơn hàng! Vui lòng kiểm tra lại link.');
-                btn.disabled = false;
-                btn.innerHTML = originalContent;
-                lucide.createIcons();
+        function showConfetti() {
+            const colors = ['#E85D04', '#22c55e', '#3b82f6', '#f59e0b', '#ef4444'];
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.width = (Math.random() * 10 + 5) + 'px';
+                el.style.height = (Math.random() * 10 + 5) + 'px';
+                el.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
             }
+        }
+
+        function showSuccess() {
+            if (pollInterval) clearInterval(pollInterval);
+            document.getElementById('payment-section').classList.add('hidden');
+            document.getElementById('success-section').classList.remove('hidden');
+            showConfetti();
+            lucide.createIcons();
+            window.scrollTo(0, 0);
+        }
+
+        function startPolling(bId) {
+            pollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`../api/sepay-status?id=${bId}`);
+                    const data = await res.json();
+                    if (data.isPaid) showSuccess();
+                } catch (err) { console.warn('Poll:', err); }
+            }, 5000);
+        }
+
+        // Load from API (new method)
+        async function loadFromAPI(id) {
+            try {
+                const res = await fetch(`../api/payment-link?id=${id}`);
+                if (!res.ok) throw new Error('Not found');
+                const data = await res.json();
+
+                if (data.isPaid) {
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('payment-main').classList.remove('hidden');
+                    showSuccess();
+                    return;
+                }
+
+                document.getElementById('cust-name').textContent = data.name || 'Khách hàng';
+                document.getElementById('tour-name').textContent = data.tour || 'Tour';
+                document.getElementById('amount-due').textContent = formatVND(data.amountDue);
+
+                transferCode = data.transferContent;
+                document.getElementById('transfer-content').textContent = transferCode;
+
+                const qrUrl = `https://img.vietqr.io/image/bidv-1490294222-compact.jpg?amount=${data.amountDue}&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+                document.getElementById('payment-qr').src = qrUrl;
+
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('payment-main').classList.remove('hidden');
+                lucide.createIcons();
+
+                startPolling(id);
+            } catch (err) {
+                console.error('API Error:', err);
+                alert('Không tìm thấy đơn hàng!');
+            }
+        }
+
+        // Legacy: load from base64 token
+        function loadFromToken(token) {
+            try {
+                const jsonStr = decodeURIComponent(atob(token).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join(''));
+                const data = JSON.parse(jsonStr);
+
+                document.getElementById('cust-name').textContent = data.n || '';
+                document.getElementById('tour-name').textContent = data.t || '';
+                const remaining = Number(data.r) || 0;
+                document.getElementById('amount-due').textContent = formatVND(remaining);
+
+                const cleanTour = (data.t || 'Tour').split('-')[0].trim().replace(/\s+/g, '');
+                const cleanName = (data.n || 'Khach').replace(/\s+/g, '');
+                transferCode = `${cleanTour} ${cleanName} full`;
+                document.getElementById('transfer-content').textContent = transferCode;
+
+                if (remaining > 0) {
+                    document.getElementById('payment-qr').src =
+                        `https://img.vietqr.io/image/bidv-1490294222-compact.jpg?amount=${remaining}&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+                }
+
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('payment-main').classList.remove('hidden');
+                lucide.createIcons();
+
+                // Start polling if we have booking ID from token
+                if (data.i) startPolling(data.i);
+            } catch (e) {
+                console.error('Token error:', e);
+                alert('Mã thanh toán không hợp lệ!');
+            }
+        }
+
+        // Init
+        if (bookingId) {
+            loadFromAPI(bookingId);
+        } else if (legacyToken) {
+            loadFromToken(legacyToken);
+        } else {
+            alert('Link thanh toán không hợp lệ!');
         }
     </script>
 </body>

@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
 
-
+<head>
+    <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="../favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hoàn tất đặt chỗ - CAM SITE RETREATS</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Đăng ký Tour - CAM SITE RETREATS">
+    <meta property="og:description" content="Điền thông tin và đặt cọc Tour cùng CAM SITE RETREATS 🏔️">
+    <meta property="og:image" content="https://camsiteretreats.com/og-payment.jpg">
+    <meta property="og:type" content="website">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -301,14 +309,14 @@
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền cọc cần thanh toán
                     </p>
                     <div class="text-4xl font-black text-primary mb-2">1.000.000đ</div>
-                    <p class="text-xs text-gray-500 italic mb-8">Vui lòng chuyển khoản để giữ chỗ</p>
+                    <p class="text-xs text-gray-500 italic mb-6">Vui lòng chuyển khoản để giữ chỗ</p>
 
                     <div
                         class="bg-gray-50 p-6 rounded-xl border border-dashed border-gray-300 inline-block w-full max-w-sm mx-auto mb-6">
-                        <!-- QR Image -->
+                        <!-- Dynamic QR Image -->
                         <div
-                            class="w-48 h-48 bg-white mx-auto border-2 border-primary rounded-xl overflow-hidden flex items-center justify-center">
-                            <img src="qr.jpg" alt="QR Code" class="w-full h-full object-cover">
+                            class="w-52 h-52 bg-white mx-auto border-4 border-primary/20 rounded-2xl overflow-hidden flex items-center justify-center mb-4 shadow-inner">
+                            <img id="deposit-qr" src="" alt="QR Cọc" class="w-full h-full object-contain">
                         </div>
                         <div class="text-left space-y-3 text-sm">
                             <div class="flex justify-between">
@@ -317,28 +325,35 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Số tài khoản:</span>
-                                <span class="font-bold text-lg tracking-wide">ORANGE</span>
+                                <span class="font-bold text-lg text-primary tracking-wider">1490294222</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Chủ tài khoản:</span>
                                 <span class="font-bold uppercase">PHAM THIEN AN</span>
                             </div>
-                            <div class="flex justify-between items-center bg-yellow-50 p-2 rounded-lg -mx-2">
-                                <span class="text-gray-500 text-xs">Nội dung CK:</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-primary font-mono" id="transfer-content">CAM
-                                        XXXXX</span>
-                                    <button onclick="copyContent()" class="text-gray-400 hover:text-primary"><i
-                                            data-lucide="copy" class="w-4 h-4"></i></button>
+                            <div class="bg-primary/5 p-3 rounded-xl mt-4 border border-primary/10">
+                                <span
+                                    class="text-gray-500 text-[10px] font-bold uppercase tracking-wider block mb-1">Nội
+                                    dung chuyển khoản</span>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-bold text-primary font-mono break-all"
+                                        id="transfer-content">...</span>
+                                    <button onclick="copyContent()"
+                                        class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors shrink-0">
+                                        <i data-lucide="copy" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-left bg-blue-50 p-4 rounded-xl mb-8 flex gap-3 text-blue-700 text-sm">
-                        <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
-                        <p>Sau khi chuyển khoản thành công, hãy nhấn nút "Xác nhận đã chuyển khoản" bên dưới. Hệ thống
-                            sẽ ghi nhận và Admin sẽ kiểm tra ngay lập tức.</p>
+                    <!-- Listening Status -->
+                    <div class="flex items-center justify-center gap-2 mb-4 text-sm text-gray-500"
+                        id="deposit-listening">
+                        <div
+                            style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite">
+                        </div>
+                        <span>Đang chờ thanh toán... Hệ thống sẽ tự động xác nhận</span>
                     </div>
 
                     <div class="flex gap-4">
@@ -375,13 +390,69 @@
 
     </main>
 
+    <style>
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .5;
+                transform: scale(.8)
+            }
+        }
+
+        @keyframes check-bounce {
+            0% {
+                transform: scale(0);
+                opacity: 0
+            }
+
+            50% {
+                transform: scale(1.2)
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .success-check {
+            animation: check-bounce 0.6s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            top: -20px;
+            animation: confetti-fall 3s ease-in forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
     <script>
         lucide.createIcons();
 
-        // 1. Initial Logic
+        // 1. Initial Logic — Load from URL params OR API
         const params = new URLSearchParams(window.location.search);
+        const bookingDbId = params.get('id'); // New: booking ID from DB
         const leadData = {
-            id: params.get('leadId') || Date.now(),
+            id: params.get('leadId') || bookingDbId || Date.now(),
             name: params.get('name') || '',
             phone: params.get('phone') || '',
             tour: params.get('tour') || '',
@@ -390,20 +461,94 @@
             saleName: params.get('saleName') || null
         };
 
+        // If opened via ?id=XX, load data from API
+        if (bookingDbId && !params.get('name')) {
+            fetch(`../api/payment-link?id=${bookingDbId}`)
+                .then(r => r.json())
+                .then(data => {
+                    leadData.name = data.name || '';
+                    leadData.phone = data.phone || '';
+                    leadData.tour = data.tour || '';
+                    leadData.date = data.date || '';
+                    document.getElementById('tour-name').value = leadData.tour;
+                    document.getElementById('tour-date').value = leadData.date;
+                    document.getElementById('cust-name').value = leadData.name;
+                    document.getElementById('cust-phone').value = leadData.phone;
+                    updateTransferContent();
+                    updateDepositQR();
+                })
+                .catch(err => console.warn('API load error:', err));
+        }
+
         // Populate Read-only Info
         document.getElementById('tour-name').value = leadData.tour;
         document.getElementById('tour-date').value = leadData.date;
         document.getElementById('cust-name').value = leadData.name;
         document.getElementById('cust-phone').value = leadData.phone;
 
-        // Generate Transfer Code: Tên Tour - Mã Đơn - Ngày
-        const cleanedTourName = leadData.tour.split('-')[0].trim();
-        const transferCode = `${cleanedTourName} - ${leadData.id.toString().slice(-6)} - ${leadData.date}`;
-        document.getElementById('transfer-content').textContent = transferCode;
+        // Generate Transfer Code: Tour - Ngày - Tên - cọc
+        let transferCode = '';
+        function updateTransferContent() {
+            const cleanTour = (leadData.tour || 'Tour').split('-')[0].trim().replace(/\s+/g, '');
+            const cleanDate = (leadData.date || '').replace(/\//g, '');
+            const cleanName = (document.getElementById('cust-name').value || leadData.name || 'Khach').replace(/\s+/g, '');
+            transferCode = `${cleanTour} ${cleanDate} ${cleanName} coc`;
+            document.getElementById('transfer-content').textContent = transferCode;
+        }
+
+        // Generate Dynamic QR
+        function updateDepositQR() {
+            const qrUrl = `https://img.vietqr.io/image/bidv-1490294222-compact.jpg?amount=1000000&addInfo=${encodeURIComponent(transferCode)}&accountName=PHAM%20THIEN%20AN`;
+            const qrImg = document.getElementById('deposit-qr');
+            if (qrImg) qrImg.src = qrUrl;
+        }
+
+        updateTransferContent();
+        updateDepositQR();
 
         function copyContent() {
-            navigator.clipboard.writeText(transferCode);
-            alert('Đã copy nội dung chuyển khoản!');
+            navigator.clipboard.writeText(transferCode).then(() => {
+                alert('Đã copy nội dung chuyển khoản!');
+            }).catch(() => {
+                prompt('Copy nội dung này:', transferCode);
+            });
+        }
+
+        // Confetti effect
+        function showConfetti() {
+            const colors = ['#E85D04', '#22c55e', '#3b82f6', '#f59e0b', '#ef4444'];
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.width = (Math.random() * 10 + 5) + 'px';
+                el.style.height = (Math.random() * 10 + 5) + 'px';
+                el.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
+            }
+        }
+
+        // SePay Real-time Polling (starts at Step 4)
+        let depositPollInterval = null;
+        function startDepositPolling(bId) {
+            if (depositPollInterval) return;
+            depositPollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`../api/sepay-status?id=${bId}`);
+                    const data = await res.json();
+                    if (data.isPaid) {
+                        clearInterval(depositPollInterval);
+                        // Auto-show success!
+                        document.getElementById('booking-form').classList.add('hidden');
+                        document.getElementById('success-section').classList.remove('hidden');
+                        showConfetti();
+                        window.scrollTo(0, 0);
+                    }
+                } catch (err) { console.warn('Poll error:', err); }
+            }, 5000);
         }
 
         // 2. Wizard Logic
@@ -436,6 +581,16 @@
 
             currentStep = step;
             window.scrollTo(0, 0);
+
+            // When reaching Step 4: update transfer content with latest name + refresh QR
+            if (step === 4) {
+                updateTransferContent();
+                updateDepositQR();
+                // If we already have a DB booking ID, start polling right away
+                if (bookingDbId) {
+                    startDepositPolling(bookingDbId);
+                }
+            }
         }
 
         function validateStep(step) {
@@ -562,7 +717,13 @@
                     // Show Success only on positive API response
                     document.getElementById('booking-form').classList.add('hidden');
                     document.getElementById('success-section').classList.remove('hidden');
+                    showConfetti();
                     window.scrollTo(0, 0);
+
+                    // Start SePay polling (auto-detect payment)
+                    if (savedBooking.id) {
+                        startDepositPolling(savedBooking.id);
+                    }
 
                 } else {
                     const errorData = await response.json();

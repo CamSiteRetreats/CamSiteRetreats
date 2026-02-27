@@ -8,6 +8,10 @@
   },
   "rewrites": [
     {
+      "source": "/pay/:id",
+      "destination": "/pay.html?id=:id"
+    },
+    {
       "source": "/photo/:slug",
       "destination": "/api/photo?id=:slug"
     },
