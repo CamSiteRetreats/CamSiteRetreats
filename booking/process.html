@@ -486,12 +486,15 @@
         document.getElementById('cust-name').value = leadData.name;
         document.getElementById('cust-phone').value = leadData.phone;
 
-        // Generate Transfer Code: Tour - Ngày - Tên - cọc
+        // Generate Transfer Code: tour date name coc (lowercase, no diacritics)
         let transferCode = '';
+        function normalizeVN(str) {
+            return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
+        }
         function updateTransferContent() {
-            const cleanTour = (leadData.tour || 'Tour').split('-')[0].trim().replace(/\s+/g, '');
+            const cleanTour = normalizeVN((leadData.tour || 'Tour').split('-')[0].trim());
             const cleanDate = (leadData.date || '').replace(/\//g, '');
-            const cleanName = (document.getElementById('cust-name').value || leadData.name || 'Khach').replace(/\s+/g, '');
+            const cleanName = normalizeVN(document.getElementById('cust-name').value || leadData.name || 'khach');
             transferCode = `${cleanTour} ${cleanDate} ${cleanName} coc`;
             document.getElementById('transfer-content').textContent = transferCode;
         }

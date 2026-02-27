@@ -1,5 +1,10 @@
 const db = require('./_db');
 
+// Helper: remove Vietnamese diacritics → lowercase ASCII
+function normalizeVN(str) {
+    return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
+}
+
 /**
  * Unified Payment API
  * Routes by query param "action":
@@ -54,10 +59,10 @@ async function handlePaymentLink(req, res) {
     const paymentType = needsDeposit ? 'deposit' : 'remaining';
     const amountDue = needsDeposit ? 1000000 : remaining;
 
-    // Build transfer content: Tour Date Name coc/full
-    const cleanTour = (booking.tour || 'Tour').split('-')[0].trim();
+    // Build transfer content: tour date name coc/full (lowercase, no diacritics)
+    const cleanTour = normalizeVN((booking.tour || 'Tour').split('-')[0].trim());
     const cleanDate = (booking.date || '').replace(/\//g, '');
-    const cleanName = (booking.name || 'Khach').replace(/\s+/g, '');
+    const cleanName = normalizeVN(booking.name || 'khach');
     const payLabel = needsDeposit ? 'coc' : 'full';
     const transferContent = `${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
 
