@@ -308,7 +308,7 @@
                 <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Số tiền cọc cần thanh toán
                     </p>
-                    <div class="text-4xl font-black text-primary mb-2">1.000.000đ</div>
+                    <div class="text-4xl font-black text-primary mb-2" id="deposit-amount-display">1.000.000đ</div>
                     <p class="text-xs text-gray-500 italic mb-6">Vui lòng chuyển khoản để giữ chỗ</p>
 
                     <div
@@ -356,14 +356,14 @@
                         <span>Đang chờ thanh toán... Hệ thống sẽ tự động xác nhận</span>
                     </div>
 
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 mt-6">
                         <button type="button" onclick="nextStep(3)"
-                            class="w-1/3 bg-gray-100 text-gray-600 font-bold text-lg py-4 rounded-2xl hover:bg-gray-200 transition-all">
-                            Quay lại
+                            class="w-1/3 bg-gray-100 text-gray-600 font-bold text-sm py-4 rounded-xl hover:bg-gray-200 transition-all">
+                            Quay lại sửa
                         </button>
                         <button type="button" onclick="confirmTransfer()"
-                            class="flex-1 bg-green-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-green-600/30 hover:scale-[1.02] active:scale-95 transition-all">
-                            Xác nhận đã chuyển khoản
+                            class="flex-1 bg-green-600 text-white font-bold text-sm sm:text-lg py-4 rounded-xl shadow-lg shadow-green-600/30 hover:scale-[1.02] active:scale-95 transition-all">
+                            Hoàn Tất Đăng Ký
                         </button>
                     </div>
                 </div>
@@ -470,10 +470,14 @@
                     leadData.phone = data.phone || '';
                     leadData.tour = data.tour || '';
                     leadData.date = data.date || '';
+                    leadData.depositRequired = data.amountDue || 1000000;
+
                     document.getElementById('tour-name').value = leadData.tour;
                     document.getElementById('tour-date').value = leadData.date;
                     document.getElementById('cust-name').value = leadData.name;
                     document.getElementById('cust-phone').value = leadData.phone;
+                    document.getElementById('deposit-amount-display').textContent = (parseInt(leadData.depositRequired)).toLocaleString('vi-VN') + 'đ';
+
                     updateTransferContent();
                     updateDepositQR();
                 })
@@ -501,7 +505,8 @@
 
         // Generate Dynamic QR
         function updateDepositQR() {
-            const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=1000000&des=${encodeURIComponent(transferCode)}`;
+            const amount = leadData.depositRequired || 1000000;
+            const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=${amount}&des=${encodeURIComponent(transferCode)}`;
             const qrImg = document.getElementById('deposit-qr');
             if (qrImg) qrImg.src = qrUrl;
         }
@@ -544,11 +549,8 @@
                     const data = await res.json();
                     if (data.isPaid) {
                         clearInterval(depositPollInterval);
-                        // Auto-show success!
-                        document.getElementById('booking-form').classList.add('hidden');
-                        document.getElementById('success-section').classList.remove('hidden');
-                        showConfetti();
-                        window.scrollTo(0, 0);
+                        // Auto redirect to invoice
+                        window.location.href = `/invoice.html?id=${bId}`;
                     }
                 } catch (err) { console.warn('Poll error:', err); }
             }, 5000);
@@ -649,7 +651,8 @@
                 commitments: true,
 
                 // Step 4: Payment
-                deposit: 1000000,
+                deposit: 0,  // It's unpaid initially
+                depositRequired: leadData.depositRequired || 1000000,
                 totalPrice: (function () {
                     const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
                     const found = tours.find(t => t.name === leadData.tour);
@@ -686,7 +689,8 @@
                     total_price: bookingData.totalPrice,
                     sale_id: bookingData.saleId,
                     sale_name: bookingData.saleName,
-                    trekking_pole: bookingData.trekkingPole
+                    trekking_pole: bookingData.trekkingPole,
+                    deposit_required: bookingData.depositRequired
                 };
                 delete dbBooking.id; // Let DB generate Serial ID
                 delete dbBooking.createdAt;
