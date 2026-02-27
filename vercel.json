@@ -12,6 +12,10 @@
       "destination": "/pay.html?id=:id"
     },
     {
+      "source": "/api/sepay-webhook",
+      "destination": "/api/payment?action=webhook"
+    },
+    {
       "source": "/photo/:slug",
       "destination": "/api/photo?id=:slug"
     },
