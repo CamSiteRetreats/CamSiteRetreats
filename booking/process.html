@@ -475,6 +475,9 @@
 
                     updateTransferContent();
                     updateDepositQR();
+                    // Auto jump to Step 4 and start polling
+                    nextStep(4);
+                    startDepositPolling(bookingDbId);
                 })
                 .catch(err => console.warn('API load error:', err));
         }

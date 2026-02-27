@@ -286,7 +286,7 @@
         function showSuccess(data) {
             if (pollInterval) clearInterval(pollInterval);
             // Redirect to professional invoice page
-            window.location.href = `/invoice.html?id=${bookingId}`;
+            window.location.href = window.location.origin + `/invoice.html?id=${bookingId}`;
         }
 
         // Poll for payment status
@@ -324,7 +324,7 @@
 
                 // If fully paid, or deposit paid but nothing remaining, redirect straight to invoice
                 if (data.isFullyPaid || (data.isPaid && data.remaining <= 0)) {
-                    window.location.href = `/invoice.html?id=${bookingId}`;
+                    window.location.href = window.location.origin + `/invoice.html?id=${bookingId}`;
                     return;
                 }
 
