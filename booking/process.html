@@ -445,7 +445,7 @@
 
         // 1. Initial Logic — Load from URL params OR API
         const params = new URLSearchParams(window.location.search);
-        const bookingDbId = params.get('id'); // New: booking ID from DB
+        let bookingDbId = params.get('id'); // New: booking ID from DB
         const leadData = {
             id: params.get('leadId') || bookingDbId || Date.now(),
             name: params.get('name') || '',
