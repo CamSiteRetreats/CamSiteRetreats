@@ -1,0 +1,87 @@
+﻿[dotenv@17.3.1] injecting env (4) from .env -- tip: ΓÜí∩╕Å secrets for agents: https://dotenvx.com/as2
+node : (node:12156) Warning: SECURITY WARNING: 
+The SSL modes 'prefer', 'require', and 
+'verify-ca' are treated as aliases for 
+'verify-full'.
+At line:1 char:1
++ node scripts/debug-payment.js 2>&1 | Out-File 
+-FilePath "e:\UIUX\ui-u ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((nod 
+   e:12156) Wa... 'verify-full'.:String) [], Rem  
+  oteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+In the next major version (pg-connection-string 
+v3.0.0 and pg v9.0.0), these modes will adopt 
+standard libpq semantics, which have weaker 
+security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly 
+use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 
+'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-
+ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where 
+the warning was created)
+=== PAYMENT TRANSACTIONS ===
+Γ¥î NO transactions found! SePay webhook was NEVER called successfully.
+
+=== BOOKING #72 ===
+Name: "Kh├┤ng ra link", Tour: "T├á N─âng - Phan D┼⌐ng", Date: "07/03/2026"
+Status: "Chß╗¥ cß╗ìc", Deposit: 0, Total: 2690000
+
+=== MATCHING TEST ===
+Original: tanang 07032026 khongralink coc
+After regex: "tanang 07032026 khongralink coc"
+After removing spaces: "tanang07032026khongralinkcoc"
+
+Active bookings: 9
+
+  Booking #74: name="Nguyß╗àn Long Ph├ít" ΓåÆ cleaned="nguyß╗ànlongph├ít"
+    tour="Bidoup - T├á Giang" ΓåÆ cleaned="bidoup"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #73: name="Nguyß╗àn Thß╗ï Hß╗ông Nhung" ΓåÆ cleaned="nguyß╗ànthß╗ïhß╗ôngnhung"
+    tour="Bidoup - T├á Giang" ΓåÆ cleaned="bidoup"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #72: name="Kh├┤ng ra link" ΓåÆ cleaned="kh├┤ngralink"
+    tour="T├á N─âng - Phan D┼⌐ng" ΓåÆ cleaned="t├án─âng"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #68: name="Nguyß╗àn Ph├║c Gia H╞░ng" ΓåÆ cleaned="nguyß╗ànph├║cgiah╞░ng"
+    tour="T├á N─âng - Phan D┼⌐ng" ΓåÆ cleaned="t├án─âng"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #66: name="Ho├áng Phß╗º Ngß╗ìc Diß╗çp" ΓåÆ cleaned="ho├ángphß╗ºngß╗ìcdiß╗çp"
+    tour="T├á N─âng - Phan D┼⌐ng" ΓåÆ cleaned="t├án─âng"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #64: name="NGUYß╗äN THß╗è THU HO├ÇI" ΓåÆ cleaned="nguyß╗ànthß╗ïthuho├ái"
+    tour="T├á N─âng - Phan D┼⌐ng" ΓåÆ cleaned="t├án─âng"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #63: name="Trß║ºn Yß║┐n Linh" ΓåÆ cleaned="trß║ºnyß║┐nlinh"
+    tour="Bidoup - T├á Giang" ΓåÆ cleaned="bidoup"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #62: name="Nguyß╗àn Duy Phong" ΓåÆ cleaned="nguyß╗ànduyphong"
+    tour="Bidoup - T├á Giang" ΓåÆ cleaned="bidoup"
+    nameMatch=false, tourMatch=false
+    Would match: false
+
+  Booking #56: name="Ng├┤ Kim Long" ΓåÆ cleaned="ng├┤kimlong"
+    tour="Th├íc Li├¬ng ├Çi" ΓåÆ cleaned="th├ícli├¬ng├ái"
+    nameMatch=false, tourMatch=false
+    Would match: false

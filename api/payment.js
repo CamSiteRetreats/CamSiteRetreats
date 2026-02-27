@@ -131,7 +131,14 @@ async function handleSepayWebhook(req, res) {
     }
 
     // Match booking by transfer content
-    const searchText = (transferContent || description || '').toLowerCase().replace(/[^a-z0-9\s]/gi, '');
+    // Normalize: remove Vietnamese diacritics → lowercase → remove extra spaces
+    function normalizeVN(str) {
+        return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    const searchText = normalizeVN(transferContent || description || '');
+    const searchNoSpace = searchText.replace(/\s/g, '');
+    console.log('🔍 Normalized search:', searchText, '→', searchNoSpace);
 
     let matchedBooking = null;
     let paymentType = 'deposit';
@@ -140,18 +147,39 @@ async function handleSepayWebhook(req, res) {
         `SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc') ORDER BY created_at DESC`
     );
 
+    // Strategy 1: Try matching by booking ID in transfer content (e.g., "CSR72" or just "72")
     for (const booking of bookings) {
-        const bookingName = (booking.name || '').toLowerCase().replace(/\s+/g, '');
-        const bookingTour = (booking.tour || '').split('-')[0].trim().toLowerCase().replace(/\s+/g, '');
-
-        const nameMatch = bookingName.length >= 3 && searchText.replace(/\s/g, '').includes(bookingName);
-        const tourMatch = bookingTour.length >= 2 && searchText.replace(/\s/g, '').includes(bookingTour);
-
-        if (nameMatch || (tourMatch && bookingName.length >= 2)) {
+        const idStr = String(booking.id);
+        if (searchText.includes('csr' + idStr) || searchText.includes('id' + idStr)) {
             matchedBooking = booking;
-            paymentType = searchText.includes('full') ? 'full' : 'deposit';
             break;
         }
+    }
+
+    // Strategy 2: Match by customer name + tour name
+    if (!matchedBooking) {
+        for (const booking of bookings) {
+            const bookingName = normalizeVN(booking.name).replace(/\s/g, '');
+            const bookingTour = normalizeVN((booking.tour || '').split('-')[0].trim()).replace(/\s/g, '');
+
+            const nameMatch = bookingName.length >= 3 && searchNoSpace.includes(bookingName);
+            const tourMatch = bookingTour.length >= 2 && searchNoSpace.includes(bookingTour);
+
+            console.log(`  Check #${booking.id}: name="${bookingName}" tour="${bookingTour}" nameMatch=${nameMatch} tourMatch=${tourMatch}`);
+
+            if (nameMatch && tourMatch) {
+                matchedBooking = booking;
+                break;
+            } else if (nameMatch || tourMatch) {
+                matchedBooking = booking;
+                break;
+            }
+        }
+    }
+
+    // Determine payment type from transfer content
+    if (matchedBooking) {
+        paymentType = searchText.includes('full') ? 'full' : 'deposit';
     }
 
     // Save transaction
