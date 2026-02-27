@@ -245,7 +245,7 @@
         function startPolling(bId) {
             pollInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`../api/sepay-status?id=${bId}`);
+                    const res = await fetch(`../api/payment?action=status&id=${bId}`);
                     const data = await res.json();
                     if (data.isPaid) showSuccess();
                 } catch (err) { console.warn('Poll:', err); }
@@ -255,7 +255,7 @@
         // Load from API (new method)
         async function loadFromAPI(id) {
             try {
-                const res = await fetch(`../api/payment-link?id=${id}`);
+                const res = await fetch(`../api/payment?action=link&id=${id}`);
                 if (!res.ok) throw new Error('Not found');
                 const data = await res.json();
 

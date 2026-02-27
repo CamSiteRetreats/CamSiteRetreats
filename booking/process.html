@@ -463,7 +463,7 @@
 
         // If opened via ?id=XX, load data from API
         if (bookingDbId && !params.get('name')) {
-            fetch(`../api/payment-link?id=${bookingDbId}`)
+            fetch(`../api/payment?action=link&id=${bookingDbId}`)
                 .then(r => r.json())
                 .then(data => {
                     leadData.name = data.name || '';
@@ -537,7 +537,7 @@
             if (depositPollInterval) return;
             depositPollInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`../api/sepay-status?id=${bId}`);
+                    const res = await fetch(`../api/payment?action=status&id=${bId}`);
                     const data = await res.json();
                     if (data.isPaid) {
                         clearInterval(depositPollInterval);
