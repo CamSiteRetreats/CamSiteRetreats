@@ -68,6 +68,7 @@ async function handlePaymentLink(req, res) {
     const transferContent = `${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
 
     const isPaid = booking.status === 'Đã cọc' || booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành';
+    const isFullyPaid = booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành' || (totalPrice > 0 && deposit >= totalPrice);
 
     return res.status(200).json({
         id: booking.id,
@@ -83,7 +84,8 @@ async function handlePaymentLink(req, res) {
         depositRequired,
         paymentType,
         transferContent,
-        isPaid
+        isPaid,
+        isFullyPaid
     });
 }
 
@@ -211,27 +213,29 @@ async function handleSepayWebhook(req, res) {
         const currentStatus = matchedBooking.status;
         const totalPrice = parseInt(matchedBooking.total_price) || 0;
         const currentDeposit = parseInt(matchedBooking.deposit) || 0;
+        const depositReq = parseInt(matchedBooking.deposit_required) || 1000000;
 
         let newStatus = currentStatus;
-        let newDeposit = currentDeposit;
+        let newDeposit = currentDeposit + amount;
 
-        if (paymentType === 'deposit' && (currentStatus === 'Chờ cọc' || currentStatus === 'Chờ xác nhận cọc')) {
-            newStatus = 'Đã cọc';
-            newDeposit = amount;
-        } else if (paymentType === 'full' && currentStatus === 'Đã cọc') {
+        if (totalPrice > 0 && newDeposit >= totalPrice) {
             newStatus = 'Hoàn tất';
-            newDeposit = currentDeposit + amount;
-        } else if (amount >= totalPrice && totalPrice > 0) {
-            newStatus = 'Hoàn tất';
-            newDeposit = amount;
+        } else if (newDeposit >= depositReq) {
+            if (currentStatus === 'Chờ cọc' || currentStatus === 'Chờ xác nhận cọc') {
+                newStatus = 'Đã cọc';
+            }
         }
 
-        await db.query(
-            'UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3',
-            [newStatus, newDeposit, matchedBooking.id]
-        );
-
-        console.log(`✅ Booking #${matchedBooking.id}: ${currentStatus} → ${newStatus} (${amount.toLocaleString()}đ)`);
+        // Only update DB if something changed
+        if (newStatus !== currentStatus || newDeposit !== currentDeposit) {
+            await db.query(
+                'UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3',
+                [newStatus, newDeposit, matchedBooking.id]
+            );
+            console.log(`✅ Auto-updated Booking #${matchedBooking.id}: ${currentStatus} -> ${newStatus} (Paid: ${newDeposit})`);
+        } else {
+            console.log(`ℹ️ Booking #${matchedBooking.id} unchanged. Status: ${currentStatus}, Paid: ${newDeposit}`);
+        }
     } else {
         console.warn('⚠️ No matching booking for:', transferContent);
     }
@@ -261,10 +265,12 @@ async function handlePaymentStatus(req, res) {
     );
 
     const isPaid = status === 'Đã cọc' || status === 'Hoàn tất' || status === 'Hoàn thành';
+    const isFullyPaid = status === 'Hoàn tất' || status === 'Hoàn thành' || (parseInt(booking.total_price) > 0 && parseInt(booking.deposit) >= parseInt(booking.total_price));
     const latestTx = txRows[0] || null;
 
     return res.status(200).json({
         isPaid,
+        isFullyPaid,
         status,
         paidAmount: latestTx ? latestTx.amount : 0,
         paidAt: latestTx ? latestTx.created_at : null,

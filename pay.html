@@ -296,7 +296,9 @@
                     const res = await fetch(`/api/payment?action=status&id=${bookingId}`);
                     const data = await res.json();
 
-                    if (data.isPaid) {
+                    if (data.isFullyPaid) {
+                        showSuccess(data);
+                    } else if (data.isPaid && document.getElementById('payment-type-badge').textContent.includes('cọc')) {
                         showSuccess(data);
                     }
                 } catch (err) {
@@ -320,8 +322,8 @@
 
                 const data = await res.json();
 
-                // If already paid, redirect straight to invoice
-                if (data.isPaid) {
+                // If fully paid, or deposit paid but nothing remaining, redirect straight to invoice
+                if (data.isFullyPaid || (data.isPaid && data.remaining <= 0)) {
                     window.location.href = `/invoice.html?id=${bookingId}`;
                     return;
                 }
