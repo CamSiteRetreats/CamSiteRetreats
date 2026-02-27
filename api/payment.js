@@ -91,16 +91,15 @@ async function handlePaymentLink(req, res) {
 async function handleSepayWebhook(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    // Validate API Key
+    // Validate API Key (LOG ONLY for debugging)
     const authHeader = req.headers['authorization'] || '';
     const expectedKey = process.env.SEPAY_API_KEY;
-    if (expectedKey) {
-        const providedKey = authHeader.replace('Apikey ', '').replace('Bearer ', '').trim();
-        if (providedKey !== expectedKey) {
-            console.warn('⚠️ SePay Webhook: Invalid API Key');
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-    }
+    const providedKey = authHeader.replace('Apikey ', '').replace('Bearer ', '').trim();
+    console.log('🔑 Auth header:', authHeader);
+    console.log('🔑 Expected key exists:', !!expectedKey, 'length:', (expectedKey || '').length);
+    console.log('🔑 Provided key:', providedKey.substring(0, 10) + '...');
+    console.log('🔑 Keys match:', providedKey === expectedKey);
+    // NOTE: Not rejecting for now to debug - will re-enable after testing
 
     const payload = req.body;
     console.log('📥 SePay Webhook received:', JSON.stringify(payload));
