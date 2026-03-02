@@ -187,10 +187,10 @@ const BookingFlow = {
 
                                 <!-- Bank Details Transfer -->
                                 <div class="w-full space-y-3 bg-white p-4 rounded-xl border border-gray-100 mb-6">
-                                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition" onclick="BookingFlow.copyText('0819685878', 'Số tài khoản')">
+                                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition" onclick="BookingFlow.copyText('96249CAMSITERETREAT', 'Số tài khoản')">
                                         <div>
-                                            <p class="text-[10px] uppercase font-bold text-gray-400 mb-0.5">Số tài khoản (MB Bank)</p>
-                                            <p class="font-bold text-gray-800">0819685878</p>
+                                            <p class="text-[10px] uppercase font-bold text-gray-400 mb-0.5">Số tài khoản (BIDV)</p>
+                                            <p class="font-bold text-gray-800">96249CAMSITERETREAT</p>
                                         </div>
                                         <i data-lucide="copy" class="w-5 h-5 text-gray-400"></i>
                                     </div>

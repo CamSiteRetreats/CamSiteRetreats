@@ -260,7 +260,7 @@ const TourManager = {
                 image3: 'tour/liengai/7.png',
                 image4: 'tour/liengai/4.png',
                 region: 'Miền Nam',
-                type: 'CANYONING',
+                type: 'CANYONING | ZIPLINE',
                 duration: '2 Ngày 1 Đêm',
                 price: 3750000,
                 level: 'Trung Bình',
