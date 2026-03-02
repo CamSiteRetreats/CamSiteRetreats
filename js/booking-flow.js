@@ -204,7 +204,17 @@ const BookingFlow = {
                                     </div>
                                 </div>
 
-                                <button onclick="BookingFlow.completeBooking()" id="bf-btn-complete" class="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-primary/20">
+                                <!-- Terms and Policies (Step 3) -->
+                                <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex gap-3 items-start w-full text-left mb-6">
+                                    <div class="mt-0.5">
+                                        <input type="checkbox" id="bf-terms-step3" class="w-5 h-5 accent-primary cursor-pointer border-gray-300">
+                                    </div>
+                                    <label for="bf-terms-step3" class="text-[12px] text-gray-600 font-medium leading-relaxed cursor-pointer select-none">
+                                        Tôi đã đọc và đồng ý với <a href="../chinh-sach.html#an-toan" target="_blank" class="text-primary font-bold hover:underline">Quy định an toàn</a>, <a href="../chinh-sach.html#mien-tru" target="_blank" class="text-primary font-bold hover:underline">Miễn trừ trách nhiệm</a> và <a href="../chinh-sach.html#hoan-huy" target="_blank" class="text-primary font-bold hover:underline">Chính sách hủy/hoàn tour</a> của CAM SITE RETREATS.
+                                    </label>
+                                </div>
+
+                                <button onclick="BookingFlow.completeBooking()" id="bf-btn-complete" class="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-primary/20 opacity-50 cursor-not-allowed">
                                     Tôi Đã Chuyển Khoản
                                 </button>
                                 <p class="text-xs text-gray-400 font-medium italic mt-3 text-center">Chúng tôi sẽ kiểm tra và gửi xác nhận qua Email/Zalo của bạn sớm nhất.</p>
@@ -233,9 +243,19 @@ const BookingFlow = {
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Add event listener for checkbox
+        // Add event listener for checkbox in Step 2
         document.getElementById('bf-terms').addEventListener('change', function (e) {
             const btn = document.getElementById('bf-btn-confirm');
+            if (e.target.checked) {
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Add event listener for checkbox in Step 3
+        document.getElementById('bf-terms-step3').addEventListener('change', function (e) {
+            const btn = document.getElementById('bf-btn-complete');
             if (e.target.checked) {
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
@@ -263,6 +283,13 @@ const BookingFlow = {
         document.getElementById('bf-step-1-form').reset();
         document.getElementById('bf-terms').checked = false;
         document.getElementById('bf-btn-confirm').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('bf-terms-step3').checked = false;
+        document.getElementById('bf-btn-complete').classList.add('opacity-50', 'cursor-not-allowed');
+
+        if (this.depositPollInterval) {
+            clearInterval(this.depositPollInterval);
+            this.depositPollInterval = null;
+        }
 
         this.setStep(1);
     },
@@ -351,49 +378,29 @@ const BookingFlow = {
         }
     },
 
-    handleStep2Submit: function () {
+    handleStep2Submit: async function () {
         if (!document.getElementById('bf-terms').checked) return;
-        this.setStep(3);
-    },
 
-    renderPayment: function () {
-        const depositAmount = 1000000; // Fixed deposit 1M
-        const amountStr = TourManager.formatPrice(depositAmount);
-
-        document.getElementById('bf-deposit-amount').textContent = amountStr;
-
-        // Generate a pseudo-unique code based on phone
-        const bookingCode = `CAM ${this.bookingData.phone.slice(-4)} ${this.tourData.name.replace(/[^A-Za-z0-9]/g, '').substring(0, 4)}`;
-        document.getElementById('bf-transfer-content').textContent = bookingCode;
-
-        // Generate VietQR
-        const qrUrl = `https://img.vietqr.io/image/MB-0819685878-compact2.png?amount=${depositAmount}&addInfo=${encodeURIComponent(bookingCode)}&accountName=CAM%20SITE%20RETREATS`;
-
-        const qrContainer = document.getElementById('bf-qr-container');
-        qrContainer.innerHTML = `<img src="${qrUrl}" class="w-full h-full object-contain mix-blend-multiply" alt="QR Code">`;
-    },
-
-    copyText: function (text, type) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert(`Đã copy ${type}: ${text}`);
-        });
-    },
-
-    completeBooking: async function () {
-        const btn = document.getElementById('bf-btn-complete');
+        const btn = document.getElementById('bf-btn-confirm');
         const ogText = btn.innerText;
-        btn.innerText = 'ĐANG XỬ LÝ...';
+        btn.innerText = 'ĐANG TẠO ĐƠN...';
         btn.disabled = true;
 
         const payload = {
-            id: 'BKG-' + Date.now().toString().slice(-6),
+            name: this.bookingData.name,
+            phone: this.bookingData.phone,
             tour: this.tourData.name,
             date: this.selectedDate,
-            customerName: this.bookingData.name,
-            customerPhone: this.bookingData.phone,
-            status: "Chờ lấy CK",
-            amount: this.tourData.price ? this.tourData.price : 0,
-            note: `Ngày sinh: ${this.bookingData.dob} | CCCD: ${this.bookingData.idCard} | Giới tính: ${this.bookingData.gender} | Huy chương: ${this.bookingData.medalName} | Địa chỉ: ${this.bookingData.address} | Yêu cầu khác: ${this.bookingData.notes}`
+            total_price: this.tourData.price ? this.tourData.price : 3200000,
+            deposit_required: 1000000,
+            status: "Chờ xác nhận cọc",
+            dob: this.bookingData.dob,
+            id_card: this.bookingData.idCard,
+            address: this.bookingData.address,
+            medal_name: this.bookingData.medalName,
+            gender: this.bookingData.gender,
+            special: this.bookingData.notes,
+            commitments: true
         };
 
         try {
@@ -404,21 +411,108 @@ const BookingFlow = {
             });
 
             if (!res.ok) throw new Error('API Error');
+            const savedBooking = await res.json();
 
-            // Show Success
-            document.getElementById('bf-step-3-content').classList.add('hidden');
-            document.getElementById('bf-success-content').classList.remove('hidden');
-            document.getElementById('bf-success-name').textContent = this.bookingData.name;
+            // Save Real DB ID to generate Accurate SePay Code
+            this.bookingDbId = savedBooking.id;
 
-            // Hide stepper
-            document.querySelector('.x-stepper-container').classList.add('hidden');
-
+            btn.innerText = ogText;
+            btn.disabled = false;
+            this.setStep(3);
         } catch (error) {
             console.error('Error saving booking:', error);
-            alert('Có lỗi xảy ra, vui lòng thử lại.');
+            alert('Có lỗi xảy ra khi tạo đơn hàng, vui lòng thử lại.');
             btn.innerText = ogText;
             btn.disabled = false;
         }
+    },
+
+    renderPayment: function () {
+        const depositAmount = 1000000; // Fixed deposit 1M
+        const amountStr = TourManager.formatPrice(depositAmount);
+
+        document.getElementById('bf-deposit-amount').textContent = amountStr;
+
+        // Generate a pseudo-unique code based on DB ID to ensure SePay matching
+        function normalizeVN(str) {
+            return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
+        }
+        const cleanName = normalizeVN(this.bookingData.name || 'khach');
+        const cleanTour = normalizeVN((this.tourData.name || 'Tour').split('-')[0].trim());
+
+        // Format: CSR{id} {tour} {name} coc (This matches strategy 1 & 2 in SePay webhook)
+        const bookingCode = `CSR${this.bookingDbId} ${cleanTour} ${cleanName} coc`;
+        document.getElementById('bf-transfer-content').textContent = bookingCode;
+
+        // Generate SePay QR
+        const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=${depositAmount}&des=${encodeURIComponent(bookingCode)}`;
+
+        const qrContainer = document.getElementById('bf-qr-container');
+        qrContainer.innerHTML = `<img src="${qrUrl}" class="w-full h-full object-contain mix-blend-multiply" alt="QR Code">`;
+
+        // Add a listening indicator text
+        let oldWaiting = document.getElementById('bf-payment-listening');
+        if (!oldWaiting) {
+            const waitingHtml = `
+            <div id="bf-payment-listening" class="flex items-center justify-center gap-2 mb-4 text-xs font-medium text-green-600 animate-pulse bg-green-50 p-2 rounded-lg border border-green-100">
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
+                <span>Hệ thống đang chờ nhận tiền... (Tự động xác nhận)</span>
+            </div>`;
+            document.getElementById('bf-btn-complete').insertAdjacentHTML('beforebegin', waitingHtml);
+        }
+
+        this.startDepositPolling();
+    },
+
+    startDepositPolling: function () {
+        if (this.depositPollInterval) clearInterval(this.depositPollInterval);
+        if (!this.bookingDbId) return;
+
+        this.depositPollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`../api/payment?action=status&id=${this.bookingDbId}`);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                // If paid, auto redirect and stop
+                if (data.isPaid) {
+                    clearInterval(this.depositPollInterval);
+                    this.handlePaymentSuccess();
+                }
+            } catch (err) { console.warn('Poll error:', err); }
+        }, 5000);
+    },
+
+    handlePaymentSuccess: function () {
+        document.getElementById('bf-step-3-content').classList.add('hidden');
+        document.getElementById('bf-success-content').classList.remove('hidden');
+        document.getElementById('bf-success-name').textContent = this.bookingData.name;
+
+        // Hide stepper container safely
+        const stepper = document.getElementById('bf-progress-bar');
+        if (stepper && stepper.parentElement) {
+            stepper.parentElement.classList.add('hidden');
+        }
+    },
+
+    copyText: function (text, type) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`Đã copy ${type}: ${text}`);
+        });
+    },
+
+    completeBooking: async function () {
+        const btn = document.getElementById('bf-btn-complete');
+        btn.innerText = 'ĐANG XỬ LÝ...';
+        btn.disabled = true;
+
+        // Just stop polling and show success screen since booking is already in DB
+        if (this.depositPollInterval) clearInterval(this.depositPollInterval);
+
+        // Small delay to make it feel natural
+        setTimeout(() => {
+            this.handlePaymentSuccess();
+        }, 800);
     }
 };
 
