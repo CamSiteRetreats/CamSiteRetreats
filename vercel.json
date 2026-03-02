@@ -9,7 +9,7 @@
   "rewrites": [
     {
       "source": "/pay/:id",
-      "destination": "/pay.html?id=:id"
+      "destination": "/pay?id=:id"
     },
     {
       "source": "/api/sepay-webhook",
