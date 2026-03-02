@@ -178,7 +178,8 @@
                 thanh toán</p>
             <div class="text-4xl font-black text-primary mb-2" id="amount-due">0đ</div>
             <div id="payment-type-badge"
-                class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-primary mb-6">Tiền cọc
+                class="block w-fit mx-auto px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-primary mb-6">
+                Tiền cọc
             </div>
 
             <div
@@ -346,10 +347,10 @@
                 const badge = document.getElementById('payment-type-badge');
                 if (data.paymentType === 'deposit') {
                     badge.textContent = 'Tiền cọc giữ chỗ';
-                    badge.className = 'inline-block px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-primary mb-6';
+                    badge.className = 'block w-fit mx-auto px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-primary mb-6';
                 } else {
                     badge.textContent = 'Thanh toán phần còn lại';
-                    badge.className = 'inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-600 mb-6';
+                    badge.className = 'block w-fit mx-auto px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-600 mb-6';
                 }
 
                 // Transfer content
