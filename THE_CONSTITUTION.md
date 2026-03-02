@@ -23,3 +23,9 @@ Tuyệt đối tuân thủ, không được phép làm trái. Đây là cơ sở
   - Khi AI làm sai hoặc bị nhắc cấu trúc, AI **KHÔNG CHỈ** được phép xin lỗi hay sửa qua loa. 
   - AI bị **NGHIÊM CẤM TÁI PHẠM** sai lầm cũ bằng cách: Tự mở file `THE_CONSTITUTION.md` này ra và tự tay viết thêm "Điều Luật Cấm Tái Phạm" để biến lỗi lầm thành Quy Trình.
   - Lỗi sai hôm nay phải được ghi chép lại thành một bài học vĩnh cửu cho ngày mai.
+
+## Điều 4: Ngôn Ngữ Giao Tiếp (The Language Protocol)
+- **Yêu cầu từ User**: Hãy ghi nhớ thông tin này vào điều khoản, tất cả ngôn ngữ khi phản hồi với tôi phải là tiếng việt.
+- **LUẬT CHẾ TÀI VĨNH CỬU**:
+  - Mọi phản hồi, giải thích, thông báo, báo cáo, và giao tiếp (bao gồm cả khi chat qua `notify_user` hoặc tạo file `walkthrough.md`, `implementation_plan.md`) **TUYỆT ĐỐI 100% PHẢI LÀ TIẾNG VIỆT**.
+  - Không được dùng Tiếng Anh để trả lời hay giải thích hành động, ngoại trừ những từ vựng chuyên ngành hoặc code bắt buộc.
