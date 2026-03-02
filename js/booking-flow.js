@@ -214,10 +214,7 @@ const BookingFlow = {
                                     </label>
                                 </div>
 
-                                <button onclick="BookingFlow.completeBooking()" id="bf-btn-complete" class="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-primary/20 opacity-50 cursor-not-allowed">
-                                    Tôi Đã Chuyển Khoản
-                                </button>
-                                <p class="text-xs text-gray-400 font-medium italic mt-3 text-center">Chúng tôi sẽ kiểm tra và gửi xác nhận qua Email/Zalo của bạn sớm nhất.</p>
+                                <p class="text-xs text-gray-400 font-medium italic mt-3 text-center">Hệ thống sẽ tự động xác nhận và chuyển hướng khi nhận được thanh toán.</p>
                             </div>
                         </div>
 
@@ -253,15 +250,7 @@ const BookingFlow = {
             }
         });
 
-        // Add event listener for checkbox in Step 3
-        document.getElementById('bf-terms-step3').addEventListener('change', function (e) {
-            const btn = document.getElementById('bf-btn-complete');
-            if (e.target.checked) {
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        });
+        // Event listener for Step 3 removed since button is removed.
     },
 
     open: function (tourName, price, date) {
@@ -454,11 +443,11 @@ const BookingFlow = {
         let oldWaiting = document.getElementById('bf-payment-listening');
         if (!oldWaiting) {
             const waitingHtml = `
-            <div id="bf-payment-listening" class="flex items-center justify-center gap-2 mb-4 text-xs font-medium text-green-600 animate-pulse bg-green-50 p-2 rounded-lg border border-green-100">
+            <div id="bf-payment-listening" class="flex items-center justify-center gap-2 mb-4 mt-4 text-xs font-medium text-green-600 animate-pulse bg-green-50 p-2 rounded-lg border border-green-100 w-full">
                 <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
                 <span>Hệ thống đang chờ nhận tiền... (Tự động xác nhận)</span>
             </div>`;
-            document.getElementById('bf-btn-complete').insertAdjacentHTML('beforebegin', waitingHtml);
+            document.getElementById('bf-qr-container').insertAdjacentHTML('afterend', waitingHtml);
         }
 
         this.startDepositPolling();
@@ -484,15 +473,8 @@ const BookingFlow = {
     },
 
     handlePaymentSuccess: function () {
-        document.getElementById('bf-step-3-content').classList.add('hidden');
-        document.getElementById('bf-success-content').classList.remove('hidden');
-        document.getElementById('bf-success-name').textContent = this.bookingData.name;
-
-        // Hide stepper container safely
-        const stepper = document.getElementById('bf-progress-bar');
-        if (stepper && stepper.parentElement) {
-            stepper.parentElement.classList.add('hidden');
-        }
+        // Redirect completely to invoice layout
+        window.location.href = `/pay/${this.bookingDbId}`;
     },
 
     copyText: function (text, type) {
