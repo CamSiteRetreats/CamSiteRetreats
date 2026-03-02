@@ -236,7 +236,13 @@
 
         // Parse booking ID from URL
         const params = new URLSearchParams(window.location.search);
-        const bookingId = params.get('id');
+        let bookingId = params.get('id');
+
+        // Fallback for Vercel Clean URLs (e.g. /pay/103)
+        if (!bookingId && window.location.pathname.includes('/pay/')) {
+            const parts = window.location.pathname.split('/');
+            bookingId = parts[parts.length - 1]; // "103"
+        }
 
         let transferCode = '';
         let pollInterval = null;
