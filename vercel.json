@@ -14,6 +14,10 @@
       "destination": "/api/media?slug=:slug"
     },
     {
+      "source": "/admin",
+      "destination": "/admin/dist/index.html"
+    },
+    {
       "source": "/admin/assets/(.*)",
       "destination": "/admin/dist/assets/$1"
     },
