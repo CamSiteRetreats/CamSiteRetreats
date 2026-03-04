@@ -1,0 +1,5 @@
+netlify/
+scripts/
+.agent/
+test-results/
+.env
