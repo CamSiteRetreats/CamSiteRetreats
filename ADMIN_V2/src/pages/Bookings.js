@@ -26,7 +26,10 @@ export const render = () => {
                   <!-- Tab Navigation -->
                   <div class="border-b border-gray-200">
                       <nav class="-mb-px flex space-x-8" aria-label="Tabs" id="bookingTabsNav">
-                          <button data-tab="pending" class="tab-btn border-csr-orange text-csr-orange whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                          <button data-tab="consult" class="tab-btn border-csr-orange text-csr-orange whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                              Khách Hàng Tư Vấn
+                          </button>
+                          <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                               Khách Hàng Đăng Ký (Chờ Cọc)
                           </button>
                           <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -84,6 +87,15 @@ export const render = () => {
                          </select>
                          <select id="filterSale" class="input-field h-10 text-sm max-w-[150px]">
                              <option value="">Tất cả Sale</option>
+                         </select>
+                         <select id="filterStatus" class="input-field h-10 text-sm max-w-[170px]">
+                             <option value="">Tất cả Trạng Thái</option>
+                             <option value="Chờ tư vấn">Chờ tư vấn</option>
+                             <option value="Chờ cọc">Chờ cọc</option>
+                             <option value="Chờ xác nhận cọc">Chờ xác nhận cọc</option>
+                             <option value="Đã cọc">Đã cọc</option>
+                             <option value="Đã cọc (Chờ đi)">Đã cọc (Chờ đi)</option>
+                             <option value="Hoàn thành">Hoàn thành</option>
                          </select>
                      </div>
                      <button id="exportExcelBtn" class="bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors border border-green-200 shadow-sm h-10 whitespace-nowrap">
@@ -444,7 +456,7 @@ export const render = () => {
 
 export const afterRender = () => {
     let currentBookings = []; // Lưu trữ tạm thời trạng thái DB
-    let activeTab = 'pending'; // 'pending', 'upcoming', 'completed'
+    let activeTab = 'consult'; // 'consult', 'pending', 'upcoming', 'completed'
     let allTours = [];
     let allSchedules = [];
 
@@ -586,13 +598,17 @@ export const afterRender = () => {
         const filterTour = document.getElementById('filterTour') ? document.getElementById('filterTour').value : '';
         const filterDate = document.getElementById('filterDate') ? document.getElementById('filterDate').value : '';
         const filterSale = document.getElementById('filterSale') ? document.getElementById('filterSale').value : '';
+        const filterStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
 
         let filteredData = currentBookings.filter(b => {
-            // 1. Phân Trạng Thái theo Tab (Luồng mới 26/02)
+            // 1. Phân Trạng Thái theo Tab
             let tabMatch = false;
             const isFullyPaid = parseInt(b.total_price) > 0 && parseInt(b.total_price) === parseInt(b.deposit);
 
-            if (activeTab === 'pending') {
+            if (activeTab === 'consult') {
+                // Khách từ form tư vấn, chưa có sale nhận
+                tabMatch = b.status === 'Chờ tư vấn';
+            } else if (activeTab === 'pending') {
                 // Chỉ hiện các lead chưa điền form hoặc đơn chưa có hành động gì
                 tabMatch = !b.status || b.status === 'Chờ cọc';
             } else if (activeTab === 'upcoming') {
@@ -619,6 +635,9 @@ export const afterRender = () => {
                 if (!searchString.includes(searchTerm)) return false;
             }
 
+            // 6. Lọc Trạng Thái
+            if (filterStatus && b.status !== filterStatus) return false;
+
             return true;
         });
 
@@ -632,7 +651,26 @@ export const afterRender = () => {
 
         let totalCustomersCount = filteredData.length;
 
-        if (activeTab === 'pending') {
+        if (activeTab === 'consult') {
+            if (statTitle1) statTitle1.textContent = 'Tổng Leads Tư Vấn';
+            if (statTitle2) statTitle2.textContent = 'Chưa Có Sale Nhận';
+            if (statTitle3) statTitle3.textContent = 'Đã Có Sale Nhận';
+
+            let noSaleCount = 0;
+            let hasSaleCount = 0;
+
+            filteredData.forEach(b => {
+                if (!b.sale_id || b.sale_id === 'null' || !b.sale_name || b.sale_name === 'Website' || b.sale_name === 'null') {
+                    noSaleCount++;
+                } else {
+                    hasSaleCount++;
+                }
+            });
+
+            if (statTotalCustomers) statTotalCustomers.textContent = totalCustomersCount;
+            if (statTotalRevenue) statTotalRevenue.textContent = noSaleCount + ' Đơn';
+            if (statTotalCollected) statTotalCollected.textContent = hasSaleCount + ' Đơn';
+        } else if (activeTab === 'pending') {
             if (statTitle1) statTitle1.textContent = 'Tổng Khách (Chờ Cọc)';
             if (statTitle2) statTitle2.textContent = 'Khách Chưa Tư Vấn (Mới)';
             if (statTitle3) statTitle3.textContent = 'Đã Có Sale Giữ Chỗ';
@@ -693,7 +731,7 @@ export const afterRender = () => {
 
         const colSpan = isDetailView ? 8 : 4;
         if (!filteredData || filteredData.length === 0) {
-            let emptyMsg = activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : 'Danh sách rỗng.');
+            let emptyMsg = activeTab === 'consult' ? 'Chưa có khách hàng tư vấn nào.' : (activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : 'Danh sách rỗng.'));
             tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-gray-500">${emptyMsg}</td></tr>`;
             return;
         }
@@ -748,8 +786,17 @@ export const afterRender = () => {
                 </tr>
                 `;
             } else {
-                // =============== LAYOUT 4 CỘT CHỜ CỌC ===============
+                // =============== LAYOUT 4 CỘT CHỜ CỌC / TƯ VẤN ===============
                 const avtChar = b.name ? b.name.substring(0, 2).toUpperCase() : 'KH';
+                // Nút Nhận khách cho tab Tư Vấn
+                const isConsultTab = activeTab === 'consult';
+                const hasNoSale = !b.sale_id || b.sale_id === 'null' || !b.sale_name || b.sale_name === 'null';
+                let saleCell = '';
+                if (isConsultTab && hasNoSale) {
+                    saleCell = `<button class="action-btn claim-btn bg-csr-orange hover:bg-[#d65503] text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">Nhận khách</button>`;
+                } else {
+                    saleCell = `<span class="text-sm text-gray-500">${b.sale_name || 'Website'}</span>`;
+                }
                 return `
                 <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
                     <td class="p-4 align-top">
@@ -765,10 +812,11 @@ export const afterRender = () => {
                         </div>
                     </td>
                     <td class="p-4 align-top">
-                        <div class="text-sm text-gray-600">${b.tour}</div>
-                        <div class="text-xs text-gray-500 mt-1">Lịch: ${b.date}</div>
+                        <div class="text-sm text-gray-600">${b.tour || '(Chưa rõ)'}</div>
+                        <div class="text-xs text-gray-500 mt-1">Lịch: ${b.date || '(Chưa chọn)'}</div>
+                        ${isConsultTab && b.special ? `<div class="text-xs text-blue-500 mt-1 italic">💬 ${b.special}</div>` : ''}
                     </td>
-                    <td class="p-4 align-top text-sm text-gray-500">${b.sale_name || 'Website'}</td>
+                    <td class="p-4 align-top">${saleCell}</td>
                     <td class="p-4 align-top text-right">
                         <div class="flex flex-col gap-1.5 items-end">
                             <button class="action-btn process-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">Copy link Process</button>
@@ -778,6 +826,53 @@ export const afterRender = () => {
                 `;
             }
         }).join('');
+
+        // --- Event: Nút "Nhận khách" trong tab Tư Vấn ---
+        document.querySelectorAll('.claim-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Ngăn row click
+                const bookingId = btn.getAttribute('data-id');
+                const userStr = localStorage.getItem('csr_user');
+                let saleId = null, saleName = 'Admin';
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    saleId = user.id;
+                    saleName = user.fullName || user.full_name || 'Admin';
+                }
+
+                btn.textContent = 'Đang xử lý...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/bookings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: bookingId,
+                            sale_id: saleId,
+                            sale_name: saleName
+                        })
+                    });
+                    if (res.ok) {
+                        // Cập nhật local data
+                        const updated = currentBookings.find(b => b.id == bookingId);
+                        if (updated) {
+                            updated.sale_id = saleId;
+                            updated.sale_name = saleName;
+                        }
+                        renderTable();
+                    } else {
+                        alert('Lỗi khi nhận khách. Vui lòng thử lại.');
+                        btn.textContent = 'Nhận khách';
+                        btn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Lỗi nhận khách:', err);
+                    btn.textContent = 'Nhận khách';
+                    btn.disabled = false;
+                }
+            });
+        });
     };
 
     // Xây dựng Dropdown Bộ Lọc từ Data Thực Tế
@@ -839,7 +934,7 @@ export const afterRender = () => {
     loadBookings();
 
     // Event Listener cho các thẻ Filter
-    ['filterSearch', 'filterTour', 'filterDate', 'filterSale'].forEach(id => {
+    ['filterSearch', 'filterTour', 'filterDate', 'filterSale', 'filterStatus'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             if (id === 'filterSearch') el.addEventListener('input', renderTable);
@@ -1463,12 +1558,12 @@ export const afterRender = () => {
                 const medalName = document.getElementById('addMedalName') ? document.getElementById('addMedalName').value : '';
 
                 // Lấy profile Sale hiện tại
-                const userSessionStr = localStorage.getItem('csr_admin_session');
+                const userSessionStr = localStorage.getItem('csr_user');
                 let sale_id = null; let sale_name = 'Admin';
                 if (userSessionStr) {
                     const session = JSON.parse(userSessionStr);
                     sale_id = session.id;
-                    sale_name = session.full_name;
+                    sale_name = session.fullName || session.full_name || 'Admin';
                 }
 
                 const editingId = document.getElementById('editingBookingId') ? document.getElementById('editingBookingId').value : '';

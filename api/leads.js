@@ -47,6 +47,26 @@ module.exports = async (req, res) => {
                 const { rows } = await db.query(query, values);
                 const newLead = rows[0];
 
+                // --- Tạo booking tương ứng để hiện trong trang Đơn Hàng (Sale) ---
+                let newBooking = null;
+                if (newLead) {
+                    try {
+                        const bookingQuery = `
+                            INSERT INTO bookings (name, phone, tour, date, status, total_price, deposit, sale_id, sale_name, special)
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                            RETURNING *;
+                        `;
+                        const bookingValues = [
+                            newLead.name, newLead.phone, newLead.tour ?? null, newLead.date ?? null,
+                            'Chờ tư vấn', 0, 0, null, null, newLead.message ?? null
+                        ];
+                        const bookingResult = await db.query(bookingQuery, bookingValues);
+                        newBooking = bookingResult.rows[0];
+                    } catch (bookingErr) {
+                        console.error('Lỗi tạo booking từ lead:', bookingErr);
+                    }
+                }
+
                 // --- Send Email Notification ---
                 let mailStatus = null;
                 if (newLead) {
@@ -68,7 +88,7 @@ module.exports = async (req, res) => {
                     });
                 }
 
-                return res.status(201).json({ ...newLead, _mailStatus: mailStatus });
+                return res.status(201).json({ ...newLead, _mailStatus: mailStatus, _bookingId: newBooking?.id });
             }
         }
 
