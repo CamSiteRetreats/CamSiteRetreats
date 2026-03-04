@@ -257,6 +257,9 @@ const BookingFlow = {
         this.init(); // Ensure modal exists
 
         this.tourData = { name: tourName, price: price };
+
+        // Strip ISO timestamp if present (e.g. "2026-04-05T00:00:00.000Z" -> "2026-04-05")
+        if (date && date.includes('T')) date = date.split('T')[0];
         this.selectedDate = date;
 
         const displayDate = date.includes('-') && date.split('-').length === 3

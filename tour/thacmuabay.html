@@ -1175,7 +1175,8 @@
                         formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
                     }
 
-                    const clickAction = isClickable ? `onclick="selectDate(this, '${item.startDate}')"` : '';
+                    let safeStart = (item.startDate || '').includes('T') ? item.startDate.split('T')[0] : item.startDate;
+                    const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
 
                     const scheduleHTML = `
                         <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}"
