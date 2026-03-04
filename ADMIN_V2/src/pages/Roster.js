@@ -273,23 +273,43 @@ export const afterRender = async () => {
     };
 
     // --- 3. Data Fetching & Rendering ---
-    const toYMD = (d) => {
-        if (!d) return '';
-        // Strip time part if ISO
+    // Robust date parser: handles "5/4 - 5/4", "05/04/2026", "2026-04-05", "5/4", etc.
+    const extractDayMonth = (d) => {
+        if (!d) return null;
+        // Nếu là range "D/M - D/M" hoặc "DD/MM - DD/MM", lấy phần đầu
+        if (d.includes(' - ')) d = d.split(' - ')[0].trim();
+        // Strip ISO timestamp
         if (d.includes('T')) d = d.split('T')[0];
         const parts = d.split(/[-/.]/);
-        if (parts.length !== 3) return d;
-        let day, month, year;
-        if (parts[0].length === 4) {
-            [year, month, day] = parts;
-        } else {
-            [day, month, year] = parts;
+        if (parts.length === 2) {
+            // Format "D/M" — không có năm
+            return { day: parseInt(parts[0]), month: parseInt(parts[1]), year: null };
         }
-        return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        if (parts.length === 3) {
+            if (parts[0].length === 4) {
+                // YYYY-MM-DD
+                return { day: parseInt(parts[2]), month: parseInt(parts[1]), year: parseInt(parts[0]) };
+            } else {
+                // DD/MM/YYYY
+                return { day: parseInt(parts[0]), month: parseInt(parts[1]), year: parseInt(parts[2]) };
+            }
+        }
+        return null;
     };
 
-    // Target date in YYYY-MM-DD for robust comparison
-    const targetYMD = toYMD(targetDateStr);
+    // Parse targetDate (luôn có năm, format YYYY-MM-DD từ Schedules)
+    const targetParsed = extractDayMonth(targetDateStr);
+
+    const dateMatches = (bookingDate) => {
+        if (!targetParsed) return true; // Không filter nếu target không hợp lệ
+        const bp = extractDayMonth(bookingDate);
+        if (!bp) return false;
+        // So sánh ngày + tháng
+        if (bp.day !== targetParsed.day || bp.month !== targetParsed.month) return false;
+        // Nếu booking có năm, so sánh năm; nếu không có năm thì chấp nhận (match D/M)
+        if (bp.year && targetParsed.year && bp.year !== targetParsed.year) return false;
+        return true;
+    };
 
     const loadData = async () => {
         try {
@@ -297,13 +317,14 @@ export const afterRender = async () => {
             const data = await res.json();
 
             // Debug log
-            console.log('[Roster] targetTour:', targetTour, 'targetDateStr:', targetDateStr, 'targetYMD:', targetYMD);
+            console.log('[Roster] targetTour:', targetTour, 'targetDateStr:', targetDateStr, 'targetParsed:', targetParsed);
             console.log('[Roster] Total bookings:', data.length);
             if (data.length > 0) {
-                console.log('[Roster] Sample booking:', { tour: data[0].tour, date: data[0].date, status: data[0].status });
+                const samples = data.filter(b => b.tour && b.tour.includes('Liêng')).slice(0, 3);
+                samples.forEach(s => console.log('[Roster] Sample Liêng:', { tour: s.tour, date: s.date, parsed: extractDayMonth(s.date) }));
             }
 
-            // Lọc theo Tour và Ngày (so sánh linh hoạt nhiều format)
+            // Lọc theo Tour và Ngày (so sánh linh hoạt: range, no-year, chuẩn)
             allBookings = data.filter(b => {
                 let mTour = true, mDate = true;
                 if (targetTour) {
@@ -312,9 +333,7 @@ export const afterRender = async () => {
                     mTour = (normB === normT || normB.includes(normT) || normT.includes(normB));
                 }
                 if (targetDateStr) {
-                    // So sánh bằng YYYY-MM-DD (normalize cả 2 bên)
-                    const bookingYMD = toYMD(b.date);
-                    mDate = (bookingYMD === targetYMD);
+                    mDate = dateMatches(b.date);
                 }
                 return mTour && mDate;
             });
