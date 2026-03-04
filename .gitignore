@@ -9,6 +9,7 @@ npm-debug.log
 
 # Build Artifacts
 dist/
+!admin/dist/
 build/
 
 # IDE Settings
