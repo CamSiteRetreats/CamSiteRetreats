@@ -1,4 +1,4 @@
-const db = require('./_db');
+const db = require('../utils/db');
 const crypto = require('crypto'); // Dummy token generator for now
 
 module.exports = async (req, res) => {

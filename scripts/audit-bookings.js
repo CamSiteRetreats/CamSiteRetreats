@@ -1,11 +1,11 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function auditBookings() {
     try {
-        console.log('--- 🛡️ Bắt đầu kiểm tra dữ liệu đơn hàng ---');
+        console.log('--- ðŸ›¡ï¸ Báº¯t Ä‘áº§u kiá»ƒm tra dá»¯ liá»‡u Ä‘Æ¡n hÃ ng ---');
 
-        // Lấy toàn bộ đơn hàng để phân tích
+        // Láº¥y toÃ n bá»™ Ä‘Æ¡n hÃ ng Ä‘á»ƒ phÃ¢n tÃ­ch
         const { rows } = await db.query(`
             SELECT id, name, phone, tour, date, status, id_card, address, dob, gender, customer_id, created_at
             FROM bookings 
@@ -13,33 +13,33 @@ async function auditBookings() {
             LIMIT 100
         `);
 
-        console.log(`Kiểm tra ${rows.length} đơn hàng gần nhất...\n`);
+        console.log(`Kiá»ƒm tra ${rows.length} Ä‘Æ¡n hÃ ng gáº§n nháº¥t...\n`);
 
         let missingInfoCount = 0;
         rows.forEach(b => {
             const missingFields = [];
-            if (!b.name) missingFields.push('Họ Tên');
-            if (!b.phone) missingFields.push('SĐT');
+            if (!b.name) missingFields.push('Há» TÃªn');
+            if (!b.phone) missingFields.push('SÄT');
             if (!b.tour) missingFields.push('Tour');
-            if (!b.date) missingFields.push('Ngày');
+            if (!b.date) missingFields.push('NgÃ y');
             if (!b.id_card && !b.cccd) missingFields.push('CCCD');
-            if (!b.address) missingFields.push('Địa chỉ');
-            if (!b.dob) missingFields.push('Ngày sinh');
-            if (!b.gender) missingFields.push('Giới tính');
+            if (!b.address) missingFields.push('Äá»‹a chá»‰');
+            if (!b.dob) missingFields.push('NgÃ y sinh');
+            if (!b.gender) missingFields.push('Giá»›i tÃ­nh');
 
             if (missingFields.length > 0) {
                 missingInfoCount++;
-                console.log(`❌ ID: ${b.id} | Khách: ${b.name || 'N/A'} | SĐT: ${b.phone || 'N/A'}`);
-                console.log(`   Thiếu: ${missingFields.join(', ')}`);
+                console.log(`âŒ ID: ${b.id} | KhÃ¡ch: ${b.name || 'N/A'} | SÄT: ${b.phone || 'N/A'}`);
+                console.log(`   Thiáº¿u: ${missingFields.join(', ')}`);
                 console.log(`   Status: ${b.status} | Created: ${b.created_at}`);
                 console.log('-----------------------------------');
             }
         });
 
-        console.log(`\nTổng kết: Có ${missingInfoCount} đơn hàng bị thiếu thông tin.`);
+        console.log(`\nTá»•ng káº¿t: CÃ³ ${missingInfoCount} Ä‘Æ¡n hÃ ng bá»‹ thiáº¿u thÃ´ng tin.`);
 
     } catch (err) {
-        console.error('❌ Lỗi:', err);
+        console.error('âŒ Lá»—i:', err);
     } finally {
         process.exit(0);
     }

@@ -1,9 +1,9 @@
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function updateBidoupTour() {
     const tourId = 11;
     const updateData = {
-        name: 'Bidoup - Tà Giang',
+        name: 'Bidoup - TÃ  Giang',
         image: 'tour/Bidoup/bdtg (5).jpg',
         image2: 'tour/Bidoup/bdtg (7).jpg',
         image3: 'tour/Bidoup/bdtg (2).jpg',
@@ -28,7 +28,7 @@ async function updateBidoupTour() {
         const { rows } = await db.query(query, values);
 
         if (rows.length > 0) {
-            console.log('SUCCESS: Updated Bidoup Tà Giang (ID 11).');
+            console.log('SUCCESS: Updated Bidoup TÃ  Giang (ID 11).');
             console.log('New data:', rows[0]);
         } else {
             console.log('ERROR: Tour ID 11 not found.');

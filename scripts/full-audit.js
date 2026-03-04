@@ -1,16 +1,16 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function fullAudit() {
     try {
-        console.log('--- 🛡️ Toàn bộ kiểm tra dữ liệu hệ thống ---');
+        console.log('--- ðŸ›¡ï¸ ToÃ n bá»™ kiá»ƒm tra dá»¯ liá»‡u há»‡ thá»‘ng ---');
 
         const { rows } = await db.query(`
             SELECT id, name, phone, tour, date, status, id_card, address, dob, gender, customer_id
             FROM bookings
         `);
 
-        console.log(`Kiểm tra tổng cộng ${rows.length} đơn hàng...`);
+        console.log(`Kiá»ƒm tra tá»•ng cá»™ng ${rows.length} Ä‘Æ¡n hÃ ng...`);
 
         const stats = {
             total: rows.length,
@@ -36,10 +36,10 @@ async function fullAudit() {
             if (!b.id_card) { stats.no_id_card++; incomplete = true; missing.push('id_card'); }
             if (!b.address) { stats.no_address++; incomplete = true; missing.push('address'); }
             if (!b.dob) { stats.no_dob++; incomplete = true; missing.push('dob'); }
-            if (!b.gender || b.gender === 'Khác') { stats.no_gender++; incomplete = true; missing.push('gender'); }
+            if (!b.gender || b.gender === 'KhÃ¡c') { stats.no_gender++; incomplete = true; missing.push('gender'); }
             if (!b.tour) { stats.no_tour++; incomplete = true; missing.push('tour'); }
-            if (!b.diet || b.diet === 'Bình Thường') { stats.no_diet++; } // This is often default, so maybe not "missing"
-            if (!b.trekking_pole || b.trekking_pole === 'Không') { stats.no_trekking_pole++; }
+            if (!b.diet || b.diet === 'BÃ¬nh ThÆ°á»ng') { stats.no_diet++; } // This is often default, so maybe not "missing"
+            if (!b.trekking_pole || b.trekking_pole === 'KhÃ´ng') { stats.no_trekking_pole++; }
             if (!b.customer_id) { stats.no_customer_id++; incomplete = true; missing.push('customer_id'); }
 
             if (incomplete) {
@@ -53,12 +53,12 @@ async function fullAudit() {
             }
         });
 
-        console.log('\nThống kê trường dữ liệu trống hoặc mặc định:');
+        console.log('\nThá»‘ng kÃª trÆ°á»ng dá»¯ liá»‡u trá»‘ng hoáº·c máº·c Ä‘á»‹nh:');
         console.log(JSON.stringify(stats, null, 2));
 
         if (missingDetails.length > 0) {
-            console.log(`\nTìm thấy ${missingDetails.length} đơn hàng có thông tin chưa đầy đủ.`);
-            console.log('5 đơn hàng mới nhất bị thiếu:');
+            console.log(`\nTÃ¬m tháº¥y ${missingDetails.length} Ä‘Æ¡n hÃ ng cÃ³ thÃ´ng tin chÆ°a Ä‘áº§y Ä‘á»§.`);
+            console.log('5 Ä‘Æ¡n hÃ ng má»›i nháº¥t bá»‹ thiáº¿u:');
             console.log(JSON.stringify(missingDetails.slice(0, 5), null, 2));
         }
 

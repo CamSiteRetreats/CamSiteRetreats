@@ -1,4 +1,4 @@
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function run() {
     try {

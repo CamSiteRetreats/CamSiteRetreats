@@ -1,11 +1,11 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 (async () => {
     try {
         console.log('Adding commission_rate to tours table...');
-        // Thêm cột commission_rate kiểu NUMERIC mặc định 5 (%)
+        // ThÃªm cá»™t commission_rate kiá»ƒu NUMERIC máº·c Ä‘á»‹nh 5 (%)
         await db.query(`
             ALTER TABLE tours 
             ADD COLUMN IF NOT EXISTS commission_rate NUMERIC DEFAULT 5

@@ -1,18 +1,18 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function updateLoyalty() {
     try {
-        console.log('--- 🎖️ Cập nhật hạng thành viên CRM ---');
+        console.log('--- ðŸŽ–ï¸ Cáº­p nháº­t háº¡ng thÃ nh viÃªn CRM ---');
 
         const { rows: customers } = await db.query("SELECT id, phone, full_name FROM crm_customers");
         const { rows: bookings } = await db.query("SELECT phone, status FROM bookings");
 
         let updatedCount = 0;
         for (const c of customers) {
-            // Đếm số tour đã Hoàn thành
+            // Äáº¿m sá»‘ tour Ä‘Ã£ HoÃ n thÃ nh
             const completedTours = bookings.filter(b =>
-                b.phone === c.phone && (b.status === 'Hoàn thành' || b.status === 'Đã đi' || b.status === 'Đã hoàn thành')
+                b.phone === c.phone && (b.status === 'HoÃ n thÃ nh' || b.status === 'ÄÃ£ Ä‘i' || b.status === 'ÄÃ£ hoÃ n thÃ nh')
             ).length;
 
             const tier = completedTours >= 3 ? 'VIP' : 'Member';
@@ -24,12 +24,12 @@ async function updateLoyalty() {
             `, [completedTours, tier, c.id]);
 
             if (completedTours > 0) {
-                console.log(`✅ ${c.full_name}: ${completedTours} tour -> ${tier}`);
+                console.log(`âœ… ${c.full_name}: ${completedTours} tour -> ${tier}`);
                 updatedCount++;
             }
         }
 
-        console.log(`\n🎉 Đã cập nhật hạng thành viên cho ${updatedCount} khách hàng.`);
+        console.log(`\nðŸŽ‰ ÄÃ£ cáº­p nháº­t háº¡ng thÃ nh viÃªn cho ${updatedCount} khÃ¡ch hÃ ng.`);
 
     } catch (err) {
         console.error(err);

@@ -1,4 +1,4 @@
-const db = require('./_db');
+const db = require('../utils/db');
 
 module.exports = async (req, res) => {
     // Enable CORS for V2 Admin

@@ -1,9 +1,9 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function searchWider() {
     try {
-        console.log('--- Wider Search for Bidoup/Tà Giang ---');
+        console.log('--- Wider Search for Bidoup/TÃ  Giang ---');
         // Search for anything containing "Bidoup" or "Giang"
         const { rows } = await db.query(
             "SELECT id, name, tour, date, status FROM bookings WHERE (tour ILIKE '%Bidoup%' OR tour ILIKE '%Giang%') AND (date LIKE '%03/2026%') ORDER BY created_at DESC"

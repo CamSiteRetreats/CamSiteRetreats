@@ -1,5 +1,5 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function check() {
     try {
@@ -11,14 +11,14 @@ async function check() {
                OR dob IS NULL 
                OR customer_id IS NULL OR customer_id = ''
         `);
-        console.log(`Tìm thấy ${rows.length} đơn hàng bị thiếu trường dữ liệu:`);
+        console.log(`TÃ¬m tháº¥y ${rows.length} Ä‘Æ¡n hÃ ng bá»‹ thiáº¿u trÆ°á»ng dá»¯ liá»‡u:`);
         rows.forEach(r => {
             const missing = [];
             if (!r.id_card) missing.push('CCCD');
-            if (!r.address) missing.push('Địa chỉ');
-            if (!r.dob) missing.push('Ngày sinh');
-            if (!r.customer_id) missing.push('Mã CSR');
-            console.log(`- ID: ${r.id} | Khách: ${r.name} | SĐT: ${r.phone} | Thiếu: ${missing.join(', ')}`);
+            if (!r.address) missing.push('Äá»‹a chá»‰');
+            if (!r.dob) missing.push('NgÃ y sinh');
+            if (!r.customer_id) missing.push('MÃ£ CSR');
+            console.log(`- ID: ${r.id} | KhÃ¡ch: ${r.name} | SÄT: ${r.phone} | Thiáº¿u: ${missing.join(', ')}`);
         });
     } catch (err) {
         console.error(err);

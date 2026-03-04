@@ -17,7 +17,7 @@ app.use(express.static(__dirname));
 // Load dynamic serverless functions from /api folder
 const apiPath = path.join(__dirname, 'api');
 fs.readdirSync(apiPath).forEach(file => {
-    if (file.endsWith('.js') && file !== '_db.js' && file !== 'setup_v2_db.js') {
+    if (file.endsWith('.js')) {
         const route = file.replace('.js', '');
         app.all(`/api/${route}`, async (req, res) => {
             try {
@@ -37,5 +37,5 @@ fs.readdirSync(apiPath).forEach(file => {
 
 app.listen(PORT, () => {
     console.log(`🚀 DEV BACKEND SERVER đang chạy tại: http://localhost:${PORT}`);
-    console.log(`Các API khả dụng bao gồm /api/auth_v2,...`);
+    console.log(`Các API khả dụng bao gồm /api/auth,...`);
 });

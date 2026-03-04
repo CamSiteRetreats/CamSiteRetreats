@@ -1,4 +1,4 @@
-const db = require('./_db');
+const db = require('../utils/db');
 
 module.exports = async (req, res) => {
     const { method } = req;

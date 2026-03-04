@@ -1,22 +1,22 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function auditCRM() {
     try {
-        console.log('--- 🔍 Kiểm tra hồ sơ CRM ---');
+        console.log('--- ðŸ” Kiá»ƒm tra há»“ sÆ¡ CRM ---');
 
-        // 1. Tìm các khách hàng trong CRM bị thiếu CCCD, Ngày sinh, hoặc Giới tính
+        // 1. TÃ¬m cÃ¡c khÃ¡ch hÃ ng trong CRM bá»‹ thiáº¿u CCCD, NgÃ y sinh, hoáº·c Giá»›i tÃ­nh
         const { rows: customers } = await db.query(`
             SELECT id, csr_code, full_name, phone, cccd, dob, gender
             FROM crm_customers
             WHERE cccd IS NULL OR cccd = ''
                OR dob IS NULL
-               OR gender IS NULL OR gender = 'Khác'
+               OR gender IS NULL OR gender = 'KhÃ¡c'
         `);
 
-        console.log(`Tìm thấy ${customers.length} hồ sơ CRM bị thiếu thông tin.`);
+        console.log(`TÃ¬m tháº¥y ${customers.length} há»“ sÆ¡ CRM bá»‹ thiáº¿u thÃ´ng tin.`);
 
-        // 2. Với mỗi khách hàng hồ sơ rỗng, thử tìm xem trong bảng Bookings có "đắp" vào được không
+        // 2. Vá»›i má»—i khÃ¡ch hÃ ng há»“ sÆ¡ rá»—ng, thá»­ tÃ¬m xem trong báº£ng Bookings cÃ³ "Ä‘áº¯p" vÃ o Ä‘Æ°á»£c khÃ´ng
         for (const c of customers) {
             const { rows: bData } = await db.query(`
                 SELECT id_card, dob, gender, address FROM bookings 
@@ -30,7 +30,7 @@ async function auditCRM() {
                 const updates = {};
                 if (!c.cccd && b.id_card) updates.cccd = b.id_card;
                 if (!c.dob && b.dob) updates.dob = b.dob;
-                if ((!c.gender || c.gender === 'Khác') && b.gender && b.gender !== 'Khác') updates.gender = b.gender;
+                if ((!c.gender || c.gender === 'KhÃ¡c') && b.gender && b.gender !== 'KhÃ¡c') updates.gender = b.gender;
 
                 if (Object.keys(updates).length > 0) {
                     const fields = Object.keys(updates);
@@ -38,10 +38,10 @@ async function auditCRM() {
                     const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
                     values.push(c.id);
                     await db.query(`UPDATE crm_customers SET ${setClause}, updated_at = NOW() WHERE id = $${values.length}`, values);
-                    console.log(`✅ Đã khôi phục CRM ID:${c.id} (${c.full_name}) từ Booking -> ${fields.join(', ')}`);
+                    console.log(`âœ… ÄÃ£ khÃ´i phá»¥c CRM ID:${c.id} (${c.full_name}) tá»« Booking -> ${fields.join(', ')}`);
                 }
             } else {
-                console.log(`⚠️ CRM ID:${c.id} (${c.full_name}) không tìm thấy dữ liệu bổ sung trong Bookings.`);
+                console.log(`âš ï¸ CRM ID:${c.id} (${c.full_name}) khÃ´ng tÃ¬m tháº¥y dá»¯ liá»‡u bá»• sung trong Bookings.`);
             }
         }
     } catch (err) {

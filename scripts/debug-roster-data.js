@@ -1,11 +1,11 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function debugRosterData() {
     try {
-        console.log('--- Debugging Bidoup Tà Giang Bookings ---');
+        console.log('--- Debugging Bidoup TÃ  Giang Bookings ---');
 
-        // 1. Check all bookings for Bidoup Tà Giang
+        // 1. Check all bookings for Bidoup TÃ  Giang
         const { rows: allBidoup } = await db.query(
             "SELECT id, name, tour, date, status FROM bookings WHERE tour ILIKE '%Bidoup%' ORDER BY date DESC"
         );

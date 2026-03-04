@@ -1,5 +1,5 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 async function checkBooking() {
     try {
         const { rows } = await db.query('SELECT id, status, deposit, total_price, deposit_required, customer_id FROM bookings WHERE id = 72');

@@ -71,7 +71,7 @@ export const afterRender = () => {
 
         try {
             // Vite Proxy Server sẽ tự động forward route /api tới Backend 8889
-            const apiUrl = '/api/auth_v2';
+            const apiUrl = '/api/auth?role=admin';
 
             const response = await fetch(apiUrl, {
                 method: 'POST',

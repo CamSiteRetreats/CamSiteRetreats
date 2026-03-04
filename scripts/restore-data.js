@@ -1,15 +1,15 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function restoreData() {
     try {
-        console.log('--- 🚀 Bắt đầu khôi phục dữ liệu từ Database & CRM ---');
+        console.log('--- ðŸš€ Báº¯t Ä‘áº§u khÃ´i phá»¥c dá»¯ liá»‡u tá»« Database & CRM ---');
 
-        // 1. Lấy toàn bộ Bookings và CRM
+        // 1. Láº¥y toÃ n bá»™ Bookings vÃ  CRM
         const { rows: bookings } = await db.query("SELECT * FROM bookings ORDER BY created_at DESC");
         const { rows: customers } = await db.query("SELECT * FROM crm_customers");
 
-        console.log(`Đang phân tích ${bookings.length} đơn hàng và ${customers.length} hồ sơ CRM...`);
+        console.log(`Äang phÃ¢n tÃ­ch ${bookings.length} Ä‘Æ¡n hÃ ng vÃ  ${customers.length} há»“ sÆ¡ CRM...`);
 
         let updatedCount = 0;
 
@@ -17,22 +17,22 @@ async function restoreData() {
             let needsUpdate = false;
             const updates = {};
 
-            // Tìm thông tin từ CRM dựa trên SĐT
+            // TÃ¬m thÃ´ng tin tá»« CRM dá»±a trÃªn SÄT
             const customer = customers.find(c => c.phone === b.phone);
 
-            // Tìm thông tin từ các Booking khác của cùng SĐT (để lấy Address chẳng hạn)
+            // TÃ¬m thÃ´ng tin tá»« cÃ¡c Booking khÃ¡c cá»§a cÃ¹ng SÄT (Ä‘á»ƒ láº¥y Address cháº³ng háº¡n)
             const otherBookings = bookings.filter(ob => ob.phone === b.phone && ob.id !== b.id);
             const bookingWithAddress = otherBookings.find(ob => ob.address && ob.address.trim().length > 0);
             const bookingWithID = otherBookings.find(ob => ob.id_card && ob.id_card.trim().length > 0);
             const bookingWithDOB = otherBookings.find(ob => ob.dob);
 
-            // --- Khôi phục Customer ID ---
+            // --- KhÃ´i phá»¥c Customer ID ---
             if (!b.customer_id && customer) {
                 updates.customer_id = customer.csr_code;
                 needsUpdate = true;
             }
 
-            // --- Khôi phục CCCD ---
+            // --- KhÃ´i phá»¥c CCCD ---
             if (!b.id_card || b.id_card.trim() === '') {
                 const sourceCCCD = (customer && customer.cccd) || (bookingWithID && bookingWithID.id_card);
                 if (sourceCCCD) {
@@ -41,7 +41,7 @@ async function restoreData() {
                 }
             }
 
-            // --- Khôi phục Địa chỉ (CRM ko có nên lấy từ Booking khác) ---
+            // --- KhÃ´i phá»¥c Äá»‹a chá»‰ (CRM ko cÃ³ nÃªn láº¥y tá»« Booking khÃ¡c) ---
             if (!b.address || b.address.trim() === '') {
                 if (bookingWithAddress) {
                     updates.address = bookingWithAddress.address;
@@ -49,7 +49,7 @@ async function restoreData() {
                 }
             }
 
-            // --- Khôi phục Ngày sinh ---
+            // --- KhÃ´i phá»¥c NgÃ y sinh ---
             if (!b.dob) {
                 const sourceDOB = (customer && customer.dob) || (bookingWithDOB && bookingWithDOB.dob);
                 if (sourceDOB) {
@@ -58,18 +58,18 @@ async function restoreData() {
                 }
             }
 
-            // --- Khôi phục Giới tính ---
-            if (!b.gender || b.gender === 'Khác') {
-                const sourceGender = (customer && customer.gender && customer.gender !== 'Khác') ? customer.gender : null;
+            // --- KhÃ´i phá»¥c Giá»›i tÃ­nh ---
+            if (!b.gender || b.gender === 'KhÃ¡c') {
+                const sourceGender = (customer && customer.gender && customer.gender !== 'KhÃ¡c') ? customer.gender : null;
                 if (sourceGender) {
                     updates.gender = sourceGender;
                     needsUpdate = true;
                 }
             }
 
-            // --- Khôi phục Ăn uống / Dị ứng ---
-            if (!b.diet || b.diet === 'Không' || b.diet === 'Bình Thường') {
-                if (customer && customer.dietary && customer.dietary !== 'Bình Thường' && customer.dietary !== 'Không') {
+            // --- KhÃ´i phá»¥c Ä‚n uá»‘ng / Dá»‹ á»©ng ---
+            if (!b.diet || b.diet === 'KhÃ´ng' || b.diet === 'BÃ¬nh ThÆ°á»ng') {
+                if (customer && customer.dietary && customer.dietary !== 'BÃ¬nh ThÆ°á»ng' && customer.dietary !== 'KhÃ´ng') {
                     updates.diet = customer.dietary;
                     needsUpdate = true;
                 }
@@ -88,15 +88,15 @@ async function restoreData() {
                 values.push(b.id);
 
                 await db.query(`UPDATE bookings SET ${setClause} WHERE id = $${values.length}`, values);
-                console.log(`✅ Đã cập nhật ID:${b.id} (${b.name}) -> ${fields.join(', ')}`);
+                console.log(`âœ… ÄÃ£ cáº­p nháº­t ID:${b.id} (${b.name}) -> ${fields.join(', ')}`);
                 updatedCount++;
             }
         }
 
-        console.log(`\n🎉 Xong! Đã khôi phục thông tin cho ${updatedCount} đơn hàng.`);
+        console.log(`\nðŸŽ‰ Xong! ÄÃ£ khÃ´i phá»¥c thÃ´ng tin cho ${updatedCount} Ä‘Æ¡n hÃ ng.`);
 
     } catch (err) {
-        console.error('❌ Lỗi:', err);
+        console.error('âŒ Lá»—i:', err);
     } finally {
         process.exit(0);
     }

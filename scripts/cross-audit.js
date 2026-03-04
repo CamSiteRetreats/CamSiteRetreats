@@ -1,11 +1,11 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function crossAudit() {
     try {
-        console.log('--- 🔍 Kiểm tra khớp nối dữ liệu Booking & CRM ---');
+        console.log('--- ðŸ” Kiá»ƒm tra khá»›p ná»‘i dá»¯ liá»‡u Booking & CRM ---');
 
-        // Lấy các đơn hàng có mã khách hàng nhưng thiếu thông tin chi tiết
+        // Láº¥y cÃ¡c Ä‘Æ¡n hÃ ng cÃ³ mÃ£ khÃ¡ch hÃ ng nhÆ°ng thiáº¿u thÃ´ng tin chi tiáº¿t
         const { rows: bookings } = await db.query(`
             SELECT b.id, b.name, b.phone, b.customer_id, b.id_card, b.address, b.dob, b.gender,
                    c.cccd as crm_cccd, c.address as crm_address, c.dob as crm_dob, c.gender as crm_gender
@@ -16,13 +16,13 @@ async function crossAudit() {
                OR (b.dob IS NULL)
         `);
 
-        console.log(`Tìm thấy ${bookings.length} đơn hàng có thể khôi phục dữ liệu từ CRM.`);
+        console.log(`TÃ¬m tháº¥y ${bookings.length} Ä‘Æ¡n hÃ ng cÃ³ thá»ƒ khÃ´i phá»¥c dá»¯ liá»‡u tá»« CRM.`);
 
         bookings.forEach(b => {
-            console.log(`ID: ${b.id} | Khách: ${b.name} | Mã: ${b.customer_id}`);
-            if (!b.id_card && b.crm_cccd) console.log(`   -> Sẽ khôi phục CCCD: ${b.crm_cccd}`);
-            if (!b.address && b.crm_address) console.log(`   -> Sẽ khôi phục Địa chỉ: ${b.crm_address}`);
-            if (!b.dob && b.crm_dob) console.log(`   -> Sẽ khôi phục Ngày sinh: ${b.crm_dob}`);
+            console.log(`ID: ${b.id} | KhÃ¡ch: ${b.name} | MÃ£: ${b.customer_id}`);
+            if (!b.id_card && b.crm_cccd) console.log(`   -> Sáº½ khÃ´i phá»¥c CCCD: ${b.crm_cccd}`);
+            if (!b.address && b.crm_address) console.log(`   -> Sáº½ khÃ´i phá»¥c Äá»‹a chá»‰: ${b.crm_address}`);
+            if (!b.dob && b.crm_dob) console.log(`   -> Sáº½ khÃ´i phá»¥c NgÃ y sinh: ${b.crm_dob}`);
         });
 
     } catch (err) {

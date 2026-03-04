@@ -1,23 +1,23 @@
-const db = require('../api/_db.js');
+const db = require('../utils/db.js');
 
 async function migrateUsers() {
     try {
-        console.log('Bắt đầu đồng bộ user từ bảng users sang admins...');
+        console.log('Báº¯t Ä‘áº§u Ä‘á»“ng bá»™ user tá»« báº£ng users sang admins...');
 
-        // Lấy tất cả user nội bộ (sale/admin) từ bảng cũ
+        // Láº¥y táº¥t cáº£ user ná»™i bá»™ (sale/admin) tá»« báº£ng cÅ©
         const oldUsersRes = await db.query("SELECT * FROM users WHERE role IN ('admin', 'sale')");
         const oldUsers = oldUsersRes.rows;
 
         if (oldUsers.length === 0) {
-            console.log('Không có user nội bộ nào trong bảng cũ cần đồng bộ.');
+            console.log('KhÃ´ng cÃ³ user ná»™i bá»™ nÃ o trong báº£ng cÅ© cáº§n Ä‘á»“ng bá»™.');
             return;
         }
 
-        console.log(`Tìm thấy ${oldUsers.length} tài khoản trong bảng cũ.`);
+        console.log(`TÃ¬m tháº¥y ${oldUsers.length} tÃ i khoáº£n trong báº£ng cÅ©.`);
 
         let count = 0;
         for (const user of oldUsers) {
-            // Kiểm tra xem username đã có trong bảng admins chưa
+            // Kiá»ƒm tra xem username Ä‘Ã£ cÃ³ trong báº£ng admins chÆ°a
             const check = await db.query("SELECT id FROM admins WHERE username = $1", [user.username]);
             if (check.rows.length === 0) {
                 // Insert
@@ -36,15 +36,15 @@ async function migrateUsers() {
                     user.created_at || new Date()
                 ]);
                 count++;
-                console.log(`- Đã thêm: ${user.username}`);
+                console.log(`- ÄÃ£ thÃªm: ${user.username}`);
             } else {
-                console.log(`- Bỏ qua: ${user.username} (Đã tồn tại)`);
+                console.log(`- Bá» qua: ${user.username} (ÄÃ£ tá»“n táº¡i)`);
             }
         }
 
-        console.log(`✅ Đồng bộ hoàn tất! (Thêm mới ${count} tài khoản)`);
+        console.log(`âœ… Äá»“ng bá»™ hoÃ n táº¥t! (ThÃªm má»›i ${count} tÃ i khoáº£n)`);
     } catch (e) {
-        console.error('❌ Lỗi đồng bộ:', e);
+        console.error('âŒ Lá»—i Ä‘á»“ng bá»™:', e);
     } finally {
         process.exit();
     }

@@ -1,6 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 (async () => {
     const { rows } = await db.query('SELECT id, name, status, total_price, deposit FROM bookings ORDER BY created_at DESC LIMIT 20');

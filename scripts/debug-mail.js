@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { sendEmail } = require('../api/_mail');
+const { sendEmail } = require('../utils/mail');
 
 async function testMail() {
     const adminEmail = process.env.ADMIN_EMAIL || 'chuyencaiom@gmail.com';
@@ -9,15 +9,15 @@ async function testMail() {
     try {
         const result = await sendEmail({
             to: adminEmail,
-            subject: '🔍 Test Email Notification - Cam Site Retreats',
+            subject: 'ðŸ” Test Email Notification - Cam Site Retreats',
             html: `
                 <div style="font-family: sans-serif; padding: 20px; border: 1px solid #E85D04; border-radius: 10px;">
-                    <h2 style="color: #E85D04;">Hệ thống kiểm tra Email</h2>
-                    <p>Chào anh Phước,</p>
-                    <p>Đây là email kiểm tra tính năng thông báo từ hệ thống CAM SITE RETREATS.</p>
-                    <p>Thời gian gửi: ${new Date().toLocaleString('vi-VN')}</p>
+                    <h2 style="color: #E85D04;">Há»‡ thá»‘ng kiá»ƒm tra Email</h2>
+                    <p>ChÃ o anh PhÆ°á»›c,</p>
+                    <p>ÄÃ¢y lÃ  email kiá»ƒm tra tÃ­nh nÄƒng thÃ´ng bÃ¡o tá»« há»‡ thá»‘ng CAM SITE RETREATS.</p>
+                    <p>Thá»i gian gá»­i: ${new Date().toLocaleString('vi-VN')}</p>
                     <hr>
-                    <p style="font-size: 12px; color: #999;">Nếu anh nhận được mail này, có nghĩa là Resend API vẫn đang hoạt động bình thường.</p>
+                    <p style="font-size: 12px; color: #999;">Náº¿u anh nháº­n Ä‘Æ°á»£c mail nÃ y, cÃ³ nghÄ©a lÃ  Resend API váº«n Ä‘ang hoáº¡t Ä‘á»™ng bÃ¬nh thÆ°á»ng.</p>
                 </div>
             `
         });
@@ -27,11 +27,11 @@ async function testMail() {
         console.error('Failed to send email:');
         console.error(error.message);
         if (error.message.includes('401')) {
-            console.error('>>> Error 401: API Key không hợp lệ hoặc đã hết hạn.');
+            console.error('>>> Error 401: API Key khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n.');
         } else if (error.message.includes('403')) {
-            console.error('>>> Error 403: Tên miền chưa được xác thực hoặc bị Resend chặn.');
+            console.error('>>> Error 403: TÃªn miá»n chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c hoáº·c bá»‹ Resend cháº·n.');
         } else if (error.message.includes('422')) {
-            console.error('>>> Error 422: Dữ liệu gửi đi không hợp lệ (kiểm tra email người nhận).');
+            console.error('>>> Error 422: Dá»¯ liá»‡u gá»­i Ä‘i khÃ´ng há»£p lá»‡ (kiá»ƒm tra email ngÆ°á»i nháº­n).');
         }
     }
 }

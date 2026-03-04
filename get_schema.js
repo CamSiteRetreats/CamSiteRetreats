@@ -1,4 +1,4 @@
-const db = require('./api/_db');
+const db = require('./utils/db');
 const tables = ['tours', 'bookings', 'leads', 'schedules', 'users'];
 async function run() {
     try {

@@ -1,4 +1,4 @@
-const db = require('./_db');
+const db = require('../utils/db');
 
 // Helper: remove Vietnamese diacritics → lowercase ASCII
 function normalizeVN(str) {

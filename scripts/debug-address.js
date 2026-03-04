@@ -1,10 +1,10 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 (async () => {
     // Test: search for a customer and check if address comes from booking
-    const phone = '0972927281'; // Huỳnh Sơn Tùng
+    const phone = '0972927281'; // Huá»³nh SÆ¡n TÃ¹ng
 
     console.log('=== CRM DATA ===');
     const crm = await db.query('SELECT * FROM crm_customers WHERE phone = $1', [phone]);

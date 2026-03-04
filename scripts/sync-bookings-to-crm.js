@@ -1,18 +1,18 @@
 /**
- * Script: Đồng bộ khách hàng từ bảng bookings sang bảng crm_customers
- * - Query tất cả bookings (DISTINCT theo phone)
- * - Upsert vào crm_customers (dựa trên phone)
- * - Tạo mã #CSR + 6 số cho khách chưa có mã
+ * Script: Äá»“ng bá»™ khÃ¡ch hÃ ng tá»« báº£ng bookings sang báº£ng crm_customers
+ * - Query táº¥t cáº£ bookings (DISTINCT theo phone)
+ * - Upsert vÃ o crm_customers (dá»±a trÃªn phone)
+ * - Táº¡o mÃ£ #CSR + 6 sá»‘ cho khÃ¡ch chÆ°a cÃ³ mÃ£
  * 
- * Chạy: node scripts/sync-bookings-to-crm.js
+ * Cháº¡y: node scripts/sync-bookings-to-crm.js
  */
 
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function syncBookingsToCRM() {
-    console.log('🔄 Bắt đầu đồng bộ khách hàng từ Bookings → CRM...\n');
+    console.log('ðŸ”„ Báº¯t Ä‘áº§u Ä‘á»“ng bá»™ khÃ¡ch hÃ ng tá»« Bookings â†’ CRM...\n');
 
     try {
         // Bookings schema: name, phone, dob, gender, id_card, address, diet, allergy, special
@@ -25,7 +25,7 @@ async function syncBookingsToCRM() {
             ORDER BY phone, created_at DESC
         `);
 
-        console.log(`📋 Tìm thấy ${bookings.length} khách hàng duy nhất (theo SĐT) trong bảng bookings.\n`);
+        console.log(`ðŸ“‹ TÃ¬m tháº¥y ${bookings.length} khÃ¡ch hÃ ng duy nháº¥t (theo SÄT) trong báº£ng bookings.\n`);
 
         let created = 0;
         let updated = 0;
@@ -35,7 +35,7 @@ async function syncBookingsToCRM() {
             try {
                 const check = await db.query('SELECT id, csr_code FROM crm_customers WHERE phone = $1', [b.phone]);
 
-                // Map booking fields → CRM fields
+                // Map booking fields â†’ CRM fields
                 const medicalNotes = [b.allergy, b.special].filter(Boolean).join('; ') || null;
 
                 if (check.rows.length > 0) {
@@ -60,7 +60,7 @@ async function syncBookingsToCRM() {
                         existing.id
                     ]);
 
-                    console.log(`  ✏️  Cập nhật: ${b.name} (${b.phone}) → Mã: ${existing.csr_code}`);
+                    console.log(`  âœï¸  Cáº­p nháº­t: ${b.name} (${b.phone}) â†’ MÃ£: ${existing.csr_code}`);
                     updated++;
                 } else {
                     const randNum = Math.floor(100000 + Math.random() * 900000);
@@ -80,36 +80,36 @@ async function syncBookingsToCRM() {
                         b.diet || null
                     ]);
 
-                    console.log(`  ✅ Tạo mới: ${b.name} (${b.phone}) → Mã: ${csrCode}`);
+                    console.log(`  âœ… Táº¡o má»›i: ${b.name} (${b.phone}) â†’ MÃ£: ${csrCode}`);
                     created++;
                 }
             } catch (innerErr) {
-                console.error(`  ❌ Lỗi với ${b.name} (${b.phone}):`, innerErr.message);
+                console.error(`  âŒ Lá»—i vá»›i ${b.name} (${b.phone}):`, innerErr.message);
                 skipped++;
             }
         }
 
         console.log('\n' + '='.repeat(60));
-        console.log(`🎉 Hoàn tất đồng bộ!`);
-        console.log(`   ✅ Tạo mới: ${created} khách hàng`);
-        console.log(`   ✏️  Cập nhật: ${updated} khách hàng`);
-        console.log(`   ❌ Bỏ qua: ${skipped} khách hàng`);
+        console.log(`ðŸŽ‰ HoÃ n táº¥t Ä‘á»“ng bá»™!`);
+        console.log(`   âœ… Táº¡o má»›i: ${created} khÃ¡ch hÃ ng`);
+        console.log(`   âœï¸  Cáº­p nháº­t: ${updated} khÃ¡ch hÃ ng`);
+        console.log(`   âŒ Bá» qua: ${skipped} khÃ¡ch hÃ ng`);
         console.log('='.repeat(60));
 
-        // In bảng tổng kết
+        // In báº£ng tá»•ng káº¿t
         const { rows: allCustomers } = await db.query('SELECT csr_code, full_name, phone, loyalty_tier FROM crm_customers ORDER BY created_at DESC');
-        console.log('\n📊 Danh sách CRM hiện tại:');
-        console.log('─'.repeat(70));
-        console.log(`${'Mã CSR'.padEnd(14)} | ${'Họ Tên'.padEnd(25)} | ${'SĐT'.padEnd(14)} | Tier`);
-        console.log('─'.repeat(70));
+        console.log('\nðŸ“Š Danh sÃ¡ch CRM hiá»‡n táº¡i:');
+        console.log('â”€'.repeat(70));
+        console.log(`${'MÃ£ CSR'.padEnd(14)} | ${'Há» TÃªn'.padEnd(25)} | ${'SÄT'.padEnd(14)} | Tier`);
+        console.log('â”€'.repeat(70));
         allCustomers.forEach(c => {
             console.log(`${(c.csr_code || '').padEnd(14)} | ${(c.full_name || '').padEnd(25)} | ${(c.phone || '').padEnd(14)} | ${c.loyalty_tier || 'New'}`);
         });
-        console.log('─'.repeat(70));
-        console.log(`Tổng: ${allCustomers.length} khách hàng trong CRM\n`);
+        console.log('â”€'.repeat(70));
+        console.log(`Tá»•ng: ${allCustomers.length} khÃ¡ch hÃ ng trong CRM\n`);
 
     } catch (error) {
-        console.error('❌ Lỗi nghiêm trọng:', error);
+        console.error('âŒ Lá»—i nghiÃªm trá»ng:', error);
     } finally {
         process.exit(0);
     }

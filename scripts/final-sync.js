@@ -1,15 +1,15 @@
 require('dotenv').config();
-const db = require('../api/_db');
+const db = require('../utils/db');
 
 async function finalSync() {
     try {
-        console.log('--- 🔄 THỰC HIỆN ĐỒNG BỘ TOÀN DIỆN HỆ THỐNG ---');
+        console.log('--- ðŸ”„ THá»°C HIá»†N Äá»’NG Bá»˜ TOÃ€N DIá»†N Há»† THá»NG ---');
 
-        // 1. Lấy Data
+        // 1. Láº¥y Data
         const { rows: bookings } = await db.query("SELECT * FROM bookings ORDER BY created_at DESC");
         const { rows: customers } = await db.query("SELECT * FROM crm_customers");
 
-        console.log(`Phân tích ${bookings.length} đơn hàng...`);
+        console.log(`PhÃ¢n tÃ­ch ${bookings.length} Ä‘Æ¡n hÃ ng...`);
 
         let newCrmCount = 0;
         let updatedBookingCount = 0;
@@ -18,7 +18,7 @@ async function finalSync() {
             let customerId = b.customer_id;
             let currentCustomer = customers.find(c => c.phone === b.phone);
 
-            // A. Nếu chưa có trong CRM -> Tạo mới
+            // A. Náº¿u chÆ°a cÃ³ trong CRM -> Táº¡o má»›i
             if (!currentCustomer) {
                 const csrCode = '#CSR' + Math.floor(Math.random() * 900000 + 100000);
                 const { rows: newC } = await db.query(`
@@ -27,22 +27,22 @@ async function finalSync() {
                     RETURNING *
                 `, [
                     csrCode, b.name, b.phone, b.id_card || '', b.dob || null,
-                    b.gender || 'Khác', b.allergy || '', b.diet || '', 'Member'
+                    b.gender || 'KhÃ¡c', b.allergy || '', b.diet || '', 'Member'
                 ]);
                 currentCustomer = newC[0];
-                customers.push(currentCustomer); // Thêm vào danh sách tạm để check cho các booking sau
-                console.log(`✨ Đã tạo hồ sơ CRM mới cho ${b.name} (${b.phone}) -> ${csrCode}`);
+                customers.push(currentCustomer); // ThÃªm vÃ o danh sÃ¡ch táº¡m Ä‘á»ƒ check cho cÃ¡c booking sau
+                console.log(`âœ¨ ÄÃ£ táº¡o há»“ sÆ¡ CRM má»›i cho ${b.name} (${b.phone}) -> ${csrCode}`);
                 newCrmCount++;
             }
 
-            // B. Đảm bảo Booking có đúng Customer ID
+            // B. Äáº£m báº£o Booking cÃ³ Ä‘Ãºng Customer ID
             if (b.customer_id !== currentCustomer.csr_code) {
                 await db.query("UPDATE bookings SET customer_id = $1 WHERE id = $2", [currentCustomer.csr_code, b.id]);
                 b.customer_id = currentCustomer.csr_code;
                 updatedBookingCount++;
             }
 
-            // C. Sync thông tin chi tiết (Lấy từ Booking đắp sang CRM nếu CRM rỗng, và ngược lại)
+            // C. Sync thÃ´ng tin chi tiáº¿t (Láº¥y tá»« Booking Ä‘áº¯p sang CRM náº¿u CRM rá»—ng, vÃ  ngÆ°á»£c láº¡i)
             if (currentCustomer) {
                 let cUpdateNeeded = false;
                 const cUpdates = {};
@@ -50,7 +50,7 @@ async function finalSync() {
                 // Book -> CRM
                 if (!currentCustomer.cccd && b.id_card) { cUpdates.cccd = b.id_card; cUpdateNeeded = true; }
                 if (!currentCustomer.dob && b.dob) { cUpdates.dob = b.dob; cUpdateNeeded = true; }
-                if ((!currentCustomer.gender || currentCustomer.gender === 'Khác') && b.gender && b.gender !== 'Khác') { cUpdates.gender = b.gender; cUpdateNeeded = true; }
+                if ((!currentCustomer.gender || currentCustomer.gender === 'KhÃ¡c') && b.gender && b.gender !== 'KhÃ¡c') { cUpdates.gender = b.gender; cUpdateNeeded = true; }
 
                 if (cUpdateNeeded) {
                     const fields = Object.keys(cUpdates);
@@ -58,7 +58,7 @@ async function finalSync() {
                     const clause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
                     values.push(currentCustomer.id);
                     await db.query(`UPDATE crm_customers SET ${clause}, updated_at = NOW() WHERE id = $${values.length}`, values);
-                    // Cập nhật lại list tạm
+                    // Cáº­p nháº­t láº¡i list táº¡m
                     Object.assign(currentCustomer, cUpdates);
                 }
 
@@ -67,7 +67,7 @@ async function finalSync() {
                 const bUpdates = {};
                 if (!b.id_card && currentCustomer.cccd) { bUpdates.id_card = currentCustomer.cccd; bUpdateNeeded = true; }
                 if (!b.dob && currentCustomer.dob) { bUpdates.dob = currentCustomer.dob; bUpdateNeeded = true; }
-                if ((!b.gender || b.gender === 'Khác') && currentCustomer.gender && currentCustomer.gender !== 'Khác') { bUpdates.gender = currentCustomer.gender; bUpdateNeeded = true; }
+                if ((!b.gender || b.gender === 'KhÃ¡c') && currentCustomer.gender && currentCustomer.gender !== 'KhÃ¡c') { bUpdates.gender = currentCustomer.gender; bUpdateNeeded = true; }
 
                 if (bUpdateNeeded) {
                     const fields = Object.keys(bUpdates);
@@ -80,9 +80,9 @@ async function finalSync() {
             }
         }
 
-        console.log(`\n✅ HOÀN THÀNH:`);
-        console.log(`- Đã tạo mới ${newCrmCount} hồ sơ CRM.`);
-        console.log(`- Đã cập nhật/khôi phục ${updatedBookingCount} lượt dữ liệu đơn hàng.`);
+        console.log(`\nâœ… HOÃ€N THÃ€NH:`);
+        console.log(`- ÄÃ£ táº¡o má»›i ${newCrmCount} há»“ sÆ¡ CRM.`);
+        console.log(`- ÄÃ£ cáº­p nháº­t/khÃ´i phá»¥c ${updatedBookingCount} lÆ°á»£t dá»¯ liá»‡u Ä‘Æ¡n hÃ ng.`);
 
     } catch (err) {
         console.error(err);

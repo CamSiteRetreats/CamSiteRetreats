@@ -1,5 +1,5 @@
-const db = require('./_db');
-const { sendEmail } = require('./_mail');
+const db = require('../utils/db');
+const { sendEmail } = require('../utils/mail');
 
 module.exports = async (req, res) => {
     const { method } = req;
