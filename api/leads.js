@@ -30,7 +30,10 @@ module.exports = async (req, res) => {
                     WHERE id=$10
                     RETURNING *;
                 `;
-                const values = [name, phone, tour, date, message, status, sale_id, sale_name, sale_avatar, id];
+                const values = [
+                    name ?? null, phone ?? null, tour ?? null, date ?? null, message ?? null,
+                    status ?? null, sale_id ?? null, sale_name ?? null, sale_avatar ?? null, id
+                ];
                 const { rows } = await db.query(query, values);
                 return res.status(200).json(rows[0]);
             } else {
@@ -40,7 +43,7 @@ module.exports = async (req, res) => {
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                     RETURNING *;
                 `;
-                const values = [name, phone, tour, date, message, status || 'Mới', sale_id, sale_name, sale_avatar];
+                const values = [name ?? null, phone ?? null, tour ?? null, date ?? null, message ?? null, status ?? 'Mới', sale_id ?? null, sale_name ?? null, sale_avatar ?? null];
                 const { rows } = await db.query(query, values);
                 const newLead = rows[0];
 

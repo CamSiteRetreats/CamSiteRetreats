@@ -1381,7 +1381,7 @@
                         formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
                     }
 
-                    const clickAction = isClickable ? `onclick="selectDate(this, '${formattedDisplay}')"` : '';
+                    const clickAction = isClickable ? `onclick="selectDate(this, '${item.startDate}')"` : '';
 
                     const scheduleHTML = `
                         <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}"
@@ -1418,6 +1418,12 @@
             };
 
             try {
+                const response = await fetch('../api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newLead)
+                });
+
                 if (!response.ok) throw new Error('Network response was not ok');
 
                 const result = await response.json();

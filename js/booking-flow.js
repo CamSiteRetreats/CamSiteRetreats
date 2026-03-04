@@ -259,7 +259,11 @@ const BookingFlow = {
         this.tourData = { name: tourName, price: price };
         this.selectedDate = date;
 
-        document.getElementById('bf-tour-name').textContent = `${tourName} | ${date}`;
+        const displayDate = date.includes('-') && date.split('-').length === 3
+            ? date.split('-').reverse().join('/')
+            : date;
+
+        document.getElementById('bf-tour-name').textContent = `${tourName} | ${displayDate}`;
         document.getElementById('booking-flow-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
 
@@ -340,11 +344,26 @@ const BookingFlow = {
     handleStep1Submit: function (e) {
         e.preventDefault();
 
+        // Helper to normalize DD/MM/YYYY to YYYY-MM-DD
+        const normalizeDateToISO = (dateStr) => {
+            if (!dateStr) return null;
+            const parts = dateStr.split(/[-/.]/);
+            if (parts.length !== 3) return dateStr;
+
+            let day, month, year;
+            if (parts[0].length === 4) { // YYYY-MM-DD
+                [year, month, day] = parts;
+            } else { // DD/MM/YYYY
+                [day, month, year] = parts;
+            }
+            return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        };
+
         // Collect Data
         this.bookingData = {
             name: document.getElementById('bf-name').value.trim(),
             phone: document.getElementById('bf-phone').value.trim(),
-            dob: document.getElementById('bf-dob').value.trim(),
+            dob: normalizeDateToISO(document.getElementById('bf-dob').value.trim()),
             idCard: document.getElementById('bf-id').value.trim(),
             address: document.getElementById('bf-address').value.trim(),
             medalName: document.getElementById('bf-medal-name').value.trim(),

@@ -74,9 +74,9 @@ module.exports = async (req, res) => {
                     RETURNING *;
                 `;
                 const values = [
-                    name, phone, tour, date, status || 'Chờ xác nhận cọc', total_price, deposit,
-                    sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required || 1000000
+                    name ?? null, phone ?? null, tour ?? null, date ?? null, status ?? 'Chờ xác nhận cọc', total_price ?? null, deposit ?? null,
+                    sale_id ?? null, sale_name ?? null, customer_id ?? null, dob ?? null, gender ?? null, address ?? null,
+                    id_card ?? null, diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null, medal_name ?? null, commitments ?? null, deposit_required ?? 1000000
                 ];
                 const { rows } = await db.query(query, values);
                 const newBooking = rows[0];
