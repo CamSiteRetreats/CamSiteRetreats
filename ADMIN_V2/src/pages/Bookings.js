@@ -1166,7 +1166,7 @@ window.actionView = (bookingId) => {
     }, 10);
 };
 
-window.actionEdit = (bookingId) => {
+window.actionEdit = async (bookingId) => {
     document.getElementById('rowActionModal').classList.add('hidden');
     const booking = currentBookings.find(b => b.id == bookingId);
     if (!booking) return;
@@ -1183,26 +1183,43 @@ window.actionEdit = (bookingId) => {
         populateDateDropdown('edit-date', booking.tour || '', booking.date || '');
     }
 
-    // Nếu ngày cũ không match schedule nào → thêm option thủ công
-    const editDateEl = document.getElementById('edit-date');
-    if (editDateEl && booking.date && editDateEl.value !== booking.date) {
-        const customOpt = document.createElement('option');
-        customOpt.value = booking.date;
-        customOpt.textContent = booking.date + ' (dữ liệu cũ)';
-        customOpt.selected = true;
-        editDateEl.appendChild(customOpt);
-    }
+    // Các trường mở rộng - LUÔN ƯU TIÊN LẤY TỪ CRM NẾU TRỐNG
+    const fillEditForm = (data) => {
+        document.getElementById('edit-dob').value = data.dob || '';
+        document.getElementById('edit-gender').value = data.gender || 'Khác';
+        document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
+        document.getElementById('edit-address').value = data.address || '';
+        document.getElementById('edit-diet').value = data.diet || data.dietary || 'Không';
+        document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+    };
 
-    // Các trường mở rộng
-    document.getElementById('edit-dob').value = booking.dob || '';
-    document.getElementById('edit-gender').value = booking.gender || 'Khác';
+    // Điền tạm dữ liệu hiện có trong booking
+    fillEditForm(booking);
     document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
-    document.getElementById('edit-allergy').value = booking.allergy || '';
-    document.getElementById('edit-address').value = booking.address || '';
-    document.getElementById('edit-diet').value = booking.diet || 'Không';
-    document.getElementById('edit-trekking-pole').value = booking.trekking_pole || 'Không';
     document.getElementById('edit-commitments').checked = !!booking.commitments;
-    document.getElementById('edit-special').value = booking.special || ''; // Ghi chú sale
+    document.getElementById('edit-special').value = booking.special || '';
+
+    // Nếu thông tin profile đang trống (DOB/Address) -> Thử pull từ CRM
+    if ((!booking.dob || !booking.address) && (booking.customer_id || booking.phone)) {
+        try {
+            const keyword = booking.customer_id || booking.phone;
+            const res = await fetch(`/api/admin_customers?action=search&keyword=${encodeURIComponent(keyword)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keyword })
+            });
+            const json = await res.json();
+            if (res.ok && json.success) {
+                // Merge dữ liệu CRM vào form nếu form đang trống
+                const c = json.data;
+                if (!document.getElementById('edit-dob').value) document.getElementById('edit-dob').value = c.dob || '';
+                if (!document.getElementById('edit-address').value) document.getElementById('edit-address').value = c.address || '';
+                if (!document.getElementById('edit-allergy').value) document.getElementById('edit-allergy').value = c.medical_notes || '';
+                if (document.getElementById('edit-diet').value === 'Không') document.getElementById('edit-diet').value = c.dietary || 'Không';
+                if (!document.getElementById('edit-medal-name').value) document.getElementById('edit-medal-name').value = c.medal_name || '';
+            }
+        } catch (err) { console.error("Pull CRM error:", err); }
+    }
 
     // Tài chính
     document.getElementById('edit-total').value = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
@@ -1210,7 +1227,6 @@ window.actionEdit = (bookingId) => {
     document.getElementById('edit-deposit').value = booking.deposit || 0;
     document.getElementById('edit-deposit-required').value = booking.deposit_required || 1000000;
 
-    // Kích hoạt hàm tính remain
     window.updateEditRemaining();
 
     // Hiện Modal Edit
@@ -1423,158 +1439,153 @@ if (tbody) {
     });
 }
 
-// Fake Auto-fill logic
-const searchBtn = document.getElementById('searchBtn');
-if (searchBtn) {
-    searchBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const input = document.getElementById('smartSearch').value;
-        const btn = e.target;
+// ===== CHỨC NĂNG SMART SEARCH (GợI Ý KHÁCH CŨ) =====
+const smartSearchInput = document.getElementById('smartSearch');
+const searchSuggestions = document.getElementById('searchSuggestions');
 
-        if (!input) {
-            alert("Vui lòng nhập Số Điện Thoại hoặc Mã #CSR");
+if (smartSearchInput) {
+    let debounceTimer;
+    smartSearchInput.addEventListener('input', (e) => {
+        const input = e.target.value.toLowerCase().trim();
+        clearTimeout(debounceTimer);
+        if (input.length < 2) {
+            if (searchSuggestions) searchSuggestions.classList.add('hidden');
             return;
         }
 
-        // ===== CHỨC NĂNG SMART SEARCH (GợI Ý KHÁCH CŨ) =====
-        const smartSearchInput = document.getElementById('smartSearch');
-        const searchSuggestions = document.getElementById('searchSuggestions');
-
-        if (smartSearchInput) {
-            let debounceTimer;
-            smartSearchInput.addEventListener('input', (e) => {
-                const input = e.target.value.toLowerCase().trim();
-                clearTimeout(debounceTimer);
-                if (input.length < 2) {
-                    if (searchSuggestions) searchSuggestions.classList.add('hidden');
-                    return;
-                }
-
-                debounceTimer = setTimeout(async () => {
-                    try {
-                        const res = await fetch(`/api/admin_customers?action=search&keyword=${input}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ keyword: input })
-                        });
-                        const json = await res.json();
-
-                        if (res.ok && json.success) {
-                            const customer = json.data;
-                            const results = [customer]; // API hiện tại trả về 1 object
-
-                            if (searchSuggestions) {
-                                searchSuggestions.innerHTML = results.map(c => `
-                                <div class="suggestion-item p-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors" 
-                                     data-name="${c.full_name}" 
-                                     data-phone="${c.phone}" 
-                                     data-csr="${c.csr_code || ''}"
-                                     data-dob="${c.dob || ''}"
-                                     data-gender="${c.gender || ''}"
-                                     data-address="${c.address || ''}"
-                                     data-cccd="${c.cccd || ''}"
-                                     data-allergy="${c.medical_notes || ''}"
-                                     data-diet="${c.dietary || ''}"
-                                     data-trekking-pole="${c.trekking_pole || ''}"
-                                     data-medal-name="${c.medal_name || ''}">
-                                    <div class="font-bold text-gray-900 text-sm">${c.full_name}</div>
-                                    <div class="flex justify-between items-center mt-1">
-                                        <span class="text-xs text-gray-500">${c.phone}</span>
-                                        ${c.csr_code ? `<span class="bg-orange-100 text-csr-orange text-[10px] font-bold px-2 py-0.5 rounded">${c.csr_code}</span>` : ''}
-                                    </div>
-                                </div>
-                            `).join('');
-                                searchSuggestions.classList.remove('hidden');
-                            }
-                        } else if (searchSuggestions) {
-                            searchSuggestions.innerHTML = '<div class="p-3 text-xs text-gray-400 italic text-center">Không tìm thấy khách hàng cũ</div>';
-                            searchSuggestions.classList.remove('hidden');
-                        }
-                    } catch (err) {
-                        console.error('Search error:', err);
-                    }
-                }, 300);
-            });
-
-            if (searchSuggestions) {
-                searchSuggestions.addEventListener('click', (e) => {
-                    const item = e.target.closest('.suggestion-item');
-                    if (item) {
-                        const fullNameInput = document.getElementById('addFullName');
-                        const phoneInput = document.getElementById('addPhone');
-                        const csrCodeInput = document.getElementById('addCsrCode');
-
-                        if (fullNameInput) fullNameInput.value = item.getAttribute('data-name');
-                        if (phoneInput) phoneInput.value = item.getAttribute('data-phone');
-                        if (csrCodeInput) csrCodeInput.value = item.getAttribute('data-csr');
-
-                        // Lưu trữ toàn bộ data khách hàng để dùng khi submit
-                        window._selectedCustomer = {
-                            fullName: item.getAttribute('data-name'),
-                            phone: item.getAttribute('data-phone'),
-                            csrCode: item.getAttribute('data-csr'),
-                            dob: item.getAttribute('data-dob') || '',
-                            gender: item.getAttribute('data-gender') || '',
-                            address: item.getAttribute('data-address') || '',
-                            id_card: item.getAttribute('data-cccd') || '',
-                            allergy: item.getAttribute('data-allergy') || '',
-                            diet: item.getAttribute('data-diet') || '',
-                            trekking_pole: item.getAttribute('data-trekking-pole') || '',
-                            medal_name: item.getAttribute('data-medal-name') || ''
-                        };
-
-                        smartSearchInput.value = item.getAttribute('data-name');
-                        searchSuggestions.classList.add('hidden');
-
-                        // Alert thành công
-                        const alertHtml = `
-                        <div id="loyalty-alert" class="mt-4 p-3 bg-green-500/10 border border-green-500/30 text-green-600 rounded-lg text-sm flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Nhận diện khách thân thiết: <b>${item.getAttribute('data-csr')}</b>. Hệ thống sẽ kế thừa toàn bộ hồ sơ cũ!
-                        </div>`;
-                        const existingAlert = document.getElementById('loyalty-alert');
-                        if (existingAlert) existingAlert.remove();
-                        smartSearchInput.parentElement.insertAdjacentHTML('afterend', alertHtml);
-                    }
+        debounceTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/admin_customers?action=search&keyword=${input}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keyword: input })
                 });
+                const json = await res.json();
+
+                if (res.ok && json.success) {
+                    const customer = json.data;
+                    const results = [customer]; // API hiện tại trả về 1 object
+
+                    if (searchSuggestions) {
+                        searchSuggestions.innerHTML = results.map(c => `
+                            <div class="suggestion-item p-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors" 
+                                 data-name="${c.full_name}" 
+                                 data-phone="${c.phone}" 
+                                 data-csr="${c.csr_code || ''}"
+                                 data-dob="${c.dob || ''}"
+                                 data-gender="${c.gender || ''}"
+                                 data-address="${c.address || ''}"
+                                 data-cccd="${c.cccd || ''}"
+                                 data-allergy="${c.medical_notes || ''}"
+                                 data-diet="${c.dietary || ''}"
+                                 data-trekking_pole="${c.trekking_pole || ''}"
+                                 data-medal-name="${c.medal_name || ''}">
+                                <div class="font-bold text-gray-900 text-sm">${c.full_name}</div>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-xs text-gray-500">${c.phone}</span>
+                                    ${c.csr_code ? `<span class="bg-orange-100 text-csr-orange text-[10px] font-bold px-2 py-0.5 rounded">${c.csr_code}</span>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                        searchSuggestions.classList.remove('hidden');
+                    }
+                } else if (searchSuggestions) {
+                    searchSuggestions.innerHTML = '<div class="p-3 text-xs text-gray-400 italic text-center">Không tìm thấy khách hàng cũ</div>';
+                    searchSuggestions.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Search error:', err);
             }
+        }, 300);
+    });
 
-            // Đóng dropdown khi click ngoài
-            document.addEventListener('click', (e) => {
-                if (!smartSearchInput.contains(e.target) && searchSuggestions && !searchSuggestions.contains(e.target)) {
-                    searchSuggestions.classList.add('hidden');
-                }
-            });
+    if (searchSuggestions) {
+        searchSuggestions.addEventListener('click', (e) => {
+            const item = e.target.closest('.suggestion-item');
+            if (item) {
+                const fullNameInput = document.getElementById('addFullName');
+                const phoneInput = document.getElementById('addPhone');
+                const csrCodeInput = document.getElementById('addCsrCode');
+
+                if (fullNameInput) fullNameInput.value = item.getAttribute('data-name');
+                if (phoneInput) phoneInput.value = item.getAttribute('data-phone');
+                if (csrCodeInput) csrCodeInput.value = item.getAttribute('data-csr');
+
+                // Lưu trữ toàn bộ data khách hàng để dùng khi submit
+                window._selectedCustomer = {
+                    fullName: item.getAttribute('data-name'),
+                    phone: item.getAttribute('data-phone'),
+                    csrCode: item.getAttribute('data-csr'),
+                    dob: item.getAttribute('data-dob') || '',
+                    gender: item.getAttribute('data-gender') || '',
+                    address: item.getAttribute('data-address') || '',
+                    id_card: item.getAttribute('data-cccd') || '',
+                    allergy: item.getAttribute('data-allergy') || '',
+                    diet: item.getAttribute('data-diet') || '',
+                    trekking_pole: item.getAttribute('data-trekking_pole') || '',
+                    medal_name: item.getAttribute('data-medal-name') || ''
+                };
+
+                smartSearchInput.value = item.getAttribute('data-name');
+                searchSuggestions.classList.add('hidden');
+
+                // Alert thành công
+                const alertHtml = `
+                    <div id="loyalty-alert" class="mt-4 p-3 bg-green-500/10 border border-green-500/30 text-green-600 rounded-lg text-sm flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Nhận diện khách thân thiết: <b>${item.getAttribute('data-csr')}</b>. Hệ thống sẽ kế thừa toàn bộ hồ sơ cũ!
+                    </div>`;
+                const existingAlert = document.getElementById('loyalty-alert');
+                if (existingAlert) existingAlert.remove();
+                smartSearchInput.parentElement.insertAdjacentHTML('afterend', alertHtml);
+            }
+        });
+    }
+
+    // Đóng dropdown khi click ngoài
+    document.addEventListener('click', (e) => {
+        if (!smartSearchInput.contains(e.target) && searchSuggestions && !searchSuggestions.contains(e.target)) {
+            searchSuggestions.classList.add('hidden');
         }
+    });
+}
 
-        // ===== LOGIC TÍNH TOÁN GIÁ THỜI GIAN THỰC =====
-        const pInput = document.getElementById('addTourPrice');
-        const dInput = document.getElementById('addDiscount');
-        const tDisplay = document.getElementById('addTotalPriceDisplay');
-        const tSelect = document.getElementById('addTourName');
+// ===== LOGIC TÍNH TOÁN GIÁ THỜI GIAN THỰC =====
+const pInput = document.getElementById('addTourPrice');
+const dInput = document.getElementById('addDiscount');
+const tDisplay = document.getElementById('addTotalPriceDisplay');
+const tSelect = document.getElementById('addTourName');
 
-        const updateCalculatedTotal = () => {
-            if (!pInput || !dInput || !tDisplay) return;
-            const price = parseInt(pInput.value) || 0;
-            const discount = parseInt(dInput.value) || 0;
-            const total = price - discount;
-            tDisplay.textContent = (total > 0 ? total : 0).toLocaleString('vi-VN') + 'đ';
-        };
+const updateCalculatedTotal = () => {
+    if (!pInput || !dInput || !tDisplay) return;
+    const price = parseInt(pInput.value) || 0;
+    const discount = parseInt(dInput.value) || 0;
+    const total = price - discount;
+    tDisplay.textContent = (total > 0 ? total : 0).toLocaleString('vi-VN') + 'đ';
+};
 
-        if (pInput) pInput.addEventListener('input', updateCalculatedTotal);
-        if (dInput) dInput.addEventListener('input', updateCalculatedTotal);
+if (pInput) pInput.addEventListener('input', updateCalculatedTotal);
+if (dInput) dInput.addEventListener('input', updateCalculatedTotal);
 
-        if (tSelect) {
-            tSelect.addEventListener('change', (e) => {
-                const tourName = e.target.value;
-                const selectedTour = allTours.find(t => t.name === tourName);
-                if (selectedTour && pInput) {
-                    pInput.value = selectedTour.price || 0;
-                    updateCalculatedTotal();
-                }
-            });
+if (tSelect) {
+    tSelect.addEventListener('change', (e) => {
+        const tourName = e.target.value;
+        const selectedTour = allTours.find(t => t.name === tourName);
+        if (selectedTour && pInput) {
+            pInput.value = selectedTour.price || 0;
+            updateCalculatedTotal();
         }
+    });
+}
 
+// Nút Search Btn (Trigger Smart Search Manual)
+const searchBtn = document.getElementById('searchBtn');
+if (searchBtn) {
+    searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Chỉ mang tính chất trang trí hoặc trigger validate nếu cần
+        const input = document.getElementById('smartSearch').value;
+        if (!input) alert("Vui lòng nhập Số Điện Thoại hoặc Mã #CSR");
     });
 }
 
@@ -1628,15 +1639,19 @@ if (bookingForm) {
             };
 
             // Nếu là khách cũ đã được chọn từ SMART SEARCH -> Kế thừa toàn bộ profile
-            if (window._selectedCustomer && window._selectedCustomer.phone === phone) {
-                bookingPayload.dob = window._selectedCustomer.dob;
-                bookingPayload.gender = window._selectedCustomer.gender;
-                bookingPayload.address = window._selectedCustomer.address;
-                bookingPayload.id_card = window._selectedCustomer.id_card;
-                bookingPayload.allergy = window._selectedCustomer.allergy;
-                bookingPayload.diet = window._selectedCustomer.diet;
-                bookingPayload.trekking_pole = window._selectedCustomer.trekking_pole;
-                bookingPayload.medal_name = window._selectedCustomer.medal_name;
+            const cleanInputPhone = phone.replace(/[^0-9]/g, '');
+            if (window._selectedCustomer) {
+                const cleanStoredPhone = (window._selectedCustomer.phone || '').replace(/[^0-9]/g, '');
+                if (cleanStoredPhone === cleanInputPhone) {
+                    bookingPayload.dob = window._selectedCustomer.dob;
+                    bookingPayload.gender = window._selectedCustomer.gender;
+                    bookingPayload.address = window._selectedCustomer.address;
+                    bookingPayload.id_card = window._selectedCustomer.id_card;
+                    bookingPayload.allergy = window._selectedCustomer.allergy;
+                    bookingPayload.diet = window._selectedCustomer.diet;
+                    bookingPayload.trekking_pole = window._selectedCustomer.trekking_pole;
+                    bookingPayload.medal_name = window._selectedCustomer.medal_name;
+                }
             }
 
             // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads
