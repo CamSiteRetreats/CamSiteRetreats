@@ -273,12 +273,37 @@ export const afterRender = async () => {
     };
 
     // --- 3. Data Fetching & Rendering ---
+    const toYMD = (d) => {
+        if (!d) return '';
+        // Strip time part if ISO
+        if (d.includes('T')) d = d.split('T')[0];
+        const parts = d.split(/[-/.]/);
+        if (parts.length !== 3) return d;
+        let day, month, year;
+        if (parts[0].length === 4) {
+            [year, month, day] = parts;
+        } else {
+            [day, month, year] = parts;
+        }
+        return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    };
+
+    // Target date in YYYY-MM-DD for robust comparison
+    const targetYMD = toYMD(targetDateStr);
+
     const loadData = async () => {
         try {
             const res = await fetch('/api/bookings');
             const data = await res.json();
 
-            // Lọc theo Tour và Ngày (khớp y chang hoặc normalize về DD/MM/YYYY)
+            // Debug log
+            console.log('[Roster] targetTour:', targetTour, 'targetDateStr:', targetDateStr, 'targetYMD:', targetYMD);
+            console.log('[Roster] Total bookings:', data.length);
+            if (data.length > 0) {
+                console.log('[Roster] Sample booking:', { tour: data[0].tour, date: data[0].date, status: data[0].status });
+            }
+
+            // Lọc theo Tour và Ngày (so sánh linh hoạt nhiều format)
             allBookings = data.filter(b => {
                 let mTour = true, mDate = true;
                 if (targetTour) {
@@ -286,11 +311,15 @@ export const afterRender = async () => {
                     const normT = normalizeText(targetTour);
                     mTour = (normB === normT || normB.includes(normT) || normT.includes(normB));
                 }
-                if (targetDateFormated) {
-                    mDate = (normalizeDate(b.date) === targetDateFormated);
+                if (targetDateStr) {
+                    // So sánh bằng YYYY-MM-DD (normalize cả 2 bên)
+                    const bookingYMD = toYMD(b.date);
+                    mDate = (bookingYMD === targetYMD);
                 }
                 return mTour && mDate;
             });
+
+            console.log('[Roster] Matched bookings:', allBookings.length);
 
             // Sắp xếp: ưu tiên Đã Cọc / Hoàn tất lên đầu
             allBookings.sort((a, b) => {
