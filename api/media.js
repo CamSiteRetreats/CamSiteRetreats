@@ -13,6 +13,20 @@ module.exports = async (req, res) => {
     }
 
     try {
+        // Redirection logic from photo.js
+        const slugRaw = req.query.slug || req.query.id;
+        if (slugRaw && method === 'GET' && !req.url.startsWith('/api/media')) {
+            const slug = slugRaw.replace('.jpg', '');
+            const { rows } = await db.query('SELECT url FROM media WHERE slug = $1', [slug]);
+
+            if (rows.length > 0) {
+                res.setHeader('Location', rows[0].url);
+                return res.status(302).end();
+            } else {
+                return res.status(404).json({ error: 'Photo not found' });
+            }
+        }
+
         if (method === 'GET') {
             const { rows } = await db.query('SELECT * FROM media ORDER BY created_at DESC');
             return res.status(200).json(rows);

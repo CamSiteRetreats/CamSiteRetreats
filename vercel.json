@@ -17,7 +17,7 @@
     },
     {
       "source": "/photo/:slug",
-      "destination": "/api/photo?id=:slug"
+      "destination": "/api/media?slug=:slug"
     },
     {
       "source": "/admin/(.*)",
