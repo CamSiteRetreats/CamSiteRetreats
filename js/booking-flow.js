@@ -415,6 +415,29 @@ const BookingFlow = {
         };
 
         try {
+            // Sync Customer to CRM first to get Customer ID
+            try {
+                const crmRes = await fetch('../api/admin_customers?action=create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        full_name: payload.name,
+                        phone: payload.phone,
+                        cccd: payload.id_card || '',
+                        dob: payload.dob || null,
+                        gender: payload.gender || 'Khác',
+                        medical_notes: payload.special || '',
+                        dietary: ''
+                    })
+                });
+                const crmData = await crmRes.json();
+                if (crmData.success && crmData.csr_code) {
+                    payload.customer_id = crmData.csr_code;
+                }
+            } catch (e) {
+                console.warn('CRM Sync Error:', e);
+            }
+
             const res = await fetch('../api/bookings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

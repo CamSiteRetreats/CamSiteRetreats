@@ -1,4 +1,4 @@
-const db = require('../utils/db');
+const db = require('./_db');
 
 // Helper: remove Vietnamese diacritics → lowercase ASCII
 function normalizeVN(str) {
@@ -78,6 +78,7 @@ async function handlePaymentLink(req, res) {
         date: booking.date,
         status: booking.status,
         totalPrice,
+        discount: parseInt(booking.discount) || 0,
         deposit,
         remaining,
         amountDue,
@@ -85,8 +86,7 @@ async function handlePaymentLink(req, res) {
         paymentType,
         transferContent,
         isPaid,
-        isFullyPaid,
-        discount: parseInt(booking.discount) || 0
+        isFullyPaid
     });
 }
 
@@ -229,47 +229,28 @@ async function handleSepayWebhook(req, res) {
 
         // Only update DB if something changed
         if (newStatus !== currentStatus || newDeposit !== currentDeposit) {
+            let customerId = matchedBooking.customer_id;
+            if (newStatus === 'Đã cọc' && (!customerId || customerId.trim() === '')) {
+                const phone = matchedBooking.phone;
+                const check = await db.query('SELECT csr_code FROM crm_customers WHERE phone = $1', [phone]);
+                if (check.rows.length > 0) {
+                    customerId = check.rows[0].csr_code;
+                } else {
+                    const randNum = Math.floor(100000 + Math.random() * 900000);
+                    customerId = '#CSR' + randNum;
+                    await db.query(`
+                        INSERT INTO crm_customers (csr_code, full_name, phone, cccd, dob, gender, medical_notes, dietary, loyalty_tier)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'New')
+                    `, [customerId, matchedBooking.name, phone, matchedBooking.id_card || null, matchedBooking.dob || null, matchedBooking.gender || null, matchedBooking.allergy || null, matchedBooking.diet || null]);
+                }
+                console.log(`✅ Auto-generated CSR Code for Booking #${matchedBooking.id}: ${customerId}`);
+            }
+
             await db.query(
-                'UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3',
-                [newStatus, newDeposit, matchedBooking.id]
+                'UPDATE bookings SET status = $1, deposit = $2, customer_id = $3 WHERE id = $4',
+                [newStatus, newDeposit, customerId, matchedBooking.id]
             );
             console.log(`✅ Auto-updated Booking #${matchedBooking.id}: ${currentStatus} -> ${newStatus} (Paid: ${newDeposit})`);
-
-            // ===== AUTO-ASSIGN CSR CODE when status becomes "Đã cọc" or "Hoàn tất" =====
-            if ((newStatus === 'Đã cọc' || newStatus === 'Hoàn tất') && !matchedBooking.customer_id) {
-                try {
-                    const custName = matchedBooking.name;
-                    const custPhone = matchedBooking.phone;
-                    if (custName && custPhone) {
-                        // Upsert CRM customer (same logic as admin_customers action=create)
-                        const check = await db.query('SELECT id, csr_code FROM crm_customers WHERE phone = $1', [custPhone]);
-                        let csrCode = '';
-
-                        if (check.rows.length > 0) {
-                            csrCode = check.rows[0].csr_code;
-                            await db.query(
-                                `UPDATE crm_customers SET full_name=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2`,
-                                [custName, check.rows[0].id]
-                            );
-                        } else {
-                            const randNum = Math.floor(100000 + Math.random() * 900000);
-                            csrCode = '#CSR' + randNum;
-                            await db.query(
-                                `INSERT INTO crm_customers (csr_code, full_name, phone, gender, loyalty_tier) VALUES ($1, $2, $3, 'Khác', 'New')`,
-                                [csrCode, custName, custPhone]
-                            );
-                        }
-
-                        // Update booking with CSR code
-                        if (csrCode) {
-                            await db.query('UPDATE bookings SET customer_id = $1 WHERE id = $2', [csrCode, matchedBooking.id]);
-                            console.log(`🎫 Auto-assigned CSR code ${csrCode} to Booking #${matchedBooking.id}`);
-                        }
-                    }
-                } catch (crmErr) {
-                    console.error('❌ CRM auto-sync error:', crmErr.message);
-                }
-            }
         } else {
             console.log(`ℹ️ Booking #${matchedBooking.id} unchanged. Status: ${currentStatus}, Paid: ${newDeposit}`);
         }

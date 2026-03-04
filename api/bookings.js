@@ -1,5 +1,5 @@
-const db = require('../utils/db');
-const { sendEmail } = require('../utils/mail');
+const db = require('./_db');
+const { sendEmail } = require('./_mail');
 
 module.exports = async (req, res) => {
     const { method } = req;
@@ -31,9 +31,9 @@ module.exports = async (req, res) => {
 
                 // List of possible fields to update
                 const possibleFields = [
-                    'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit',
+                    'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit', 'discount',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
-                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required', 'discount'
+                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required'
                 ];
 
                 for (const field of possibleFields) {
@@ -59,24 +59,24 @@ module.exports = async (req, res) => {
             } else {
                 // Insert
                 const {
-                    name, phone, tour, date, status, total_price, deposit,
+                    name, phone, tour, date, status, total_price, deposit, discount,
                     sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, discount
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
                 } = body;
 
                 const query = `
                     INSERT INTO bookings (
-                        name, phone, tour, date, status, total_price, deposit, 
+                        name, phone, tour, date, status, total_price, deposit, discount,
                         sale_id, sale_name, customer_id, dob, gender, address, 
-                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, discount
+                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
                     )
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
                     RETURNING *;
                 `;
                 const values = [
-                    name ?? null, phone ?? null, tour ?? null, date ?? null, status ?? 'Chờ xác nhận cọc', total_price ?? null, deposit ?? null,
+                    name ?? null, phone ?? null, tour ?? null, date ?? null, status ?? 'Chờ xác nhận cọc', total_price ?? null, deposit ?? null, discount ?? 0,
                     sale_id ?? null, sale_name ?? null, customer_id ?? null, dob ?? null, gender ?? null, address ?? null,
-                    id_card ?? null, diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null, medal_name ?? null, commitments ?? null, deposit_required ?? 1000000, discount ?? 0
+                    id_card ?? null, diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null, medal_name ?? null, commitments ?? null, deposit_required ?? 1000000
                 ];
                 const { rows } = await db.query(query, values);
                 const newBooking = rows[0];

@@ -184,8 +184,16 @@
                     <!-- Money breakdown -->
                     <div class="w-full sm:w-80 space-y-3">
                         <div class="flex justify-between items-center text-gray-500">
-                            <span>Tổng tiền vé:</span>
-                            <span class="font-bold text-gray-700" id="total-price">...</span>
+                            <span>Tổng tiền vé (Gốc):</span>
+                            <span class="font-bold text-gray-700" id="base-price">...</span>
+                        </div>
+                        <div id="discount-row" class="flex justify-between items-center text-red-500 hidden">
+                            <span>Giảm giá:</span>
+                            <span class="font-bold" id="discount-amount">- ...</span>
+                        </div>
+                        <div class="flex justify-between items-center text-gray-800 border-t border-gray-100 pt-2">
+                            <span class="font-bold">Tổng cộng:</span>
+                            <span class="font-bold text-lg" id="total-price">...</span>
                         </div>
                         <div class="flex justify-between items-center text-primary">
                             <span>Đã thanh toán (Cọc):</span>
@@ -248,10 +256,23 @@
                 document.getElementById('tour-date').textContent = b.date || 'Đang cập nhật';
 
                 const total = parseInt(b.total_price) || 0;
+                const discount = parseInt(b.discount) || 0;
+                const basePrice = total + discount;
                 const deposit = parseInt(b.deposit) || 0;
                 const remain = total - deposit;
 
-                document.getElementById('tour-price').textContent = formatVND(total);
+                document.getElementById('tour-price').textContent = formatVND(basePrice);
+                document.getElementById('base-price').textContent = formatVND(basePrice);
+
+                if (discount > 0) {
+                    const dRow = document.getElementById('discount-row');
+                    const dAmt = document.getElementById('discount-amount');
+                    if (dRow && dAmt) {
+                        dRow.classList.remove('hidden');
+                        dAmt.textContent = '- ' + formatVND(discount);
+                    }
+                }
+
                 document.getElementById('total-price').textContent = formatVND(total);
                 document.getElementById('deposit-paid').textContent = '- ' + formatVND(deposit);
                 document.getElementById('remaining-price').textContent = remain > 0 ? formatVND(remain) : '0đ';

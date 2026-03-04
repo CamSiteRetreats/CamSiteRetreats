@@ -169,9 +169,9 @@
                     <span class="text-gray-500">Ngày khởi hành:</span>
                     <span class="font-bold text-primary" id="tour-date">...</span>
                 </div>
-                <div class="flex justify-between border-b border-gray-50 pb-2" id="discount-row" style="display:none">
+                <div id="discount-row" class="flex justify-between border-b border-gray-50 pb-2 hidden">
                     <span class="text-gray-500">Giảm giá:</span>
-                    <span class="font-bold text-green-600" id="discount-amount">Không</span>
+                    <span class="font-bold text-red-500" id="discount-amount">-0đ</span>
                 </div>
             </div>
         </div>
@@ -344,18 +344,18 @@
                 document.getElementById('tour-name').textContent = data.tour || 'Tour';
                 document.getElementById('tour-date').textContent = data.date || '';
 
-                // Discount display
-                const discountRow = document.getElementById('discount-row');
-                if (data.discount && data.discount > 0) {
-                    discountRow.style.display = 'flex';
-                    document.getElementById('discount-amount').textContent = formatVND(data.discount);
-                } else {
-                    discountRow.style.display = 'flex';
-                    document.getElementById('discount-amount').textContent = 'Không';
-                }
-
                 // Amount
                 document.getElementById('amount-due').textContent = formatVND(data.amountDue);
+
+                // Discount
+                if (data.discount > 0) {
+                    const discountRow = document.getElementById('discount-row');
+                    const discountAmt = document.getElementById('discount-amount');
+                    if (discountRow && discountAmt) {
+                        discountRow.classList.remove('hidden');
+                        discountAmt.textContent = '-' + formatVND(data.discount);
+                    }
+                }
 
                 // Payment type badge
                 const badge = document.getElementById('payment-type-badge');
