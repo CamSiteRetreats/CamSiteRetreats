@@ -192,6 +192,30 @@ export const render = () => {
                               </div>
                               <input type="hidden" id="addCsrCode">
                           </div>
+
+                          <!-- Hidden by default, shown when detail is expanded or via auto-fill -->
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Sinh</label>
+                                  <input type="date" id="addDob" class="input-field">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới Tính</label>
+                                  <select id="addGender" class="input-field">
+                                      <option value="Khác">Khác</option>
+                                      <option value="Nam">Nam</option>
+                                      <option value="Nữ">Nữ</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">CCCD / Passport</label>
+                                  <input type="text" id="addIdCard" class="input-field" placeholder="Số định danh">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa Chỉ</label>
+                                  <input type="text" id="addAddress" class="input-field" placeholder="Tỉnh/Thành, Quận/Huyện">
+                              </div>
+                          </div>
                       </div>
 
                       <!-- SECTION 2: Tuyến Tour & Tài Chính -->
@@ -216,6 +240,11 @@ export const render = () => {
                               </div>
                           </div>
 
+                          <div class="grid grid-cols-1 mb-6">
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 font-bold text-blue-600">Ghi chú (Sale Note)</label>
+                              <input type="text" id="addSpecial" class="input-field bg-blue-50/30" placeholder="Lưu ý đón khách, yêu cầu riêng...">
+                          </div>
+                          
                           <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-4 gap-4">
                               <div>
                                   <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Giá Gốc (đ)</label>
@@ -783,7 +812,6 @@ export const afterRender = () => {
                         ${isConsultTab && b.special ? `<div class="text-xs text-blue-500 mt-1 italic">💬 ${b.special}</div>` : ''}
                     </td>
                     <td class="p-4 align-top">${saleCell}</td>
-                // Nút linh hoạt cho tab Chờ cọc/Tư vấn
                 const actionBtn = b.customer_id
                     ? `< button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >💳 Thanh toán</button > `
                     : `< button class="action-btn process-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" > Copy link Process</button > `;
@@ -1526,6 +1554,17 @@ if (smartSearchInput) {
                 if (phoneInput) phoneInput.value = item.getAttribute('data-phone');
                 if (csrCodeInput) csrCodeInput.value = item.getAttribute('data-csr');
 
+                // Điền thông tin chi tiết vào các trường mới
+                const dobInput = document.getElementById('addDob');
+                const genderInput = document.getElementById('addGender');
+                const idCardInput = document.getElementById('addIdCard');
+                const addressInput = document.getElementById('addAddress');
+
+                if (dobInput) dobInput.value = item.getAttribute('data-dob') || '';
+                if (genderInput) genderInput.value = item.getAttribute('data-gender') || 'Khác';
+                if (idCardInput) idCardInput.value = item.getAttribute('data-cccd') || '';
+                if (addressInput) addressInput.value = item.getAttribute('data-address') || '';
+
                 // Lưu trữ toàn bộ data khách hàng để dùng khi submit
                 window._selectedCustomer = {
                     fullName: item.getAttribute('data-name'),
@@ -1621,6 +1660,13 @@ if (bookingForm) {
             const tourName = document.getElementById('addTourName').value;
             const tourDate = document.getElementById('addTourDate').value;
 
+            // Thu thập các trường chi tiết mới
+            const dob = document.getElementById('addDob').value;
+            const gender = document.getElementById('addGender').value;
+            const idCard = document.getElementById('addIdCard').value;
+            const address = document.getElementById('addAddress').value;
+            const special = document.getElementById('addSpecial').value;
+
             const tourPrice = parseInt(document.getElementById('addTourPrice').value) || 0;
             const discount = parseInt(document.getElementById('addDiscount').value) || 0;
             const depositRequired = parseInt(document.getElementById('addDepositRequired').value) || 1000000;
@@ -1650,18 +1696,27 @@ if (bookingForm) {
                 sale_name: sale_name,
                 customer_id: csrCode,
                 deposit_required: depositRequired,
-                commitments: true
+                commitments: true,
+                // Gán các trường chi tiết
+                dob: dob,
+                gender: gender,
+                address: address,
+                id_card: idCard,
+                special: special
             };
 
-            // Nếu là khách cũ đã được chọn từ SMART SEARCH -> Kế thừa toàn bộ profile
+            // Nếu là khách cũ -> Kế thừa các trường ẩn (allergy, diet, etc.) nếu không có trên form
             const cleanInputPhone = phone.replace(/[^0-9]/g, '');
             if (window._selectedCustomer) {
                 const cleanStoredPhone = (window._selectedCustomer.phone || '').replace(/[^0-9]/g, '');
                 if (cleanStoredPhone === cleanInputPhone) {
-                    bookingPayload.dob = window._selectedCustomer.dob;
-                    bookingPayload.gender = window._selectedCustomer.gender;
-                    bookingPayload.address = window._selectedCustomer.address;
-                    bookingPayload.id_card = window._selectedCustomer.id_card;
+                    // Ưu tiên các trường đã có trên form, nếu trống mới lấy từ CRM
+                    bookingPayload.dob = bookingPayload.dob || window._selectedCustomer.dob;
+                    bookingPayload.gender = (bookingPayload.gender && bookingPayload.gender !== 'Khác') ? bookingPayload.gender : (window._selectedCustomer.gender || 'Khác');
+                    bookingPayload.address = bookingPayload.address || window._selectedCustomer.address;
+                    bookingPayload.id_card = bookingPayload.id_card || window._selectedCustomer.id_card;
+
+                    // Các trường chưa có input trên form -> Lấy từ CRM
                     bookingPayload.allergy = window._selectedCustomer.allergy;
                     bookingPayload.diet = window._selectedCustomer.diet;
                     bookingPayload.trekking_pole = window._selectedCustomer.trekking_pole;
