@@ -196,11 +196,11 @@ export const render = () => {
                           <!-- Hidden by default, shown when detail is expanded or via auto-fill -->
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100">
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Sinh</label>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 font-bold text-blue-600">Ngày Sinh</label>
                                   <input type="date" id="addDob" class="input-field">
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới Tính</label>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 font-bold text-blue-600">Giới Tính</label>
                                   <select id="addGender" class="input-field">
                                       <option value="Khác">Khác</option>
                                       <option value="Nam">Nam</option>
@@ -208,12 +208,39 @@ export const render = () => {
                                   </select>
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">CCCD / Passport</label>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 font-bold text-blue-600">CCCD / Passport</label>
                                   <input type="text" id="addIdCard" class="input-field" placeholder="Số định danh">
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa Chỉ</label>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 font-bold text-blue-600">Địa Chỉ</label>
                                   <input type="text" id="addAddress" class="input-field" placeholder="Tỉnh/Thành, Quận/Huyện">
+                              </div>
+                          </div>
+
+                          <!-- SECTION 3: Hồ Sơ Chi Tiết -->
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100 bg-gray-50/50 -mx-5 px-5 rounded-b-xl">
+                              <div class="md:col-span-2 text-xs font-black text-csr-orange uppercase tracking-widest mb-2 flex items-center gap-2">
+                                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                  Hồ sơ chi tiết (Mở rộng)
+                              </div>
+                              <div>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Dị ứng / Y tế</label>
+                                  <input type="text" id="addAllergy" class="input-field bg-white" placeholder="Thuốc, hải sản, hen suyễn...">
+                              </div>
+                              <div>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Chế độ ăn</label>
+                                  <input type="text" id="addDiet" class="input-field bg-white" placeholder="Chay, không cay, không hành...">
+                              </div>
+                              <div>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Mượn gậy</label>
+                                  <select id="addTrekkingPole" class="input-field bg-white">
+                                      <option value="Không">Không mượn</option>
+                                      <option value="Có">Có mượn gậy</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tên khắc Huy chương</label>
+                                  <input type="text" id="addMedalName" class="input-field bg-white" placeholder="Để trống nếu lấy Họ Tên">
                               </div>
                           </div>
                       </div>
@@ -814,7 +841,7 @@ export const afterRender = () => {
                     <td class="p-4 align-top">${saleCell}</td>
                 const actionBtn = b.customer_id
                     ? `< button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >💳 Thanh toán</button > `
-                    : `< button class="action-btn process-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" > Copy link Process</button > `;
+                    : `< button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >🔗 Gửi Link Cọc</button > `;
 
                 return `
                     < tr class="${rowClass} cursor-pointer row-clickable" data - id="${b.id}" >
@@ -1431,16 +1458,16 @@ if (tbody) {
             window.actionDelete(bookingId);
             return;
         }
-        // COPY LINK PROCESS
-        else if (btn.classList.contains('process-btn')) {
+        // COPY LINK THANH TOÁN (KÈM ĐIỀU KHOẢN)
+        else if (btn.classList.contains('pay-terms-btn')) {
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const baseUrl = isLocal
                 ? 'http://localhost:8888'
                 : window.location.origin;
 
-            const url = baseUrl + `/booking/process.html?id=${bookingId}`;
+            const url = baseUrl + `/pay-terms.html?id=${bookingId}`;
             navigator.clipboard.writeText(url).then(() => {
-                alert('📋 Đã sao chép Link Form Điền Thông Tin Cơ Bản! Gửi cho khách qua Zalo nhé:\\n' + url);
+                alert('📋 Đã sao chép Link Xác nhận điều khoản & Cọc!\\nGửi cho khách: ' + url);
             }).catch(err => {
                 alert('Lỗi khi Copy Clipboard. Link là: ' + url);
             });
@@ -1565,6 +1592,17 @@ if (smartSearchInput) {
                 if (idCardInput) idCardInput.value = item.getAttribute('data-cccd') || '';
                 if (addressInput) addressInput.value = item.getAttribute('data-address') || '';
 
+                // Điền thông tin Section 3
+                const allergyInput = document.getElementById('addAllergy');
+                const dietInput = document.getElementById('addDiet');
+                const trekkingInput = document.getElementById('addTrekkingPole');
+                const medalInput = document.getElementById('addMedalName');
+
+                if (allergyInput) allergyInput.value = item.getAttribute('data-allergy') || '';
+                if (dietInput) dietInput.value = item.getAttribute('data-diet') || '';
+                if (trekkingInput) trekkingInput.value = item.getAttribute('data-trekking_pole') || 'Không';
+                if (medalInput) medalInput.value = item.getAttribute('data-medal-name') || '';
+
                 // Lưu trữ toàn bộ data khách hàng để dùng khi submit
                 window._selectedCustomer = {
                     fullName: item.getAttribute('data-name'),
@@ -1667,6 +1705,12 @@ if (bookingForm) {
             const address = document.getElementById('addAddress').value;
             const special = document.getElementById('addSpecial').value;
 
+            // Thu thập các trường Section 3
+            const allergy = document.getElementById('addAllergy').value;
+            const diet = document.getElementById('addDiet').value;
+            const trekkingPole = document.getElementById('addTrekkingPole').value;
+            const medalName = document.getElementById('addMedalName').value;
+
             const tourPrice = parseInt(document.getElementById('addTourPrice').value) || 0;
             const discount = parseInt(document.getElementById('addDiscount').value) || 0;
             const depositRequired = parseInt(document.getElementById('addDepositRequired').value) || 1000000;
@@ -1702,7 +1746,12 @@ if (bookingForm) {
                 gender: gender,
                 address: address,
                 id_card: idCard,
-                special: special
+                special: special,
+                // Gán các trường Section 3
+                allergy: allergy,
+                diet: diet,
+                trekking_pole: trekkingPole,
+                medal_name: medalName
             };
 
             // Nếu là khách cũ -> Kế thừa các trường ẩn (allergy, diet, etc.) nếu không có trên form
