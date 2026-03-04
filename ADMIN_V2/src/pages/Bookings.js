@@ -159,28 +159,28 @@ export const render = () => {
               </div>
               
               <div class="p-6">
-                  <!-- Smart Search Bar -->
-                  <div class="mb-8 p-4 bg-csr-orange/5 border border-csr-orange/20 rounded-lg">
-                      <h3 class="text-sm font-medium text-csr-light mb-3 flex items-center gap-2">
-                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                          Tự động điền thông tin khách hàng cũ
+                  <!-- Ô 1: Tìm Khách Hàng Cũ -->
+                  <div class="mb-6 p-4 bg-csr-orange/5 border border-csr-orange/20 rounded-lg">
+                      <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                          <svg class="w-4 h-4 text-csr-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                          Tìm Khách Hàng Cũ
                       </h3>
-                      <div class="flex gap-4">
-                          <input type="text" id="smartSearch" class="input-field bg-gray-100 focus:bg-white flex-1" placeholder="Nhập Số Điện Thoại hoặc Mã ID (#CSR...)">
-                          <button id="searchBtn" class="bg-white hover:bg-gray-200 border border-gray-200 text-gray-900 px-4 rounded-lg transition-colors">Tra cứu</button>
+                      <div class="relative">
+                          <input type="text" id="smartSearch" class="input-field bg-white w-full" placeholder="Nhập mã CSR, SĐT, hoặc họ tên..." autocomplete="off">
+                          <div id="searchDropdown" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
                       </div>
-                      <p class="text-[11px] text-gray-500 mt-2 italic">* Nếu tìm thấy, toàn bộ thông tin Y tế, CCCD, Ngày sinh sẽ được tự động điền (Auto-fill).</p>
+                      <p class="text-[11px] text-gray-500 mt-2 italic">* Tìm thấy → tự động điền thông tin, link thanh toán thay cho link process.</p>
                   </div>
 
                   <form id="bookingForm" class="space-y-5">
-                      <!-- SECTION 1: Định Danh Khách Hàng (BẮT BUỘC) -->
+                      <!-- Ô 2: Thông Tin Khách Hàng -->
                       <div class="rounded-xl border-2 border-csr-orange/40 bg-orange-50/30 p-5">
                           <div class="flex items-center gap-2 mb-4">
                               <span class="w-7 h-7 rounded-full bg-csr-orange text-white text-xs font-bold flex items-center justify-center">1</span>
-                              <span class="font-bold text-gray-900">Định Danh Khách Hàng</span>
+                              <span class="font-bold text-gray-900">Thông Tin Khách Hàng</span>
                               <span class="text-[10px] bg-csr-orange/20 text-csr-orange px-2 py-0.5 rounded-full font-bold ml-auto">BẮT BUỘC</span>
                           </div>
-                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Họ và Tên *</label>
                                   <input type="text" id="addFullName" class="input-field" required placeholder="Nhập họ và tên">
@@ -189,22 +189,18 @@ export const render = () => {
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Số Điện Thoại *</label>
                                   <input type="tel" id="addPhone" class="input-field" required placeholder="0912 345 678">
                               </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mã CSR (Tự Sinh)</label>
-                                  <input type="text" id="addCsrCode" class="input-field bg-gray-100 text-csr-orange font-mono" placeholder="#CSR------" disabled>
-                              </div>
                           </div>
                       </div>
 
-                      <!-- SECTION 2: Chọn Tour & Khởi Hành (BẮT BUỘC) -->
+                      <!-- Ô 3: Chọn Tour & Khởi Hành -->
                       <div class="rounded-xl border-2 border-blue-400/40 bg-blue-50/30 p-5">
                           <div class="flex items-center gap-2 mb-4">
                               <span class="w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">2</span>
-                              <span class="font-bold text-gray-900">Chọn Tour & Khởi Hành</span>
+                              <span class="font-bold text-gray-900">Chọn Tour Khởi Hành</span>
                               <span class="text-[10px] bg-blue-500/20 text-blue-600 px-2 py-0.5 rounded-full font-bold ml-auto">BẮT BUỘC</span>
                           </div>
-                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div class="md:col-span-2">
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tuyến Tour *</label>
                                   <select id="addTourName" class="input-field" required>
                                       <option value="">-- Chọn Tour --</option>
@@ -217,73 +213,38 @@ export const render = () => {
                                   </select>
                               </div>
                           </div>
-                      </div>
 
-                      <!-- SECTION 3: Thông Tin Chi Tiết (TÙY CHỌN) -->
-                      <div class="rounded-xl border border-gray-200 bg-white p-5">
-                          <div class="flex items-center gap-2 mb-4">
-                              <span class="w-7 h-7 rounded-full bg-gray-400 text-white text-xs font-bold flex items-center justify-center">3</span>
-                              <span class="font-bold text-gray-900">Thông Tin Chi Tiết</span>
-                              <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-bold ml-auto">TÙY CHỌN</span>
-                          </div>
-                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <!-- Giảm giá + Giá tour + Cọc -->
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-blue-200">
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Sinh</label>
-                                  <input type="date" id="addDob" class="input-field text-sm">
+                                  <label class="block text-xs font-bold text-green-600 uppercase mb-1.5">Giảm Giá (đ)</label>
+                                  <input type="number" id="addDiscount" class="input-field text-sm font-bold bg-green-50/50 text-green-700" value="0" min="0" placeholder="0">
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới Tính</label>
-                                  <select id="addGender" class="input-field text-sm">
-                                      <option value="Khác">Chưa rõ</option>
-                                      <option value="Nam">Nam</option>
-                                      <option value="Nữ">Nữ</option>
-                                  </select>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá Tour (đ)</label>
+                                  <input type="number" id="addTotalPrice" class="input-field text-sm font-bold" placeholder="Tự động lấy từ tour" value="0">
                               </div>
                               <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">CCCD / CMND</label>
-                                  <input type="text" id="addIdCard" class="input-field text-sm" placeholder="Số CCCD">
-                              </div>
-                              <div class="md:col-span-3">
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa Chỉ</label>
-                                  <input type="text" id="addAddress" class="input-field text-sm" placeholder="Quận/Huyện, Tỉnh/Thành phố">
-                              </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Chế Độ Ăn</label>
-                                  <select id="addDiet" class="input-field text-sm">
-                                      <option value="Bình Thường">Bình Thường</option>
-                                      <option value="Ăn Chay">Ăn Chay</option>
-                                      <option value="Không Ăn Bò">Không Ăn Bò</option>
-                                      <option value="Khác">Khác</option>
-                                  </select>
-                              </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Gậy Trekking</label>
-                                  <select id="addTrekkingPole" class="input-field text-sm">
-                                      <option value="Không">Không mượn</option>
-                                      <option value="Có">Có (mượn gậy)</option>
-                                  </select>
-                              </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Dị Ứng / Lưu Ý Y Tế</label>
-                                  <input type="text" id="addAllergy" class="input-field text-sm" placeholder="VD: dị ứng hải sản...">
-                              </div>
-                              <div class="md:col-span-2">
-                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú Thêm (Sale / Yêu Cầu Đặc Biệt)</label>
-                                  <textarea id="addNote" rows="1" class="input-field resize-none text-sm" placeholder="VD: Khách chốt qua zalo, giá ưu đãi..."></textarea>
-                              </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
+                                  <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Tiền Cọc (đ)</label>
                                   <input type="number" id="addDepositRequired" class="input-field text-sm font-bold bg-orange-50/50" value="1000000" placeholder="1000000">
                               </div>
-                              <div>
-                                  <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">Tên In Huy Chương</label>
-                                  <input type="text" id="addMedalName" class="input-field text-sm font-bold bg-blue-50/50" placeholder="Mặc định ghi Tên Thật">
-                              </div>
                           </div>
+                          <div id="priceCalculation" class="mt-3 p-3 bg-white rounded-lg border border-blue-100 text-sm hidden">
+                              <div class="flex justify-between text-gray-500"><span>Giá gốc:</span><span id="calcOriginal">0đ</span></div>
+                              <div class="flex justify-between text-green-600 font-bold"><span>Giảm giá:</span><span id="calcDiscount">-0đ</span></div>
+                              <div class="flex justify-between text-gray-900 font-black border-t border-gray-200 pt-1 mt-1"><span>Tổng thu:</span><span id="calcTotal">0đ</span></div>
+                          </div>
+                      </div>
+
+                      <!-- Ghi chú -->
+                      <div class="rounded-xl border border-gray-200 bg-white p-5">
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú (Sale / Yêu Cầu Đặc Biệt)</label>
+                          <textarea id="addNote" rows="2" class="input-field resize-none text-sm" placeholder="VD: Khách chốt qua zalo, giá ưu đãi..."></textarea>
                       </div>
 
                       <div class="flex justify-end gap-3 pt-4">
                           <input type="hidden" id="editingBookingId" value="">
+                          <input type="hidden" id="selectedCustomerId" value="">
                           <button type="button" class="px-5 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors" onclick="window.closeModal()">Hủy Lên Đơn</button>
                           <button type="submit" id="submitBookingBtn" class="btn-primary px-8">Tạo Đơn Đăng Ký</button>
                       </div>
@@ -750,14 +711,15 @@ export const afterRender = () => {
                 const formatedRemain = remainPrice > 0 ? remainPrice.toLocaleString('vi-VN') + 'đ' : (remainPrice === 0 && totalPrice > 0 ? 'Đã thu trọn' : '-');
 
                 let statusBadge = '';
+                const invoiceLink = `<a href="/invoice.html?id=${b.id}" target="_blank" class="block mt-1 text-[10px] text-blue-500 hover:text-blue-700 font-bold text-center underline">🧾 Xem hóa đơn</a>`;
                 if (b.status === 'Hoàn thành' || b.status === 'Đã đi') {
-                    statusBadge = '<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded text-xs block w-full text-center">Hoàn thành</span>';
+                    statusBadge = '<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded text-xs block w-full text-center">Hoàn thành</span>' + invoiceLink;
                 } else if (b.status === 'Chờ xác nhận cọc') {
                     statusBadge = `<button class="action-btn confirm-deposit-btn bg-csr-orange text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-[#d65503] w-full" data-id="${b.id}">Xác nhận cọc</button>`;
                 } else if (depositPrice > 0 && remainPrice === 0) {
-                    statusBadge = '<span class="bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Hoàn tất phí</span>';
+                    statusBadge = '<span class="bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Hoàn tất phí</span>' + invoiceLink;
                 } else {
-                    statusBadge = '<span class="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Đã Cọc</span>';
+                    statusBadge = '<span class="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Đã Cọc</span>' + invoiceLink;
                 }
 
                 return `
@@ -1436,93 +1398,138 @@ export const afterRender = () => {
         });
     }
 
-    // Fake Auto-fill logic
-    const searchBtn = document.getElementById('searchBtn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('smartSearch').value;
-            const btn = e.target;
+    // ====== DROPDOWN LIVE SEARCH ======
+    const searchInput = document.getElementById('smartSearch');
+    const searchDropdown = document.getElementById('searchDropdown');
+    let searchTimeout = null;
+    let allCrmCustomers = []; // Cache
 
-            if (!input) {
-                alert("Vui lòng nhập Số Điện Thoại hoặc Mã #CSR");
+    // Fetch all CRM customers once for local filtering
+    const loadCrmCustomers = async () => {
+        try {
+            const res = await fetch('/api/admin_customers');
+            const json = await res.json();
+            if (json.success) allCrmCustomers = json.data || [];
+        } catch (e) { console.warn('CRM load error:', e); }
+    };
+    loadCrmCustomers();
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            const query = searchInput.value.trim().toLowerCase();
+            if (query.length < 2) {
+                searchDropdown.classList.add('hidden');
                 return;
             }
 
-            btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-gray-900 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-            btn.disabled = true;
+            searchTimeout = setTimeout(() => {
+                const results = allCrmCustomers.filter(c => {
+                    const name = (c.full_name || '').toLowerCase();
+                    const phone = (c.phone || '').toLowerCase();
+                    const csr = (c.csr_code || '').toLowerCase();
+                    return name.includes(query) || phone.includes(query) || csr.includes(query);
+                }).slice(0, 8);
 
-            try {
-                // Vite Proxy xử lý Endpoint
-                const apiUrl = `/api/admin_customers?action=search`;
-
-                const res = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keyword: input })
-                });
-
-                const json = await res.json();
-
-                if (res.ok && json.success) {
-                    const customer = json.data;
-                    // Đổ dữ liệu vào giao diện tinh gọn bằng ID
-                    // Section 1: Định danh
-                    if (document.getElementById('addFullName')) document.getElementById('addFullName').value = customer.full_name || '';
-                    if (document.getElementById('addPhone')) document.getElementById('addPhone').value = customer.phone || '';
-                    if (document.getElementById('addCsrCode')) document.getElementById('addCsrCode').value = customer.csr_code || '';
-
-                    // Section 3: Chi tiết (auto-fill từ CRM)
-                    if (document.getElementById('addDob') && customer.dob) {
-                        // Convert dob to YYYY-MM-DD for date input
-                        let dobVal = customer.dob;
-                        if (dobVal.includes('/')) {
-                            const parts = dobVal.split('/');
-                            dobVal = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
-                        }
-                        document.getElementById('addDob').value = dobVal;
-                    }
-                    if (document.getElementById('addGender')) document.getElementById('addGender').value = customer.gender || 'Khác';
-                    if (document.getElementById('addIdCard')) document.getElementById('addIdCard').value = customer.cccd || '';
-                    if (document.getElementById('addAllergy')) document.getElementById('addAllergy').value = customer.medical_notes || '';
-                    if (document.getElementById('addDiet')) document.getElementById('addDiet').value = customer.dietary || 'Bình Thường';
-                    if (document.getElementById('addAddress')) document.getElementById('addAddress').value = customer.address || '';
-                    if (document.getElementById('addTrekkingPole')) document.getElementById('addTrekkingPole').value = customer.trekking_pole || 'Không';
-                    if (document.getElementById('addMedalName')) document.getElementById('addMedalName').value = customer.medal_name || '';
-
-                    // Loyalty Highlight Logic
-                    let tagHtml = "";
-                    if (customer.loyalty_tier === 'VIP') {
-                        tagHtml = `<span class="bg-yellow-500/20 text-yellow-500 ml-2 px-2 py-0.5 rounded text-xs">⭐ Khách VIP - Đã đi ${customer.tour_count} chuyến</span>`;
-                    } else if (customer.loyalty_tier === 'Member') {
-                        tagHtml = `<span class="bg-csr-orange/20 text-csr-orange ml-2 px-2 py-0.5 rounded text-xs">✨ Thành viên</span>`;
-                    }
-
-                    const alertHtml = `
-                    <div id="loyalty-alert" class="mt-4 p-3 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg text-sm flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Đã tải thông tin Auto-fill thành công! ${tagHtml}
-                    </div>`;
-
-                    // Remove old alert if exist
-                    const existingAlert = document.getElementById('loyalty-alert');
-                    if (existingAlert) existingAlert.remove();
-
-                    document.getElementById('smartSearch').parentElement.insertAdjacentHTML('afterend', alertHtml);
-
+                if (results.length === 0) {
+                    searchDropdown.innerHTML = '<div class="p-3 text-sm text-gray-400 text-center">Không tìm thấy khách hàng</div>';
                 } else {
-                    throw new Error(json.message || "Không tìm thấy dữ liệu.");
+                    searchDropdown.innerHTML = results.map(c => `
+                        <div class="search-result-item p-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
+                             data-phone="${c.phone || ''}" data-name="${c.full_name || ''}" data-csr="${c.csr_code || ''}"
+                             data-tier="${c.loyalty_tier || ''}" data-count="${c.tour_count || 0}">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-gray-900 text-sm">${c.full_name || ''}</span>
+                                    <span class="text-gray-400 text-xs ml-2">${c.phone || ''}</span>
+                                </div>
+                                <span class="text-csr-orange text-xs font-mono font-bold">${(c.csr_code || '').toUpperCase()}</span>
+                            </div>
+                            ${c.loyalty_tier === 'VIP' ? '<span class="text-[10px] text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded font-bold">⭐ VIP</span>' : ''}
+                        </div>
+                    `).join('');
                 }
+                searchDropdown.classList.remove('hidden');
 
-            } catch (err) {
-                alert("❌ " + err.message);
-                // Reset form fields
-                document.getElementById('bookingForm').reset();
-                const existingAlert = document.getElementById('loyalty-alert');
-                if (existingAlert) existingAlert.remove();
-            } finally {
-                btn.innerHTML = 'Tra cứu';
-                btn.disabled = false;
+                // Attach click handlers
+                searchDropdown.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const name = item.dataset.name;
+                        const phone = item.dataset.phone;
+                        const csr = item.dataset.csr;
+
+                        document.getElementById('addFullName').value = name;
+                        document.getElementById('addPhone').value = phone;
+                        document.getElementById('selectedCustomerId').value = csr;
+                        searchInput.value = `${name} (${csr})`;
+                        searchDropdown.classList.add('hidden');
+
+                        // Show loyalty alert
+                        const existingAlert = document.getElementById('loyalty-alert');
+                        if (existingAlert) existingAlert.remove();
+                        const tier = item.dataset.tier;
+                        const count = item.dataset.count;
+                        let tagHtml = '';
+                        if (tier === 'VIP') tagHtml = `<span class="text-yellow-500 ml-1">⭐ VIP - ${count} chuyến</span>`;
+                        else if (tier === 'Member') tagHtml = `<span class="text-csr-orange ml-1">✨ Thành viên</span>`;
+
+                        searchInput.parentElement.insertAdjacentHTML('afterend',
+                            `<div id="loyalty-alert" class="mt-2 p-2 bg-green-500/10 border border-green-500/30 text-green-600 rounded-lg text-xs flex items-center">
+                                ✅ Đã chọn khách hàng: <strong class="ml-1">${name}</strong> ${tagHtml}
+                            </div>`
+                        );
+                    });
+                });
+            }, 300);
+        });
+
+        // Hide dropdown khi click ngoài
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    // ====== PRICE CALCULATION ======
+    const updatePriceCalc = () => {
+        const totalPriceInput = document.getElementById('addTotalPrice');
+        const discountInput = document.getElementById('addDiscount');
+        const calcBlock = document.getElementById('priceCalculation');
+        if (!totalPriceInput || !discountInput || !calcBlock) return;
+
+        const originalPrice = parseInt(totalPriceInput.value) || 0;
+        const discount = parseInt(discountInput.value) || 0;
+        const finalPrice = Math.max(0, originalPrice - discount);
+
+        if (originalPrice > 0) {
+            calcBlock.classList.remove('hidden');
+            document.getElementById('calcOriginal').textContent = originalPrice.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('calcDiscount').textContent = discount > 0 ? '-' + discount.toLocaleString('vi-VN') + 'đ' : 'Không';
+            document.getElementById('calcTotal').textContent = finalPrice.toLocaleString('vi-VN') + 'đ';
+        } else {
+            calcBlock.classList.add('hidden');
+        }
+    };
+
+    // Listen to discount & total price changes
+    const addDiscountInput = document.getElementById('addDiscount');
+    const addTotalPriceInput = document.getElementById('addTotalPrice');
+    if (addDiscountInput) addDiscountInput.addEventListener('input', updatePriceCalc);
+    if (addTotalPriceInput) addTotalPriceInput.addEventListener('input', updatePriceCalc);
+
+    // Auto-fill price when tour selected (hook into existing tour change event)
+    const addTourNameEl = document.getElementById('addTourName');
+    if (addTourNameEl) {
+        const originalOnChange = addTourNameEl.onchange;
+        addTourNameEl.addEventListener('change', () => {
+            const selectedTour = allTours.find(t => t.name === addTourNameEl.value);
+            if (selectedTour && selectedTour.price) {
+                const priceInput = document.getElementById('addTotalPrice');
+                if (priceInput) {
+                    priceInput.value = parseInt(selectedTour.price) || 0;
+                    updatePriceCalc();
+                }
             }
         });
     }
@@ -1538,24 +1545,23 @@ export const afterRender = () => {
             btn.disabled = true;
 
             try {
-                // Thu thập tất cả field từ form
+                // Thu thập field từ form tối giản
                 const fullName = document.getElementById('addFullName').value;
                 const phone = document.getElementById('addPhone').value;
                 const tourName = document.getElementById('addTourName').value;
                 const tourDate = document.getElementById('addTourDate').value;
                 const saleTag = document.getElementById('addNote').value;
 
-                // Section 3: Chi tiết (lấy từ form thay vì hardcode null)
-                const dob = document.getElementById('addDob').value || null;
-                const gender = document.getElementById('addGender').value || 'Khác';
-                const idCard = document.getElementById('addIdCard').value || '';
-                const address = document.getElementById('addAddress').value || '';
-                const diet = document.getElementById('addDiet').value || 'Bình Thường';
-                const trekkingPole = document.getElementById('addTrekkingPole').value || 'Không';
-                const allergy = document.getElementById('addAllergy').value || '';
+                // Giá & Giảm giá
+                const totalPriceInput = document.getElementById('addTotalPrice');
+                const discountInput = document.getElementById('addDiscount');
                 const depositRequiredInput = document.getElementById('addDepositRequired');
+                const discount = discountInput ? parseInt(discountInput.value) || 0 : 0;
+                const totalPrice = totalPriceInput ? Math.max(0, (parseInt(totalPriceInput.value) || 0) - discount) : 0;
                 const depositRequired = depositRequiredInput ? parseInt(depositRequiredInput.value) : 1000000;
-                const medalName = document.getElementById('addMedalName') ? document.getElementById('addMedalName').value : '';
+
+                // CSR code từ khách cũ đã chọn
+                const selectedCsr = document.getElementById('selectedCustomerId') ? document.getElementById('selectedCustomerId').value : '';
 
                 // Lấy profile Sale hiện tại
                 const userSessionStr = localStorage.getItem('csr_user');
@@ -1568,31 +1574,20 @@ export const afterRender = () => {
 
                 const editingId = document.getElementById('editingBookingId') ? document.getElementById('editingBookingId').value : '';
 
-                // Tìm giá của tour
-                const selectedTourInfo = allTours.find(t => t.name === tourName);
-                const defaultTourPrice = selectedTourInfo ? (parseInt(selectedTourInfo.price) || 0) : 0;
-
                 const bookingPayload = {
                     name: fullName,
                     phone: phone,
                     tour: tourName,
                     date: tourDate,
-                    status: 'Chờ cọc', // Luôn set là "Chờ cọc" với tạo mới thủ công
-                    total_price: defaultTourPrice,
+                    status: 'Chờ cọc',
+                    total_price: totalPrice,
                     deposit: 0,
                     sale_id: sale_id,
                     sale_name: sale_name,
-                    customer_id: "", // Không cấp mã khi tạo mới
-                    dob: dob,
-                    gender: gender,
-                    id_card: idCard,
-                    address: address,
-                    diet: diet,
-                    trekking_pole: trekkingPole,
-                    allergy: allergy,
+                    customer_id: selectedCsr,
                     special: saleTag,
-                    medal_name: medalName,
-                    deposit_required: depositRequired
+                    deposit_required: depositRequired,
+                    discount: discount
                 };
 
                 // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads

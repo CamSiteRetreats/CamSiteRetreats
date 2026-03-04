@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
                 const possibleFields = [
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
-                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required'
+                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required', 'discount'
                 ];
 
                 for (const field of possibleFields) {
@@ -61,22 +61,22 @@ module.exports = async (req, res) => {
                 const {
                     name, phone, tour, date, status, total_price, deposit,
                     sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, discount
                 } = body;
 
                 const query = `
                     INSERT INTO bookings (
                         name, phone, tour, date, status, total_price, deposit, 
                         sale_id, sale_name, customer_id, dob, gender, address, 
-                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
+                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, discount
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
                     RETURNING *;
                 `;
                 const values = [
                     name ?? null, phone ?? null, tour ?? null, date ?? null, status ?? 'Chờ xác nhận cọc', total_price ?? null, deposit ?? null,
                     sale_id ?? null, sale_name ?? null, customer_id ?? null, dob ?? null, gender ?? null, address ?? null,
-                    id_card ?? null, diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null, medal_name ?? null, commitments ?? null, deposit_required ?? 1000000
+                    id_card ?? null, diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null, medal_name ?? null, commitments ?? null, deposit_required ?? 1000000, discount ?? 0
                 ];
                 const { rows } = await db.query(query, values);
                 const newBooking = rows[0];

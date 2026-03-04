@@ -169,6 +169,10 @@
                     <span class="text-gray-500">Ngày khởi hành:</span>
                     <span class="font-bold text-primary" id="tour-date">...</span>
                 </div>
+                <div class="flex justify-between border-b border-gray-50 pb-2" id="discount-row" style="display:none">
+                    <span class="text-gray-500">Giảm giá:</span>
+                    <span class="font-bold text-green-600" id="discount-amount">Không</span>
+                </div>
             </div>
         </div>
 
@@ -339,6 +343,16 @@
                 document.getElementById('cust-name').textContent = data.name || 'Khách hàng';
                 document.getElementById('tour-name').textContent = data.tour || 'Tour';
                 document.getElementById('tour-date').textContent = data.date || '';
+
+                // Discount display
+                const discountRow = document.getElementById('discount-row');
+                if (data.discount && data.discount > 0) {
+                    discountRow.style.display = 'flex';
+                    document.getElementById('discount-amount').textContent = formatVND(data.discount);
+                } else {
+                    discountRow.style.display = 'flex';
+                    document.getElementById('discount-amount').textContent = 'Không';
+                }
 
                 // Amount
                 document.getElementById('amount-due').textContent = formatVND(data.amountDue);
