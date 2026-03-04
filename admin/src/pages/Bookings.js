@@ -819,7 +819,6 @@ export const afterRender = () => {
                 } else {
                     saleCell = `<span class="text-sm text-gray-500">${b.sale_name || 'Website'}</span>`;
                 }
-
                 const actionBtn = b.customer_id
                     ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
                     : `<button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Gửi Link Cọc</button>`;
@@ -850,7 +849,7 @@ export const afterRender = () => {
                         </div>
                     </td>
                 </tr>
-                `;
+    `;
             }
         }).join('');
 
@@ -921,14 +920,14 @@ export const afterRender = () => {
         if (filterTourInfo) {
             const currentVal = filterTourInfo.value;
             filterTourInfo.innerHTML = '<option value="">Tất cả Tour</option>';
-            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `<option value="${t}">${t}</option>`);
+            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `< option value = "${t}" > ${t}</option > `);
             filterTourInfo.value = currentVal;
         }
 
         if (filterDateInfo) {
             const currentVal = filterDateInfo.value;
             filterDateInfo.innerHTML = '<option value="">Tất cả Ngày</option>';
-            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `<option value="${d}">${d}</option>`);
+            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `< option value = "${d}" > ${d}</option > `);
             filterDateInfo.value = currentVal;
         }
 
@@ -938,7 +937,7 @@ export const afterRender = () => {
             // Add Website option
             filterSaleInfo.innerHTML += '<option value="null">Nguồn Website</option>';
             for (let [id, name] of saleMap) {
-                filterSaleInfo.innerHTML += `<option value="${id}">${name}</option>`;
+                filterSaleInfo.innerHTML += `< option value = "${id}" > ${name}</option > `;
             }
             filterSaleInfo.value = currentVal;
         }
