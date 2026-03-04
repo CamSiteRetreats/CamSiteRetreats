@@ -14,8 +14,16 @@
       "destination": "/api/media?slug=:slug"
     },
     {
+      "source": "/admin/assets/(.*)",
+      "destination": "/admin/dist/assets/$1"
+    },
+    {
+      "source": "/admin/vite.svg",
+      "destination": "/admin/dist/vite.svg"
+    },
+    {
       "source": "/admin/(.*)",
-      "destination": "/admin/"
+      "destination": "/admin/dist/index.html"
     }
   ],
   "headers": [

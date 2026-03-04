@@ -13,7 +13,7 @@ export default defineConfig({
         }
     },
     build: {
-        outDir: '../admin',
+        outDir: 'dist',
         emptyOutDir: true
     }
 });

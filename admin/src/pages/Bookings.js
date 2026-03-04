@@ -819,32 +819,13 @@ export const afterRender = () => {
                 } else {
                     saleCell = `<span class="text-sm text-gray-500">${b.sale_name || 'Website'}</span>`;
                 }
-                return `
-                <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
-                    <td class="p-4 align-top">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-csr-orange/20 text-csr-orange flex items-center justify-center font-bold">${avtChar}</div>
-                            <div>
-                                <div class="font-medium text-gray-900">${b.name}</div>
-                                ${b.customer_id
-                        ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
-                        : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
-                    }
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 align-top">
-                        <div class="text-sm text-gray-600">${b.tour || '(Chưa rõ)'}</div>
-                        <div class="text-xs text-gray-500 mt-1">Lịch: ${b.date || '(Chưa chọn)'}</div>
-                        ${isConsultTab && b.special ? `<div class="text-xs text-blue-500 mt-1 italic">💬 ${b.special}</div>` : ''}
-                    </td>
-                    <td class="p-4 align-top">${saleCell}</td>
+
                 const actionBtn = b.customer_id
-                    ? `< button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >💳 Thanh toán</button > `
-                    : `< button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >🔗 Gửi Link Cọc</button > `;
+                    ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
+                    : `<button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Gửi Link Cọc</button>`;
 
                 return `
-                    < tr class="${rowClass} cursor-pointer row-clickable" data - id="${b.id}" >
+                <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
                     <td class="p-4 align-top">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-csr-orange/20 text-csr-orange flex items-center justify-center font-bold">${avtChar}</div>
@@ -868,8 +849,8 @@ export const afterRender = () => {
                             ${actionBtn}
                         </div>
                     </td>
-                </tr >
-    `;
+                </tr>
+                `;
             }
         }).join('');
 
@@ -940,14 +921,14 @@ export const afterRender = () => {
         if (filterTourInfo) {
             const currentVal = filterTourInfo.value;
             filterTourInfo.innerHTML = '<option value="">Tất cả Tour</option>';
-            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `< option value = "${t}" > ${ t }</option > `);
+            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `<option value="${t}">${t}</option>`);
             filterTourInfo.value = currentVal;
         }
 
         if (filterDateInfo) {
             const currentVal = filterDateInfo.value;
             filterDateInfo.innerHTML = '<option value="">Tất cả Ngày</option>';
-            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `< option value = "${d}" > ${ d }</option > `);
+            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `<option value="${d}">${d}</option>`);
             filterDateInfo.value = currentVal;
         }
 
@@ -957,7 +938,7 @@ export const afterRender = () => {
             // Add Website option
             filterSaleInfo.innerHTML += '<option value="null">Nguồn Website</option>';
             for (let [id, name] of saleMap) {
-                filterSaleInfo.innerHTML += `< option value = "${id}" > ${ name }</option > `;
+                filterSaleInfo.innerHTML += `<option value="${id}">${name}</option>`;
             }
             filterSaleInfo.value = currentVal;
         }
@@ -1009,7 +990,7 @@ export const afterRender = () => {
                 if (filterDate && b.date !== filterDate) return false;
                 if (filterSale && String(b.sale_id) !== String(filterSale)) return false;
                 if (searchTerm) {
-                    const searchString = `${ b.name || '' } ${ b.phone || '' } ${ b.customer_id || '' } `.toLowerCase();
+                    const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} `.toLowerCase();
                     if (!searchString.includes(searchTerm)) return false;
                 }
                 return true;
@@ -1036,114 +1017,114 @@ export const afterRender = () => {
                     `"${b.sale_name || 'Website'}"`,
                     b.deposit || 0,
                     b.total_price || 0,
-                    `"${(b.special || '').replace(/" / g, '""')}"` // Escape quotes
+                    `"${(b.special || '').replace(/"/g, '""')}"` // Escape quotes
                 ]);
             });
 
-// Convert to CSV string format with BOM for UTF-8 compatibility
-const csvContent = "\\uFEFF" + rows.map(e => e.join(",")).join("\n");
+            // Convert to CSV string format with BOM for UTF-8 compatibility
+            const csvContent = "\\uFEFF" + rows.map(e => e.join(",")).join("\n");
 
-// Trigger download
-const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-const url = URL.createObjectURL(blob);
-const link = document.createElement("a");
-link.setAttribute("href", url);
-let filenameStatus = activeTab === 'pending' ? 'ChoCoc' : (activeTab === 'upcoming' ? 'SapThamGia' : 'HoanThanh');
-link.setAttribute("download", `BaoCao_DonHang_${filenameStatus}_${new Date().toISOString().slice(0, 10)}.csv`);
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
+            // Trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            let filenameStatus = activeTab === 'pending' ? 'ChoCoc' : (activeTab === 'upcoming' ? 'SapThamGia' : 'HoanThanh');
+            link.setAttribute("download", `BaoCao_DonHang_${filenameStatus}_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     }
 
-// Logic Đổi Tab
-const tabBtns = document.querySelectorAll('.tab-btn');
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        // Đặt lại Style tất cả Tab
-        tabBtns.forEach(b => {
-            b.classList.remove('border-csr-orange', 'text-csr-orange');
-            b.classList.add('border-transparent', 'text-gray-500');
+    // Logic Đổi Tab
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Đặt lại Style tất cả Tab
+            tabBtns.forEach(b => {
+                b.classList.remove('border-csr-orange', 'text-csr-orange');
+                b.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            // Gắn Style Tab đang chọn
+            e.target.classList.add('border-csr-orange', 'text-csr-orange');
+            e.target.classList.remove('border-transparent', 'text-gray-500');
+
+            // Cập nhật State & Render lại
+            activeTab = e.target.getAttribute('data-tab');
+            renderTable();
         });
-
-        // Gắn Style Tab đang chọn
-        e.target.classList.add('border-csr-orange', 'text-csr-orange');
-        e.target.classList.remove('border-transparent', 'text-gray-500');
-
-        // Cập nhật State & Render lại
-        activeTab = e.target.getAttribute('data-tab');
-        renderTable();
     });
-});
 
-// Modal behavior - Smooth Animation
-const modal = document.getElementById('bookingModal');
-const modalContent = document.getElementById('bookingModalContent');
-const detailModal = document.getElementById('detailModal');
-const detailModalContent = document.getElementById('detailModalContent');
-const editModal = document.getElementById('editModal');
-const editModalContent = document.getElementById('editModalContent');
-const btnAdd = document.getElementById('addBookingBtn');
+    // Modal behavior - Smooth Animation
+    const modal = document.getElementById('bookingModal');
+    const modalContent = document.getElementById('bookingModalContent');
+    const detailModal = document.getElementById('detailModal');
+    const detailModalContent = document.getElementById('detailModalContent');
+    const editModal = document.getElementById('editModal');
+    const editModalContent = document.getElementById('editModalContent');
+    const btnAdd = document.getElementById('addBookingBtn');
 
-// Make modal transition faster and smoother
-if (modal) {
-    modal.classList.add('duration-200', 'ease-out');
-    modalContent.classList.add('duration-300', 'ease-out');
-}
-if (editModal) {
-    editModal.classList.add('duration-200', 'ease-out');
-    editModalContent.classList.add('duration-300', 'ease-out');
-}
+    // Make modal transition faster and smoother
+    if (modal) {
+        modal.classList.add('duration-200', 'ease-out');
+        modalContent.classList.add('duration-300', 'ease-out');
+    }
+    if (editModal) {
+        editModal.classList.add('duration-200', 'ease-out');
+        editModalContent.classList.add('duration-300', 'ease-out');
+    }
 
-if (btnAdd) {
-    btnAdd.addEventListener('click', () => {
-        document.getElementById('bookingModalContent').querySelector('h2').innerText = 'Thêm Khách Hàng (Tạo Đơn)';
-        document.getElementById('submitBookingBtn').innerText = 'Tạo Phơi Đăng Ký';
-        document.getElementById('editingBookingId').value = ''; // Reset trạng thái Sửa
-        document.getElementById('bookingForm').reset();
-        const existingAlert = document.getElementById('loyalty-alert');
-        if (existingAlert) existingAlert.remove();
+    if (btnAdd) {
+        btnAdd.addEventListener('click', () => {
+            document.getElementById('bookingModalContent').querySelector('h2').innerText = 'Thêm Khách Hàng (Tạo Đơn)';
+            document.getElementById('submitBookingBtn').innerText = 'Tạo Phơi Đăng Ký';
+            document.getElementById('editingBookingId').value = ''; // Reset trạng thái Sửa
+            document.getElementById('bookingForm').reset();
+            const existingAlert = document.getElementById('loyalty-alert');
+            if (existingAlert) existingAlert.remove();
 
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.add('opacity-100');
-            modalContent.classList.remove('scale-95', 'translate-y-4');
-            modalContent.classList.add('scale-100', 'translate-y-0');
-        }, 10);
-    });
-}
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-95', 'translate-y-4');
+                modalContent.classList.add('scale-100', 'translate-y-0');
+            }, 10);
+        });
+    }
 
-// Window global functions for closing modals
-window.closeModal = () => {
-    if (!modal) return;
-    modal.classList.remove('opacity-100');
-    modalContent.classList.remove('scale-100', 'translate-y-0');
-    modalContent.classList.add('scale-95', 'translate-y-4');
-    setTimeout(() => { modal.classList.add('hidden'); }, 200);
-}
+    // Window global functions for closing modals
+    window.closeModal = () => {
+        if (!modal) return;
+        modal.classList.remove('opacity-100');
+        modalContent.classList.remove('scale-100', 'translate-y-0');
+        modalContent.classList.add('scale-95', 'translate-y-4');
+        setTimeout(() => { modal.classList.add('hidden'); }, 200);
+    }
 
-window.closeDetailModal = () => {
-    if (!detailModal) return;
-    detailModal.classList.remove('opacity-100');
-    detailModalContent.classList.remove('scale-100', 'translate-y-0');
-    detailModalContent.classList.add('scale-95', 'translate-y-4');
-    setTimeout(() => { detailModal.classList.add('hidden'); }, 200);
-}
+    window.closeDetailModal = () => {
+        if (!detailModal) return;
+        detailModal.classList.remove('opacity-100');
+        detailModalContent.classList.remove('scale-100', 'translate-y-0');
+        detailModalContent.classList.add('scale-95', 'translate-y-4');
+        setTimeout(() => { detailModal.classList.add('hidden'); }, 200);
+    }
 
-window.closeEditModal = () => {
-    if (!editModal) return;
-    editModal.classList.remove('opacity-100');
-    editModalContent.classList.remove('scale-100', 'translate-y-0');
-    editModalContent.classList.add('scale-95', 'translate-y-4');
-    setTimeout(() => { editModal.classList.add('hidden'); }, 200);
-}
+    window.closeEditModal = () => {
+        if (!editModal) return;
+        editModal.classList.remove('opacity-100');
+        editModalContent.classList.remove('scale-100', 'translate-y-0');
+        editModalContent.classList.add('scale-95', 'translate-y-4');
+        setTimeout(() => { editModal.classList.add('hidden'); }, 200);
+    }
 
-// Modal Hành Động trên Dòng (Row Action Modal)
-window.openRowActionModal = (booking) => {
-    document.getElementById('ramName').textContent = booking.name || 'Khách Hàng Này';
-    document.getElementById('ramPhone').textContent = booking.customer_id ? `🥇 ${booking.customer_id.toUpperCase()}` : (booking.phone || '');
+    // Modal Hành Động trên Dòng (Row Action Modal)
+    window.openRowActionModal = (booking) => {
+        document.getElementById('ramName').textContent = booking.name || 'Khách Hàng Này';
+        document.getElementById('ramPhone').textContent = booking.customer_id ? `🥇 ${booking.customer_id.toUpperCase()}` : (booking.phone || '');
 
-    const actionHtml = `
+        const actionHtml = `
             <button class="w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-4 hover:bg-gray-50 transition-colors group" onclick="window.actionView(${booking.id})">
                 <div class="bg-blue-100/60 text-blue-600 p-2 rounded-lg group-hover:bg-blue-200 transition-colors">
                     <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
@@ -1163,28 +1144,28 @@ window.openRowActionModal = (booking) => {
                 <span class="font-bold text-[#1f2937] text-sm">Xóa Đơn Hàng Này</span>
             </button>
         `;
-    document.getElementById('ramActions').innerHTML = actionHtml;
-    document.getElementById('rowActionModal').classList.remove('hidden');
-};
+        document.getElementById('ramActions').innerHTML = actionHtml;
+        document.getElementById('rowActionModal').classList.remove('hidden');
+    };
 
-// Đóng Modal khi bấm ra ngoài
-window.addEventListener('click', (e) => {
-    const rowModal = document.getElementById('rowActionModal');
-    if (rowModal && e.target === rowModal) {
-        rowModal.classList.add('hidden');
-    }
-});
+    // Đóng Modal khi bấm ra ngoài
+    window.addEventListener('click', (e) => {
+        const rowModal = document.getElementById('rowActionModal');
+        if (rowModal && e.target === rowModal) {
+            rowModal.classList.add('hidden');
+        }
+    });
 
-// Hàm chức năng Row (Toàn cục)
-window.actionView = (bookingId) => {
-    document.getElementById('rowActionModal').classList.add('hidden');
-    const booking = currentBookings.find(b => b.id == bookingId);
-    if (!booking) return;
+    // Hàm chức năng Row (Toàn cục)
+    window.actionView = (bookingId) => {
+        document.getElementById('rowActionModal').classList.add('hidden');
+        const booking = currentBookings.find(b => b.id == bookingId);
+        if (!booking) return;
 
-    const depositHtml = parseInt(booking.deposit) > 0 ? `<span class="text-green-600 font-bold">${parseInt(booking.deposit).toLocaleString('vi-VN')}đ</span>` : `<span class="text-yellow-600 font-bold">0đ (Chưa Cọc)</span>`;
-    const priceHtml = booking.total_price ? `${parseInt(booking.total_price).toLocaleString('vi-VN')}đ` : 'Chưa định giá';
+        const depositHtml = parseInt(booking.deposit) > 0 ? `<span class="text-green-600 font-bold">${parseInt(booking.deposit).toLocaleString('vi-VN')}đ</span>` : `<span class="text-yellow-600 font-bold">0đ (Chưa Cọc)</span>`;
+        const priceHtml = booking.total_price ? `${parseInt(booking.total_price).toLocaleString('vi-VN')}đ` : 'Chưa định giá';
 
-    const content = `
+        const content = `
            <div class="grid grid-cols-2 gap-y-3 gap-x-6 border-b pb-4">
                <p><strong class="text-gray-500 block">Họ và Tên:</strong> <span class="text-lg font-medium">${booking.name}</span></p>
                <p><strong class="text-gray-500 block">SĐT:</strong> <span class="text-lg">${booking.phone}</span></p>
@@ -1209,335 +1190,335 @@ window.actionView = (bookingId) => {
                 <p class="col-span-2"><strong class="text-gray-500 block">Nhân Viên Sale / Ghi Chú:</strong> <span class="italic text-gray-700 bg-yellow-50 p-2 block mt-1 rounded border border-yellow-100">${booking.sale_name || 'Website'} - ${booking.special || '(Không có nhánh ghi chú)'}</span></p>
             </div>
         `;
-    document.getElementById('detailContentBlock').innerHTML = content;
-    document.getElementById('detailModal').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('detailModal').classList.add('opacity-100');
-        const mc = document.getElementById('detailModalContent');
-        if (mc) {
-            mc.classList.remove('scale-95', 'translate-y-4');
-            mc.classList.add('scale-100', 'translate-y-0');
-        }
-    }, 10);
-};
-
-window.actionEdit = async (bookingId) => {
-    document.getElementById('rowActionModal').classList.add('hidden');
-    const booking = currentBookings.find(b => b.id == bookingId);
-    if (!booking) return;
-
-    // Nạp data vào các trường của Edit Form
-    document.getElementById('edit-id').value = bookingId;
-    document.getElementById('edit-name').value = booking.name || '';
-    document.getElementById('edit-phone').value = booking.phone || '';
-    document.getElementById('edit-medal-name').value = booking.medal_name || '';
-
-    // Tour & Lịch trình (populate dropdown date theo tour)
-    document.getElementById('edit-tour').value = booking.tour || '';
-    if (typeof populateDateDropdown === 'function') {
-        populateDateDropdown('edit-date', booking.tour || '', booking.date || '');
-    }
-
-    // Các trường mở rộng - LUÔN ƯU TIÊN LẤY TỪ CRM NẾU TRỐNG
-    const fillEditForm = (data) => {
-        // Chuẩn hóa DOB nếu là DD/MM/YYYY
-        let dobVal = data.dob || '';
-        if (typeof dobVal === 'string' && dobVal.includes('/')) {
-            const parts = dobVal.split('/');
-            if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        }
-
-        document.getElementById('edit-dob').value = dobVal;
-        document.getElementById('edit-gender').value = data.gender || 'Khác';
-        document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
-        document.getElementById('edit-address').value = data.address || '';
-        document.getElementById('edit-diet').value = data.diet || data.dietary || 'Không';
-        document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+        document.getElementById('detailContentBlock').innerHTML = content;
+        document.getElementById('detailModal').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('detailModal').classList.add('opacity-100');
+            const mc = document.getElementById('detailModalContent');
+            if (mc) {
+                mc.classList.remove('scale-95', 'translate-y-4');
+                mc.classList.add('scale-100', 'translate-y-0');
+            }
+        }, 10);
     };
 
-    // Điền tạm dữ liệu hiện có trong booking
-    fillEditForm(booking);
-    document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
-    document.getElementById('edit-commitments').checked = !!booking.commitments;
-    document.getElementById('edit-special').value = booking.special || '';
-
-    // Nếu thông tin profile đang trống (DOB/Address/Gender) -> Thử pull từ CRM/Hệ thống
-    if ((!booking.dob || !booking.address || !booking.gender || booking.gender === 'Khác') && (booking.customer_id || booking.phone)) {
-        try {
-            const keyword = booking.customer_id || booking.phone;
-            const res = await fetch(`/api/admin_customers?action=search&keyword=${encodeURIComponent(keyword)}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keyword })
-            });
-            const json = await res.json();
-            if (res.ok && json.success) {
-                // Merge dữ liệu hệ thống vào form nếu form đang trống
-                const c = json.data;
-                const dobInput = document.getElementById('edit-dob');
-                const addressInput = document.getElementById('edit-address');
-                const allergyInput = document.getElementById('edit-allergy');
-                const dietInput = document.getElementById('edit-diet');
-                const genderInput = document.getElementById('edit-gender');
-                const medalInput = document.getElementById('edit-medal-name');
-
-                if (dobInput && !dobInput.value) dobInput.value = c.dob || '';
-                if (addressInput && !addressInput.value) addressInput.value = c.address || '';
-                if (allergyInput && !allergyInput.value) allergyInput.value = c.medical_notes || '';
-                if (dietInput && (dietInput.value === 'Không' || !dietInput.value)) dietInput.value = c.dietary || 'Không';
-                if (genderInput && (genderInput.value === 'Khác' || !genderInput.value)) genderInput.value = c.gender || 'Khác';
-                if (medalInput && !medalInput.value) medalInput.value = c.medal_name || '';
-            }
-        } catch (err) { console.error("Pull CRM error:", err); }
-    }
-
-    // Tài chính
-    document.getElementById('edit-total').value = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
-    document.getElementById('edit-discount').value = booking.discount || 0;
-    document.getElementById('edit-deposit').value = booking.deposit || 0;
-    document.getElementById('edit-deposit-required').value = booking.deposit_required || 1000000;
-
-    window.updateEditRemaining();
-
-    // Hiện Modal Edit
-    const editModal = document.getElementById('editModal');
-    const editModalContent = document.getElementById('editModalContent');
-    if (editModal && editModalContent) {
-        editModal.classList.remove('hidden');
-        setTimeout(() => {
-            editModal.classList.add('opacity-100');
-            editModalContent.classList.remove('scale-95', 'translate-y-4');
-            editModalContent.classList.add('scale-100', 'translate-y-0');
-        }, 10);
-    }
-};
-
-window.actionDelete = async (bookingId) => {
-    document.getElementById('rowActionModal').classList.add('hidden');
-    if (confirm('Bạn có chắc chắn muốn xóa Đơn hàng này? Thao tác không thể hoàn tác.')) {
-        try {
-            const res = await fetch(`/api/bookings?id=${bookingId}`, { method: 'DELETE' });
-            if (res.ok) {
-                alert('✅ Đã xóa đơn hàng thành công!');
-                loadBookings();
-            } else {
-                throw new Error('Lỗi từ Server');
-            }
-        } catch (err) {
-            alert('❌ Không thể xóa bảng ghi này: ' + err.message);
-        }
-    }
-};
-
-// Logic tính toán số tiền còn lại trong Form Edit
-window.updateEditRemaining = () => {
-    const total = parseInt(document.getElementById('edit-total').value) || 0;
-    const discount = parseInt(document.getElementById('edit-discount').value) || 0;
-    const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
-    const finalPrice = total - discount;
-    const remaining = finalPrice - deposit;
-
-    const remainEl = document.getElementById('edit-remaining');
-    if (remainEl) {
-        remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
-    }
-};
-
-// Gắn event tự động tính toán
-const editTotalInput = document.getElementById('edit-total');
-const editDepositInput = document.getElementById('edit-deposit');
-if (editTotalInput) editTotalInput.addEventListener('input', updateRemainingCalculation);
-if (editDepositInput) editDepositInput.addEventListener('input', updateRemainingCalculation);
-
-// Cần phải gán lại event cho 2 nút close cũ 
-const closeBtns = document.querySelectorAll('#bookingModal button[onclick*="hidden"]');
-closeBtns.forEach(btn => {
-    btn.removeAttribute('onclick');
-    btn.addEventListener('click', window.closeModal);
-});
-
-// Hàm tự động đồng bộ khách hàng sang CRM (Khách Hàng Thân Thiết)
-const syncToCRM = async (booking) => {
-    try {
-        const res = await fetch('/api/admin_customers?action=create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                full_name: booking.name,
-                phone: booking.phone,
-                cccd: booking.id_card || '',
-                dob: booking.dob || null,
-                gender: booking.gender || 'Khác',
-                medical_notes: booking.allergy || '',
-                dietary: booking.diet || ''
-            })
-        });
-        const data = await res.json();
-        if (data.success && data.csr_code) {
-            console.log("✅ Đã đồng bộ CRM thành công:", booking.name, data.csr_code);
-            // Update booking with new internal CRM ID
-            const updateRes = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: booking.id,
-                    customer_id: data.csr_code
-                })
-            });
-            if (updateRes.ok) {
-                console.log("✅ Đã cập nhật Booking mã CRM");
-                if (typeof loadBookings === 'function') loadBookings();
-            }
-        }
-    } catch (err) {
-        console.error("❌ Lỗi đồng bộ CRM:", err);
-    }
-};
-
-// Delegation Events cho bảng (Xóa, Edit, View, Ký Cọc, Payment, Row Click)
-const tbody = document.getElementById('bookingsTableBody');
-if (tbody) {
-    tbody.addEventListener('click', async (e) => {
-        const btn = e.target.closest('.action-btn');
-
-        // XỬ LÝ CLICK VÀO DÒNG (KÍCH HOẠT ACTION MODAL NẾU KHÔNG PHẢI BUTTON)
-        if (!btn) {
-            const tr = e.target.closest('.row-clickable');
-            if (tr) {
-                const bookingId = tr.getAttribute('data-id');
-                const booking = currentBookings.find(b => b.id == bookingId);
-                if (booking) openRowActionModal(booking);
-            }
-            return;
-        }
-
-        const bookingId = btn.getAttribute('data-id');
+    window.actionEdit = async (bookingId) => {
+        document.getElementById('rowActionModal').classList.add('hidden');
         const booking = currentBookings.find(b => b.id == bookingId);
         if (!booking) return;
 
-        // Đóng Modal Hành động dòng (nếu có đang mở)
-        const rowModal = document.getElementById('rowActionModal');
-        if (rowModal) rowModal.classList.add('hidden');
+        // Nạp data vào các trường của Edit Form
+        document.getElementById('edit-id').value = bookingId;
+        document.getElementById('edit-name').value = booking.name || '';
+        document.getElementById('edit-phone').value = booking.phone || '';
+        document.getElementById('edit-medal-name').value = booking.medal_name || '';
 
-        // XÁC NHẬN CỌC NHANH
-        if (btn.classList.contains('confirm-deposit-btn')) {
-            if (confirm("Xác nhận khách hàng này đã chuyển khoản đặt cọc?")) {
-                try {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-50');
+        // Tour & Lịch trình (populate dropdown date theo tour)
+        document.getElementById('edit-tour').value = booking.tour || '';
+        if (typeof populateDateDropdown === 'function') {
+            populateDateDropdown('edit-date', booking.tour || '', booking.date || '');
+        }
 
-                    const res = await fetch('/api/bookings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            id: bookingId,
-                            status: 'Đã cọc'
-                        })
-                    });
-
-                    if (res.ok) {
-                        alert("✅ Đã xác nhận cọc thành công!");
-                        // Tự động đồng bộ CRM khi đã cọc
-                        syncToCRM(booking);
-                        if (typeof loadBookings === 'function') loadBookings();
-                    } else {
-                        throw new Error('Lỗi cập nhật API');
-                    }
-                } catch (err) {
-                    alert("❌ Lỗi: " + err.message);
-                } finally {
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50');
-                }
+        // Các trường mở rộng - LUÔN ƯU TIÊN LẤY TỪ CRM NẾU TRỐNG
+        const fillEditForm = (data) => {
+            // Chuẩn hóa DOB nếu là DD/MM/YYYY
+            let dobVal = data.dob || '';
+            if (typeof dobVal === 'string' && dobVal.includes('/')) {
+                const parts = dobVal.split('/');
+                if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
             }
-            return;
-        }
 
-        // XÓA
-        if (btn.classList.contains('delete-btn')) {
-            window.actionDelete(bookingId);
-            return;
-        }
-        // COPY LINK THANH TOÁN (KÈM ĐIỀU KHOẢN)
-        else if (btn.classList.contains('pay-terms-btn')) {
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const baseUrl = isLocal
-                ? 'http://localhost:8888'
-                : window.location.origin;
+            document.getElementById('edit-dob').value = dobVal;
+            document.getElementById('edit-gender').value = data.gender || 'Khác';
+            document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
+            document.getElementById('edit-address').value = data.address || '';
+            document.getElementById('edit-diet').value = data.diet || data.dietary || 'Không';
+            document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+        };
 
-            const url = baseUrl + `/pay-terms.html?id=${bookingId}`;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('📋 Đã sao chép Link Xác nhận điều khoản & Cọc!\\nGửi cho khách: ' + url);
-            }).catch(err => {
-                alert('Lỗi khi Copy Clipboard. Link là: ' + url);
-            });
-        }
-        // GỬI LINK CỌC (SHORT URL)
-        else if (btn.classList.contains('send-btn')) {
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const baseUrl = isLocal
-                ? 'http://localhost:8888'
-                : window.location.origin;
+        // Điền tạm dữ liệu hiện có trong booking
+        fillEditForm(booking);
+        document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
+        document.getElementById('edit-commitments').checked = !!booking.commitments;
+        document.getElementById('edit-special').value = booking.special || '';
 
-            const url = baseUrl + `/pay/${bookingId}`;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('📋 Đã sao chép Link Thanh Toán Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
-            }).catch(err => {
-                alert('Lỗi khi Copy Clipboard. Link là: ' + url);
-            });
-        }
-        // NÚT THANH TOÁN (SHORT URL)
-        else if (btn.classList.contains('payment-btn')) {
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const baseUrl = isLocal
-                ? 'http://localhost:8888'
-                : window.location.origin;
-
-            const url = baseUrl + `/pay/${bookingId}`;
-            window.open(url, '_blank');
-        }
-        // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
-        else if (btn.classList.contains('view-btn')) {
-            // Đóng menu nếu mở từ Menu Thao Tác Dòng
-            document.getElementById('rowActionModal').classList.add('hidden');
-            window.actionView(bookingId);
-        }
-        // SỬA ĐƠN HÀNG - Gọi Edit Form Mở Rộng
-        else if (btn.classList.contains('edit-btn')) {
-            window.actionEdit(bookingId);
-        }
-    });
-}
-
-// ===== CHỨC NĂNG SMART SEARCH (GợI Ý KHÁCH CŨ) =====
-const smartSearchInput = document.getElementById('smartSearch');
-const searchSuggestions = document.getElementById('searchSuggestions');
-
-if (smartSearchInput) {
-    let debounceTimer;
-    smartSearchInput.addEventListener('input', (e) => {
-        const input = e.target.value.toLowerCase().trim();
-        clearTimeout(debounceTimer);
-        if (input.length < 2) {
-            if (searchSuggestions) searchSuggestions.classList.add('hidden');
-            return;
-        }
-
-        debounceTimer = setTimeout(async () => {
+        // Nếu thông tin profile đang trống (DOB/Address/Gender) -> Thử pull từ CRM/Hệ thống
+        if ((!booking.dob || !booking.address || !booking.gender || booking.gender === 'Khác') && (booking.customer_id || booking.phone)) {
             try {
-                const res = await fetch(`/api/admin_customers?action=search&keyword=${input}`, {
+                const keyword = booking.customer_id || booking.phone;
+                const res = await fetch(`/api/admin_customers?action=search&keyword=${encodeURIComponent(keyword)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keyword: input })
+                    body: JSON.stringify({ keyword })
                 });
                 const json = await res.json();
-
                 if (res.ok && json.success) {
-                    const customer = json.data;
-                    const results = [customer]; // API hiện tại trả về 1 object
+                    // Merge dữ liệu hệ thống vào form nếu form đang trống
+                    const c = json.data;
+                    const dobInput = document.getElementById('edit-dob');
+                    const addressInput = document.getElementById('edit-address');
+                    const allergyInput = document.getElementById('edit-allergy');
+                    const dietInput = document.getElementById('edit-diet');
+                    const genderInput = document.getElementById('edit-gender');
+                    const medalInput = document.getElementById('edit-medal-name');
 
-                    if (searchSuggestions) {
-                        searchSuggestions.innerHTML = results.map(c => `
+                    if (dobInput && !dobInput.value) dobInput.value = c.dob || '';
+                    if (addressInput && !addressInput.value) addressInput.value = c.address || '';
+                    if (allergyInput && !allergyInput.value) allergyInput.value = c.medical_notes || '';
+                    if (dietInput && (dietInput.value === 'Không' || !dietInput.value)) dietInput.value = c.dietary || 'Không';
+                    if (genderInput && (genderInput.value === 'Khác' || !genderInput.value)) genderInput.value = c.gender || 'Khác';
+                    if (medalInput && !medalInput.value) medalInput.value = c.medal_name || '';
+                }
+            } catch (err) { console.error("Pull CRM error:", err); }
+        }
+
+        // Tài chính
+        document.getElementById('edit-total').value = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+        document.getElementById('edit-discount').value = booking.discount || 0;
+        document.getElementById('edit-deposit').value = booking.deposit || 0;
+        document.getElementById('edit-deposit-required').value = booking.deposit_required || 1000000;
+
+        window.updateEditRemaining();
+
+        // Hiện Modal Edit
+        const editModal = document.getElementById('editModal');
+        const editModalContent = document.getElementById('editModalContent');
+        if (editModal && editModalContent) {
+            editModal.classList.remove('hidden');
+            setTimeout(() => {
+                editModal.classList.add('opacity-100');
+                editModalContent.classList.remove('scale-95', 'translate-y-4');
+                editModalContent.classList.add('scale-100', 'translate-y-0');
+            }, 10);
+        }
+    };
+
+    window.actionDelete = async (bookingId) => {
+        document.getElementById('rowActionModal').classList.add('hidden');
+        if (confirm('Bạn có chắc chắn muốn xóa Đơn hàng này? Thao tác không thể hoàn tác.')) {
+            try {
+                const res = await fetch(`/api/bookings?id=${bookingId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('✅ Đã xóa đơn hàng thành công!');
+                    loadBookings();
+                } else {
+                    throw new Error('Lỗi từ Server');
+                }
+            } catch (err) {
+                alert('❌ Không thể xóa bảng ghi này: ' + err.message);
+            }
+        }
+    };
+
+    // Logic tính toán số tiền còn lại trong Form Edit
+    window.updateEditRemaining = () => {
+        const total = parseInt(document.getElementById('edit-total').value) || 0;
+        const discount = parseInt(document.getElementById('edit-discount').value) || 0;
+        const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
+        const finalPrice = total - discount;
+        const remaining = finalPrice - deposit;
+
+        const remainEl = document.getElementById('edit-remaining');
+        if (remainEl) {
+            remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
+        }
+    };
+
+    // Gắn event tự động tính toán
+    const editTotalInput = document.getElementById('edit-total');
+    const editDepositInput = document.getElementById('edit-deposit');
+    if (editTotalInput) editTotalInput.addEventListener('input', updateRemainingCalculation);
+    if (editDepositInput) editDepositInput.addEventListener('input', updateRemainingCalculation);
+
+    // Cần phải gán lại event cho 2 nút close cũ 
+    const closeBtns = document.querySelectorAll('#bookingModal button[onclick*="hidden"]');
+    closeBtns.forEach(btn => {
+        btn.removeAttribute('onclick');
+        btn.addEventListener('click', window.closeModal);
+    });
+
+    // Hàm tự động đồng bộ khách hàng sang CRM (Khách Hàng Thân Thiết)
+    const syncToCRM = async (booking) => {
+        try {
+            const res = await fetch('/api/admin_customers?action=create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    full_name: booking.name,
+                    phone: booking.phone,
+                    cccd: booking.id_card || '',
+                    dob: booking.dob || null,
+                    gender: booking.gender || 'Khác',
+                    medical_notes: booking.allergy || '',
+                    dietary: booking.diet || ''
+                })
+            });
+            const data = await res.json();
+            if (data.success && data.csr_code) {
+                console.log("✅ Đã đồng bộ CRM thành công:", booking.name, data.csr_code);
+                // Update booking with new internal CRM ID
+                const updateRes = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: booking.id,
+                        customer_id: data.csr_code
+                    })
+                });
+                if (updateRes.ok) {
+                    console.log("✅ Đã cập nhật Booking mã CRM");
+                    if (typeof loadBookings === 'function') loadBookings();
+                }
+            }
+        } catch (err) {
+            console.error("❌ Lỗi đồng bộ CRM:", err);
+        }
+    };
+
+    // Delegation Events cho bảng (Xóa, Edit, View, Ký Cọc, Payment, Row Click)
+    const tbody = document.getElementById('bookingsTableBody');
+    if (tbody) {
+        tbody.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.action-btn');
+
+            // XỬ LÝ CLICK VÀO DÒNG (KÍCH HOẠT ACTION MODAL NẾU KHÔNG PHẢI BUTTON)
+            if (!btn) {
+                const tr = e.target.closest('.row-clickable');
+                if (tr) {
+                    const bookingId = tr.getAttribute('data-id');
+                    const booking = currentBookings.find(b => b.id == bookingId);
+                    if (booking) openRowActionModal(booking);
+                }
+                return;
+            }
+
+            const bookingId = btn.getAttribute('data-id');
+            const booking = currentBookings.find(b => b.id == bookingId);
+            if (!booking) return;
+
+            // Đóng Modal Hành động dòng (nếu có đang mở)
+            const rowModal = document.getElementById('rowActionModal');
+            if (rowModal) rowModal.classList.add('hidden');
+
+            // XÁC NHẬN CỌC NHANH
+            if (btn.classList.contains('confirm-deposit-btn')) {
+                if (confirm("Xác nhận khách hàng này đã chuyển khoản đặt cọc?")) {
+                    try {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50');
+
+                        const res = await fetch('/api/bookings', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id: bookingId,
+                                status: 'Đã cọc'
+                            })
+                        });
+
+                        if (res.ok) {
+                            alert("✅ Đã xác nhận cọc thành công!");
+                            // Tự động đồng bộ CRM khi đã cọc
+                            syncToCRM(booking);
+                            if (typeof loadBookings === 'function') loadBookings();
+                        } else {
+                            throw new Error('Lỗi cập nhật API');
+                        }
+                    } catch (err) {
+                        alert("❌ Lỗi: " + err.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50');
+                    }
+                }
+                return;
+            }
+
+            // XÓA
+            if (btn.classList.contains('delete-btn')) {
+                window.actionDelete(bookingId);
+                return;
+            }
+            // COPY LINK THANH TOÁN (KÈM ĐIỀU KHOẢN)
+            else if (btn.classList.contains('pay-terms-btn')) {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocal
+                    ? 'http://localhost:8888'
+                    : window.location.origin;
+
+                const url = baseUrl + `/pay-terms.html?id=${bookingId}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('📋 Đã sao chép Link Xác nhận điều khoản & Cọc!\\nGửi cho khách: ' + url);
+                }).catch(err => {
+                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
+                });
+            }
+            // GỬI LINK CỌC (SHORT URL)
+            else if (btn.classList.contains('send-btn')) {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocal
+                    ? 'http://localhost:8888'
+                    : window.location.origin;
+
+                const url = baseUrl + `/pay/${bookingId}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('📋 Đã sao chép Link Thanh Toán Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
+                }).catch(err => {
+                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
+                });
+            }
+            // NÚT THANH TOÁN (SHORT URL)
+            else if (btn.classList.contains('payment-btn')) {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocal
+                    ? 'http://localhost:8888'
+                    : window.location.origin;
+
+                const url = baseUrl + `/pay/${bookingId}`;
+                window.open(url, '_blank');
+            }
+            // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
+            else if (btn.classList.contains('view-btn')) {
+                // Đóng menu nếu mở từ Menu Thao Tác Dòng
+                document.getElementById('rowActionModal').classList.add('hidden');
+                window.actionView(bookingId);
+            }
+            // SỬA ĐƠN HÀNG - Gọi Edit Form Mở Rộng
+            else if (btn.classList.contains('edit-btn')) {
+                window.actionEdit(bookingId);
+            }
+        });
+    }
+
+    // ===== CHỨC NĂNG SMART SEARCH (GợI Ý KHÁCH CŨ) =====
+    const smartSearchInput = document.getElementById('smartSearch');
+    const searchSuggestions = document.getElementById('searchSuggestions');
+
+    if (smartSearchInput) {
+        let debounceTimer;
+        smartSearchInput.addEventListener('input', (e) => {
+            const input = e.target.value.toLowerCase().trim();
+            clearTimeout(debounceTimer);
+            if (input.length < 2) {
+                if (searchSuggestions) searchSuggestions.classList.add('hidden');
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/admin_customers?action=search&keyword=${input}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ keyword: input })
+                    });
+                    const json = await res.json();
+
+                    if (res.ok && json.success) {
+                        const customer = json.data;
+                        const results = [customer]; // API hiện tại trả về 1 object
+
+                        if (searchSuggestions) {
+                            searchSuggestions.innerHTML = results.map(c => `
                             <div class="suggestion-item p-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors" 
                                  data-name="${c.full_name}" 
                                  data-phone="${c.phone}" 
@@ -1557,351 +1538,351 @@ if (smartSearchInput) {
                                 </div>
                             </div>
                         `).join('');
+                            searchSuggestions.classList.remove('hidden');
+                        }
+                    } else if (searchSuggestions) {
+                        searchSuggestions.innerHTML = '<div class="p-3 text-xs text-gray-400 italic text-center">Không tìm thấy khách hàng cũ</div>';
                         searchSuggestions.classList.remove('hidden');
                     }
-                } else if (searchSuggestions) {
-                    searchSuggestions.innerHTML = '<div class="p-3 text-xs text-gray-400 italic text-center">Không tìm thấy khách hàng cũ</div>';
-                    searchSuggestions.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Search error:', err);
                 }
-            } catch (err) {
-                console.error('Search error:', err);
-            }
-        }, 300);
-    });
+            }, 300);
+        });
 
-    if (searchSuggestions) {
-        searchSuggestions.addEventListener('click', (e) => {
-            const item = e.target.closest('.suggestion-item');
-            if (item) {
-                const fullNameInput = document.getElementById('addFullName');
-                const phoneInput = document.getElementById('addPhone');
-                const csrCodeInput = document.getElementById('addCsrCode');
+        if (searchSuggestions) {
+            searchSuggestions.addEventListener('click', (e) => {
+                const item = e.target.closest('.suggestion-item');
+                if (item) {
+                    const fullNameInput = document.getElementById('addFullName');
+                    const phoneInput = document.getElementById('addPhone');
+                    const csrCodeInput = document.getElementById('addCsrCode');
 
-                if (fullNameInput) fullNameInput.value = item.getAttribute('data-name');
-                if (phoneInput) phoneInput.value = item.getAttribute('data-phone');
-                if (csrCodeInput) csrCodeInput.value = item.getAttribute('data-csr');
+                    if (fullNameInput) fullNameInput.value = item.getAttribute('data-name');
+                    if (phoneInput) phoneInput.value = item.getAttribute('data-phone');
+                    if (csrCodeInput) csrCodeInput.value = item.getAttribute('data-csr');
 
-                // Điền thông tin chi tiết vào các trường mới
-                const dobInput = document.getElementById('addDob');
-                const genderInput = document.getElementById('addGender');
-                const idCardInput = document.getElementById('addIdCard');
-                const addressInput = document.getElementById('addAddress');
+                    // Điền thông tin chi tiết vào các trường mới
+                    const dobInput = document.getElementById('addDob');
+                    const genderInput = document.getElementById('addGender');
+                    const idCardInput = document.getElementById('addIdCard');
+                    const addressInput = document.getElementById('addAddress');
 
-                if (dobInput) dobInput.value = item.getAttribute('data-dob') || '';
-                if (genderInput) genderInput.value = item.getAttribute('data-gender') || 'Khác';
-                if (idCardInput) idCardInput.value = item.getAttribute('data-cccd') || '';
-                if (addressInput) addressInput.value = item.getAttribute('data-address') || '';
+                    if (dobInput) dobInput.value = item.getAttribute('data-dob') || '';
+                    if (genderInput) genderInput.value = item.getAttribute('data-gender') || 'Khác';
+                    if (idCardInput) idCardInput.value = item.getAttribute('data-cccd') || '';
+                    if (addressInput) addressInput.value = item.getAttribute('data-address') || '';
 
-                // Điền thông tin Section 3
-                const allergyInput = document.getElementById('addAllergy');
-                const dietInput = document.getElementById('addDiet');
-                const trekkingInput = document.getElementById('addTrekkingPole');
-                const medalInput = document.getElementById('addMedalName');
+                    // Điền thông tin Section 3
+                    const allergyInput = document.getElementById('addAllergy');
+                    const dietInput = document.getElementById('addDiet');
+                    const trekkingInput = document.getElementById('addTrekkingPole');
+                    const medalInput = document.getElementById('addMedalName');
 
-                if (allergyInput) allergyInput.value = item.getAttribute('data-allergy') || '';
-                if (dietInput) dietInput.value = item.getAttribute('data-diet') || '';
-                if (trekkingInput) trekkingInput.value = item.getAttribute('data-trekking_pole') || 'Không';
-                if (medalInput) medalInput.value = item.getAttribute('data-medal-name') || '';
+                    if (allergyInput) allergyInput.value = item.getAttribute('data-allergy') || '';
+                    if (dietInput) dietInput.value = item.getAttribute('data-diet') || '';
+                    if (trekkingInput) trekkingInput.value = item.getAttribute('data-trekking_pole') || 'Không';
+                    if (medalInput) medalInput.value = item.getAttribute('data-medal-name') || '';
 
-                // Lưu trữ toàn bộ data khách hàng để dùng khi submit
-                window._selectedCustomer = {
-                    fullName: item.getAttribute('data-name'),
-                    phone: item.getAttribute('data-phone'),
-                    csrCode: item.getAttribute('data-csr'),
-                    dob: item.getAttribute('data-dob') || '',
-                    gender: item.getAttribute('data-gender') || '',
-                    address: item.getAttribute('data-address') || '',
-                    id_card: item.getAttribute('data-cccd') || '',
-                    allergy: item.getAttribute('data-allergy') || '',
-                    diet: item.getAttribute('data-diet') || '',
-                    trekking_pole: item.getAttribute('data-trekking_pole') || '',
-                    medal_name: item.getAttribute('data-medal-name') || ''
-                };
+                    // Lưu trữ toàn bộ data khách hàng để dùng khi submit
+                    window._selectedCustomer = {
+                        fullName: item.getAttribute('data-name'),
+                        phone: item.getAttribute('data-phone'),
+                        csrCode: item.getAttribute('data-csr'),
+                        dob: item.getAttribute('data-dob') || '',
+                        gender: item.getAttribute('data-gender') || '',
+                        address: item.getAttribute('data-address') || '',
+                        id_card: item.getAttribute('data-cccd') || '',
+                        allergy: item.getAttribute('data-allergy') || '',
+                        diet: item.getAttribute('data-diet') || '',
+                        trekking_pole: item.getAttribute('data-trekking_pole') || '',
+                        medal_name: item.getAttribute('data-medal-name') || ''
+                    };
 
-                smartSearchInput.value = item.getAttribute('data-name');
-                searchSuggestions.classList.add('hidden');
+                    smartSearchInput.value = item.getAttribute('data-name');
+                    searchSuggestions.classList.add('hidden');
 
-                // Alert thành công
-                const alertHtml = `
+                    // Alert thành công
+                    const alertHtml = `
                     <div id="loyalty-alert" class="mt-4 p-3 bg-green-500/10 border border-green-500/30 text-green-600 rounded-lg text-sm flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         Nhận diện khách thân thiết: <b>${item.getAttribute('data-csr')}</b>. Hệ thống sẽ kế thừa toàn bộ hồ sơ cũ!
                     </div>`;
-                const existingAlert = document.getElementById('loyalty-alert');
-                if (existingAlert) existingAlert.remove();
-                smartSearchInput.parentElement.insertAdjacentHTML('afterend', alertHtml);
+                    const existingAlert = document.getElementById('loyalty-alert');
+                    if (existingAlert) existingAlert.remove();
+                    smartSearchInput.parentElement.insertAdjacentHTML('afterend', alertHtml);
+                }
+            });
+        }
+
+        // Đóng dropdown khi click ngoài
+        document.addEventListener('click', (e) => {
+            if (!smartSearchInput.contains(e.target) && searchSuggestions && !searchSuggestions.contains(e.target)) {
+                searchSuggestions.classList.add('hidden');
             }
         });
     }
 
-    // Đóng dropdown khi click ngoài
-    document.addEventListener('click', (e) => {
-        if (!smartSearchInput.contains(e.target) && searchSuggestions && !searchSuggestions.contains(e.target)) {
-            searchSuggestions.classList.add('hidden');
-        }
-    });
-}
+    // ===== LOGIC TÍNH TOÁN GIÁ THỜI GIAN THỰC =====
+    const pInput = document.getElementById('addTourPrice');
+    const dInput = document.getElementById('addDiscount');
+    const tDisplay = document.getElementById('addTotalPriceDisplay');
+    const tSelect = document.getElementById('addTourName');
 
-// ===== LOGIC TÍNH TOÁN GIÁ THỜI GIAN THỰC =====
-const pInput = document.getElementById('addTourPrice');
-const dInput = document.getElementById('addDiscount');
-const tDisplay = document.getElementById('addTotalPriceDisplay');
-const tSelect = document.getElementById('addTourName');
+    const updateCalculatedTotal = () => {
+        if (!pInput || !dInput || !tDisplay) return;
+        const price = parseInt(pInput.value) || 0;
+        const discount = parseInt(dInput.value) || 0;
+        const total = price - discount;
+        tDisplay.textContent = (total > 0 ? total : 0).toLocaleString('vi-VN') + 'đ';
+    };
 
-const updateCalculatedTotal = () => {
-    if (!pInput || !dInput || !tDisplay) return;
-    const price = parseInt(pInput.value) || 0;
-    const discount = parseInt(dInput.value) || 0;
-    const total = price - discount;
-    tDisplay.textContent = (total > 0 ? total : 0).toLocaleString('vi-VN') + 'đ';
-};
+    if (pInput) pInput.addEventListener('input', updateCalculatedTotal);
+    if (dInput) dInput.addEventListener('input', updateCalculatedTotal);
 
-if (pInput) pInput.addEventListener('input', updateCalculatedTotal);
-if (dInput) dInput.addEventListener('input', updateCalculatedTotal);
-
-if (tSelect) {
-    tSelect.addEventListener('change', (e) => {
-        const tourName = e.target.value;
-        const selectedTour = allTours.find(t => t.name === tourName);
-        if (selectedTour && pInput) {
-            pInput.value = selectedTour.price || 0;
-            updateCalculatedTotal();
-        }
-    });
-}
-
-// Nút Search Btn (Trigger Smart Search Manual)
-const searchBtn = document.getElementById('searchBtn');
-if (searchBtn) {
-    searchBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Chỉ mang tính chất trang trí hoặc trigger validate nếu cần
-        const input = document.getElementById('smartSearch').value;
-        if (!input) alert("Vui lòng nhập Số Điện Thoại hoặc Mã #CSR");
-    });
-}
-
-// Xử lý Lưu Form (Tạo Khách Hàng / Đăng Ký Bookings)
-const bookingForm = document.getElementById('bookingForm');
-if (bookingForm) {
-    bookingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.textContent = 'Đang lưu hệ thống...';
-        btn.disabled = true;
-
-        try {
-            // Thu thập tất cả field từ form đã tối giản
-            const fullName = document.getElementById('addFullName').value;
-            const phone = document.getElementById('addPhone').value;
-            const tourName = document.getElementById('addTourName').value;
-            const tourDate = document.getElementById('addTourDate').value;
-
-            // Thu thập các trường chi tiết mới
-            const dob = document.getElementById('addDob').value;
-            const gender = document.getElementById('addGender').value;
-            const idCard = document.getElementById('addIdCard').value;
-            const address = document.getElementById('addAddress').value;
-            const special = document.getElementById('addSpecial').value;
-
-            // Thu thập các trường Section 3
-            const allergy = document.getElementById('addAllergy').value;
-            const diet = document.getElementById('addDiet').value;
-            const trekkingPole = document.getElementById('addTrekkingPole').value;
-            const medalName = document.getElementById('addMedalName').value;
-
-            const tourPrice = parseInt(document.getElementById('addTourPrice').value) || 0;
-            const discount = parseInt(document.getElementById('addDiscount').value) || 0;
-            const depositRequired = parseInt(document.getElementById('addDepositRequired').value) || 1000000;
-            const csrCode = document.getElementById('addCsrCode').value || "";
-
-            // Lấy profile Sale hiện tại
-            const userSessionStr = localStorage.getItem('csr_user');
-            let sale_id = null; let sale_name = 'Admin';
-            if (userSessionStr) {
-                const session = JSON.parse(userSessionStr);
-                sale_id = session.id;
-                sale_name = session.fullName || session.full_name || 'Admin';
+    if (tSelect) {
+        tSelect.addEventListener('change', (e) => {
+            const tourName = e.target.value;
+            const selectedTour = allTours.find(t => t.name === tourName);
+            if (selectedTour && pInput) {
+                pInput.value = selectedTour.price || 0;
+                updateCalculatedTotal();
             }
+        });
+    }
 
-            const editingId = document.getElementById('editingBookingId') ? document.getElementById('editingBookingId').value : '';
+    // Nút Search Btn (Trigger Smart Search Manual)
+    const searchBtn = document.getElementById('searchBtn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Chỉ mang tính chất trang trí hoặc trigger validate nếu cần
+            const input = document.getElementById('smartSearch').value;
+            if (!input) alert("Vui lòng nhập Số Điện Thoại hoặc Mã #CSR");
+        });
+    }
 
-            const bookingPayload = {
-                name: fullName,
-                phone: phone,
-                tour: tourName,
-                date: tourDate,
-                status: 'Chờ cọc',
-                total_price: tourPrice - discount,
-                discount: discount,
-                deposit: 0,
-                sale_id: sale_id,
-                sale_name: sale_name,
-                customer_id: csrCode,
-                deposit_required: depositRequired,
-                commitments: true,
-                // Gán các trường chi tiết
-                dob: dob,
-                gender: gender,
-                address: address,
-                id_card: idCard,
-                special: special,
-                // Gán các trường Section 3
-                allergy: allergy,
-                diet: diet,
-                trekking_pole: trekkingPole,
-                medal_name: medalName
-            };
+    // Xử lý Lưu Form (Tạo Khách Hàng / Đăng Ký Bookings)
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Đang lưu hệ thống...';
+            btn.disabled = true;
 
-            // Nếu là khách cũ -> Kế thừa các trường ẩn (allergy, diet, etc.) nếu không có trên form
-            const cleanInputPhone = phone.replace(/[^0-9]/g, '');
-            if (window._selectedCustomer) {
-                const cleanStoredPhone = (window._selectedCustomer.phone || '').replace(/[^0-9]/g, '');
-                if (cleanStoredPhone === cleanInputPhone) {
-                    // Ưu tiên các trường đã có trên form, nếu trống mới lấy từ CRM
-                    bookingPayload.dob = bookingPayload.dob || window._selectedCustomer.dob;
-                    bookingPayload.gender = (bookingPayload.gender && bookingPayload.gender !== 'Khác') ? bookingPayload.gender : (window._selectedCustomer.gender || 'Khác');
-                    bookingPayload.address = bookingPayload.address || window._selectedCustomer.address;
-                    bookingPayload.id_card = bookingPayload.id_card || window._selectedCustomer.id_card;
+            try {
+                // Thu thập tất cả field từ form đã tối giản
+                const fullName = document.getElementById('addFullName').value;
+                const phone = document.getElementById('addPhone').value;
+                const tourName = document.getElementById('addTourName').value;
+                const tourDate = document.getElementById('addTourDate').value;
 
-                    // Các trường chưa có input trên form -> Lấy từ CRM
-                    bookingPayload.allergy = window._selectedCustomer.allergy;
-                    bookingPayload.diet = window._selectedCustomer.diet;
-                    bookingPayload.trekking_pole = window._selectedCustomer.trekking_pole;
-                    bookingPayload.medal_name = window._selectedCustomer.medal_name;
-                }
-            }
+                // Thu thập các trường chi tiết mới
+                const dob = document.getElementById('addDob').value;
+                const gender = document.getElementById('addGender').value;
+                const idCard = document.getElementById('addIdCard').value;
+                const address = document.getElementById('addAddress').value;
+                const special = document.getElementById('addSpecial').value;
 
-            // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads
-            if (editingId) {
-                bookingPayload.id = editingId;
-                delete bookingPayload.status;
-                delete bookingPayload.deposit;
-                delete bookingPayload.sale_id;
-                delete bookingPayload.sale_name;
-            }
+                // Thu thập các trường Section 3
+                const allergy = document.getElementById('addAllergy').value;
+                const diet = document.getElementById('addDiet').value;
+                const trekkingPole = document.getElementById('addTrekkingPole').value;
+                const medalName = document.getElementById('addMedalName').value;
 
-            const bookingRes = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookingPayload)
-            });
+                const tourPrice = parseInt(document.getElementById('addTourPrice').value) || 0;
+                const discount = parseInt(document.getElementById('addDiscount').value) || 0;
+                const depositRequired = parseInt(document.getElementById('addDepositRequired').value) || 1000000;
+                const csrCode = document.getElementById('addCsrCode').value || "";
 
-            if (bookingRes.ok) {
-                alert(editingId ? "✅ Đã lưu Cập nhật Đơn hàng!" : "✅ Thêm Đơn Hàng Thành Công!");
-                window.closeModal();
-
-                // Reset form và xóa alert
-                if (bookingForm) bookingForm.reset();
-                window._selectedCustomer = null;
-                const existingAlert = document.getElementById('loyalty-alert');
-                if (existingAlert) existingAlert.remove();
-                if (document.getElementById('addTotalPriceDisplay')) {
-                    document.getElementById('addTotalPriceDisplay').textContent = '0đ';
+                // Lấy profile Sale hiện tại
+                const userSessionStr = localStorage.getItem('csr_user');
+                let sale_id = null; let sale_name = 'Admin';
+                if (userSessionStr) {
+                    const session = JSON.parse(userSessionStr);
+                    sale_id = session.id;
+                    sale_name = session.fullName || session.full_name || 'Admin';
                 }
 
-                // Tải lại rổ hàng List Booking Table
-                if (typeof loadBookings === 'function') {
-                    loadBookings();
+                const editingId = document.getElementById('editingBookingId') ? document.getElementById('editingBookingId').value : '';
+
+                const bookingPayload = {
+                    name: fullName,
+                    phone: phone,
+                    tour: tourName,
+                    date: tourDate,
+                    status: 'Chờ cọc',
+                    total_price: tourPrice - discount,
+                    discount: discount,
+                    deposit: 0,
+                    sale_id: sale_id,
+                    sale_name: sale_name,
+                    customer_id: csrCode,
+                    deposit_required: depositRequired,
+                    commitments: true,
+                    // Gán các trường chi tiết
+                    dob: dob,
+                    gender: gender,
+                    address: address,
+                    id_card: idCard,
+                    special: special,
+                    // Gán các trường Section 3
+                    allergy: allergy,
+                    diet: diet,
+                    trekking_pole: trekkingPole,
+                    medal_name: medalName
+                };
+
+                // Nếu là khách cũ -> Kế thừa các trường ẩn (allergy, diet, etc.) nếu không có trên form
+                const cleanInputPhone = phone.replace(/[^0-9]/g, '');
+                if (window._selectedCustomer) {
+                    const cleanStoredPhone = (window._selectedCustomer.phone || '').replace(/[^0-9]/g, '');
+                    if (cleanStoredPhone === cleanInputPhone) {
+                        // Ưu tiên các trường đã có trên form, nếu trống mới lấy từ CRM
+                        bookingPayload.dob = bookingPayload.dob || window._selectedCustomer.dob;
+                        bookingPayload.gender = (bookingPayload.gender && bookingPayload.gender !== 'Khác') ? bookingPayload.gender : (window._selectedCustomer.gender || 'Khác');
+                        bookingPayload.address = bookingPayload.address || window._selectedCustomer.address;
+                        bookingPayload.id_card = bookingPayload.id_card || window._selectedCustomer.id_card;
+
+                        // Các trường chưa có input trên form -> Lấy từ CRM
+                        bookingPayload.allergy = window._selectedCustomer.allergy;
+                        bookingPayload.diet = window._selectedCustomer.diet;
+                        bookingPayload.trekking_pole = window._selectedCustomer.trekking_pole;
+                        bookingPayload.medal_name = window._selectedCustomer.medal_name;
+                    }
+                }
+
+                // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads
+                if (editingId) {
+                    bookingPayload.id = editingId;
+                    delete bookingPayload.status;
+                    delete bookingPayload.deposit;
+                    delete bookingPayload.sale_id;
+                    delete bookingPayload.sale_name;
+                }
+
+                const bookingRes = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingPayload)
+                });
+
+                if (bookingRes.ok) {
+                    alert(editingId ? "✅ Đã lưu Cập nhật Đơn hàng!" : "✅ Thêm Đơn Hàng Thành Công!");
+                    window.closeModal();
+
+                    // Reset form và xóa alert
+                    if (bookingForm) bookingForm.reset();
+                    window._selectedCustomer = null;
+                    const existingAlert = document.getElementById('loyalty-alert');
+                    if (existingAlert) existingAlert.remove();
+                    if (document.getElementById('addTotalPriceDisplay')) {
+                        document.getElementById('addTotalPriceDisplay').textContent = '0đ';
+                    }
+
+                    // Tải lại rổ hàng List Booking Table
+                    if (typeof loadBookings === 'function') {
+                        loadBookings();
+                    } else {
+                        window.location.reload();
+                    }
                 } else {
-                    window.location.reload();
+                    const errDB = await bookingRes.json();
+                    throw new Error(errDB.error || "Lỗi tạo Booking!");
                 }
-            } else {
-                const errDB = await bookingRes.json();
-                throw new Error(errDB.error || "Lỗi tạo Booking!");
+
+            } catch (err) {
+                alert("❌ " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
+        });
+    }
 
-        } catch (err) {
-            alert("❌ " + err.message);
-        } finally {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    });
-}
+    // Xử lý XÁC NHẬN SỬA ĐƠN HÀNG CHI TIẾT
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Đang lưu cập nhật...';
+            btn.disabled = true;
 
-// Xử lý XÁC NHẬN SỬA ĐƠN HÀNG CHI TIẾT
-const editForm = document.getElementById('editForm');
-if (editForm) {
-    editForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.textContent = 'Đang lưu cập nhật...';
-        btn.disabled = true;
+            try {
+                // Thu thập Dữ liệu Edit
+                const bookingId = document.getElementById('edit-id').value;
+                const name = document.getElementById('edit-name').value;
+                const phone = document.getElementById('edit-phone').value;
+                const medalName = document.getElementById('edit-medal-name').value;
+                const tour = document.getElementById('edit-tour').value;
+                const date = document.getElementById('edit-date').value;
+                const dob = document.getElementById('edit-dob').value;
+                const gender = document.getElementById('edit-gender').value;
+                const status = document.getElementById('edit-status').value;
+                const allergy = document.getElementById('edit-allergy').value;
+                const address = document.getElementById('edit-address').value;
+                const diet = document.getElementById('edit-diet').value;
+                const trekking_pole = document.getElementById('edit-trekking-pole').value;
+                const commitments = document.getElementById('edit-commitments').checked;
+                const special = document.getElementById('edit-special').value;
 
-        try {
-            // Thu thập Dữ liệu Edit
-            const bookingId = document.getElementById('edit-id').value;
-            const name = document.getElementById('edit-name').value;
-            const phone = document.getElementById('edit-phone').value;
-            const medalName = document.getElementById('edit-medal-name').value;
-            const tour = document.getElementById('edit-tour').value;
-            const date = document.getElementById('edit-date').value;
-            const dob = document.getElementById('edit-dob').value;
-            const gender = document.getElementById('edit-gender').value;
-            const status = document.getElementById('edit-status').value;
-            const allergy = document.getElementById('edit-allergy').value;
-            const address = document.getElementById('edit-address').value;
-            const diet = document.getElementById('edit-diet').value;
-            const trekking_pole = document.getElementById('edit-trekking-pole').value;
-            const commitments = document.getElementById('edit-commitments').checked;
-            const special = document.getElementById('edit-special').value;
+                const basePrice = parseInt(document.getElementById('edit-total').value) || 0;
+                const discount = parseInt(document.getElementById('edit-discount').value) || 0;
+                const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
+                const deposit_required = parseInt(document.getElementById('edit-deposit-required').value) || 1000000;
 
-            const basePrice = parseInt(document.getElementById('edit-total').value) || 0;
-            const discount = parseInt(document.getElementById('edit-discount').value) || 0;
-            const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
-            const deposit_required = parseInt(document.getElementById('edit-deposit-required').value) || 1000000;
+                const bookingPayload = {
+                    id: bookingId,
+                    name: name,
+                    phone: phone,
+                    medal_name: medalName,
+                    tour: tour,
+                    date: date,
+                    dob: dob,
+                    gender: gender,
+                    status: status,
+                    allergy: allergy,
+                    address: address,
+                    diet: diet,
+                    trekking_pole: trekking_pole,
+                    commitments: commitments,
+                    special: special,
+                    total_price: basePrice - discount,
+                    discount: discount,
+                    deposit: deposit,
+                    deposit_required: deposit_required
+                };
 
-            const bookingPayload = {
-                id: bookingId,
-                name: name,
-                phone: phone,
-                medal_name: medalName,
-                tour: tour,
-                date: date,
-                dob: dob,
-                gender: gender,
-                status: status,
-                allergy: allergy,
-                address: address,
-                diet: diet,
-                trekking_pole: trekking_pole,
-                commitments: commitments,
-                special: special,
-                total_price: basePrice - discount,
-                discount: discount,
-                deposit: deposit,
-                deposit_required: deposit_required
-            };
+                // Chỉ Call Update API Bookings
+                const res = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingPayload)
+                });
 
-            // Chỉ Call Update API Bookings
-            const res = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookingPayload)
-            });
-
-            if (res.ok) {
-                alert("✅ Đã cập nhật thành công Chi tiết Đơn hàng!");
-                // Nếu trạng thái là Đã cọc hoặc Hoàn tất phí, tự động đồng bộ CRM
-                if (status.includes('Đã cọc') || (total_price > 0 && total_price === deposit)) {
-                    syncToCRM(bookingPayload);
+                if (res.ok) {
+                    alert("✅ Đã cập nhật thành công Chi tiết Đơn hàng!");
+                    // Nếu trạng thái là Đã cọc hoặc Hoàn tất phí, tự động đồng bộ CRM
+                    if (status.includes('Đã cọc') || (total_price > 0 && total_price === deposit)) {
+                        syncToCRM(bookingPayload);
+                    }
+                    window.closeEditModal();
+                    if (typeof loadBookings === 'function') loadBookings();
+                } else {
+                    const errDB = await res.json();
+                    throw new Error(errDB.error || "Gặp sự cố khi Cập nhật API.");
                 }
-                window.closeEditModal();
-                if (typeof loadBookings === 'function') loadBookings();
-            } else {
-                const errDB = await res.json();
-                throw new Error(errDB.error || "Gặp sự cố khi Cập nhật API.");
-            }
 
-        } catch (err) {
-            alert("❌ Lỗi Cập nhật: " + err.message);
-        } finally {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    });
-}
+            } catch (err) {
+                alert("❌ Lỗi Cập nhật: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
 };
