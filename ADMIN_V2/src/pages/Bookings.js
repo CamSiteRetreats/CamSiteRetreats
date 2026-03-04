@@ -784,7 +784,7 @@ export const afterRender = () => {
                     </td>
                     <td class="p-4 align-top">${saleCell}</td>
                 // Nút linh hoạt cho tab Chờ cọc/Tư vấn
-                const actionBtn = b.customer_id 
+                const actionBtn = b.customer_id
                     ? `< button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" >💳 Thanh toán</button > `
                     : `< button class="action-btn process-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data - id="${b.id}" > Copy link Process</button > `;
 
@@ -1185,7 +1185,14 @@ window.actionEdit = async (bookingId) => {
 
     // Các trường mở rộng - LUÔN ƯU TIÊN LẤY TỪ CRM NẾU TRỐNG
     const fillEditForm = (data) => {
-        document.getElementById('edit-dob').value = data.dob || '';
+        // Chuẩn hóa DOB nếu là DD/MM/YYYY
+        let dobVal = data.dob || '';
+        if (typeof dobVal === 'string' && dobVal.includes('/')) {
+            const parts = dobVal.split('/');
+            if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+
+        document.getElementById('edit-dob').value = dobVal;
         document.getElementById('edit-gender').value = data.gender || 'Khác';
         document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
         document.getElementById('edit-address').value = data.address || '';
@@ -1199,8 +1206,8 @@ window.actionEdit = async (bookingId) => {
     document.getElementById('edit-commitments').checked = !!booking.commitments;
     document.getElementById('edit-special').value = booking.special || '';
 
-    // Nếu thông tin profile đang trống (DOB/Address) -> Thử pull từ CRM
-    if ((!booking.dob || !booking.address) && (booking.customer_id || booking.phone)) {
+    // Nếu thông tin profile đang trống (DOB/Address/Gender) -> Thử pull từ CRM/Hệ thống
+    if ((!booking.dob || !booking.address || !booking.gender || booking.gender === 'Khác') && (booking.customer_id || booking.phone)) {
         try {
             const keyword = booking.customer_id || booking.phone;
             const res = await fetch(`/api/admin_customers?action=search&keyword=${encodeURIComponent(keyword)}`, {
@@ -1210,13 +1217,21 @@ window.actionEdit = async (bookingId) => {
             });
             const json = await res.json();
             if (res.ok && json.success) {
-                // Merge dữ liệu CRM vào form nếu form đang trống
+                // Merge dữ liệu hệ thống vào form nếu form đang trống
                 const c = json.data;
-                if (!document.getElementById('edit-dob').value) document.getElementById('edit-dob').value = c.dob || '';
-                if (!document.getElementById('edit-address').value) document.getElementById('edit-address').value = c.address || '';
-                if (!document.getElementById('edit-allergy').value) document.getElementById('edit-allergy').value = c.medical_notes || '';
-                if (document.getElementById('edit-diet').value === 'Không') document.getElementById('edit-diet').value = c.dietary || 'Không';
-                if (!document.getElementById('edit-medal-name').value) document.getElementById('edit-medal-name').value = c.medal_name || '';
+                const dobInput = document.getElementById('edit-dob');
+                const addressInput = document.getElementById('edit-address');
+                const allergyInput = document.getElementById('edit-allergy');
+                const dietInput = document.getElementById('edit-diet');
+                const genderInput = document.getElementById('edit-gender');
+                const medalInput = document.getElementById('edit-medal-name');
+
+                if (dobInput && !dobInput.value) dobInput.value = c.dob || '';
+                if (addressInput && !addressInput.value) addressInput.value = c.address || '';
+                if (allergyInput && !allergyInput.value) allergyInput.value = c.medical_notes || '';
+                if (dietInput && (dietInput.value === 'Không' || !dietInput.value)) dietInput.value = c.dietary || 'Không';
+                if (genderInput && (genderInput.value === 'Khác' || !genderInput.value)) genderInput.value = c.gender || 'Khác';
+                if (medalInput && !medalInput.value) medalInput.value = c.medal_name || '';
             }
         } catch (err) { console.error("Pull CRM error:", err); }
     }

@@ -27,46 +27,73 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Vui lòng nhập từ khóa tìm kiếm' });
             }
 
-            const { rows } = await db.query(
+            // A. Thử tìm trong CRM trước
+            const { rows: crmRows } = await db.query(
                 `SELECT * FROM crm_customers 
                  WHERE phone = $1 OR UPPER(csr_code) = UPPER($1)`,
                 [keyword]
             );
 
-            if (rows.length > 0) {
-                const customer = rows[0];
+            let customer = crmRows.length > 0 ? crmRows[0] : null;
+            let phoneForBooking = customer ? customer.phone : keyword;
 
-                // Query booking gần nhất để lấy thêm address, trekking_pole, id_card...
-                const bookingResult = await db.query(
-                    `SELECT id_card, address, diet, allergy, trekking_pole, special, dob, gender, medal_name
-                     FROM bookings WHERE phone = $1 
-                     ORDER BY created_at DESC LIMIT 1`,
-                    [customer.phone]
-                );
-                const latestBooking = bookingResult.rows[0] || {};
+            // B. Luôn tìm booking gần nhất để lấy thông tin chi tiết (Address, ID Card, etc.)
+            const { rows: bookingRows } = await db.query(
+                `SELECT id_card, address, diet, allergy, trekking_pole, special, dob, gender, medal_name, name
+                 FROM bookings WHERE phone = $1 
+                 ORDER BY created_at DESC LIMIT 1`,
+                [phoneForBooking]
+            );
+            const latestBooking = bookingRows[0] || {};
 
-                return res.status(200).json({
-                    success: true,
-                    data: {
-                        csr_code: customer.csr_code,
-                        full_name: customer.full_name,
-                        phone: customer.phone,
-                        cccd: customer.cccd || latestBooking.id_card || '',
-                        dob: customer.dob ? customer.dob.toISOString().split('T')[0] : (latestBooking.dob || ''),
-                        gender: customer.gender || latestBooking.gender || '',
-                        medical_notes: customer.medical_notes || latestBooking.allergy || '',
-                        dietary: customer.dietary || latestBooking.diet || '',
-                        // Fields từ booking (không có trong CRM)
-                        address: latestBooking.address || '',
-                        trekking_pole: latestBooking.trekking_pole || '',
-                        medal_name: latestBooking.medal_name || '',
-                        loyalty_tier: customer.loyalty_tier,
-                        tour_count: customer.tour_count
-                    }
-                });
-            } else {
+            if (!customer && bookingRows.length === 0) {
                 return res.status(404).json({ success: false, message: 'Không tìm thấy dữ liệu khách hàng cũ.' });
             }
+
+            // Helper để chuẩn hóa ngày sinh (về YYYY-MM-DD)
+            const normalizeDob = (val) => {
+                if (!val) return '';
+                if (val instanceof Date) return val.toISOString().split('T')[0];
+                if (typeof val === 'string') {
+                    // Nếu là định dạng DD/MM/YYYY
+                    const parts = val.split('/');
+                    if (parts.length === 3) {
+                        const [d, m, y] = parts;
+                        if (y.length === 4) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                    }
+                    // Nếu đã là YYYY-MM-DD
+                    if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.split('T')[0];
+                }
+                return val;
+            };
+
+            // Helper để chuẩn hóa giới tính
+            const normalizeGender = (g) => {
+                if (!g) return 'Khác';
+                if (g.toLowerCase() === 'nam') return 'Nam';
+                if (g.toLowerCase() === 'nữ' || g.toLowerCase() === 'nu') return 'Nữ';
+                return 'Khác';
+            };
+
+            return res.status(200).json({
+                success: true,
+                data: {
+                    csr_code: customer ? customer.csr_code : null,
+                    full_name: customer ? customer.full_name : (latestBooking.name || ''),
+                    phone: phoneForBooking,
+                    cccd: (customer ? customer.cccd : null) || latestBooking.id_card || '',
+                    dob: normalizeDob(customer ? customer.dob : null) || normalizeDob(latestBooking.dob) || '',
+                    gender: normalizeGender(customer ? customer.gender : latestBooking.gender),
+                    medical_notes: (customer ? customer.medical_notes : null) || latestBooking.allergy || '',
+                    dietary: (customer ? customer.dietary : null) || latestBooking.diet || '',
+                    // Fields từ booking (không có trong CRM)
+                    address: latestBooking.address || '',
+                    trekking_pole: latestBooking.trekking_pole || '',
+                    medal_name: (latestBooking.medal_name || (customer ? latestBooking.name : '') || '').trim(),
+                    loyalty_tier: customer ? customer.loyalty_tier : 'New',
+                    tour_count: customer ? customer.tour_count : 1
+                }
+            });
         }
 
         // 2. CHỨC NĂNG LƯU / THÊM MỚI KHÁCH HÀNG (UPSERT)
