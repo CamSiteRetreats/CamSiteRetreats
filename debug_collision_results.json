@@ -1,0 +1,67 @@
+{
+  "bookings_hương": [],
+  "bookings_tú": [
+    {
+      "id": 109,
+      "created_at": "2026-03-02T22:42:27.705Z",
+      "name": "PHẠM KHẢ TÚ",
+      "phone": "0965321539",
+      "tour": "Tà Năng - Phan Dũng",
+      "date": "07/03/2026",
+      "status": "Hoàn thành",
+      "total_price": "2690000",
+      "deposit": "0",
+      "sale_id": null,
+      "sale_name": null,
+      "dob": "2000-04-10",
+      "gender": "Nữ",
+      "id_card": "094300011709",
+      "address": "116 đường số 16, phường Bình Tân, thành phố Hồ Chí Minh",
+      "trekking_pole": "Có",
+      "diet": "Không",
+      "medal_name": "Khả Tú",
+      "allergy": "Không",
+      "special": "Em bị say xe, không ăn hành hoặc mỡ thịt, ko ăn rau giá sống ạ",
+      "commitments": true,
+      "customer_id": "#CSR225092",
+      "deposit_required": 1000000,
+      "discount": 0
+    }
+  ],
+  "crm_hương": [],
+  "crm_tú": [
+    {
+      "id": 63,
+      "csr_code": "#CSR225092",
+      "full_name": "PHẠM KHẢ TÚ",
+      "phone": "0965321539",
+      "cccd": "094300011709",
+      "dob": "2000-04-09T17:00:00.000Z",
+      "gender": "Nữ",
+      "medical_notes": "Không",
+      "dietary": "Không",
+      "loyalty_tier": "New",
+      "tour_count": 0,
+      "created_at": "2026-03-02T22:46:14.943Z",
+      "updated_at": "2026-03-03T03:40:33.775Z"
+    }
+  ],
+  "crm_csr225092": [
+    {
+      "id": 63,
+      "csr_code": "#CSR225092",
+      "full_name": "PHẠM KHẢ TÚ",
+      "phone": "0965321539",
+      "cccd": "094300011709",
+      "dob": "2000-04-09T17:00:00.000Z",
+      "gender": "Nữ",
+      "medical_notes": "Không",
+      "dietary": "Không",
+      "loyalty_tier": "New",
+      "tour_count": 0,
+      "created_at": "2026-03-02T22:46:14.943Z",
+      "updated_at": "2026-03-03T03:40:33.775Z"
+    }
+  ],
+  "duplicate_phones": []
+}
