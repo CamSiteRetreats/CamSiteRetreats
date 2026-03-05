@@ -1326,8 +1326,8 @@ export const afterRender = () => {
     // Gắn event tự động tính toán
     const editTotalInput = document.getElementById('edit-total');
     const editDepositInput = document.getElementById('edit-deposit');
-    if (editTotalInput) editTotalInput.addEventListener('input', updateRemainingCalculation);
-    if (editDepositInput) editDepositInput.addEventListener('input', updateRemainingCalculation);
+    if (editTotalInput) editTotalInput.addEventListener('input', window.updateEditRemaining);
+    if (editDepositInput) editDepositInput.addEventListener('input', window.updateEditRemaining);
 
     // Cần phải gán lại event cho 2 nút close cũ 
     const closeBtns = document.querySelectorAll('#bookingModal button[onclick*="hidden"]');
