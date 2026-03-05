@@ -821,7 +821,8 @@ export const afterRender = () => {
                 }
                 const actionBtn = b.customer_id
                     ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
-                    : `<button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Gửi Link Cọc</button>`;
+                    : `<button class="action-btn process-btn bg-csr-orange hover:bg-[#d65503] text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors mr-1" data-id="${b.id}">📝 Thông Tin</button>
+                       <button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Cọc Tour</button>`;
 
                 return `
                 <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
@@ -920,14 +921,14 @@ export const afterRender = () => {
         if (filterTourInfo) {
             const currentVal = filterTourInfo.value;
             filterTourInfo.innerHTML = '<option value="">Tất cả Tour</option>';
-            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `< option value = "${t}" > ${t}</option > `);
+            [...tourSet].sort().forEach(t => filterTourInfo.innerHTML += `<option value="${t}">${t}</option>`);
             filterTourInfo.value = currentVal;
         }
 
         if (filterDateInfo) {
             const currentVal = filterDateInfo.value;
             filterDateInfo.innerHTML = '<option value="">Tất cả Ngày</option>';
-            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `< option value = "${d}" > ${d}</option > `);
+            [...dateSet].sort().forEach(d => filterDateInfo.innerHTML += `<option value="${d}">${d}</option>`);
             filterDateInfo.value = currentVal;
         }
 
@@ -937,7 +938,7 @@ export const afterRender = () => {
             // Add Website option
             filterSaleInfo.innerHTML += '<option value="null">Nguồn Website</option>';
             for (let [id, name] of saleMap) {
-                filterSaleInfo.innerHTML += `< option value = "${id}" > ${name}</option > `;
+                filterSaleInfo.innerHTML += `<option value="${id}">${name}</option>`;
             }
             filterSaleInfo.value = currentVal;
         }
@@ -1326,8 +1327,8 @@ export const afterRender = () => {
     // Gắn event tự động tính toán
     const editTotalInput = document.getElementById('edit-total');
     const editDepositInput = document.getElementById('edit-deposit');
-    if (editTotalInput) editTotalInput.addEventListener('input', window.updateEditRemaining);
-    if (editDepositInput) editDepositInput.addEventListener('input', window.updateEditRemaining);
+    if (editTotalInput) editTotalInput.addEventListener('input', updateRemainingCalculation);
+    if (editDepositInput) editDepositInput.addEventListener('input', updateRemainingCalculation);
 
     // Cần phải gán lại event cho 2 nút close cũ 
     const closeBtns = document.querySelectorAll('#bookingModal button[onclick*="hidden"]');
@@ -1438,6 +1439,20 @@ export const afterRender = () => {
                 window.actionDelete(bookingId);
                 return;
             }
+            // COPY LINK THÔNG TIN (FORM)
+            else if (btn.classList.contains('process-btn')) {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocal
+                    ? 'http://localhost:8888'
+                    : window.location.origin;
+
+                const url = baseUrl + `/booking/process.html?id=${bookingId}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('📋 Đã sao chép Link Điền Thông Tin!\\nGửi cho khách: ' + url);
+                }).catch(err => {
+                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
+                });
+            }
             // COPY LINK THANH TOÁN (KÈM ĐIỀU KHOẢN)
             else if (btn.classList.contains('pay-terms-btn')) {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -1447,7 +1462,7 @@ export const afterRender = () => {
 
                 const url = baseUrl + `/pay-terms.html?id=${bookingId}`;
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('📋 Đã sao chép Link Xác nhận điều khoản & Cọc!\\nGửi cho khách: ' + url);
+                    alert('📋 Đã sao chép Link Cọc Tour!\\nGửi cho khách: ' + url);
                 }).catch(err => {
                     alert('Lỗi khi Copy Clipboard. Link là: ' + url);
                 });
