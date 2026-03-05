@@ -21,6 +21,7 @@ module.exports = async (req, res) => {
                  AND b.status NOT IN ('Đã hủy', 'Cancelled')
                  AND (
                     b.date = TO_CHAR(s.start_date, 'DD/MM/YYYY') 
+                    OR b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')
                     OR b.date = TO_CHAR(s.start_date, 'FMDD/FMMM/YYYY')
                     OR b.date LIKE TO_CHAR(s.start_date, 'DD/MM') || '%'
                     OR b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || '%'
