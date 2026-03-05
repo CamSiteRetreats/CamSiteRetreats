@@ -519,7 +519,7 @@ const BookingFlow = {
 
     handlePaymentSuccess: function () {
         // Redirect completely to invoice layout
-        window.location.href = `/pay/${this.bookingDbId}`;
+        window.location.href = `/invoice.html?id=${this.bookingDbId}`;
     },
 
     copyText: function (text, type) {

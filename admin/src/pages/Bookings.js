@@ -640,8 +640,8 @@ export const afterRender = () => {
             // 2. Lọc Tour
             if (filterTour && b.tour !== filterTour) return false;
 
-            // 3. Lọc Ngày
-            if (filterDate && b.date !== filterDate) return false;
+            // 3. Lọc Ngày (Sử dụng Normalization để đồng nhất)
+            if (filterDate && normalizeDate(b.date) !== filterDate) return false;
 
             // 4. Lọc Sale
             if (filterSale && String(b.sale_id) !== String(filterSale)) return false;
@@ -819,10 +819,13 @@ export const afterRender = () => {
                 } else {
                     saleCell = `<span class="text-sm text-gray-500">${b.sale_name || 'Website'}</span>`;
                 }
-                const actionBtn = b.customer_id
-                    ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
-                    : `<button class="action-btn process-btn bg-csr-orange hover:bg-[#d65503] text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors mr-1" data-id="${b.id}">📝 Thông Tin</button>
-                       <button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Cọc Tour</button>`;
+                const actionBtn = `
+                    <button class="action-btn process-btn bg-csr-orange hover:bg-[#d65503] text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors mr-1" data-id="${b.id}">📝 Thông Tin</button>
+                    ${b.customer_id
+                        ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
+                        : `<button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Cọc Tour</button>`
+                    }
+                `;
 
                 return `
                 <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
@@ -910,7 +913,10 @@ export const afterRender = () => {
 
         currentBookings.forEach(b => {
             if (b.tour) tourSet.add(b.tour);
-            if (b.date) dateSet.add(b.date);
+            if (b.date) {
+                const normalized = normalizeDate(b.date);
+                if (normalized) dateSet.add(normalized);
+            }
             if (b.sale_id && b.sale_name) saleMap.set(b.sale_id, b.sale_name);
         });
 
@@ -942,6 +948,50 @@ export const afterRender = () => {
             }
             filterSaleInfo.value = currentVal;
         }
+    }
+
+    // Hàm chuẩn hóa định dạng ngày từ DB (ISO, DD/MM/YYYY, etc.) về dd/mm - dd/mm
+    function normalizeDate(dateStr) {
+        if (!dateStr) return '';
+
+        // Nếu đã đúng định dạng dd/m - dd/m hoặc dd/mm - dd/mm
+        if (/^\d{1,2}\/\d{1,2}\s*-\s*\d{1,2}\/\d{1,2}$/.test(dateStr)) {
+            return dateStr.replace(/\s+/g, ''); // Xóa space thừa
+        }
+
+        try {
+            // Trường hợp: 2026-04-11 (ISO)
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const [y, m, d] = dateStr.split('-');
+                const fmt = `${parseInt(d)}/${parseInt(m)}`;
+                return `${fmt}-${fmt}`;
+            }
+
+            // Trường hợp: 14/03/2026 hoặc 14/3/2026
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                const [d, m, y] = dateStr.split('/');
+                const fmt = `${parseInt(d)}/${parseInt(m)}`;
+                return `${fmt}-${fmt}`;
+            }
+
+            // Trường hợp: 11/4 - 11/4 (không có năm, có dấu gạch) nhưng có thể lệch space
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-').map(p => {
+                    const clean = p.trim();
+                    // Nếu có năm ở cuối (dd/mm/yyyy), cắt bỏ năm
+                    if (/\/\d{4}$/.test(clean)) {
+                        const [dd, mm] = clean.split('/');
+                        return `${parseInt(dd)}/${parseInt(mm)}`;
+                    }
+                    return clean;
+                });
+                return parts.join('-');
+            }
+        } catch (e) {
+            console.warn("Date normalization failed for:", dateStr);
+        }
+
+        return dateStr; // Fallback
     }
 
     // Tải danh sách Khách hàng đăng ký từ Backend
@@ -1327,8 +1377,8 @@ export const afterRender = () => {
     // Gắn event tự động tính toán
     const editTotalInput = document.getElementById('edit-total');
     const editDepositInput = document.getElementById('edit-deposit');
-    if (editTotalInput) editTotalInput.addEventListener('input', updateRemainingCalculation);
-    if (editDepositInput) editDepositInput.addEventListener('input', updateRemainingCalculation);
+    if (editTotalInput) editTotalInput.addEventListener('input', window.updateEditRemaining);
+    if (editDepositInput) editDepositInput.addEventListener('input', window.updateEditRemaining);
 
     // Cần phải gán lại event cho 2 nút close cũ 
     const closeBtns = document.querySelectorAll('#bookingModal button[onclick*="hidden"]');
@@ -1881,7 +1931,7 @@ export const afterRender = () => {
                 if (res.ok) {
                     alert("✅ Đã cập nhật thành công Chi tiết Đơn hàng!");
                     // Nếu trạng thái là Đã cọc hoặc Hoàn tất phí, tự động đồng bộ CRM
-                    if (status.includes('Đã cọc') || (total_price > 0 && total_price === deposit)) {
+                    if (status.includes('Đã cọc') || (bookingPayload.total_price > 0 && bookingPayload.total_price === deposit)) {
                         syncToCRM(bookingPayload);
                     }
                     window.closeEditModal();
