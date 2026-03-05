@@ -27,23 +27,41 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Vui lòng nhập từ khóa tìm kiếm' });
             }
 
-            // A. Thử tìm trong CRM trước
+            // A. Thử tìm trong CRM trước (exact phone/CSR code, hoặc tìm theo tên)
             const { rows: crmRows } = await db.query(
                 `SELECT * FROM crm_customers 
-                 WHERE phone = $1 OR UPPER(csr_code) = UPPER($1)`,
-                [keyword]
+                 WHERE phone = $1 OR UPPER(csr_code) = UPPER($1) OR full_name ILIKE $2
+                 ORDER BY CASE WHEN phone = $1 THEN 0 WHEN UPPER(csr_code) = UPPER($1) THEN 1 ELSE 2 END
+                 LIMIT 1`,
+                [keyword, `%${keyword}%`]
             );
 
             let customer = crmRows.length > 0 ? crmRows[0] : null;
             let phoneForBooking = customer ? customer.phone : keyword;
 
             // B. Luôn tìm booking gần nhất để lấy thông tin chi tiết (Address, ID Card, etc.)
-            const { rows: bookingRows } = await db.query(
-                `SELECT id_card, address, diet, allergy, trekking_pole, special, dob, gender, medal_name, name
-                 FROM bookings WHERE phone = $1 
-                 ORDER BY created_at DESC LIMIT 1`,
-                [phoneForBooking]
-            );
+            let bookingRows;
+            if (customer) {
+                // Nếu đã tìm thấy CRM customer, lấy booking theo phone
+                ({ rows: bookingRows } = await db.query(
+                    `SELECT id_card, address, diet, allergy, trekking_pole, special, dob, gender, medal_name, name
+                     FROM bookings WHERE phone = $1 
+                     ORDER BY created_at DESC LIMIT 1`,
+                    [phoneForBooking]
+                ));
+            } else {
+                // Nếu chưa tìm thấy CRM, thử tìm booking theo phone HOẶC tên
+                ({ rows: bookingRows } = await db.query(
+                    `SELECT id_card, address, diet, allergy, trekking_pole, special, dob, gender, medal_name, name, phone
+                     FROM bookings WHERE phone = $1 OR name ILIKE $2
+                     ORDER BY created_at DESC LIMIT 1`,
+                    [keyword, `%${keyword}%`]
+                ));
+                // Nếu tìm được booking theo tên, dùng phone của booking đó
+                if (bookingRows.length > 0 && bookingRows[0].phone) {
+                    phoneForBooking = bookingRows[0].phone;
+                }
+            }
             const latestBooking = bookingRows[0] || {};
 
             if (!customer && bookingRows.length === 0) {
