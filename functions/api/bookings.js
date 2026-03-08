@@ -21,7 +21,7 @@ export async function onRequest(context) {
     try {
         let response;
         if (method === 'GET') {
-            const rows = await sql('SELECT * FROM bookings ORDER BY created_at DESC');
+            const rows = await sql`SELECT * FROM bookings ORDER BY created_at DESC`;
             response = Response.json(rows);
         } else if (method === 'POST') {
             const body = await request.json();
@@ -51,7 +51,7 @@ export async function onRequest(context) {
 
                 values.push(id);
                 const query = `UPDATE bookings SET ${fields.join(', ')} WHERE id=$${idx} RETURNING *`;
-                const rows = await sql(query, values);
+                const rows = await sql.query(query, values);
                 if (rows.length === 0) return Response.json({ error: 'Not found' }, { status: 404 });
                 response = Response.json(rows[0]);
             } else {
@@ -79,7 +79,7 @@ export async function onRequest(context) {
                     medal_name ?? null, commitments ?? null, deposit_required ?? 1000000
                 ];
 
-                const rows = await sql(query, values);
+                const rows = await sql.query(query, values);
                 const newBooking = rows[0];
 
                 // Send Email
@@ -95,7 +95,7 @@ export async function onRequest(context) {
         } else if (method === 'DELETE') {
             const id = url.searchParams.get('id');
             if (!id) return Response.json({ error: 'ID is required' }, { status: 400 });
-            await sql('DELETE FROM bookings WHERE id = $1', [id]);
+            await sql.query('DELETE FROM bookings WHERE id = $1', [id]);
             response = Response.json({ success: true });
         } else {
             return new Response('Method Not Allowed', { status: 405 });

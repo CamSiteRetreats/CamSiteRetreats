@@ -8,7 +8,7 @@ export async function onRequest(context) {
         if (request.method === 'GET') {
             // Fetch schedules with booked count calculation
             // Based on the logic in list-schedules.js or similar
-            const schedules = await sql(`
+            const schedules = await sql`
                 SELECT 
                     s.*, 
                     (SELECT COUNT(*) FROM bookings b 
@@ -21,7 +21,7 @@ export async function onRequest(context) {
                     ) as booked_count
                 FROM schedules s
                 ORDER BY s.start_date ASC
-            `);
+            `;
 
             return Response.json(schedules, {
                 headers: { 'Access-Control-Allow-Origin': '*' }

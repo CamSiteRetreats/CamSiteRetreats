@@ -54,7 +54,7 @@ async function handlePaymentLink({ request, env }) {
     if (!id) return Response.json({ error: 'Booking ID is required' }, { status: 400 });
 
     const sql = getDb(env);
-    const rows = await sql('SELECT * FROM bookings WHERE id = $1', [id]);
+    const rows = await sql.query('SELECT * FROM bookings WHERE id = $1', [id]);
 
     if (rows.length === 0) return Response.json({ error: 'Booking not found' }, { status: 404 });
 
@@ -120,7 +120,7 @@ async function handleSepayWebhook({ request, env }) {
     const sql = getDb(env);
 
     // Check duplicate
-    const existingTx = await sql('SELECT id FROM payment_transactions WHERE sepay_transaction_id = $1', [String(sepayTransactionId)]);
+    const existingTx = await sql.query('SELECT id FROM payment_transactions WHERE sepay_transaction_id = $1', [String(sepayTransactionId)]);
     if (existingTx.length > 0) return Response.json({ success: true, message: 'Duplicate' });
 
     // Matching logic (Simplified for space, but should mirror the original)
@@ -146,11 +146,11 @@ async function handleSepayWebhook({ request, env }) {
         if (newDeposit >= (parseInt(matchedBooking.total_price) || 0)) newStatus = 'Hoàn tất';
         else if (newDeposit >= (parseInt(matchedBooking.deposit_required) || 1000000)) newStatus = 'Đã cọc';
 
-        await sql('UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3', [newStatus, newDeposit, matchedBooking.id]);
+        await sql.query('UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3', [newStatus, newDeposit, matchedBooking.id]);
     }
 
     // Insert transaction
-    await sql(`INSERT INTO payment_transactions (booking_id, sepay_transaction_id, amount, transfer_content, payment_type) VALUES ($1, $2, $3, $4, $5)`,
+    await sql.query(`INSERT INTO payment_transactions (booking_id, sepay_transaction_id, amount, transfer_content, payment_type) VALUES ($1, $2, $3, $4, $5)`,
         [matchedBooking ? matchedBooking.id : null, String(sepayTransactionId), amount, transferContent, 'deposit']);
 
     return Response.json({ success: true });
@@ -160,7 +160,7 @@ async function handlePaymentStatus({ request, env }) {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     const sql = getDb(env);
-    const rows = await sql('SELECT status, deposit, total_price FROM bookings WHERE id = $1', [id]);
+    const rows = await sql.query('SELECT status, deposit, total_price FROM bookings WHERE id = $1', [id]);
 
     if (rows.length === 0) return Response.json({ error: 'Not found' }, { status: 404 });
     const booking = rows[0];

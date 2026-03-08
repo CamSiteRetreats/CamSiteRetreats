@@ -37,7 +37,7 @@ export async function onRequest(context) {
             values = [username, password, 'active'];
         }
 
-        const rows = await sql(query, values);
+        const rows = await sql.query(query, values);
 
         if (rows.length > 0) {
             const user = rows[0];

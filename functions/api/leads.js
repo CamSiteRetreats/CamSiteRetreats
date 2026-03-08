@@ -19,7 +19,7 @@ export async function onRequest(context) {
 
     try {
         if (request.method === 'GET') {
-            const leads = await sql('SELECT * FROM leads ORDER BY created_at DESC');
+            const leads = await sql`SELECT * FROM leads ORDER BY created_at DESC`;
             return Response.json(leads, { headers: corsHeaders });
         }
 

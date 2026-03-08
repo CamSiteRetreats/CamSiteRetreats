@@ -7,7 +7,7 @@ export async function onRequest(context) {
 
     try {
         if (request.method === 'GET') {
-            const tours = await sql('SELECT * FROM tours ORDER BY id ASC');
+            const tours = await sql`SELECT * FROM tours ORDER BY id ASC`;
             return Response.json(tours, {
                 headers: { 'Access-Control-Allow-Origin': '*' }
             });

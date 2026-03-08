@@ -20,7 +20,7 @@ export async function onRequest(context) {
     try {
         // 0. LIỆT KÊ TOÀN BỘ KHÁCH HÀNG THÂN THIẾT (GET)
         if (request.method === 'GET') {
-            const rows = await sql('SELECT * FROM crm_customers ORDER BY created_at DESC');
+            const rows = await sql`SELECT * FROM crm_customers ORDER BY created_at DESC`;
             return Response.json({ success: true, data: rows }, { headers: corsHeaders });
         }
 
