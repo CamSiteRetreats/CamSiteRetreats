@@ -1,0 +1,9 @@
+name = "cam-site-retreats"
+pages_build_output_dir = "."
+
+[vars]
+# Thêm các biến môi trường tại đây hoặc trong Cloudflare Dashboard
+# DATABASE_URL = "postgres://..."
+# SEPAY_API_KEY = "..."
+# RESEND_API_KEY = "..."
+# ADMIN_EMAIL = "..."
