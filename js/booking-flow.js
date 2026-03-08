@@ -417,7 +417,7 @@ const BookingFlow = {
         try {
             // Sync Customer to CRM first to get Customer ID
             try {
-                const crmRes = await fetch('../api/admin_customers?action=create', {
+                const crmRes = await fetch('/api/admin_customers?action=create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -438,7 +438,7 @@ const BookingFlow = {
                 console.warn('CRM Sync Error:', e);
             }
 
-            const res = await fetch('../api/bookings', {
+            const res = await fetch('/api/bookings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -504,7 +504,7 @@ const BookingFlow = {
 
         this.depositPollInterval = setInterval(async () => {
             try {
-                const res = await fetch(`../api/payment?action=status&id=${this.bookingDbId}`);
+                const res = await fetch(`/api/payment?action=status&id=${this.bookingDbId}`);
                 if (!res.ok) return;
                 const data = await res.json();
 
