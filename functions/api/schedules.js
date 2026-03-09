@@ -17,9 +17,9 @@ export async function onRequest(context) {
                      AND (
                          (b.date = TO_CHAR(s.start_date + interval '12 hours', 'YYYY-MM-DD')) OR
                          (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/MM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'D/M') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'D/MM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/M') || '%')
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'FMDD/FMMM') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'FMDD/MM') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/FMMM') || '%')
                      )
                     ) as booked_count
                 FROM schedules s
