@@ -1,9 +1,9 @@
-import{S,H as C}from"./Header-CvqOcIss.js";const H=()=>`
+import{S as C,H as I}from"./Header-n5pNPUhI.js";const F=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
-        ${S()}
+        ${C()}
         
         <div class="flex flex-col flex-1 w-full overflow-hidden">
-          ${C()}
+          ${I()}
           
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-7xl mx-auto space-y-6">
@@ -21,8 +21,20 @@ import{S,H as C}from"./Header-CvqOcIss.js";const H=()=>`
 
                   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                       <!-- Left filter pane -->
-                      <div class="glass-panel p-5 h-fit lg:col-span-1">
-                          <h3 class="font-medium text-gray-900 mb-4">Lọc Tuyến Đi</h3>
+                      <div class="glass-panel p-5 h-fit lg:col-span-1 mb-6 lg:mb-0">
+                          <h3 class="font-medium text-gray-900 mb-4 border-b pb-2">Thời Gian</h3>
+                          <div class="flex flex-col gap-2 mb-6" id="timeFilterOptions">
+                              <label class="flex items-center gap-3 cursor-pointer group">
+                                  <input type="radio" name="timeFilter" value="upcoming" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100" checked>
+                                  <span class="text-gray-700 font-medium group-hover:text-gray-900 transition-colors text-sm">Sắp diễn ra</span>
+                              </label>
+                              <label class="flex items-center gap-3 cursor-pointer group">
+                                  <input type="radio" name="timeFilter" value="past" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100">
+                                  <span class="text-gray-500 group-hover:text-gray-900 transition-colors text-sm">Đã khởi hành</span>
+                              </label>
+                          </div>
+
+                          <h3 class="font-medium text-gray-900 mb-4 border-b pb-2">Lọc Tuyến Đi</h3>
                           <div id="tourFilterList" class="space-y-3">
                               <label class="flex items-center gap-3 cursor-pointer group">
                                   <input type="radio" name="tourFilter" value="" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100" checked>
@@ -94,40 +106,40 @@ import{S,H as C}from"./Header-CvqOcIss.js";const H=()=>`
               </div>
           </div>
       </div>
-    `,$=()=>{let m=[],u="";const v="/api/schedules",k="/api/tours",i=document.getElementById("scheduleList"),d=document.getElementById("scheduleModal"),h=document.getElementById("scheduleModalContent"),b=document.getElementById("scheduleForm"),x=(t=null)=>{const e=document.getElementById("scheduleModalTitle");if(t){e.textContent="Chỉnh Sửa Lịch Trình",document.getElementById("sch-edit-id").value=t.id,document.getElementById("sch-tour-name").value=t.tour_name;const a=n=>n&&n.includes("T")?n.split("T")[0]:n;document.getElementById("sch-start-date").value=a(t.start_date),document.getElementById("sch-end-date").value=a(t.end_date),document.getElementById("sch-slots").value=t.slots,document.getElementById("sch-status").value=t.status||"Đang mở"}else e.textContent="Thêm Lịch Khởi Hành",b.reset(),document.getElementById("sch-edit-id").value="";d.classList.remove("hidden"),setTimeout(()=>{d.classList.add("opacity-100"),h.classList.remove("scale-95"),h.classList.add("scale-100")},10)},g=()=>{d.classList.remove("opacity-100"),h.classList.remove("scale-100"),h.classList.add("scale-95"),setTimeout(()=>{d.classList.add("hidden")},200)};document.getElementById("addScheduleBtn").addEventListener("click",()=>x()),document.getElementById("closeScheduleModalBtn").addEventListener("click",g),document.getElementById("cancelScheduleBtn").addEventListener("click",g),d.addEventListener("click",t=>{t.target===d&&g()});const L=async()=>{try{const t=await fetch(k);if(!t.ok)throw new Error("Failed to load tours");const e=await t.json(),a=document.getElementById("sch-tour-name");a.innerHTML='<option value="">-- Chọn Tour --</option>',e.forEach(s=>{a.innerHTML+=`<option value="${s.name}">${s.name}</option>`});const n=document.getElementById("tourFilterList");let o=`
+    `,_=()=>{let y=[],h="",u="upcoming";const b="/api/schedules",E="/api/tours",g=document.getElementById("scheduleList"),d=document.getElementById("scheduleModal"),p=document.getElementById("scheduleModalContent"),w=document.getElementById("scheduleForm"),k=(t=null)=>{const r=document.getElementById("scheduleModalTitle");if(t){r.textContent="Chỉnh Sửa Lịch Trình",document.getElementById("sch-edit-id").value=t.id,document.getElementById("sch-tour-name").value=t.tour_name;const e=a=>a&&a.includes("T")?a.split("T")[0]:a;document.getElementById("sch-start-date").value=e(t.start_date),document.getElementById("sch-end-date").value=e(t.end_date),document.getElementById("sch-slots").value=t.slots,document.getElementById("sch-status").value=t.status||"Đang mở"}else r.textContent="Thêm Lịch Khởi Hành",w.reset(),document.getElementById("sch-edit-id").value="";d.classList.remove("hidden"),setTimeout(()=>{d.classList.add("opacity-100"),p.classList.remove("scale-95"),p.classList.add("scale-100")},10)},m=()=>{d.classList.remove("opacity-100"),p.classList.remove("scale-100"),p.classList.add("scale-95"),setTimeout(()=>{d.classList.add("hidden")},200)};document.getElementById("addScheduleBtn").addEventListener("click",()=>k()),document.getElementById("closeScheduleModalBtn").addEventListener("click",m),document.getElementById("cancelScheduleBtn").addEventListener("click",m),d.addEventListener("click",t=>{t.target===d&&m()});const S=async()=>{try{const t=await fetch(E);if(!t.ok)throw new Error("Failed to load tours");const r=await t.json(),e=document.getElementById("sch-tour-name");e.innerHTML='<option value="">-- Chọn Tour --</option>',r.forEach(s=>{e.innerHTML+=`<option value="${s.name}">${s.name}</option>`});const a=document.getElementById("tourFilterList");let n=`
                 <label class="flex items-center gap-3 cursor-pointer group">
                     <input type="radio" name="tourFilter" value="" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100" checked>
                     <span class="text-gray-500 group-hover:text-gray-900 transition-colors text-sm">Tất cả Tuyến</span>
                 </label>
-            `;e.forEach(s=>{o+=`
+            `;r.forEach(s=>{n+=`
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="radio" name="tourFilter" value="${s.name}" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100">
                         <span class="text-gray-500 group-hover:text-gray-900 transition-colors text-sm">${s.name}</span>
                     </label>
-                `}),n.innerHTML=o,n.querySelectorAll('input[name="tourFilter"]').forEach(s=>{s.addEventListener("change",l=>{u=l.target.value,f()})})}catch(t){console.error("Error loading tours:",t)}},y=async()=>{i.innerHTML='<div class="text-center py-12 text-gray-400">Đang tải lịch trình...</div>';try{const t=await fetch(v);if(!t.ok)throw new Error("Failed to fetch schedules");m=await t.json(),f()}catch(t){console.error("Error loading schedules:",t),i.innerHTML='<div class="text-center py-12 text-red-400 font-medium">Lỗi kết nối server.</div>'}},f=()=>{let t=m;if(u&&(t=t.filter(e=>e.tour_name===u)),t.length===0){i.innerHTML='<div class="text-center py-12 text-gray-400 italic">Chưa có lịch trình nào'+(u?" cho tuyến này":"")+".</div>";return}i.innerHTML=t.map(e=>{const a=new Date(e.start_date),n=new Date(e.end_date),o=a.toLocaleDateString("vi-VN"),s=n.toLocaleDateString("vi-VN"),l=`${a.getDate().toString().padStart(2,"0")}/${(a.getMonth()+1).toString().padStart(2,"0")}`,c=parseInt(e.booked_count)||0,p=parseInt(e.slots)||0,w=Math.max(0,p-c),B=p>0?Math.min(100,Math.round(c/p*100)):0;let r=e.status||"Đang mở";w<=0?r="Hết chỗ":w<=3&&(r="Sắp hết"),e.status==="Hết chỗ"&&(r="Hết chỗ");const M=r==="Đang mở"?"text-green-600 bg-green-50 border-green-200":r==="Sắp hết"?"text-orange-600 bg-orange-50 border-orange-200":"text-red-500 bg-red-50 border-red-200",T=r==="Đang mở"?"bg-green-500":r==="Sắp hết"?"bg-orange-500":"bg-red-500";return`
+                `}),a.innerHTML=n,a.querySelectorAll('input[name="tourFilter"]').forEach(s=>{s.addEventListener("change",o=>{h=o.target.value,f()})}),document.querySelectorAll('input[name="timeFilter"]').forEach(s=>{s.addEventListener("change",o=>{u=o.target.value,document.querySelectorAll('input[name="timeFilter"]').forEach(c=>{const l=c.nextElementSibling;c.checked?(l.classList.add("text-gray-700","font-medium"),l.classList.remove("text-gray-500")):(l.classList.remove("text-gray-700","font-medium"),l.classList.add("text-gray-500"))}),f()})})}catch(t){console.error("Error loading tours:",t)}},x=async()=>{g.innerHTML='<div class="text-center py-12 text-gray-400">Đang tải lịch trình...</div>';try{const t=await fetch(b);if(!t.ok)throw new Error("Failed to fetch schedules");y=await t.json(),f()}catch(t){console.error("Error loading schedules:",t),g.innerHTML='<div class="text-center py-12 text-red-400 font-medium">Lỗi kết nối server.</div>'}},f=()=>{let t=y;h&&(t=t.filter(e=>e.tour_name===h));const r=new Date;if(r.setHours(0,0,0,0),t=t.filter(e=>{const a=new Date(e.start_date);a.setHours(0,0,0,0);const n=a<r;return u==="upcoming"?!n:u==="past"?n:!0}),t.sort((e,a)=>{const n=new Date(e.start_date),s=new Date(a.start_date);return u==="upcoming"?n-s:s-n}),t.length===0){g.innerHTML='<div class="text-center py-12 text-gray-400 italic">Chưa có lịch trình nào'+(h?" cho tuyến này":"")+(u==="past"?" trong quá khứ":" sắp tới")+".</div>";return}g.innerHTML=t.map(e=>{const a=new Date(e.start_date),n=new Date(e.end_date),s=a.toLocaleDateString("vi-VN"),o=n.toLocaleDateString("vi-VN"),c=`${a.getDate().toString().padStart(2,"0")}/${(a.getMonth()+1).toString().padStart(2,"0")}`,l=parseInt(e.booked_count)||0,v=parseInt(e.slots)||0,L=Math.max(0,v-l),T=v>0?Math.min(100,Math.round(l/v*100)):0;let i=e.status||"Đang mở";L<=0?i="Hết chỗ":L<=3&&(i="Sắp hết"),e.status==="Hết chỗ"&&(i="Hết chỗ");const M=i==="Đang mở"?"text-green-600 bg-green-50 border-green-200":i==="Sắp hết"?"text-orange-600 bg-orange-50 border-orange-200":"text-red-500 bg-red-50 border-red-200",H=i==="Đang mở"?"bg-green-500":i==="Sắp hết"?"bg-orange-500":"bg-red-500";return`
                 <div class="glass-panel p-5 border-l-4 border-csr-orange hover:shadow-md transition-all duration-200" data-schedule-id="${e.id}">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center gap-4 flex-1 min-w-0">
                             <div class="bg-csr-orange/10 text-csr-orange font-bold rounded-xl p-3 text-center min-w-[72px] shrink-0">
                                 <div class="text-[10px] uppercase tracking-wider font-medium">Khởi Hành</div>
-                                <div class="text-xl font-black">${l}</div>
+                                <div class="text-xl font-black">${c}</div>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-bold text-gray-900 mb-1 tracking-wide truncate">${e.tour_name}</h3>
                                 <div class="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                                     <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        ${o} — ${s}
+                                        ${s} — ${o}
                                     </span>
                                     <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                        <strong class="text-csr-orange">${c}</strong> / ${p} chỗ
+                                        <strong class="text-csr-orange">${l}</strong> / ${v} chỗ
                                     </span>
-                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${M}">${r}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${M}">${i}</span>
                                 </div>
                                 <!-- Progress Bar -->
                                 <div class="mt-2 w-full bg-gray-100 rounded-full h-2 overflow-hidden max-w-xs">
-                                    <div class="${T} h-2 rounded-full transition-all duration-500" style="width: ${B}%"></div>
+                                    <div class="${H} h-2 rounded-full transition-all duration-500" style="width: ${T}%"></div>
                                 </div>
                             </div>
                         </div>
@@ -145,4 +157,4 @@ import{S,H as C}from"./Header-CvqOcIss.js";const H=()=>`
                         </div>
                     </div>
                 </div>
-            `}).join(""),i.addEventListener("click",E)},E=async t=>{const e=t.target.closest(".sch-edit-btn"),a=t.target.closest(".sch-delete-btn"),n=t.target.closest(".sch-details-btn");if(e){const o=e.getAttribute("data-id"),s=m.find(l=>l.id==o);s&&x(s)}if(a){const o=a.getAttribute("data-id");if(confirm("Bạn có chắc chắn muốn xóa lịch trình này?"))try{if((await fetch(`${v}?id=${o}`,{method:"DELETE"})).ok)y();else throw new Error("Delete failed")}catch(s){alert("Lỗi khi xóa: "+s.message)}}if(n){const o=n.getAttribute("data-tour"),s=n.getAttribute("data-date"),l=s&&s.includes("T")?s.split("T")[0]:s,c=`/admin/roster?tour=${encodeURIComponent(o)}&date=${encodeURIComponent(l)}`;history.pushState(null,null,c),window.dispatchEvent(new Event("popstate"))}};b.addEventListener("submit",async t=>{t.preventDefault();const e=t.target.querySelector('button[type="submit"]'),a=e.textContent;e.textContent="Đang lưu...",e.disabled=!0;const n=document.getElementById("sch-edit-id").value,o={id:n?parseInt(n):null,tour_name:document.getElementById("sch-tour-name").value,start_date:document.getElementById("sch-start-date").value,end_date:document.getElementById("sch-end-date").value,slots:parseInt(document.getElementById("sch-slots").value),status:document.getElementById("sch-status").value};try{if(!(await fetch(v,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)})).ok)throw new Error("Failed to save schedule");g(),y(),alert(n?"✅ Cập nhật lịch trình thành công!":"✅ Thêm lịch trình mới thành công! Form đặt chỗ trên website sẽ tự cập nhật trong 30 giây.")}catch(s){alert("❌ Lỗi: "+s.message)}finally{e.textContent=a,e.disabled=!1}}),L(),y()};export{$ as afterRender,H as render};
+            `}).join(""),g.addEventListener("click",B)},B=async t=>{const r=t.target.closest(".sch-edit-btn"),e=t.target.closest(".sch-delete-btn"),a=t.target.closest(".sch-details-btn");if(r){const n=r.getAttribute("data-id"),s=y.find(o=>o.id==n);s&&k(s)}if(e){const n=e.getAttribute("data-id");if(confirm("Bạn có chắc chắn muốn xóa lịch trình này?"))try{if((await fetch(`${b}?id=${n}`,{method:"DELETE"})).ok)x();else throw new Error("Delete failed")}catch(s){alert("Lỗi khi xóa: "+s.message)}}if(a){const n=a.getAttribute("data-tour"),s=a.getAttribute("data-date"),o=s&&s.includes("T")?s.split("T")[0]:s,c=`/admin/roster?tour=${encodeURIComponent(n)}&date=${encodeURIComponent(o)}`;history.pushState(null,null,c),window.dispatchEvent(new Event("popstate"))}};w.addEventListener("submit",async t=>{t.preventDefault();const r=t.target.querySelector('button[type="submit"]'),e=r.textContent;r.textContent="Đang lưu...",r.disabled=!0;const a=document.getElementById("sch-edit-id").value,n={id:a?parseInt(a):null,tour_name:document.getElementById("sch-tour-name").value,start_date:document.getElementById("sch-start-date").value,end_date:document.getElementById("sch-end-date").value,slots:parseInt(document.getElementById("sch-slots").value),status:document.getElementById("sch-status").value};try{if(!(await fetch(b,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(n)})).ok)throw new Error("Failed to save schedule");m(),x(),alert(a?"✅ Cập nhật lịch trình thành công!":"✅ Thêm lịch trình mới thành công! Form đặt chỗ trên website sẽ tự cập nhật trong 30 giây.")}catch(s){alert("❌ Lỗi: "+s.message)}finally{r.textContent=e,r.disabled=!1}}),S(),x()};export{_ as afterRender,F as render};

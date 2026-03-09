@@ -1,4 +1,4 @@
-import{S as y,H as h}from"./Header-CvqOcIss.js";const f=()=>`
+import{S as y,H as h}from"./Header-n5pNPUhI.js";const f=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${y()}
         
@@ -93,7 +93,7 @@ import{S as y,H as h}from"./Header-CvqOcIss.js";const f=()=>`
                           </div>
                           <div>
                               <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá (VNĐ) *</label>
-                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold" placeholder="3200000" required>
+                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold" placeholder="3000000" required>
                           </div>
                       </div>
                       <div class="grid grid-cols-3 gap-4">
