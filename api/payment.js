@@ -60,12 +60,12 @@ async function handlePaymentLink(req, res) {
     const paymentType = needsDeposit ? 'deposit' : 'remaining';
     const amountDue = needsDeposit ? depositRequired : remaining;
 
-    // Build transfer content: tour date name coc/full (lowercase, no diacritics)
+    // Build transfer content: CSR[ID] [Tour] [Date] [Name] [Type]
     const cleanTour = normalizeVN((booking.tour || 'Tour').split('-')[0].trim());
     const cleanDate = (booking.date || '').replace(/\//g, '');
     const cleanName = normalizeVN(booking.name || 'khach');
     const payLabel = needsDeposit ? 'coc' : 'full';
-    const transferContent = `${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
+    const transferContent = `CSR${booking.id} ${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
 
     const isPaid = booking.status === 'Đã cọc' || booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành';
     const isFullyPaid = booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành' || (totalPrice > 0 && deposit >= totalPrice);
@@ -107,7 +107,15 @@ async function handleSepayWebhook(req, res) {
     }
 
     const payload = req.body;
+    const headers = req.headers;
     console.log('📥 SePay Webhook received:', JSON.stringify(payload));
+
+    // Log to debug table (NEON/PG)
+    try {
+        await db.query('INSERT INTO debug_webhook_logs (payload, headers) VALUES ($1, $2)', [JSON.stringify(payload), JSON.stringify(headers)]);
+    } catch (e) {
+        console.error('Debug log fail:', e);
+    }
 
     const {
         id: sepayTransactionId,
@@ -165,7 +173,7 @@ async function handleSepayWebhook(req, res) {
         }
     }
 
-    // Strategy 2: Match by customer name + tour name
+    // Strategy 2: Match by Customer Name + Tour Name (fallback) - MUST MATCH BOTH
     if (!matchedBooking) {
         for (const booking of bookings) {
             const bookingName = normalizeVN(booking.name).replace(/\s/g, '');
@@ -174,12 +182,7 @@ async function handleSepayWebhook(req, res) {
             const nameMatch = bookingName.length >= 3 && searchNoSpace.includes(bookingName);
             const tourMatch = bookingTour.length >= 2 && searchNoSpace.includes(bookingTour);
 
-            console.log(`  Check #${booking.id}: name="${bookingName}" tour="${bookingTour}" nameMatch=${nameMatch} tourMatch=${tourMatch}`);
-
             if (nameMatch && tourMatch) {
-                matchedBooking = booking;
-                break;
-            } else if (nameMatch || tourMatch) {
                 matchedBooking = booking;
                 break;
             }
@@ -216,15 +219,13 @@ async function handleSepayWebhook(req, res) {
         const currentDeposit = parseInt(matchedBooking.deposit) || 0;
         const depositReq = parseInt(matchedBooking.deposit_required) || 1000000;
 
-        let newStatus = currentStatus;
         let newDeposit = currentDeposit + amount;
+        let newStatus = currentStatus;
 
         if (totalPrice > 0 && newDeposit >= totalPrice) {
             newStatus = 'Hoàn tất';
         } else if (newDeposit >= depositReq) {
-            if (currentStatus === 'Chờ cọc' || currentStatus === 'Chờ xác nhận cọc') {
-                newStatus = 'Đã cọc';
-            }
+            newStatus = 'Đã cọc';
         }
 
         // Only update DB if something changed
@@ -243,22 +244,16 @@ async function handleSepayWebhook(req, res) {
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'New')
                     `, [customerId, matchedBooking.name, phone, matchedBooking.id_card || null, matchedBooking.dob || null, matchedBooking.gender || null, matchedBooking.allergy || null, matchedBooking.diet || null]);
                 }
-                console.log(`✅ Auto-generated CSR Code for Booking #${matchedBooking.id}: ${customerId}`);
             }
 
             await db.query(
                 'UPDATE bookings SET status = $1, deposit = $2, customer_id = $3 WHERE id = $4',
                 [newStatus, newDeposit, customerId, matchedBooking.id]
             );
-            console.log(`✅ Auto-updated Booking #${matchedBooking.id}: ${currentStatus} -> ${newStatus} (Paid: ${newDeposit})`);
-        } else {
-            console.log(`ℹ️ Booking #${matchedBooking.id} unchanged. Status: ${currentStatus}, Paid: ${newDeposit}`);
         }
-    } else {
-        console.warn('⚠️ No matching booking for:', transferContent);
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, matched: matchedBooking ? matchedBooking.id : null });
 }
 
 // ============================================================
@@ -271,29 +266,31 @@ async function handlePaymentStatus(req, res) {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: 'Booking ID is required' });
 
-    const { rows: bookingRows } = await db.query('SELECT status, deposit, total_price FROM bookings WHERE id = $1', [id]);
+    const { rows: bookingRows } = await db.query('SELECT status, deposit, total_price, deposit_required FROM bookings WHERE id = $1', [id]);
     if (bookingRows.length === 0) return res.status(404).json({ error: 'Booking not found' });
 
     const booking = bookingRows[0];
-    const status = booking.status;
+    const totalPrice = parseInt(booking.total_price) || 0;
+    const currentDeposit = parseInt(booking.deposit) || 0;
+    const depositReq = parseInt(booking.deposit_required) || 1000000;
 
-    const { rows: txRows } = await db.query(
-        'SELECT amount, created_at, payment_type FROM payment_transactions WHERE booking_id = $1 ORDER BY created_at DESC LIMIT 1',
-        [id]
+    const isPaid = booking.status && (
+        booking.status.includes('Đã cọc') ||
+        booking.status === 'Hoàn tất' ||
+        booking.status === 'Hoàn thành' ||
+        booking.status === 'Đã thanh toán' ||
+        (totalPrice > 0 && currentDeposit >= depositReq)
     );
 
-    const isPaid = status === 'Đã cọc' || status === 'Hoàn tất' || status === 'Hoàn thành';
-    const isFullyPaid = status === 'Hoàn tất' || status === 'Hoàn thành' || (parseInt(booking.total_price) > 0 && parseInt(booking.deposit) >= parseInt(booking.total_price));
-    const latestTx = txRows[0] || null;
+    const isFullyPaid = booking.status === 'Hoàn tất' ||
+        booking.status === 'Hoàn thành' ||
+        (totalPrice > 0 && currentDeposit >= totalPrice);
 
     return res.status(200).json({
-        isPaid,
-        isFullyPaid,
-        status,
-        paidAmount: latestTx ? latestTx.amount : 0,
-        paidAt: latestTx ? latestTx.created_at : null,
-        paymentType: latestTx ? latestTx.payment_type : null,
-        deposit: parseInt(booking.deposit) || 0,
-        totalPrice: parseInt(booking.total_price) || 0
+        isPaid: !!isPaid,
+        isFullyPaid: !!isFullyPaid,
+        status: booking.status,
+        deposit: currentDeposit,
+        totalPrice: totalPrice
     });
 }

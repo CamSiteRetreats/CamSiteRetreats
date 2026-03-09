@@ -739,8 +739,14 @@
 
         // Listen for API updates
         window.addEventListener('tours-updated', () => {
-            console.log('UI refreshing from API update...');
+            console.log('Tours updated from API, refreshing UI...');
             initTours();
+            loadHomeBookingData();
+        });
+
+        window.addEventListener('schedules-updated', () => {
+            console.log('Schedules updated from API, refreshing booking flow...');
+            loadHomeSchedules();
         });
     </script>
 </body>

@@ -54,7 +54,7 @@ async function handlePaymentLink({ request, env }) {
     if (!id) return Response.json({ error: 'Booking ID is required' }, { status: 400 });
 
     const sql = getDb(env);
-    const rows = await sql.query('SELECT * FROM bookings WHERE id = $1', [id]);
+    const rows = await sql`SELECT * FROM bookings WHERE id = ${id}`;
 
     if (rows.length === 0) return Response.json({ error: 'Booking not found' }, { status: 404 });
 
@@ -68,13 +68,14 @@ async function handlePaymentLink({ request, env }) {
     const paymentType = needsDeposit ? 'deposit' : 'remaining';
     const amountDue = needsDeposit ? depositRequired : remaining;
 
+    // Build transfer content: CSR[ID] [Tour] [Date] [Name] [Type]
     const cleanTour = normalizeVN((booking.tour || 'Tour').split('-')[0].trim());
     const cleanDate = (booking.date || '').replace(/\//g, '');
     const cleanName = normalizeVN(booking.name || 'khach');
     const payLabel = needsDeposit ? 'coc' : 'full';
-    const transferContent = `${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
+    const transferContent = `CSR${booking.id} ${cleanTour} ${cleanDate} ${cleanName} ${payLabel}`;
 
-    const isPaid = booking.status === 'Đã cọc' || booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành';
+    const isPaid = booking.status && (booking.status.includes('Đã cọc') || booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành' || booking.status === 'Đã thanh toán');
     const isFullyPaid = booking.status === 'Hoàn tất' || booking.status === 'Hoàn thành' || (totalPrice > 0 && deposit >= totalPrice);
 
     return Response.json({
@@ -96,6 +97,17 @@ async function handlePaymentLink({ request, env }) {
 async function handleSepayWebhook({ request, env }) {
     if (request.method !== 'POST') return Response.json({ error: 'POST only' }, { status: 405 });
 
+    const sql = getDb(env);
+    const payload = await request.clone().json().catch(() => ({}));
+    const headers = Object.fromEntries(request.headers.entries());
+
+    // Log to debug table (Log EVERYTHING even before auth)
+    try {
+        await sql`INSERT INTO debug_webhook_logs (payload, headers) VALUES (${payload}, ${headers})`;
+    } catch (e) {
+        console.error('Debug log fail:', e);
+    }
+
     const authHeader = request.headers.get('authorization') || '';
     const expectedKey = env.SEPAY_API_KEY;
     const providedKey = authHeader.replace('Apikey ', '').replace('Bearer ', '').trim();
@@ -104,12 +116,12 @@ async function handleSepayWebhook({ request, env }) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const payload = await request.json();
     const {
         id: sepayTransactionId,
         content: transferContent,
         transferType,
         transferAmount,
+        description
     } = payload;
 
     if (transferType && transferType !== 'in') {
@@ -117,21 +129,20 @@ async function handleSepayWebhook({ request, env }) {
     }
 
     const amount = parseInt(transferAmount) || 0;
-    const sql = getDb(env);
 
     // Check duplicate
-    const existingTx = await sql.query('SELECT id FROM payment_transactions WHERE sepay_transaction_id = $1', [String(sepayTransactionId)]);
+    const existingTx = await sql`SELECT id FROM payment_transactions WHERE sepay_transaction_id = ${String(sepayTransactionId)}`;
     if (existingTx.length > 0) return Response.json({ success: true, message: 'Duplicate' });
 
-    // Matching logic (Simplified for space, but should mirror the original)
-    // ... (Same logic as in payment.js but using `sql` template literal for queries)
-
-    // For now, let's keep it robust
-    const bookings = await sql(`SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc') ORDER BY created_at DESC`);
+    // Robust matching logic
+    const bookings = await sql(`SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc') OR status IS NULL OR status = '' ORDER BY created_at DESC`);
 
     let matchedBooking = null;
-    const searchText = normalizeVN(transferContent || '');
+    let paymentType = 'deposit';
+    const searchText = normalizeVN(transferContent || description || '');
+    const searchNoSpace = searchText.replace(/\s/g, '');
 
+    // Strategy 1: Match by ID (CSR153, ID153, or just 153 if unique enough)
     for (const booking of bookings) {
         const idStr = String(booking.id);
         if (searchText.includes('csr' + idStr) || searchText.includes('id' + idStr)) {
@@ -140,35 +151,83 @@ async function handleSepayWebhook({ request, env }) {
         }
     }
 
-    if (matchedBooking) {
-        const newDeposit = (parseInt(matchedBooking.deposit) || 0) + amount;
-        let newStatus = matchedBooking.status;
-        if (newDeposit >= (parseInt(matchedBooking.total_price) || 0)) newStatus = 'Hoàn tất';
-        else if (newDeposit >= (parseInt(matchedBooking.deposit_required) || 1000000)) newStatus = 'Đã cọc';
+    // Strategy 2: Match by Customer Name + Tour Name (fallback)
+    if (!matchedBooking) {
+        for (const booking of bookings) {
+            const bookingName = normalizeVN(booking.name).replace(/\s/g, '');
+            const bookingTour = normalizeVN((booking.tour || '').split('-')[0].trim()).replace(/\s/g, '');
 
-        await sql.query('UPDATE bookings SET status = $1, deposit = $2 WHERE id = $3', [newStatus, newDeposit, matchedBooking.id]);
+            const nameMatch = bookingName.length >= 3 && searchNoSpace.includes(bookingName);
+            const tourMatch = bookingTour.length >= 2 && searchNoSpace.includes(bookingTour);
+
+            if (nameMatch && tourMatch) {
+                matchedBooking = booking;
+                break;
+            }
+        }
+    }
+
+    if (matchedBooking) {
+        paymentType = searchText.includes('full') ? 'full' : 'deposit';
+        const currentDeposit = parseInt(matchedBooking.deposit) || 0;
+        const newDeposit = currentDeposit + amount;
+        const totalPrice = parseInt(matchedBooking.total_price) || 0;
+        const depositReq = parseInt(matchedBooking.deposit_required) || 1000000;
+
+        let newStatus = matchedBooking.status;
+        if (totalPrice > 0 && newDeposit >= totalPrice) newStatus = 'Hoàn tất';
+        else if (newDeposit >= depositReq) newStatus = 'Đã cọc';
+
+        // Get or Generate Customer ID
+        let customerId = matchedBooking.customer_id;
+        if (newStatus === 'Đã cọc' && (!customerId || customerId.trim() === '')) {
+            const check = await sql`SELECT csr_code FROM crm_customers WHERE phone = ${matchedBooking.phone}`;
+            if (check.length > 0) {
+                customerId = check[0].csr_code;
+            } else {
+                const randNum = Math.floor(100000 + Math.random() * 900000);
+                customerId = '#CSR' + randNum;
+                await sql`INSERT INTO crm_customers (csr_code, full_name, phone, loyalty_tier) VALUES (${customerId}, ${matchedBooking.name}, ${matchedBooking.phone}, 'New')`;
+            }
+        }
+
+        await sql`UPDATE bookings SET status = ${newStatus}, deposit = ${newDeposit}, customer_id = ${customerId} WHERE id = ${matchedBooking.id}`;
     }
 
     // Insert transaction
-    await sql.query(`INSERT INTO payment_transactions (booking_id, sepay_transaction_id, amount, transfer_content, payment_type) VALUES ($1, $2, $3, $4, $5)`,
-        [matchedBooking ? matchedBooking.id : null, String(sepayTransactionId), amount, transferContent, 'deposit']);
+    await sql`INSERT INTO payment_transactions (booking_id, sepay_transaction_id, amount, transfer_content, payment_type) VALUES (${matchedBooking ? matchedBooking.id : null}, ${String(sepayTransactionId)}, ${amount}, ${transferContent || description || ''}, ${paymentType})`;
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, matched: matchedBooking ? matchedBooking.id : null });
 }
 
 async function handlePaymentStatus({ request, env }) {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     const sql = getDb(env);
-    const rows = await sql.query('SELECT status, deposit, total_price FROM bookings WHERE id = $1', [id]);
+    const rows = await sql`SELECT status, deposit, total_price FROM bookings WHERE id = ${id}`;
 
     if (rows.length === 0) return Response.json({ error: 'Not found' }, { status: 404 });
     const booking = rows[0];
+    const totalPrice = parseInt(booking.total_price) || 0;
+    const currentDeposit = parseInt(booking.deposit) || 0;
+
+    const isPaid = booking.status && (
+        booking.status.includes('Đã cọc') ||
+        booking.status === 'Hoàn tất' ||
+        booking.status === 'Hoàn thành' ||
+        booking.status === 'Đã thanh toán' ||
+        (totalPrice > 0 && currentDeposit >= (parseInt(booking.deposit_required) || 1000000))
+    );
+
+    const isFullyPaid = booking.status === 'Hoàn tất' ||
+        booking.status === 'Hoàn thành' ||
+        (totalPrice > 0 && currentDeposit >= totalPrice);
 
     return Response.json({
         status: booking.status,
-        isPaid: ['Đã cọc', 'Hoàn tất'].includes(booking.status),
-        deposit: booking.deposit,
-        totalPrice: booking.total_price
+        isPaid: !!isPaid,
+        isFullyPaid: !!isFullyPaid,
+        deposit: currentDeposit,
+        totalPrice: totalPrice
     });
 }

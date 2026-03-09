@@ -34,12 +34,12 @@ const TourManager = {
     // NEW: Fetch from Backend API
     fetchToursFromAPI: async function () {
         try {
-            // Only fetch if not recently fetched (e.g. 1 minute cache)
-            const lastFetch = localStorage.getItem('cam_site_last_fetch');
-            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
+            // Temporary: Disable local cache check to force first-time sync from Neon
+            // const lastFetch = localStorage.getItem('cam_site_last_fetch');
+            // if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
 
-            // Vercel API endpoint
-            const response = await fetch('/api/tours');
+            // Cloudflare API endpoint with cache buster
+            const response = await fetch('/api/tours?t=' + Date.now());
             if (!response.ok) throw new Error('API Network response was not ok');
 
             const tours = await response.json();
@@ -64,7 +64,7 @@ const TourManager = {
             const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
             if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return;
 
-            const res = await fetch('/api/schedules');
+            const res = await fetch('/api/schedules?t=' + Date.now());
             if (!res.ok) throw new Error('Failed to fetch schedules');
 
             const schedules = await res.json();
