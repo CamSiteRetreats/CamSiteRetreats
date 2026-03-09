@@ -35,8 +35,11 @@ export const render = () => {
                           <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                               Khách Sắp Tham Gia
                           </button>
-                          <button data-tab="completed" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                          <button data-tab="ready" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                               Khách Chờ Lên Xe
+                          </button>
+                          <button data-tab="completed" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                              Lịch Sử (Đã Đi)
                           </button>
                       </nav>
                   </div>
@@ -609,7 +612,7 @@ export const afterRender = () => {
         if (!tbody || !thead) return;
 
         // Xử lý Thead tùy thuộc theo Tab
-        const isDetailView = activeTab === 'upcoming' || activeTab === 'completed';
+        const isDetailView = activeTab === 'upcoming' || activeTab === 'ready' || activeTab === 'completed';
 
         if (isDetailView) {
             thead.innerHTML = `
@@ -674,7 +677,9 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isDonePast;
+                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+            } else if (activeTab === 'ready') {
+                tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
             } else if (activeTab === 'completed') {
                 tabMatch = isDonePast;
             }
@@ -769,11 +774,28 @@ export const afterRender = () => {
             if (statTotalCustomers) statTotalCustomers.textContent = totalCustomersCount;
             if (statTotalRevenue) statTotalRevenue.textContent = unconfirmedCount + ' Khách';
             if (statTotalCollected) statTotalCollected.textContent = partialPaidCount + ' Khách';
-        } else {
+        } else if (activeTab === 'ready') {
             // Dashboard cho Khách Chờ Lên Xe
             if (statTitle1) statTitle1.textContent = 'Khách Sẵn Sàng (Full)';
             if (statTitle2) statTitle2.textContent = 'Tổng Doanh Thu Tab';
             if (statTitle3) statTitle3.textContent = 'Thực Thu (Full Tận Nơi)';
+
+            let totalRevenueSum = 0;
+            let totalCollectedSum = 0;
+
+            filteredData.forEach(b => {
+                totalRevenueSum += parseInt(b.total_price) || 0;
+                totalCollectedSum += parseInt(b.deposit) || 0;
+            });
+
+            if (statTotalCustomers) statTotalCustomers.textContent = totalCustomersCount;
+            if (statTotalRevenue) statTotalRevenue.textContent = totalRevenueSum > 0 ? totalRevenueSum.toLocaleString('vi-VN') + 'đ' : '0đ';
+            if (statTotalCollected) statTotalCollected.textContent = totalCollectedSum > 0 ? totalCollectedSum.toLocaleString('vi-VN') + 'đ' : '0đ';
+        } else {
+            // Dashboard cho Lịch Sử
+            if (statTitle1) statTitle1.textContent = 'Khách Đã Xong (Lịch Sử)';
+            if (statTitle2) statTitle2.textContent = 'Tổng Doanh Thu Tab';
+            if (statTitle3) statTitle3.textContent = 'Thực Thu (Đã Đóng)';
 
             let totalRevenueSum = 0;
             let totalCollectedSum = 0;
@@ -791,13 +813,13 @@ export const afterRender = () => {
 
         const colSpan = isDetailView ? 8 : 4;
         if (!filteredData || filteredData.length === 0) {
-            let emptyMsg = activeTab === 'consult' ? 'Chưa có khách hàng tư vấn nào.' : (activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : 'Danh sách rỗng.'));
+            let emptyMsg = activeTab === 'consult' ? 'Chưa có khách hàng tư vấn nào.' : (activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : (activeTab === 'ready' ? 'Chưa có khách sẵn sàng.' : 'Danh sách rỗng.')));
             tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-gray-500">${emptyMsg}</td></tr>`;
             return;
         }
 
         tbody.innerHTML = filteredData.map(b => {
-            const rowClass = activeTab === 'upcoming' ? 'bg-green-50/20 hover:bg-green-50 transition-colors' : 'hover:bg-gray-100 transition-colors';
+            const rowClass = (activeTab === 'upcoming' || activeTab === 'ready') ? 'bg-green-50/20 hover:bg-green-50 transition-colors' : 'hover:bg-gray-100 transition-colors';
 
             if (isDetailView) {
                 // =============== LAYOUT 8 CỘT CHI TIẾT ===============
@@ -1075,12 +1097,42 @@ export const afterRender = () => {
 
             let dataToExport = currentBookings.filter(b => {
                 let tabMatch = false;
-                if (activeTab === 'pending') tabMatch = b.status === 'Chờ xác nhận cọc' || parseInt(b.deposit) === 0 || !b.deposit;
-                else if (activeTab === 'upcoming') tabMatch = b.status !== 'Chờ xác nhận cọc' && parseInt(b.deposit) > 0;
-                else if (activeTab === 'completed') tabMatch = b.status === 'Hoàn thành';
+                const isFullyPaid = parseInt(b.total_price) > 0 && parseInt(b.total_price) === parseInt(b.deposit);
+                const isPastTour = (dateStr) => {
+                    if (!dateStr) return false;
+                    try {
+                        const parts = dateStr.split('/');
+                        if (parts.length === 3) {
+                            const tourDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return tourDate.getTime() < today.getTime();
+                        } else if (dateStr.includes('-')) {
+                            const tourDate = new Date(`${dateStr}T00:00:00`);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return tourDate.getTime() < today.getTime();
+                        }
+                    } catch (e) { }
+                    return false;
+                };
+                const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
+
+                if (activeTab === 'consult') {
+                    tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
+                } else if (activeTab === 'pending') {
+                    tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
+                } else if (activeTab === 'upcoming') {
+                    tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+                } else if (activeTab === 'ready') {
+                    tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
+                } else if (activeTab === 'completed') {
+                    tabMatch = isDonePast;
+                }
+
                 if (!tabMatch) return false;
                 if (filterTour && b.tour !== filterTour) return false;
-                if (filterDate && b.date !== filterDate) return false;
+                if (filterDate && normalizeDate(b.date) !== filterDate) return false;
                 if (filterSale && String(b.sale_id) !== String(filterSale)) return false;
                 if (searchTerm) {
                     const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} `.toLowerCase();
@@ -1122,7 +1174,7 @@ export const afterRender = () => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            let filenameStatus = activeTab === 'pending' ? 'ChoCoc' : (activeTab === 'upcoming' ? 'SapThamGia' : 'HoanThanh');
+            let filenameStatus = activeTab === 'pending' ? 'ChoCoc' : (activeTab === 'upcoming' ? 'SapThamGia' : (activeTab === 'ready' ? 'ChoLenXe' : 'LichSu'));
             link.setAttribute("download", `BaoCao_DonHang_${filenameStatus}_${new Date().toISOString().slice(0, 10)}.csv`);
             document.body.appendChild(link);
             link.click();
