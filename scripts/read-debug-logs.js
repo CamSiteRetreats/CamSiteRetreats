@@ -7,8 +7,8 @@ async function checkDebug() {
     const logs = await sql`SELECT * FROM debug_webhook_logs ORDER BY created_at DESC LIMIT 10`;
     if (logs.length === 0) console.log("No logs found yet.");
     logs.forEach(log => {
-        console.log(`[${log.created_at}] Matched: ${log.matched_booking_id}`);
-        console.log(`Payload: ${JSON.stringify(log.payload)}`);
+        console.log(`[${log.created_at}] ID: ${log.id} | Matched: ${log.matched_booking_id}`);
+        console.log(`Payload: ${JSON.stringify(log.payload, null, 2)}`);
     });
 }
 

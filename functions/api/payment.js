@@ -2,7 +2,13 @@ import { getDb } from './_db';
 
 // Helper: remove Vietnamese diacritics → lowercase ASCII
 function normalizeVN(str) {
-    return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
+    if (!str) return '';
+    return str.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/gi, 'd')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
 }
 
 export async function onRequest(context) {
@@ -139,13 +145,12 @@ async function handleSepayWebhook({ request, env }) {
 
     let matchedBooking = null;
     let paymentType = 'deposit';
-    const searchText = normalizeVN(transferContent || description || '');
-    const searchNoSpace = searchText.replace(/\s/g, '');
+    const cleanSearch = normalizeVN(transferContent || description || '');
 
-    // Strategy 1: Match by ID (CSR153, ID153, or just 153 if unique enough)
+    // Strategy 1: Match by ID (CSR154, ID154, or just 154 if unique enough)
     for (const booking of bookings) {
         const idStr = String(booking.id);
-        if (searchText.includes('csr' + idStr) || searchText.includes('id' + idStr)) {
+        if (cleanSearch.includes('csr' + idStr) || cleanSearch.includes('id' + idStr)) {
             matchedBooking = booking;
             break;
         }
@@ -154,13 +159,11 @@ async function handleSepayWebhook({ request, env }) {
     // Strategy 2: Match by Customer Name + Tour Name (fallback)
     if (!matchedBooking) {
         for (const booking of bookings) {
-            const bookingName = normalizeVN(booking.name).replace(/\s/g, '');
-            const bookingTour = normalizeVN((booking.tour || '').split('-')[0].trim()).replace(/\s/g, '');
+            const bName = normalizeVN(booking.name);
+            const bTour = normalizeVN((booking.tour || '').split('-')[0]);
 
-            const nameMatch = bookingName.length >= 3 && searchNoSpace.includes(bookingName);
-            const tourMatch = bookingTour.length >= 2 && searchNoSpace.includes(bookingTour);
-
-            if (nameMatch && tourMatch) {
+            if (bName.length >= 3 && cleanSearch.includes(bName) &&
+                bTour.length >= 2 && cleanSearch.includes(bTour)) {
                 matchedBooking = booking;
                 break;
             }

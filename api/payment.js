@@ -2,7 +2,13 @@ const db = require('./_db');
 
 // Helper: remove Vietnamese diacritics → lowercase ASCII
 function normalizeVN(str) {
-    return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
+    if (!str) return '';
+    return str.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/gi, 'd')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '') // Remove everything except alphanumeric
+        .trim();
 }
 
 /**
@@ -147,15 +153,13 @@ async function handleSepayWebhook(req, res) {
         return res.status(200).json({ success: true, message: 'Duplicate' });
     }
 
-    // Match booking by transfer content
     // Normalize: remove Vietnamese diacritics → lowercase → remove extra spaces
     function normalizeVN(str) {
         return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    const searchText = normalizeVN(transferContent || description || '');
-    const searchNoSpace = searchText.replace(/\s/g, '');
-    console.log('🔍 Normalized search:', searchText, '→', searchNoSpace);
+    const searchText = (transferContent || description || '').toLowerCase();
+    const cleanSearch = normalizeVN(searchText);
 
     let matchedBooking = null;
     let paymentType = 'deposit';
@@ -164,25 +168,23 @@ async function handleSepayWebhook(req, res) {
         `SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc') ORDER BY created_at DESC`
     );
 
-    // Strategy 1: Try matching by booking ID in transfer content (e.g., "CSR72" or just "72")
+    // Strategy 1: Match by ID (CSR154, ID154, etc)
     for (const booking of bookings) {
         const idStr = String(booking.id);
-        if (searchText.includes('csr' + idStr) || searchText.includes('id' + idStr)) {
+        if (cleanSearch.includes('csr' + idStr) || cleanSearch.includes('id' + idStr)) {
             matchedBooking = booking;
             break;
         }
     }
 
-    // Strategy 2: Match by Customer Name + Tour Name (fallback) - MUST MATCH BOTH
+    // Strategy 2: Match by Customer Name + Tour Name (fallback)
     if (!matchedBooking) {
         for (const booking of bookings) {
-            const bookingName = normalizeVN(booking.name).replace(/\s/g, '');
-            const bookingTour = normalizeVN((booking.tour || '').split('-')[0].trim()).replace(/\s/g, '');
+            const bName = normalizeVN(booking.name);
+            const bTour = normalizeVN((booking.tour || '').split('-')[0]);
 
-            const nameMatch = bookingName.length >= 3 && searchNoSpace.includes(bookingName);
-            const tourMatch = bookingTour.length >= 2 && searchNoSpace.includes(bookingTour);
-
-            if (nameMatch && tourMatch) {
+            if (bName.length >= 3 && cleanSearch.includes(bName) &&
+                bTour.length >= 2 && cleanSearch.includes(bTour)) {
                 matchedBooking = booking;
                 break;
             }
