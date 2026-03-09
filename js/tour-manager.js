@@ -61,7 +61,7 @@ const TourManager = {
         try {
             // Short cache 30s
             const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
-            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return;
+            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 5000) return;
 
             const res = await fetch('/api/schedules?t=' + Date.now());
             if (!res.ok) throw new Error('Failed to fetch schedules');

@@ -16,8 +16,10 @@ export async function onRequest(context) {
                      AND b.status NOT IN ('Đã hủy', 'Cancelled')
                      AND (
                          (b.date = TO_CHAR(s.start_date + interval '12 hours', 'YYYY-MM-DD')) OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/MM')) OR
-                         (b.date LIKE TO_CHAR(s.start_date + interval '12 hours', 'DD/MM') || '%')
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/MM') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'D/M') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'D/MM') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/M') || '%')
                      )
                     ) as booked_count
                 FROM schedules s
