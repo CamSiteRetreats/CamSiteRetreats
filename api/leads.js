@@ -51,6 +51,14 @@ module.exports = async (req, res) => {
                 let newBooking = null;
                 if (newLead) {
                     try {
+                        let tourPrice = 0;
+                        if (newLead.tour) {
+                            const tourResult = await db.query('SELECT price FROM tours WHERE name = $1 LIMIT 1', [newLead.tour]);
+                            if (tourResult.rows.length > 0) {
+                                tourPrice = tourResult.rows[0].price || 0;
+                            }
+                        }
+
                         const bookingQuery = `
                             INSERT INTO bookings (name, phone, tour, date, status, total_price, deposit, sale_id, sale_name, special)
                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -58,7 +66,7 @@ module.exports = async (req, res) => {
                         `;
                         const bookingValues = [
                             newLead.name, newLead.phone, newLead.tour ?? null, newLead.date ?? null,
-                            'Chờ tư vấn', 0, 0, null, null, newLead.message ?? null
+                            'Chờ tư vấn', tourPrice, 0, null, null, newLead.message ?? null
                         ];
                         const bookingResult = await db.query(bookingQuery, bookingValues);
                         newBooking = bookingResult.rows[0];

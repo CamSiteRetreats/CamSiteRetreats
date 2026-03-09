@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Tà Năng - Phan Dũng",
+    "image": "https://cam-site-retreats.vercel.app/photo/f51jz6be.jpg",
+    "price": 2690000,
+    "region": "Miền Nam",
+    "type": "TREKKING",
+    "duration": "2 Ngày 1 Đêm",
+    "short_desc": "Cung đường trekking đẹp nhất Việt Nam...",
+    "slug": "ta-nang-phan-dung",
+    "long_desc": null,
+    "hero_image": null,
+    "image2": "https://cam-site-retreats.vercel.app/photo/f51jz6be.jpg",
+    "image3": "https://cam-site-retreats.vercel.app/photo/f51jz6be.jpg",
+    "image4": "",
+    "altitude": "1.168M",
+    "level": "Trung Bình",
+    "specs": null,
+    "itinerary": null,
+    "inclusions": null,
+    "exclusions": null,
+    "preparation": null,
+    "gallery": null,
+    "sort_order": 1,
+    "custom_domain": "https://camsiteretreats.com/tour/tanangphandung",
+    "is_visible": true,
+    "commission_rate": "7"
+  }
+]
