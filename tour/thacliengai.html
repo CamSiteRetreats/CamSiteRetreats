@@ -1218,10 +1218,10 @@
                     const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
 
                     const scheduleHTML = `
-                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 cursor-pointer ${opacityClass}"
+                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 transition-all ${isClickable ? 'cursor-pointer hover:bg-primary/5 hover:border-primary' : ''} ${opacityClass}"
                             ${clickAction}>
-                            <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
-                            <span class="text-[13px] date-status ${statusClass} font-bold">${statusDisplay}</span>
+                            <span class="text-[12px] font-bold leading-tight pointer-events-none">${formattedDisplay}</span>
+                            <span class="text-[13px] date-status ${statusClass} font-bold pointer-events-none">${statusDisplay}</span>
                         </div>
                     `;
                     dateSelector.insertAdjacentHTML('beforeend', scheduleHTML);

@@ -12,12 +12,12 @@ export async function onRequest(context) {
                 SELECT 
                     s.*, 
                     (SELECT COUNT(*) FROM bookings b 
-                     WHERE b.tour = s.tour_name 
-                     AND b.status != 'Đã hủy'
+                     WHERE (b.tour = s.tour_name OR b.tour LIKE s.tour_name || '%')
+                     AND b.status NOT IN ('Đã hủy', 'Cancelled')
                      AND (
-                         (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM')) OR
-                         (b.date LIKE TO_CHAR(s.start_date, 'DD/MM') || '%')
+                         (b.date = TO_CHAR(s.start_date + interval '12 hours', 'YYYY-MM-DD')) OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/MM')) OR
+                         (b.date LIKE TO_CHAR(s.start_date + interval '12 hours', 'DD/MM') || '%')
                      )
                     ) as booked_count
                 FROM schedules s
