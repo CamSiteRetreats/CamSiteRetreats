@@ -15,8 +15,9 @@ export async function onRequest(context) {
                      WHERE b.tour = s.tour_name 
                      AND b.status != 'Đã hủy'
                      AND (
-                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR 
-                         (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD'))
+                         (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM')) OR
+                         (b.date LIKE TO_CHAR(s.start_date, 'DD/MM') || '%')
                      )
                     ) as booked_count
                 FROM schedules s

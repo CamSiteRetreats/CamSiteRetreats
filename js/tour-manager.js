@@ -97,8 +97,9 @@ const TourManager = {
             localStorage.setItem('cam_site_schedules_last_fetch', Date.now().toString());
             console.log('Schedules updated from API with real booked counts');
 
-            // Dispatch event
+            // Dispatch events
             window.dispatchEvent(new Event('schedules-updated'));
+            window.dispatchEvent(new Event('tours-updated'));
 
         } catch (error) {
             console.warn('Failed to fetch schedules:', error);
@@ -113,8 +114,12 @@ const TourManager = {
             // Attach schedules from separate key
             const schedulesData = JSON.parse(localStorage.getItem('cam_site_schedules')) || [];
 
-            // Filter schedules for this tour
-            let tourSchedules = schedulesData.filter(s => s.tour === tour.name);
+            // Helper to normalize for comparison
+            const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+            const targetNorm = norm(tour.name);
+
+            // Filter schedules for this tour using normalized names
+            let tourSchedules = schedulesData.filter(s => norm(s.tour) === targetNorm);
 
             // If no schedules in LocalStorage, check if there are default ones
             if (tourSchedules.length === 0 && tour.defaultSchedules) {

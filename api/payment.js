@@ -158,8 +158,8 @@ async function handleSepayWebhook(req, res) {
         return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    const searchText = (transferContent || description || '').toLowerCase();
-    const cleanSearch = normalizeVN(searchText);
+    const rawSearch = (transferContent || description || '').toLowerCase();
+    const cleanSearch = normalizeVN(rawSearch);
 
     let matchedBooking = null;
     let paymentType = 'deposit';
@@ -171,7 +171,14 @@ async function handleSepayWebhook(req, res) {
     // Strategy 1: Match by ID (CSR154, ID154, etc)
     for (const booking of bookings) {
         const idStr = String(booking.id);
-        if (cleanSearch.includes('csr' + idStr) || cleanSearch.includes('id' + idStr)) {
+        const searchTerms = [
+            'csr' + idStr,
+            'id' + idStr,
+            'thanh toan ' + idStr,
+            'tt' + idStr
+        ];
+
+        if (searchTerms.some(term => cleanSearch.includes(term))) {
             matchedBooking = booking;
             break;
         }
@@ -193,7 +200,7 @@ async function handleSepayWebhook(req, res) {
 
     // Determine payment type from transfer content
     if (matchedBooking) {
-        paymentType = searchText.includes('full') ? 'full' : 'deposit';
+        paymentType = rawSearch.includes('full') ? 'full' : 'deposit';
     }
 
     // Save transaction

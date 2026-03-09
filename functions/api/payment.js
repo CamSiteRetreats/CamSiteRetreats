@@ -145,12 +145,20 @@ async function handleSepayWebhook({ request, env }) {
 
     let matchedBooking = null;
     let paymentType = 'deposit';
-    const cleanSearch = normalizeVN(transferContent || description || '');
+    const rawSearch = (transferContent || description || '').toLowerCase();
+    const cleanSearch = normalizeVN(rawSearch);
 
     // Strategy 1: Match by ID (CSR154, ID154, or just 154 if unique enough)
     for (const booking of bookings) {
         const idStr = String(booking.id);
-        if (cleanSearch.includes('csr' + idStr) || cleanSearch.includes('id' + idStr)) {
+        const searchTerms = [
+            'csr' + idStr,
+            'id' + idStr,
+            'thanh toan ' + idStr,
+            'tt' + idStr
+        ];
+
+        if (searchTerms.some(term => cleanSearch.includes(term))) {
             matchedBooking = booking;
             break;
         }
@@ -171,7 +179,7 @@ async function handleSepayWebhook({ request, env }) {
     }
 
     if (matchedBooking) {
-        paymentType = searchText.includes('full') ? 'full' : 'deposit';
+        paymentType = rawSearch.includes('full') ? 'full' : 'deposit';
         const currentDeposit = parseInt(matchedBooking.deposit) || 0;
         const newDeposit = currentDeposit + amount;
         const totalPrice = parseInt(matchedBooking.total_price) || 0;

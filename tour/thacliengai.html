@@ -1120,8 +1120,8 @@
             loadTourOptions();
             filterSchedules(); // Initial load
 
-            // Render Recommended Tours (Excluding current Liêng Ài ID = 1)
-            TourManager.renderRecommendations('recc-marquee', 1);
+            // Render Recommended Tours (Excluding current Liêng Ài ID = 3)
+            TourManager.renderRecommendations('recc-marquee', 3);
             lucide.createIcons();
 
             // Listen for API updates
@@ -1129,8 +1129,13 @@
                 console.log('UI refreshing from API update...');
                 loadTourOptions();
                 filterSchedules();
-                TourManager.renderRecommendations('recc-marquee', 1);
+                TourManager.renderRecommendations('recc-marquee', 3);
                 lucide.createIcons();
+            });
+
+            window.addEventListener('schedules-updated', () => {
+                console.log('UI refreshing from schedule update...');
+                filterSchedules();
             });
         });
 
@@ -1202,12 +1207,18 @@
                         formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
                     }
 
-                    // Format startDate: strip ISO 'T...' and convert YYYY-MM-DD to D/M/YYYY for BookingFlow
-                    let safeStart = (item.startDate || '').includes('T') ? item.startDate.split('T')[0] : item.startDate;
+                    // Format startDate: strip ISO 'T...' and convert YYYY-MM-DD for BookingFlow
+                    let safeStart = item.startDate;
+                    if (safeStart instanceof Date) {
+                        safeStart = safeStart.toISOString().split('T')[0];
+                    } else if (typeof safeStart === 'string' && safeStart.includes('T')) {
+                        safeStart = safeStart.split('T')[0];
+                    }
+
                     const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
 
                     const scheduleHTML = `
-                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}"
+                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 cursor-pointer ${opacityClass}"
                             ${clickAction}>
                             <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
                             <span class="text-[13px] date-status ${statusClass} font-bold">${statusDisplay}</span>
