@@ -34,9 +34,8 @@ const TourManager = {
     // NEW: Fetch from Backend API
     fetchToursFromAPI: async function () {
         try {
-            // Temporary: Disable local cache check to force first-time sync from Neon
-            // const lastFetch = localStorage.getItem('cam_site_last_fetch');
-            // if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
+            const lastFetch = localStorage.getItem('cam_site_last_fetch');
+            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
 
             // Cloudflare API endpoint with cache buster
             const response = await fetch('/api/tours?t=' + Date.now());

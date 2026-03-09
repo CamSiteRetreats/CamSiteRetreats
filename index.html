@@ -544,15 +544,30 @@
         });
 
         // Initialize Tours Logic
-        function initTours() {
+        let currentRegion = 'south';
+
+        function initTours(skipFilter = false) {
             const tours = TourManager.getAllTours();
             const slider = document.getElementById('tour-slider');
             if (slider) {
                 slider.innerHTML = tours.map(tour => TourManager.createTourCardHTML(tour)).join('');
                 lucide.createIcons();
                 TourManager.initSlideshows();
-                // Re-initialize Slideshow logic if needed or it will be handled by hover
-                filterTours('south'); // Default filter
+
+                // Only apply filter/fade on initial load or if explicitly requested
+                if (!skipFilter) {
+                    filterTours(currentRegion);
+                } else {
+                    // Update display immediately without fade
+                    const allTourCards = document.querySelectorAll('.tour-card');
+                    allTourCards.forEach(card => {
+                        if (card.dataset.region === currentRegion) {
+                            card.classList.remove('hidden');
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+                }
             }
         }
 
@@ -561,7 +576,7 @@
         const btnNorth = document.getElementById('btn-north');
 
         const filterTours = (region) => {
-            const slider = document.getElementById('tour-slider');
+            currentRegion = region;
             const allTourCards = document.querySelectorAll('.tour-card');
 
             // 1. Fade Out
@@ -737,17 +752,30 @@
             btnNorth.addEventListener('click', () => filterTours('north'));
         }
 
-        // Listen for API updates
-        window.addEventListener('tours-updated', () => {
-            console.log('Tours updated from API, refreshing UI...');
-            initTours();
-            loadHomeBookingData();
-        });
+        // Debounce helper
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
-        window.addEventListener('schedules-updated', () => {
+        // Listen for API updates with debounce
+        window.addEventListener('tours-updated', debounce(() => {
+            console.log('Tours updated from API, refreshing UI...');
+            initTours(true); // skipFilter = true to avoid fade
+            loadHomeBookingData();
+        }, 500));
+
+        window.addEventListener('schedules-updated', debounce(() => {
             console.log('Schedules updated from API, refreshing booking flow...');
             loadHomeSchedules();
-        });
+        }, 500));
     </script>
 </body>
 
