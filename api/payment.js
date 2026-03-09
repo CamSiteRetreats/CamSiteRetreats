@@ -92,7 +92,9 @@ async function handlePaymentLink(req, res) {
         paymentType,
         transferContent,
         isPaid,
-        isFullyPaid
+        isFullyPaid,
+        saleId: booking.sale_id,
+        saleName: booking.sale_name
     });
 }
 
@@ -153,13 +155,15 @@ async function handleSepayWebhook(req, res) {
         return res.status(200).json({ success: true, message: 'Duplicate' });
     }
 
-    // Normalize: remove Vietnamese diacritics → lowercase → remove extra spaces
-    function normalizeVN(str) {
-        return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    // Normalize: remove Vietnamese diacritics → lowercase → remove ALL spaces for tight matching
+    function normalizeVN(str, removeSpaces = false) {
+        let res = (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+        if (removeSpaces) res = res.replace(/\s+/g, '');
+        return res;
     }
 
     const rawSearch = (transferContent || description || '').toLowerCase();
-    const cleanSearch = normalizeVN(rawSearch);
+    const cleanSearchNoSpace = normalizeVN(rawSearch, true);
 
     let matchedBooking = null;
     let paymentType = 'deposit';
@@ -178,7 +182,8 @@ async function handleSepayWebhook(req, res) {
             'tt' + idStr
         ];
 
-        if (searchTerms.some(term => cleanSearch.includes(term))) {
+        // Also check if idStr is found as a standalone number or attached to CSR/ID
+        if (searchTerms.some(term => cleanSearchNoSpace.includes(normalizeVN(term, true)))) {
             matchedBooking = booking;
             break;
         }
@@ -187,11 +192,11 @@ async function handleSepayWebhook(req, res) {
     // Strategy 2: Match by Customer Name + Tour Name (fallback)
     if (!matchedBooking) {
         for (const booking of bookings) {
-            const bName = normalizeVN(booking.name);
-            const bTour = normalizeVN((booking.tour || '').split('-')[0]);
+            const bName = normalizeVN(booking.name, true);
+            const bTour = normalizeVN((booking.tour || '').split('-')[0], true);
 
-            if (bName.length >= 3 && cleanSearch.includes(bName) &&
-                bTour.length >= 2 && cleanSearch.includes(bTour)) {
+            if (bName.length >= 3 && cleanSearchNoSpace.includes(bName) &&
+                bTour.length >= 2 && cleanSearchNoSpace.includes(bTour)) {
                 matchedBooking = booking;
                 break;
             }

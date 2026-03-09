@@ -467,6 +467,10 @@
                     leadData.date = data.date || '';
                     leadData.depositRequired = data.amountDue || 1000000;
 
+                    // Preserve Sale Info from API if missing in URL
+                    if (!leadData.saleId) leadData.saleId = data.saleId;
+                    if (!leadData.saleName) leadData.saleName = data.saleName;
+
                     document.getElementById('tour-name').value = leadData.tour;
                     document.getElementById('tour-date').value = leadData.date;
                     document.getElementById('cust-name').value = leadData.name;
@@ -497,7 +501,10 @@
             const cleanTour = normalizeVN((leadData.tour || 'Tour').split('-')[0].trim());
             const cleanDate = (leadData.date || '').replace(/\//g, '');
             const cleanName = normalizeVN(document.getElementById('cust-name').value || leadData.name || 'khach');
-            transferCode = `${cleanTour} ${cleanDate} ${cleanName} coc`;
+
+            // Add CSR prefix + ID for robust matching if bookingDbId exists
+            const prefix = bookingDbId ? `CSR${bookingDbId} ` : '';
+            transferCode = `${prefix}${cleanTour} ${cleanDate} ${cleanName} coc`;
             document.getElementById('transfer-content').textContent = transferCode;
         }
 
