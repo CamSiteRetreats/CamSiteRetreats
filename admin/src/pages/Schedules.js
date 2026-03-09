@@ -25,8 +25,20 @@ export const render = () => {
 
                   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                       <!-- Left filter pane -->
-                      <div class="glass-panel p-5 h-fit lg:col-span-1">
-                          <h3 class="font-medium text-gray-900 mb-4">Lọc Tuyến Đi</h3>
+                      <div class="glass-panel p-5 h-fit lg:col-span-1 mb-6 lg:mb-0">
+                          <h3 class="font-medium text-gray-900 mb-4 border-b pb-2">Thời Gian</h3>
+                          <div class="flex flex-col gap-2 mb-6" id="timeFilterOptions">
+                              <label class="flex items-center gap-3 cursor-pointer group">
+                                  <input type="radio" name="timeFilter" value="upcoming" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100" checked>
+                                  <span class="text-gray-700 font-medium group-hover:text-gray-900 transition-colors text-sm">Sắp diễn ra</span>
+                              </label>
+                              <label class="flex items-center gap-3 cursor-pointer group">
+                                  <input type="radio" name="timeFilter" value="past" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100">
+                                  <span class="text-gray-500 group-hover:text-gray-900 transition-colors text-sm">Đã khởi hành</span>
+                              </label>
+                          </div>
+
+                          <h3 class="font-medium text-gray-900 mb-4 border-b pb-2">Lọc Tuyến Đi</h3>
                           <div id="tourFilterList" class="space-y-3">
                               <label class="flex items-center gap-3 cursor-pointer group">
                                   <input type="radio" name="tourFilter" value="" class="text-csr-orange focus:ring-csr-orange border-gray-200 bg-gray-100" checked>
@@ -104,6 +116,7 @@ export const render = () => {
 export const afterRender = () => {
     let currentSchedules = [];
     let currentFilter = '';
+    let currentTimeFilter = 'upcoming';
 
     // API endpoints
     const API_SCHEDULES = '/api/schedules';
@@ -193,6 +206,25 @@ export const afterRender = () => {
                     renderCards();
                 });
             });
+
+            // Attach time filter listener
+            document.querySelectorAll('input[name="timeFilter"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentTimeFilter = e.target.value;
+                    // Styling updates
+                    document.querySelectorAll('input[name="timeFilter"]').forEach(r => {
+                        const span = r.nextElementSibling;
+                        if (r.checked) {
+                            span.classList.add('text-gray-700', 'font-medium');
+                            span.classList.remove('text-gray-500');
+                        } else {
+                            span.classList.remove('text-gray-700', 'font-medium');
+                            span.classList.add('text-gray-500');
+                        }
+                    });
+                    renderCards();
+                });
+            });
         } catch (err) {
             console.error('Error loading tours:', err);
         }
@@ -219,8 +251,32 @@ export const afterRender = () => {
             data = data.filter(s => s.tour_name === currentFilter);
         }
 
+        // Lọc thời gian dựa vào start_date (không tính giờ)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        data = data.filter(s => {
+            const startDate = new Date(s.start_date);
+            startDate.setHours(0, 0, 0, 0);
+            const isPast = startDate < today;
+
+            if (currentTimeFilter === 'upcoming') {
+                return !isPast; // Các tour tương lai hoặc hôm nay
+            } else if (currentTimeFilter === 'past') {
+                return isPast; // Các tour đã qua
+            }
+            return true;
+        });
+
+        // Sắp xếp: sắp tới thì tăng dần (sắp đi xếp trước), đã qua thì giảm dần (gần nhất xếp trước)
+        data.sort((a, b) => {
+            const dateA = new Date(a.start_date);
+            const dateB = new Date(b.start_date);
+            return currentTimeFilter === 'upcoming' ? dateA - dateB : dateB - dateA;
+        });
+
         if (data.length === 0) {
-            scheduleList.innerHTML = '<div class="text-center py-12 text-gray-400 italic">Chưa có lịch trình nào' + (currentFilter ? ' cho tuyến này' : '') + '.</div>';
+            scheduleList.innerHTML = '<div class="text-center py-12 text-gray-400 italic">Chưa có lịch trình nào' + (currentFilter ? ' cho tuyến này' : '') + (currentTimeFilter === 'past' ? ' trong quá khứ' : ' sắp tới') + '.</div>';
             return;
         }
 

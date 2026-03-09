@@ -33,12 +33,12 @@ export const render = () => {
                   
                   <div class="flex justify-between items-end">
                       <div>
-                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Người Dùng</h1>
+                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Người Phụ Trách</h1>
                           <p class="text-gray-500 text-sm">Quản trị tài khoản đăng nhập nội bộ (Admin / Sale).</p>
                       </div>
                       <button id="btnAddNewUser" class="bg-gray-900 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-csr-orange hover:shadow-lg transition-all flex items-center gap-2">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                          Thêm Tài Khoản
+                          Thêm Người Phụ Trách
                       </button>
                   </div>
 
@@ -75,7 +75,7 @@ export const render = () => {
               <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/50 rounded-t-2xl">
                   <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2" id="modalUserTitle">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span>Thêm Tài Khoản</span>
+                    <span>Thêm Người Phụ Trách</span>
                   </h3>
                   <button type="button" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors" onclick="window.closeUserModal()">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -135,7 +135,7 @@ export const render = () => {
 
                   <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
                       <button type="button" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors" onclick="window.closeUserModal()">Hủy</button>
-                      <button type="submit" id="btnSubmitUser" class="px-5 py-2.5 text-sm font-bold text-white bg-gray-900 hover:bg-csr-orange rounded-xl transition-all shadow-md">Lưu Tài Khoản</button>
+                      <button type="submit" id="btnSubmitUser" class="px-5 py-2.5 text-sm font-bold text-white bg-gray-900 hover:bg-csr-orange rounded-xl transition-all shadow-md">Lưu Cập Nhật</button>
                   </div>
               </form>
           </div>

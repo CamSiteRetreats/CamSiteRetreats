@@ -39,9 +39,10 @@ export const Sidebar = () => {
     return `
       <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col transition-all duration-300 relative z-20">
           <!-- Logo Area -->
-          <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-gray-50">
+          <!-- Logo Area -->
+          <a href="/admin/" data-link class="h-16 flex items-center justify-center border-b border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
               <span class="text-xl font-bold bg-gradient-to-r from-csr-light to-csr-orange bg-clip-text text-transparent">CAM SITE RETREATS</span>
-          </div>
+          </a>
   
           <!-- Navigation -->
           <nav class="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">

@@ -385,7 +385,7 @@ export const render = () => {
                           </div>
                       </div>
 
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 border-b border-gray-100 pb-5">
                           <div>
                               <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Trạng Thái Đơn</label>
                               <select id="edit-status" class="input-field bg-gray-50 text-sm font-medium">
@@ -394,6 +394,15 @@ export const render = () => {
                                   <option value="Hoàn thành">Hoàn thành</option>
                               </select>
                           </div>
+                          <div id="edit-sale-container" class="hidden">
+                              <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">Người Phụ Trách</label>
+                              <select id="edit-sale" class="input-field bg-blue-50 text-sm font-bold text-blue-700 border-blue-200">
+                                  <option value="">-- Website --</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
                           <div>
                               <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Dị ứng / Ghi Chú Y Tế</label>
                               <input type="text" id="edit-allergy" class="input-field bg-gray-50 text-sm" placeholder="VD: Không có">
@@ -476,23 +485,39 @@ export const afterRender = () => {
     let activeTab = 'consult'; // 'consult', 'pending', 'upcoming', 'completed'
     let allTours = [];
     let allSchedules = [];
+    let allUsers = [];
 
-    // ===== FETCH TOURS + SCHEDULES ĐỂ POPULATE DROPDOWNS =====
+    // ===== FETCH TOURS + SCHEDULES + USERS ĐỂ POPULATE DROPDOWNS =====
     const loadToursAndSchedules = async () => {
         try {
-            const [toursRes, schedulesRes] = await Promise.all([
+            const [toursRes, schedulesRes, usersRes] = await Promise.all([
                 fetch('/api/tours'),
-                fetch('/api/schedules')
+                fetch('/api/schedules'),
+                fetch('/api/users')
             ]);
             allTours = toursRes.ok ? await toursRes.json() : [];
             allSchedules = schedulesRes.ok ? await schedulesRes.json() : [];
+            allUsers = usersRes.ok ? await usersRes.json() : [];
 
             // Populate tour dropdowns (cả modal tạo đơn + modal edit)
             populateTourDropdown('addTourName');
             populateTourDropdown('edit-tour');
+            populateSaleDropdown('edit-sale');
         } catch (err) {
             console.error('Lỗi tải tours/schedules:', err);
         }
+    };
+
+    const populateSaleDropdown = (selectId) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Website --</option>';
+        allUsers.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = `${u.full_name || u.fullName} (${u.role})`;
+            select.appendChild(opt);
+        });
     };
 
     const populateTourDropdown = (selectId) => {
@@ -622,18 +647,36 @@ export const afterRender = () => {
             let tabMatch = false;
             const isFullyPaid = parseInt(b.total_price) > 0 && parseInt(b.total_price) === parseInt(b.deposit);
 
+            // Helper để check xem Tour đã qua hay chưa
+            const isPastTour = (dateStr) => {
+                if (!dateStr) return false;
+                try {
+                    const parts = dateStr.split('/'); // DD/MM/YYYY
+                    if (parts.length === 3) {
+                        const tourDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return tourDate.getTime() < today.getTime();
+                    } else if (dateStr.includes('-')) {
+                        const tourDate = new Date(`${dateStr}T00:00:00`);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return tourDate.getTime() < today.getTime();
+                    }
+                } catch (e) { }
+                return false;
+            };
+
+            const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
+
             if (activeTab === 'consult') {
-                // Khách từ form tư vấn, chưa có sale nhận
-                tabMatch = b.status === 'Chờ tư vấn';
+                tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
             } else if (activeTab === 'pending') {
-                // Chỉ hiện các lead chưa điền form hoặc đơn chưa có hành động gì
-                tabMatch = !b.status || b.status === 'Chờ cọc';
+                tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-                // Khách đã có thông tin/cọc nhưng CHƯA hoàn tất phí
-                tabMatch = (b.status === 'Chờ xác nhận cọc' || b.status === 'Đã cọc' || b.status === 'Đã cọc (Chờ đi)') && !isFullyPaid;
+                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isDonePast;
             } else if (activeTab === 'completed') {
-                // Khách đã hoàn tất phí HOẶC trạng thái là Hoàn thành/Đã đi
-                tabMatch = isFullyPaid || b.status === 'Hoàn thành' || b.status === 'Đã đi';
+                tabMatch = isDonePast;
             }
             if (!tabMatch) return false;
 
@@ -1292,6 +1335,20 @@ export const afterRender = () => {
         document.getElementById('edit-commitments').checked = !!booking.commitments;
         document.getElementById('edit-special').value = booking.special || '';
 
+        // Hiển thị chọn Sale nếu là Admin
+        try {
+            const userStr = localStorage.getItem('csr_user');
+            if (userStr) {
+                const userObj = JSON.parse(userStr);
+                if (userObj.role === 'admin') {
+                    const saleContainer = document.getElementById('edit-sale-container');
+                    if (saleContainer) saleContainer.classList.remove('hidden');
+                    const saleSelect = document.getElementById('edit-sale');
+                    if (saleSelect) saleSelect.value = booking.sale_id || '';
+                }
+            }
+        } catch (e) { }
+
         // Nếu thông tin profile đang trống (DOB/Address/Gender) -> Thử pull từ CRM/Hệ thống
         if ((!booking.dob || !booking.address || !booking.gender || booking.gender === 'Khác') && (booking.customer_id || booking.phone)) {
             try {
@@ -1894,6 +1951,20 @@ export const afterRender = () => {
                 const commitments = document.getElementById('edit-commitments').checked;
                 const special = document.getElementById('edit-special').value;
 
+                // Lấy thông tin Sale được chọn (chỉ khả dụng với Admin, nếu không thì lấy mặc định từ element)
+                const saleSelect = document.getElementById('edit-sale');
+                let sale_id = undefined;
+                let sale_name = undefined;
+
+                if (saleSelect && saleSelect.parentElement && !saleSelect.parentElement.classList.contains('hidden')) {
+                    sale_id = saleSelect.value || null;
+                    sale_name = 'Website';
+                    if (sale_id) {
+                        const u = allUsers.find(x => String(x.id) === String(sale_id));
+                        if (u) sale_name = u.full_name || u.fullName;
+                    }
+                }
+
                 const basePrice = parseInt(document.getElementById('edit-total').value) || 0;
                 const discount = parseInt(document.getElementById('edit-discount').value) || 0;
                 const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
@@ -1915,6 +1986,8 @@ export const afterRender = () => {
                     trekking_pole: trekking_pole,
                     commitments: commitments,
                     special: special,
+                    sale_id: sale_id,
+                    sale_name: sale_name,
                     total_price: basePrice - discount,
                     discount: discount,
                     deposit: deposit,

@@ -41,13 +41,13 @@ export const Header = () => {
               </button>
   
               <!-- Profile dropdown -->
-              <div class="relative flex items-center gap-3 pl-4 border-l border-gray-200 cursor-pointer hover:bg-gray-100 p-1 px-3 rounded-lg transition-colors">
+              <a href="/admin/profile" data-link class="relative flex items-center gap-3 pl-4 border-l border-gray-200 cursor-pointer hover:bg-gray-100 p-1 px-3 rounded-lg transition-colors" title="Chỉnh sửa thông tin cá nhân">
                   <div class="flex flex-col items-end">
                       <span class="text-sm font-medium text-gray-900 line-clamp-1">${user.fullName}</span>
                       ${roleLabel}
                   </div>
-                  <img class="h-9 w-9 rounded-full object-cover border-2 border-gray-200" src="${user.avatar}" alt="${user.fullName}">
-              </div>
+                  <img class="h-9 w-9 rounded-full object-cover border-2 border-gray-200" src="${user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.fullName)}" alt="${user.fullName}">
+              </a>
           </div>
       </header>
     `;
