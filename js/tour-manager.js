@@ -4,10 +4,25 @@
  */
 
 const TOURS_KEY = 'cam_site_tours';
+const APP_VERSION = '1.2'; // Cập nhật version để force clear cache giá cũ
 
 const TourManager = {
+    // Khởi tạo và kiểm tra Version
+    init: function () {
+        const savedVersion = localStorage.getItem('cam_site_version');
+        if (savedVersion !== APP_VERSION) {
+            console.log('Phát hiện phiên bản cũ, đang làm mới dữ liệu...');
+            localStorage.removeItem(TOURS_KEY);
+            localStorage.removeItem('cam_site_last_fetch');
+            localStorage.removeItem('cam_site_schedules');
+            localStorage.removeItem('cam_site_schedules_last_fetch');
+            localStorage.setItem('cam_site_version', APP_VERSION);
+        }
+    },
+
     // Get all tours from LocalStorage or API
     getAllTours: function () {
+        this.init(); // Đảm bảo version luôn đúng
         // Try to fetch from API in background to update cache
         this.fetchToursFromAPI();
         this.fetchSchedulesFromAPI(); // NEW: Fetch schedules too
@@ -225,7 +240,7 @@ const TourManager = {
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
-                price: 3200000,
+                price: 2690000,
                 level: 'Trung Bình',
                 altitude: '1.168M',
                 url: 'tour/tanangphandung',
@@ -246,7 +261,7 @@ const TourManager = {
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '2 Ngày 1 Đêm',
-                price: 'Update',
+                price: 2850000,
                 level: 'Khó',
                 altitude: '2.287M',
                 url: 'tour/bidouptagiang',
@@ -266,7 +281,7 @@ const TourManager = {
                 region: 'Miền Nam',
                 type: 'CANYONING | ZIPLINE',
                 duration: '1 Ngày 1 Đêm',
-                price: 3750000,
+                price: 3050000,
                 level: 'Trung Bình',
                 url: '#',
                 shortDesc: 'Trải nghiệm đu dây vượt thác đầy phấn khích tại một trong những con thác hoang sơ nhất.',
@@ -320,7 +335,7 @@ const TourManager = {
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '1 Ngày 1 Đêm',
-                price: 'Update',
+                price: 2450000,
                 level: 'Vừa phải',
                 altitude: '50m',
                 url: 'tour/thacmuabay',
@@ -555,9 +570,14 @@ const TourManager = {
     // Initialize Slideshow Hover effects
     initSlideshows: function () {
         document.querySelectorAll('.group').forEach(card => {
+            // Ngăn chặn gán lặp listener gây giật (Flickering)
+            if (card.dataset.slideshowAttached) return;
+
             let interval;
             const images = card.querySelectorAll('.slideshow img');
             if (images.length <= 1) return;
+
+            card.dataset.slideshowAttached = "true";
 
             card.addEventListener('mouseenter', () => {
                 let current = 0;

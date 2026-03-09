@@ -15,7 +15,7 @@ const tours = [
         region: 'Miền Nam',
         type: 'TREKKING',
         duration: '2 Ngày 1 Đêm',
-        price: 3200000,
+        price: 2690000,
         short_desc: 'Cung đường trekking đẹp nhất Việt Nam, đi qua 3 tỉnh Lâm Đồng, Ninh Thuận, Bình Thuận. Trải nghiệm đồi cỏ cháy ngút ngàn.',
         schedules: [
             { start_date: '2026-03-20', slots: 12, status: 'Đang mở' },

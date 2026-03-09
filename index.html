@@ -768,9 +768,10 @@
         // Listen for API updates with debounce
         window.addEventListener('tours-updated', debounce(() => {
             console.log('Tours updated from API, refreshing UI...');
+            // Tăng debounce lên 1s để tránh nháy khi load nhiều
             initTours(true); // skipFilter = true to avoid fade
             loadHomeBookingData();
-        }, 500));
+        }, 1000));
 
         window.addEventListener('schedules-updated', debounce(() => {
             console.log('Schedules updated from API, refreshing booking flow...');

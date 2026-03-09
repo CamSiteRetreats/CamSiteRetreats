@@ -969,7 +969,7 @@
                     <!-- Price Card -->
                     <div class="content-card py-5 px-8 text-center border-2 border-primary/10">
                         <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">CHI PHÍ</p>
-                        <p id="tour-price-display" class="text-4xl font-black text-primary mb-2">3.200.000đ</p>
+                        <p id="tour-price-display" class="text-4xl font-black text-primary mb-2">3.050.000đ</p>
                         <p class="text-xs text-gray-500 font-medium">(Chi phí đã bao gồm trọn gói)</p>
                     </div>
 
@@ -1093,7 +1093,7 @@
             );
 
             if (!currentTour) {
-                currentTour = { id: 3, name: 'Thác Liêng Ài', price: 3200000 };
+                currentTour = { id: 3, name: 'Thác Liêng Ài', price: 3050000 };
             }
             return currentTour;
         }
@@ -1157,7 +1157,7 @@
                 if (priceDisplay) priceDisplay.textContent = formattedPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
             } else {
-                const defaultPrice = '3.200.000đ';
+                const defaultPrice = 'Update...';
                 if (priceDisplay) priceDisplay.textContent = defaultPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
             }

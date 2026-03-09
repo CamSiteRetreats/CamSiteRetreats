@@ -97,7 +97,7 @@ export const render = () => {
                           </div>
                           <div>
                               <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá (VNĐ) *</label>
-                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold" placeholder="3200000" required>
+                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold" placeholder="3000000" required>
                           </div>
                       </div>
                       <div class="grid grid-cols-3 gap-4">

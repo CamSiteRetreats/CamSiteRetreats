@@ -662,7 +662,7 @@
                 totalPrice: (function () {
                     const tours = JSON.parse(localStorage.getItem('cam_site_tours')) || [];
                     const found = tours.find(t => t.name === leadData.tour);
-                    return found ? Number(found.price) : 3200000;
+                    return found ? Number(found.price) : 0;
                 })(),
                 status: 'Chờ xác nhận cọc',
 

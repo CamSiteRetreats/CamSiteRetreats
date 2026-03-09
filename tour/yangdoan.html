@@ -1155,10 +1155,10 @@
                 const formattedPrice = TourManager.formatPrice(currentTour.price);
                 priceDisplay.textContent = formattedPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
-            } else if (selectedTour === 'Tà Năng - Phan Dũng') {
-                const defaultPrice = '3.200.000đ';
-                priceDisplay.textContent = defaultPrice;
-                if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
+            } else {
+                const fallbackPrice = 'Update...';
+                priceDisplay.textContent = fallbackPrice;
+                if (mobilePriceDisplay) mobilePriceDisplay.textContent = fallbackPrice;
             }
 
             dateSelector.innerHTML = '';
