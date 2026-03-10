@@ -2,25 +2,26 @@ export async function onRequest(context) {
     const { request, env } = context;
 
     try {
-        // Try fetching the existing asset first
+        // Try fetching the requested asset
         let response = await env.ASSETS.fetch(request);
 
-        // If the path doesn't exist (404), fallback to the SPA root
+        // On 404, fallback to the SPA root URL
         if (response.status === 404) {
             const url = new URL(request.url);
 
-            // Re-fetch the admin index.html asset
-            const rewriteUrl = new URL(url.origin + "/admin/index.html");
+            // Fetch /admin/ (not /admin/index.html to avoid 308 redirect)
+            const rewriteUrl = new URL(url.origin + "/admin/");
             const indexResponse = await env.ASSETS.fetch(new Request(rewriteUrl, request));
 
-            // Return it with a 200 OK status
+            // Delete Location header if it exists
+            const headers = new Headers(indexResponse.headers);
+            headers.delete('Location');
+            headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            headers.set('Content-Type', 'text/html; charset=utf-8');
+
             return new Response(indexResponse.body, {
                 status: 200,
-                headers: {
-                    ...Object.fromEntries(indexResponse.headers),
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Content-Type': 'text/html; charset=utf-8'
-                }
+                headers: headers
             });
         }
 
