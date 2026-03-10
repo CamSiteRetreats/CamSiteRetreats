@@ -243,10 +243,13 @@
         const params = new URLSearchParams(window.location.search);
         let bookingId = params.get('id');
 
-        // Fallback for Vercel Clean URLs (e.g. /pay/103)
-        if (!bookingId && window.location.pathname.includes('/pay/')) {
-            const parts = window.location.pathname.split('/');
-            bookingId = parts[parts.length - 1]; // "103"
+        // Fallback: try to find ID in pathname if not in query params (e.g. /pay/103 or /pay.html)
+        if (!bookingId) {
+            const path = window.location.pathname;
+            const pathMatch = path.match(/\/pay\/(\d+)/);
+            if (pathMatch) {
+                bookingId = pathMatch[1];
+            }
         }
 
         let transferCode = '';
