@@ -19,3 +19,21 @@ build/
 # Environment Variables
 .env
 .env.local
+
+# Debug / Audit / Temp scripts (local-only)
+scripts/debug-*.js
+scripts/audit-*.js
+scripts/inspect-*.js
+scripts/deep-audit-*.js
+scripts/raw-audit-*.js
+scripts/sample-db.js
+scripts/final-audit.js
+scripts/full-audit.js
+scripts/cross-audit.js
+scripts/fetch-recent-bookings.js
+audit_results.txt
+*.log
+
+# Cloudflare / Vercel local
+.wrangler/
+.vercel/
