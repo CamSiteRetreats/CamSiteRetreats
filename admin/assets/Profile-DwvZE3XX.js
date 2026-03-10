@@ -1,4 +1,4 @@
-import{S as s,H as o}from"./Header-DjwXxBfR.js";const c=()=>{let e={fullName:"",role:"",avatar:"",phone:"",email:"",bank_info:""};try{const a=localStorage.getItem("csr_user");a&&(e=JSON.parse(a))}catch{}return`
+import{S as s,H as o}from"./Header-n5pNPUhI.js";const c=()=>{let e={fullName:"",role:"",avatar:"",phone:"",email:"",bank_info:""};try{const a=localStorage.getItem("csr_user");a&&(e=JSON.parse(a))}catch{}return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${s()}
         
