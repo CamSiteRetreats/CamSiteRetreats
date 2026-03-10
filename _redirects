@@ -1,3 +1,1 @@
-/pay/:id /pay.html?id=:id 200
-/pay/* /pay.html 200
 /admin/* /admin/index.html 200

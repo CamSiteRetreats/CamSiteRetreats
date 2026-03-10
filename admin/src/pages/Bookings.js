@@ -1633,7 +1633,7 @@ export const afterRender = () => {
                     ? 'http://localhost:8888'
                     : window.location.origin;
 
-                const url = baseUrl + `/pay/${bookingId}`;
+                const url = baseUrl + `/pay?id=${bookingId}`;
                 navigator.clipboard.writeText(url).then(() => {
                     alert('📋 Đã sao chép Link Thanh Toán Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
                 }).catch(err => {
@@ -1647,7 +1647,7 @@ export const afterRender = () => {
                     ? 'http://localhost:8888'
                     : window.location.origin;
 
-                const url = baseUrl + `/pay/${bookingId}`;
+                const url = baseUrl + `/pay?id=${bookingId}`;
                 window.open(url, '_blank');
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
