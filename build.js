@@ -83,4 +83,11 @@ console.log('📄 Bước 6: Cập nhật admin/index.html với file build mớ
 fs.copyFileSync(INDEX_SRC, INDEX_DEST);
 console.log('   ✅ Done\n');
 
+console.log('🔗 Bước 7: Cài đặt file _redirects cho SPA Admin...');
+const REDIRECTS_CONTENT = '/admin/* /admin/index.html 200\n';
+fs.writeFileSync(path.join(ADMIN_DIR, '_redirects'), REDIRECTS_CONTENT, 'utf8');
+// Đồng thời tạo một bản backup ở root để Cloudflare không bị miss
+fs.writeFileSync(path.join(ROOT, '_redirects'), REDIRECTS_CONTENT, 'utf8');
+console.log('   ✅ Done\n');
+
 console.log('🚀 Build hoàn tất! Cloudflare Pages sẵn sàng deploy.\n');

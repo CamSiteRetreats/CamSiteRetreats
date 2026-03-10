@@ -40,31 +40,46 @@ export async function onRequest(context) {
         }
 
         if (method === 'POST') {
-            const body = await request.json();
-            const { id, tour_name, start_date, end_date, slots, status } = body;
+            try {
+                const body = await request.json();
+                console.log("SCHEDULE POST BODY:", body);
 
-            if (id) {
-                // Update
-                const result = await sql`
-                    UPDATE schedules 
-                    SET tour_name=${tour_name}, start_date=${start_date}, end_date=${end_date}, slots=${slots}, status=${status}
-                    WHERE id=${id}
-                    RETURNING *;
-                `;
-                return Response.json(result[0] || {}, {
-                    headers: { 'Access-Control-Allow-Origin': '*' }
-                });
-            } else {
-                // Insert
-                const result = await sql`
-                    INSERT INTO schedules (tour_name, start_date, end_date, slots, status)
-                    VALUES (${tour_name}, ${start_date}, ${end_date}, ${slots}, ${status || 'Đang mở'})
-                    RETURNING *;
-                `;
-                return Response.json(result[0] || {}, {
-                    status: 201,
-                    headers: { 'Access-Control-Allow-Origin': '*' }
-                });
+                const { id, tour_name, start_date, end_date, slots, status } = body;
+
+                if (!tour_name || !start_date || !end_date || slots === undefined) {
+                    return Response.json({ error: "Thiếu dữ liệu bắt buộc (tour, dates, slots)" }, { status: 400 });
+                }
+
+                if (id) {
+                    // Update
+                    const result = await sql`
+                        UPDATE schedules 
+                        SET tour_name=${tour_name}, 
+                            start_date=${start_date}, 
+                            end_date=${end_date}, 
+                            slots=${Number(slots)}, 
+                            status=${status}
+                        WHERE id=${Number(id)}
+                        RETURNING *;
+                    `;
+                    return Response.json(result[0] || {}, {
+                        headers: { 'Access-Control-Allow-Origin': '*' }
+                    });
+                } else {
+                    // Insert
+                    const result = await sql`
+                        INSERT INTO schedules (tour_name, start_date, end_date, slots, status)
+                        VALUES (${tour_name}, ${start_date}, ${end_date}, ${Number(slots)}, ${status || 'Đang mở'})
+                        RETURNING *;
+                    `;
+                    return Response.json(result[0] || {}, {
+                        status: 201,
+                        headers: { 'Access-Control-Allow-Origin': '*' }
+                    });
+                }
+            } catch (err) {
+                console.error("POST SCHEDULES ERROR:", err);
+                return Response.json({ error: "Lỗi lưu DB: " + err.message }, { status: 500 });
             }
         }
 
