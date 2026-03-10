@@ -693,7 +693,8 @@ export const afterRender = () => {
             if (filterDate && normalizeDate(b.date) !== filterDate) return false;
 
             // 4. Lọc Sale
-            if (filterSale && String(b.sale_id) !== String(filterSale)) return false;
+            if (filterSale && filterSale !== "null" && b.sale_name !== filterSale) return false;
+            if (filterSale === "null" && b.sale_name && b.sale_name !== 'Website') return false;
 
             // 5. Lọc Search (Tên, SĐT, CRM ID)
             if (searchTerm) {
@@ -975,7 +976,7 @@ export const afterRender = () => {
     const populateFilters = () => {
         const tourSet = new Set();
         const dateSet = new Set();
-        const saleMap = new Map();
+        const saleSet = new Set();
 
         currentBookings.forEach(b => {
             if (b.tour) tourSet.add(b.tour);
@@ -983,7 +984,7 @@ export const afterRender = () => {
                 const normalized = normalizeDate(b.date);
                 if (normalized) dateSet.add(normalized);
             }
-            if (b.sale_id && b.sale_name) saleMap.set(b.sale_id, b.sale_name);
+            if (b.sale_name && b.sale_name !== 'Website' && b.sale_name !== 'null') saleSet.add(b.sale_name.trim());
         });
 
         const filterTourInfo = document.getElementById('filterTour');
@@ -1009,9 +1010,9 @@ export const afterRender = () => {
             filterSaleInfo.innerHTML = '<option value="">Tất cả Sale</option>';
             // Add Website option
             filterSaleInfo.innerHTML += '<option value="null">Nguồn Website</option>';
-            for (let [id, name] of saleMap) {
-                filterSaleInfo.innerHTML += `<option value="${id}">${name}</option>`;
-            }
+            [...saleSet].sort().forEach(name => {
+                filterSaleInfo.innerHTML += `<option value="${name}">${name}</option>`;
+            });
             filterSaleInfo.value = currentVal;
         }
     }
@@ -1134,7 +1135,8 @@ export const afterRender = () => {
                 if (!tabMatch) return false;
                 if (filterTour && b.tour !== filterTour) return false;
                 if (filterDate && normalizeDate(b.date) !== filterDate) return false;
-                if (filterSale && String(b.sale_id) !== String(filterSale)) return false;
+                if (filterSale && filterSale !== "null" && b.sale_name !== filterSale) return false;
+                if (filterSale === "null" && b.sale_name && b.sale_name !== 'Website') return false;
                 if (searchTerm) {
                     const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} `.toLowerCase();
                     if (!searchString.includes(searchTerm)) return false;
