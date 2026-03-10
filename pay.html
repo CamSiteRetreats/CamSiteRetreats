@@ -243,12 +243,24 @@
         const params = new URLSearchParams(window.location.search);
         let bookingId = params.get('id');
 
-        // Fallback: try to find ID in pathname if not in query params (e.g. /pay/103 or /pay.html)
+        // Fallback: Extremely robust ID extraction
         if (!bookingId) {
-            const path = window.location.pathname;
-            const pathMatch = path.match(/\/pay\/(\d+)/);
-            if (pathMatch) {
-                bookingId = pathMatch[1];
+            const urlStr = window.location.href;
+            // 1. Try /pay/123
+            const pathMatch = urlStr.match(/\/pay\/(\d+)/);
+            if (pathMatch) bookingId = pathMatch[1];
+
+            // 2. Try any digits at the end of path
+            if (!bookingId) {
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                const last = parts[parts.length - 1];
+                if (last && /^\d+$/.test(last)) bookingId = last;
+            }
+
+            // 3. Try to find any number after "pay" even if slash is missing
+            if (!bookingId) {
+                const match = urlStr.match(/pay(\d+)/);
+                if (match) bookingId = match[1];
             }
         }
 
