@@ -4,7 +4,7 @@
  */
 
 const TOURS_KEY = 'cam_site_tours';
-const APP_VERSION = '1.3'; // Bump để force clear cache giá cũ (3750k → 3050k)
+const APP_VERSION = '1.4'; // Bump to clear infinite loop caches
 
 const TourManager = {
     // Khởi tạo và kiểm tra Version
@@ -46,10 +46,14 @@ const TourManager = {
         return tours.filter(t => t.is_visible !== false);
     },
 
-    // NEW: Fetch from Backend API (no cache - always fresh)
-    fetchToursFromAPI: async function () {
+    // NEW: Fetch from Backend API
+    fetchToursFromAPI: async function (force = false) {
         try {
-            // Always fetch fresh data - no more 60s cache
+            if (!force) {
+                const lastFetch = localStorage.getItem('cam_site_last_fetch');
+                if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return; // Cache 30s
+            }
+
             const response = await fetch('/api/tours?t=' + Date.now());
             if (!response.ok) throw new Error('API Network response was not ok');
 
@@ -69,22 +73,20 @@ const TourManager = {
     },
 
     // NEW: Fetch Schedules from API to LocalStorage
-    fetchSchedulesFromAPI: async function () {
+    fetchSchedulesFromAPI: async function (force = false) {
         try {
-            // Short cache 30s
-            const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
-            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 5000) return;
+            if (!force) {
+                // Short cache 30s
+                const lastFetch = localStorage.getItem('cam_site_schedules_last_fetch');
+                if (lastFetch && (Date.now() - parseInt(lastFetch)) < 30000) return;
+            }
 
             const res = await fetch('/api/schedules?t=' + Date.now());
             if (!res.ok) throw new Error('Failed to fetch schedules');
 
             const schedules = await res.json();
 
-            // Transform DB structure to Frontend structure if needed? 
-            // DB: id, tour_name, start_date, end_date, slots, status
-            // Frontend expects: { tour: "Tour Name", startDate: "YYYY-MM-DD", slots: 20, status: "..." }
-            // Let's map it to match what getTourById expects (it expects `s.tour === tour.name`)
-
+            // Transform DB structure to Frontend structure
             const mappedSchedules = schedules.map(s => {
                 const formatDate = (isoStr) => {
                     if (!isoStr) return '';
@@ -99,7 +101,7 @@ const TourManager = {
                     endDate: s.end_date,
                     date: `${formatDate(s.start_date)} - ${formatDate(s.end_date)}`,
                     slots: s.slots,
-                    bookedCount: s.booked_count || 0, // NEW: from API
+                    bookedCount: s.booked_count || 0,
                     status: s.status
                 };
             });
@@ -110,8 +112,7 @@ const TourManager = {
 
             // Dispatch events
             window.dispatchEvent(new Event('schedules-updated'));
-            window.dispatchEvent(new Event('tours-updated'));
-
+            // Remove tours-updated dispatch here to stop cascading double updates
         } catch (error) {
             console.warn('Failed to fetch schedules:', error);
         }
