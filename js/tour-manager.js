@@ -46,13 +46,10 @@ const TourManager = {
         return tours.filter(t => t.is_visible !== false);
     },
 
-    // NEW: Fetch from Backend API
+    // NEW: Fetch from Backend API (no cache - always fresh)
     fetchToursFromAPI: async function () {
         try {
-            const lastFetch = localStorage.getItem('cam_site_last_fetch');
-            if (lastFetch && (Date.now() - parseInt(lastFetch)) < 60000) return;
-
-            // Cloudflare API endpoint with cache buster
+            // Always fetch fresh data - no more 60s cache
             const response = await fetch('/api/tours?t=' + Date.now());
             if (!response.ok) throw new Error('API Network response was not ok');
 
