@@ -307,15 +307,14 @@
                     const res = await fetch(`/api/payment?action=status&id=${bookingId}`);
                     const data = await res.json();
 
-                    if (data.isFullyPaid) {
-                        showSuccess(data);
-                    } else if (data.isPaid && document.getElementById('payment-type-badge').textContent.includes('cọc')) {
+                    // Redirect to invoice as soon as any payment is detected (deposit OR fully paid)
+                    if (data.isPaid || data.isFullyPaid) {
                         showSuccess(data);
                     }
                 } catch (err) {
                     console.warn('Poll error:', err);
                 }
-            }, 5000); // Every 5 seconds
+            }, 3000); // Every 3 seconds (faster polling)
         }
 
         // Main: Load booking data
