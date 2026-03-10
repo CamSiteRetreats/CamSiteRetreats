@@ -1,4 +1,4 @@
-import{S as N,H as S}from"./Header-n5pNPUhI.js";const L=()=>{let h={role:"sale",fullName:"Guest"};try{const i=localStorage.getItem("csr_user");i&&(h=JSON.parse(i))}catch{}const m=h.role==="admin",x=new Date,b=`${x.getFullYear()}-${(x.getMonth()+1).toString().padStart(2,"0")}`;return`
+import{S as N,H as S}from"./Header-DjwXxBfR.js";const L=()=>{let h={role:"sale",fullName:"Guest"};try{const i=localStorage.getItem("csr_user");i&&(h=JSON.parse(i))}catch{}const m=h.role==="admin",x=new Date,b=`${x.getFullYear()}-${(x.getMonth()+1).toString().padStart(2,"0")}`;return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${N()}
         
