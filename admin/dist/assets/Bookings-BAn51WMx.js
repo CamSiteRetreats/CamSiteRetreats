@@ -1,4 +1,4 @@
-import{S as pt,H as mt}from"./Header-n5pNPUhI.js";const ft=()=>`
+import{S as pt,H as mt}from"./Header-n5pNPUhI.js";console.log("Bookings V3 - Cache Busted!");const ft=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${pt()}
         

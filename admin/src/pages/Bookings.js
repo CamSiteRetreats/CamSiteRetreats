@@ -1,3 +1,4 @@
+console.log('Bookings V3 - Cache Busted!');
 import { Sidebar } from '../components/Sidebar.js';
 import { Header } from '../components/Header.js';
 
