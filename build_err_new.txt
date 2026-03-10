@@ -1,0 +1,29 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+node.exe : file:///E:/UIUX/ui-ux-pro-max-skill-mai
+n/CAM%20SITE%20RETREATS/admin/node_modules/vite/di
+st/node/chunks/config.js:23919
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (file 
+   :///E:/UIUX...config.js:23919:String) [], Rem  
+  oteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+										if (!resolved) return Promise.reject(/* 
+@__PURE__ */ new Error(`Failed to resolve 
+${url$3} from ${id}`));
+										                                        
+             ^
+
+Error: Failed to resolve 
+/admin/assets/index-De9QBlIB.js from 
+E:/UIUX/ui-ux-pro-max-skill-main/CAM SITE 
+RETREATS/admin/index.html
+    at file:///E:/UIUX/ui-ux-pro-max-skill-main/CA
+M%20SITE%20RETREATS/admin/node_modules/vite/dist/n
+ode/chunks/config.js:23919:64
+
+Node.js v24.13.1
