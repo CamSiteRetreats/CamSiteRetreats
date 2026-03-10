@@ -257,9 +257,103 @@
     </section>
 
     <!-- ===== UPCOMING SCHEDULE SECTION ===== -->
+    <style>
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .cal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cal-col {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+        }
+
+        .cal-col-header {
+            background: #E85D04;
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 10px 16px;
+        }
+
+        .cal-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-bottom: 1px solid #f5f5f5;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .cal-item:last-child {
+            border-bottom: none;
+        }
+
+        .cal-item:hover {
+            background: #FFF8F0;
+        }
+
+        .cal-date {
+            font-size: 11px;
+            font-weight: 800;
+            color: #E85D04;
+            background: #FFF8F0;
+            padding: 2px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .cal-tour {
+            font-size: 11px;
+            font-weight: 600;
+            color: #374151;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .cal-status {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .cs-green {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .cs-orange {
+            background: #FFF7ED;
+            color: #D97706;
+        }
+
+        .cs-red {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+    </style>
+
     <section id="lich-trinh" class="py-16 px-6 md:px-20 bg-[#FAFAFA]">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <p class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Cập nhật liên tục</p>
@@ -270,13 +364,11 @@
                 </a>
             </div>
 
-            <!-- Schedule Grid 3 cols -->
-            <div id="schedule-list">
-                <div class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
+            <div id="schedule-list" class="cal-grid">
+                <div class="col-span-3 text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
             </div>
 
-            <!-- Mobile link -->
-            <div class="flex justify-center mt-6 md:hidden">
+            <div class="flex justify-center mt-5 md:hidden">
                 <a href="tour" class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
                     Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
@@ -284,83 +376,11 @@
         </div>
     </section>
 
-    .schedule-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
-    }
-    @media (max-width: 768px) {
-    .schedule-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-    .schedule-grid { grid-template-columns: 1fr; }
-    }
-    .schedule-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 12px;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #f0f0f0;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    min-width: 0;
-    }
-    .schedule-row:hover {
-    border-color: #E85D04;
-    box-shadow: 0 2px 12px rgba(232,93,4,0.10);
-    transform: translateY(-1px);
-    }
-    .schedule-date-badge {
-    font-size: 11px;
-    font-weight: 800;
-    color: #E85D04;
-    background: #FFF8F0;
-    padding: 3px 8px;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    }
-    .schedule-tour-tag {
-    font-size: 11px;
-    font-weight: 700;
-    color: #374151;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-    }
-    .schedule-status {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    }
-    .status-green { background: #ECFDF5; color: #059669; }
-    .status-orange { background: #FFF7ED; color: #D97706; }
-    .status-red { background: #FEF2F2; color: #DC2626; }
-    .month-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #9CA3AF;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 6px;
-    margin-top: 4px;
-    }
-    </style>
-
     <script>
         async function loadUpcomingSchedules() {
             const container = document.getElementById('schedule-list');
             if (!container) return;
 
-            // Map tên tour → URL
             const tourLinks = {
                 'Thác Liêng Ài': '/tour/thacliengai',
                 'Tà Năng - Phan Dũng': '/tour/tanangphandung',
@@ -371,15 +391,12 @@
                 'Yangdoan': '/tour/yangdoan',
             };
 
+            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+
             const fmtDate = (iso) => {
-                if (!iso) return '';
                 const d = new Date(iso);
                 return `${d.getDate()}/${d.getMonth() + 1}`;
-            };
-            const monthLabel = (iso) => {
-                if (!iso) return '';
-                const d = new Date(iso);
-                return `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
             };
 
             try {
@@ -392,34 +409,35 @@
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 
                 if (upcoming.length === 0) {
-                    container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành sắp tới.</div>';
+                    container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành sắp tới.</div>';
                     return;
                 }
 
-                // Group by month, render each month as a block with a 3-col grid
-                const groupedByMonth = {};
+                // Group by month key "YYYY-MM"
+                const grouped = {};
                 upcoming.forEach(s => {
-                    const month = monthLabel(s.start_date);
-                    if (!groupedByMonth[month]) groupedByMonth[month] = [];
-                    groupedByMonth[month].push(s);
+                    const d = new Date(s.start_date);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    if (!grouped[key]) grouped[key] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, items: [] };
+                    grouped[key].items.push(s);
                 });
 
+                const monthCols = Object.values(grouped).slice(0, 3); // tối đa 3 tháng
+
                 let html = '';
-                Object.entries(groupedByMonth).forEach(([month, items]) => {
-                    html += `<div class="month-label">${month}</div><div class="schedule-grid">`;
-                    items.forEach(s => {
+                monthCols.forEach(col => {
+                    html += `<div class="cal-col">
+                        <div class="cal-col-header">${col.label}</div>`;
+
+                    col.items.forEach(s => {
                         const booked = parseInt(s.booked_count) || 0;
                         const slots = parseInt(s.slots) || 0;
                         const remaining = Math.max(0, slots - booked);
 
-                        let statusHTML = '';
-                        if (remaining <= 0) {
-                            statusHTML = '<span class="schedule-status status-red">Hết chỗ</span>';
-                        } else if (remaining <= 3) {
-                            statusHTML = `<span class="schedule-status status-orange">Còn ${remaining}</span>`;
-                        } else {
-                            statusHTML = `<span class="schedule-status status-green">Còn ${remaining}</span>`;
-                        }
+                        let statusClass, statusText;
+                        if (remaining <= 0) { statusClass = 'cs-red'; statusText = 'Hết chỗ'; }
+                        else if (remaining <= 3) { statusClass = 'cs-orange'; statusText = `Còn ${remaining}`; }
+                        else { statusClass = 'cs-green'; statusText = `Còn ${remaining}`; }
 
                         const startFmt = fmtDate(s.start_date);
                         const endFmt = s.end_date ? fmtDate(s.end_date) : '';
@@ -429,24 +447,27 @@
                             ? tourLinks[Object.keys(tourLinks).find(k => s.tour_name.includes(k))]
                             : '#';
 
-                        html += `<a class="schedule-row" href="${link}">
-                            <span class="schedule-date-badge">${dateLabel}</span>
-                            <span class="schedule-tour-tag">${s.tour_name}</span>
-                            ${statusHTML}
+                        html += `<a class="cal-item" href="${link}">
+                            <span class="cal-date">${dateLabel}</span>
+                            <span class="cal-tour">${s.tour_name}</span>
+                            <span class="cal-status ${statusClass}">${statusText}</span>
                         </a>`;
                     });
+
                     html += `</div>`;
                 });
 
                 container.innerHTML = html;
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch (e) {
-                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Không thể tải lịch trình.</div>';
+                container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Không thể tải lịch trình.</div>';
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadUpcomingSchedules);
     </script>
+
+
 
     <!-- Tour Explorer Section -->
     <section id="chuyen-di" class="py-24 px-6 md:px-20">
