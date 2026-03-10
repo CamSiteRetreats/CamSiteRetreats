@@ -4,7 +4,7 @@
  */
 
 const TOURS_KEY = 'cam_site_tours';
-const APP_VERSION = '1.2'; // Cập nhật version để force clear cache giá cũ
+const APP_VERSION = '1.3'; // Bump để force clear cache giá cũ (3750k → 3050k)
 
 const TourManager = {
     // Khởi tạo và kiểm tra Version

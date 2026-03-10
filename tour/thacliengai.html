@@ -1172,7 +1172,21 @@
             if (tourWithSchedules && tourWithSchedules.schedules && tourWithSchedules.schedules.length > 0) {
                 tourWithSchedules.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-                tourWithSchedules.schedules.forEach(item => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const futureSchedules = tourWithSchedules.schedules.filter(item => {
+                    if (!item.startDate) return true;
+                    const d = new Date(item.startDate);
+                    return d >= today;
+                });
+
+                if (futureSchedules.length === 0) {
+                    dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch sắp khởi hành.</div>';
+                    return;
+                }
+
+                futureSchedules.forEach(item => {
                     const remaining = item.remaining;
                     const statusText = item.calculatedStatus;
 
