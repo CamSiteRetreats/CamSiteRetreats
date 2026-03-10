@@ -436,7 +436,10 @@ export const afterRender = () => {
                 body: JSON.stringify(payload)
             });
 
-            if (!res.ok) throw new Error('Failed to save schedule');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to save schedule');
+            }
 
             closeModal();
             loadSchedules();
