@@ -1,0 +1,43 @@
+
+--- ALL bookings for date: 2026-03-01 ---
+Found 14 bookings for date variations of 2026-03-01
+ - 44: [Thác Liêng Ài] Nguyễn Thanh Huy | Date: 01/03/2026 | Status: Hoàn thành
+ - 56: [Thác Liêng Ài] Ngô Kim Long | Date: 01/03/2026 | Status: Hoàn thành
+ - 55: [Thác Liêng Ài] Phạm Minh Toàn | Date: 01/03/2026 | Status: Hoàn thành
+ - 54: [Thác Liêng Ài] Nguyễn Thị Hồng Đào | Date: 01/03/2026 | Status: Hoàn thành
+ - 52: [Thác Liêng Ài] Huỳnh Thị Thoại Ngân | Date: 01/03/2026 | Status: Hoàn thành
+ - 43: [Thác Liêng Ài] Huỳnh Sơn Tùng | Date: 01/03/2026 | Status: Hoàn thành
+ - 45: [Thác Liêng Ài] Tiên Tiên | Date: 01/03/2026 | Status: Hoàn thành
+ - 47: [Thác Liêng Ài] Nguyễn Thành Hải  | Date: 01/03/2026 | Status: Hoàn thành
+ - 51: [Thác Liêng Ài] Phan Thành Nam  | Date: 01/03/2026 | Status: Hoàn thành
+ - 50: [Thác Liêng Ài] Võ Thị Tuyết Nhi | Date: 01/03/2026 | Status: Hoàn thành
+ - 46: [Thác Liêng Ài] Trà My | Date: 01/03/2026 | Status: Hoàn thành
+ - 86: [Thác Liêng Ài] Đỗ Thái Học | Date: 01/03/2026 | Status: Hoàn thành
+ - 85: [Thác Liêng Ài] Phạm Thiên Ân | Date: 01/03/2026 | Status: Hoàn thành
+ - 53: [Thác Liêng Ài] Phương Thanh Thanh | Date: 01/03/2026 | Status: Hoàn thành
+
+--- ALL bookings for date: 2026-03-05 ---
+Found 0 bookings for date variations of 2026-03-05
+
+--- ALL bookings for date: 2026-04-05 ---
+Found 12 bookings for date variations of 2026-04-05
+ - 102: [Thác Liêng Ài] Lê Anh Thư | Date: 5/4 - 5/4 | Status: Đã cọc (Chờ đi)
+ - 106: [Thác Liêng Ài] Nguyễn Thị Phương Uyên | Date: 5/4 - 5/4 | Status: Đã cọc (Chờ đi)
+ - 107: [Thác Liêng Ài] Nguyễn Ngọc Anh Thư | Date: 5/4 - 5/4 | Status: Đã cọc (Chờ đi)
+ - 114: [Thác Liêng Ài] Tô Thị Mai Linh | Date: 5/4 - 5/4 | Status: Đã cọc (Chờ đi)
+ - 118: [Thác Liêng Ài] Đặng Thị Kim Tiền | Date: 2026-04-05 | Status: Đã cọc (Chờ đi)
+ - 148: [Thác Liêng Ài] NGUYỄN THỊ MAI TRÂM | Date: 05/04/2026 | Status: Đã cọc
+ - 163: [Thác Liêng Ài] Nguyễn Thị Phương | Date: 05/04/2026 | Status: Đã cọc
+ - 167: [Thác Liêng Ài] Lê Thị Phương Thảo | Date: 05/04/2026 | Status: Đã cọc (Chờ đi)
+ - 171: [Thác Liêng Ài] Phạm Vũ An | Date: 05/04/2026 | Status: Đã cọc (Chờ đi)
+ - 192: [Thác Liêng Ài] Phạm Mỹ Duyên | Date: 05/04/2026 | Status: Đã cọc (Chờ đi)
+ - 190: [Thác Liêng Ài] Nguyễn Hoàng Minh | Date: 05/04/2026 | Status: Đã cọc (Chờ đi)
+ - 199: [Thác Liêng Ài] Lê Nguyễn Tuyết Anh | Date: 05/04/2026 | Status: Đã cọc (Chờ đi)
+
+--- TARGET SCHEDULES ---
+ID | Tour | Start Date | Slots
+17 | Thác Liêng Ài | Sun Mar 01 2026 00:00:00 GMT+0700 (Indochina Time) | 15
+18 | Thác Liêng Ài | Sun Apr 05 2026 00:00:00 GMT+0700 (Indochina Time) | 13
+19 | Thác Liêng Ài | Sat Apr 11 2026 00:00:00 GMT+0700 (Indochina Time) | 13
+21 | Thác Liêng Ài | Thu Apr 30 2026 00:00:00 GMT+0700 (Indochina Time) | 13
+22 | Thác Liêng Ài | Fri May 01 2026 00:00:00 GMT+0700 (Indochina Time) | 13

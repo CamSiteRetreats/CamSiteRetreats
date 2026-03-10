@@ -12,14 +12,19 @@ export async function onRequest(context) {
                 SELECT 
                     s.*, 
                     (SELECT COUNT(*) FROM bookings b 
-                     WHERE (b.tour = s.tour_name OR b.tour LIKE s.tour_name || '%')
+                     WHERE (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour)
                      AND b.status NOT IN ('Đã hủy', 'Cancelled')
                      AND (
-                         (b.date = TO_CHAR(s.start_date + interval '12 hours', 'YYYY-MM-DD')) OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/MM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'FMDD/FMMM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'FMDD/MM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date + interval '12 hours', 'DD/FMMM') || '%')
+                         -- ISO format
+                         (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
+                         -- Format DD/MM or D/M
+                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR
+                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'FMDD/FMMM') || '%') OR
+                         -- Date ranges like "5/4 - 5/4"
+                         (b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || ' - %') OR
+                         (b.date LIKE '% - ' || TO_CHAR(s.start_date, 'FMDD/FMMM')) OR
+                         -- Handle inverted formats or short years if any
+                         (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
                      )
                     ) as booked_count
                 FROM schedules s

@@ -29,9 +29,9 @@
     rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <script src="https://unpkg.com/lucide@latest"></script>
-<script src="../js/tour-manager.js?v=0845"></script>
-<script src="../js/ui-components.js?v=0845"></script>
-<script src="../js/booking-flow.js?v=0845"></script>
+<script src="../js/tour-manager.js"></script>
+<script src="../js/ui-components.js"></script>
+<script src="../js/booking-flow.js"></script>
 
 <style>
     :root {
@@ -508,7 +508,11 @@
                                     <span class="font-bold text-gray-800 shrink-0">18h00:</span>
                                     <span class="font-light italic text-gray-600">Lên xe di chuyển về HCM</span>
                                 </div>
-
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">20h00:</span>
+                                    <span class="font-light italic text-gray-600">Thưởng thức bữa ăn tối no nê trước khi
+                                        về đến nhà</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -701,7 +705,7 @@
                                         Bữa
                                         ăn</h4>
                                     <p class="text-[10px] md:text-[13.5px] text-gray-500 leading-relaxed font-medium">
-                                        3 bữa ăn: Ăn sáng, ăn trưa nhẹ và ăn chiều.</p>
+                                        4 bữa ăn: Ăn sáng, ăn trưa nhẹ, ăn chiều và ăn tối đầy đủ.</p>
                                 </div>
                             </div>
                             <!-- Item 4 (Sup) -->
@@ -965,7 +969,7 @@
                     <!-- Price Card -->
                     <div class="content-card py-5 px-8 text-center border-2 border-primary/10">
                         <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">CHI PHÍ</p>
-                        <p id="tour-price-display" class="text-4xl font-black text-primary mb-2">3.050.000đ</p>
+                        <p id="tour-price-display" class="text-4xl font-black text-primary mb-2">3.200.000đ</p>
                         <p class="text-xs text-gray-500 font-medium">(Chi phí đã bao gồm trọn gói)</p>
                     </div>
 
@@ -1067,14 +1071,21 @@
         }
 
         function selectDate(element, dateStr) {
+            console.log('Selecting date:', dateStr);
             document.querySelectorAll('.date-option').forEach(opt => {
-                opt.classList.remove('selected');
+                opt.classList.remove('selected', 'border-primary', 'bg-primary/10');
             });
-            element.classList.add('selected');
-            document.getElementById('selected-date-input').value = dateStr;
+            element.classList.add('selected', 'border-primary', 'bg-primary/10');
+
+            const input = document.getElementById('selected-date-input');
+            if (input) input.value = dateStr;
+
             const btn = document.getElementById('btn-book-now');
             if (btn) {
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('hover:scale-[1.02]');
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
             }
         }
 
@@ -1089,7 +1100,7 @@
             );
 
             if (!currentTour) {
-                currentTour = { id: 3, name: 'Thác Liêng Ài', price: 3050000 };
+                currentTour = { id: 3, name: 'Thác Liêng Ài', price: 3200000 };
             }
             return currentTour;
         }
@@ -1153,7 +1164,7 @@
                 if (priceDisplay) priceDisplay.textContent = formattedPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
             } else {
-                const defaultPrice = 'Update...';
+                const defaultPrice = '3.200.000đ';
                 if (priceDisplay) priceDisplay.textContent = defaultPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
             }
@@ -1172,21 +1183,7 @@
             if (tourWithSchedules && tourWithSchedules.schedules && tourWithSchedules.schedules.length > 0) {
                 tourWithSchedules.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const futureSchedules = tourWithSchedules.schedules.filter(item => {
-                    if (!item.startDate) return true;
-                    const d = new Date(item.startDate);
-                    return d >= today;
-                });
-
-                if (futureSchedules.length === 0) {
-                    dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch sắp khởi hành.</div>';
-                    return;
-                }
-
-                futureSchedules.forEach(item => {
+                tourWithSchedules.schedules.forEach(item => {
                     const remaining = item.remaining;
                     const statusText = item.calculatedStatus;
 
@@ -1228,10 +1225,10 @@
                     const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
 
                     const scheduleHTML = `
-                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 transition-all ${isClickable ? 'cursor-pointer hover:bg-primary/5 hover:border-primary' : ''} ${opacityClass}"
+                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 cursor-pointer ${opacityClass}"
                             ${clickAction}>
-                            <span class="text-[12px] font-bold leading-tight pointer-events-none">${formattedDisplay}</span>
-                            <span class="text-[13px] date-status ${statusClass} font-bold pointer-events-none">${statusDisplay}</span>
+                            <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
+                            <span class="text-[13px] date-status ${statusClass} font-bold">${statusDisplay}</span>
                         </div>
                     `;
                     dateSelector.insertAdjacentHTML('beforeend', scheduleHTML);

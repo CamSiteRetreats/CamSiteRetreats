@@ -2,10 +2,6 @@ import { Sidebar } from '../components/Sidebar.js';
 import { Header } from '../components/Header.js';
 
 export const render = () => {
-    let user = { role: 'sale' };
-    try { const s = localStorage.getItem('csr_user'); if (s) user = JSON.parse(s); } catch (e) { }
-    const isAdmin = user.role === 'admin';
-
     return `
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${Sidebar()}
@@ -16,20 +12,15 @@ export const render = () => {
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-7xl mx-auto space-y-6">
                   
-                  ${!isAdmin ? `<div class="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-3 text-sm font-medium">
-                      <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                      Bạn đang ở chế độ <strong class="ml-1">Chỉ xem</strong>. Liên hệ Admin để chỉnh sửa dữ liệu.
-                  </div>` : ''}
-
                   <div class="flex justify-between items-end">
                       <div>
                           <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Tour</h1>
                           <p class="text-gray-500 text-sm">Thêm, sửa, xóa các tuyến trekking. Đồng bộ trực tiếp lên Website.</p>
                       </div>
-                      ${isAdmin ? `<button id="addTourBtn" class="btn-primary flex items-center gap-2">
+                      <button id="addTourBtn" class="btn-primary flex items-center gap-2">
                           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                           Thêm Tour Mới
-                      </button>` : ''}
+                      </button>
                   </div>
 
                   <!-- Table -->
@@ -225,16 +216,10 @@ export const afterRender = () => {
         setTimeout(() => { modal.classList.add('hidden'); }, 200);
     };
 
-    let user = { role: 'sale' };
-    try { const s = localStorage.getItem('csr_user'); if (s) user = JSON.parse(s); } catch (e) { }
-    const isAdmin = user.role === 'admin';
-
-    if (isAdmin) {
-        document.getElementById('addTourBtn')?.addEventListener('click', () => openModal());
-        document.getElementById('closeTourModalBtn')?.addEventListener('click', closeModal);
-        document.getElementById('cancelTourBtn')?.addEventListener('click', closeModal);
-        modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-    }
+    document.getElementById('addTourBtn').addEventListener('click', () => openModal());
+    document.getElementById('closeTourModalBtn').addEventListener('click', closeModal);
+    document.getElementById('cancelTourBtn').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
     // --- LOAD TOURS ---
     const loadTours = async () => {
@@ -270,16 +255,6 @@ export const afterRender = () => {
                 ? '<span class="bg-green-100 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold">Hiển thị</span>'
                 : '<span class="bg-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold">Đã ẩn</span>';
 
-            const actionBtns = isAdmin ? `
-                <div class="flex items-center justify-end gap-1">
-                    <button class="tour-edit-btn p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" data-id="${t.id}" title="Sửa">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    </button>
-                    <button class="tour-delete-btn p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-id="${t.id}" title="Xóa">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>` : '<span class="text-xs text-gray-400 italic">Chỉ xem</span>';
-
             return `
                 <tr class="hover:bg-gray-50 transition-colors group" data-tour-id="${t.id}">
                     <td class="p-4">
@@ -303,7 +278,16 @@ export const afterRender = () => {
                     </td>
                     <td class="p-4">${priceDisplay}</td>
                     <td class="p-4 text-center">${visibleBadge}</td>
-                    <td class="p-4 text-right">${actionBtns}</td>
+                    <td class="p-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="tour-edit-btn p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" data-id="${t.id}" title="Sửa">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <button class="tour-delete-btn p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" data-id="${t.id}" title="Xóa">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `;
         }).join('');
