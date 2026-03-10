@@ -1,10 +1,35 @@
 const db = require('../utils/db');
 
+// Helper: ghi activity log
+async function writeLog({ userId, userName, action, targetType, targetId, targetName, detail }) {
+    try {
+        await db.query(
+            `INSERT INTO activity_logs (user_id, user_name, action, target_type, target_id, target_name, detail)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [userId || null, userName || 'Hệ thống', action, targetType, String(targetId || ''), targetName || '', JSON.stringify(detail || {})]
+        );
+    } catch (e) { console.error('writeLog error:', e.message); }
+}
+
+// Helper: đưa vào thùng rác
+async function writeTrash({ type, data, deletedBy, deletedByName }) {
+    try {
+        await db.query(
+            `INSERT INTO trash (type, data, deleted_by, deleted_by_name) VALUES ($1, $2, $3, $4)`,
+            [type, JSON.stringify(data), deletedBy || null, deletedByName || 'Hệ thống']
+        );
+    } catch (e) { console.error('writeTrash error:', e.message); }
+}
+
 module.exports = async (req, res) => {
+    // Lấy thông tin actor từ header
+    const actorId = req.headers['x-user-id'] || null;
+    const actorName = req.headers['x-user-name'] || 'Hệ thống';
+
     // Enable CORS for V2 Admin
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, X-User-Name');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -148,10 +173,13 @@ module.exports = async (req, res) => {
                 `, [csrCode, full_name, phone, cccd || null, safeDob, gender, medical_notes, dietary]);
             }
 
+            // Ghi log sau khi lưu khách hàng
+            const logAction = check.rows.length > 0 ? 'UPDATE' : 'CREATE';
+            await writeLog({ userId: actorId, userName: actorName, action: logAction, targetType: 'customer', targetId: check.rows[0]?.id || csrCode, targetName: `${full_name} — ${phone}`, detail: { csrCode } });
+
             return res.status(200).json({ success: true, message: 'Đã lưu thông tin Khách hàng thành công!', csr_code: csrCode });
         }
 
-        // 3. CHỨC NĂNG XÓA KHÁCH HÀNG (DELETE) - CHỈ ADMIN GỌI ĐƯỢC
         if (req.method === 'DELETE') {
             const { id } = req.query;
 
@@ -159,23 +187,27 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Thiếu ID khách hàng cần xóa.' });
             }
 
-            // Lấy SĐT để cân nhắc xóa booking theo (tùy chọn)
-            const custCheck = await db.query('SELECT phone FROM crm_customers WHERE id = $1', [id]);
+            // Lấy toàn bộ thông tin trước khi xóa
+            const custCheck = await db.query('SELECT * FROM crm_customers WHERE id = $1', [id]);
 
             if (custCheck.rows.length === 0) {
                 return res.status(404).json({ success: false, message: 'Không tìm thấy khách hàng này trong CRM.' });
             }
 
-            const phone = custCheck.rows[0].phone;
+            const customer = custCheck.rows[0];
+
+            // 1. Đưa vào Thùng Rác
+            await writeTrash({ type: 'customer', data: customer, deletedBy: actorId, deletedByName: actorName });
+
+            // 2. Ghi Activity Log
+            await writeLog({ userId: actorId, userName: actorName, action: 'DELETE', targetType: 'customer', targetId: customer.id, targetName: `${customer.full_name} — ${customer.phone}`, detail: { csr_code: customer.csr_code } });
 
             // Xóa khách hàng khỏi CRM
             await db.query('DELETE FROM crm_customers WHERE id = $1', [id]);
 
-            // [OPTIONAL] Xóa luôn tất cả booking của khách này? (Theo kịch bản User chọn)
-            // Trong trường hợp này, ta có thể xóa (tuỳ chọn qua query delete_bookings=true).
             const { delete_bookings } = req.query;
             if (delete_bookings === 'true') {
-                await db.query('DELETE FROM bookings WHERE phone = $1', [phone]);
+                await db.query('DELETE FROM bookings WHERE phone = $1', [customer.phone]);
             }
 
             return res.status(200).json({ success: true, message: 'Đã xóa dữ liệu khách hàng thành công.' });
