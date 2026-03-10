@@ -256,8 +256,210 @@
         </div>
     </section>
 
+    <!-- ===== UPCOMING SCHEDULE SECTION ===== -->
+    <section id="lich-trinh" class="py-16 px-6 md:px-20 bg-[#FAFAFA]">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <p class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Cập nhật liên tục</p>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase">Lịch Khởi Hành Sắp Tới</h2>
+                </div>
+                <a href="tour" class="hidden md:flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+                    Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <!-- Schedule Table -->
+            <div id="schedule-list" class="space-y-2">
+                <div class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
+            </div>
+
+            <!-- Mobile link -->
+            <div class="flex justify-center mt-6 md:hidden">
+                <a href="tour" class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                    Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .schedule-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .schedule-row:hover {
+            border-color: #E85D04;
+            box-shadow: 0 4px 20px rgba(232, 93, 4, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .schedule-date-badge {
+            font-size: 13px;
+            font-weight: 800;
+            color: #E85D04;
+            background: #FFF8F0;
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1.5px solid #E85D0420;
+            white-space: nowrap;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .schedule-tour-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .schedule-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .status-green {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .status-orange {
+            background: #FFF7ED;
+            color: #D97706;
+        }
+
+        .status-red {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+
+        .schedule-arrow {
+            color: #D1D5DB;
+            flex-shrink: 0;
+        }
+
+        .month-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 4px 0 2px;
+        }
+    </style>
+
+    <script>
+        async function loadUpcomingSchedules() {
+            const container = document.getElementById('schedule-list');
+            if (!container) return;
+
+            // Map tên tour → URL
+            const tourLinks = {
+                'Thác Liêng Ài': '/tour/thacliengai',
+                'Tà Năng - Phan Dũng': '/tour/tanangphandung',
+                'Bidoup Tà Giang': '/tour/bidouptagiang',
+                'Thác Mưa Bay': '/tour/thacmuabay',
+                'Langbiang': '/tour/langbiang',
+                'Kỳ Quan Sơn': '/tour/kyquansan',
+                'Yangdoan': '/tour/yangdoan',
+            };
+
+            const fmtDate = (iso) => {
+                if (!iso) return '';
+                const d = new Date(iso);
+                return `${d.getDate()}/${d.getMonth() + 1}`;
+            };
+            const monthLabel = (iso) => {
+                if (!iso) return '';
+                const d = new Date(iso);
+                return `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
+            };
+
+            try {
+                const res = await fetch('/api/schedules?t=' + Date.now());
+                const all = await res.json();
+
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                const upcoming = all
+                    .filter(s => new Date(s.start_date) >= today)
+                    .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+                if (upcoming.length === 0) {
+                    container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành sắp tới.</div>';
+                    return;
+                }
+
+                let html = '';
+                let lastMonth = '';
+
+                upcoming.forEach(s => {
+                    const month = monthLabel(s.start_date);
+                    if (month !== lastMonth) {
+                        html += `<div class="month-label">${month}</div>`;
+                        lastMonth = month;
+                    }
+
+                    const booked = parseInt(s.booked_count) || 0;
+                    const slots = parseInt(s.slots) || 0;
+                    const remaining = Math.max(0, slots - booked);
+
+                    let statusHTML = '';
+                    let statusText = '';
+                    if (remaining <= 0) {
+                        statusHTML = '<span class="schedule-status status-red">Hết chỗ</span>';
+                        statusText = 'Hết chỗ';
+                    } else if (remaining <= 3) {
+                        statusHTML = `<span class="schedule-status status-orange">Còn ${remaining} chỗ</span>`;
+                    } else {
+                        statusHTML = `<span class="schedule-status status-green">Còn ${remaining} chỗ</span>`;
+                    }
+
+                    const startFmt = fmtDate(s.start_date);
+                    const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                    const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt} – ${endFmt}` : startFmt;
+
+                    const link = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k))
+                        ? tourLinks[Object.keys(tourLinks).find(k => s.tour_name.includes(k))]
+                        : '#';
+
+                    html += `
+                        <a class="schedule-row" href="${link}">
+                            <span class="schedule-date-badge">${dateLabel}</span>
+                            <span class="schedule-tour-tag">${s.tour_name}</span>
+                            ${statusHTML}
+                            <i data-lucide="chevron-right" class="schedule-arrow w-4 h-4"></i>
+                        </a>`;
+                });
+
+                container.innerHTML = html;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (e) {
+                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Không thể tải lịch trình.</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUpcomingSchedules);
+    </script>
+
     <!-- Tour Explorer Section -->
     <section id="chuyen-di" class="py-24 px-6 md:px-20">
+
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-6">
                 <h2 class="text-3xl md:text-4xl font-black mb-6">KHÁM PHÁ CHUYẾN ĐI</h2>
