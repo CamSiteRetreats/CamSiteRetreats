@@ -1,4 +1,4 @@
-import{S as z,H as V}from"./Header-DjwXxBfR.js";const O=()=>`
+import{S as z,H as V}from"./Header-n5pNPUhI.js";const O=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800 font-sans">
         <!-- Sidebar is hidden when printing -->
         <div class="print:hidden">

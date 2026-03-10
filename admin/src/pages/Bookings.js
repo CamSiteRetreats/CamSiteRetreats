@@ -675,7 +675,7 @@ export const afterRender = () => {
             if (activeTab === 'consult') {
                 tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
             } else if (activeTab === 'pending') {
-                tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
+                tabMatch = (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
                 tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
             } else if (activeTab === 'ready') {

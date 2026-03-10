@@ -141,7 +141,7 @@ async function handleSepayWebhook({ request, env }) {
     if (existingTx.length > 0) return Response.json({ success: true, message: 'Duplicate' });
 
     // Robust matching logic
-    const bookings = await sql(`SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc') OR status IS NULL OR status = '' ORDER BY created_at DESC`);
+    const bookings = await sql`SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc', 'Đã cọc (Chờ đi)') OR status IS NULL OR status = '' ORDER BY created_at DESC`;
 
     let matchedBooking = null;
     let paymentType = 'deposit';
@@ -187,7 +187,7 @@ async function handleSepayWebhook({ request, env }) {
 
         let newStatus = matchedBooking.status;
         if (totalPrice > 0 && newDeposit >= totalPrice) newStatus = 'Hoàn tất';
-        else if (newDeposit >= depositReq) newStatus = 'Đã cọc';
+        else if (newDeposit >= depositReq) newStatus = 'Đã cọc (Chờ đi)';
 
         // Get or Generate Customer ID
         let customerId = matchedBooking.customer_id;
@@ -222,13 +222,14 @@ async function handlePaymentStatus({ request, env }) {
     const totalPrice = parseInt(booking.total_price) || 0;
     const currentDeposit = parseInt(booking.deposit) || 0;
 
-    const isPaid = booking.status && (
-        booking.status.includes('Đã cọc') ||
-        booking.status === 'Hoàn tất' ||
-        booking.status === 'Hoàn thành' ||
-        booking.status === 'Đã thanh toán' ||
-        (totalPrice > 0 && currentDeposit >= (parseInt(booking.deposit_required) || 1000000))
-    );
+    const isPaid = booking.status &&
+        (
+            booking.status.includes('Đã cọc') ||
+            booking.status === 'Hoàn tất' ||
+            booking.status === 'Hoàn thành' ||
+            booking.status === 'Đã thanh toán' ||
+            (totalPrice > 0 && currentDeposit >= (parseInt(booking.deposit_required) || 1000000))
+        );
 
     const isFullyPaid = booking.status === 'Hoàn tất' ||
         booking.status === 'Hoàn thành' ||
