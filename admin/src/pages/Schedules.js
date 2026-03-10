@@ -298,8 +298,9 @@ export const afterRender = () => {
         scheduleList.innerHTML = data.map(item => {
             const startDate = new Date(item.start_date);
             const endDate = new Date(item.end_date);
-            const startStr = startDate.toLocaleDateString('vi-VN');
-            const endStr = endDate.toLocaleDateString('vi-VN');
+            const fmtDate = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+            const startStr = fmtDate(startDate);
+            const endStr = fmtDate(endDate);
             const dayMonth = `${startDate.getDate().toString().padStart(2, '0')}/${(startDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
             const booked = parseInt(item.booked_count) || 0;
