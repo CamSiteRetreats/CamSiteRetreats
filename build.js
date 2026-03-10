@@ -83,13 +83,4 @@ console.log('📄 Bước 6: Cập nhật admin/index.html với file build mớ
 fs.copyFileSync(INDEX_SRC, INDEX_DEST);
 console.log('   ✅ Done\n');
 
-console.log('🔗 Bước 7: Cài đặt file _redirects và 404.html cho SPA Admin...');
-const REDIRECTS_CONTENT = '/admin/* /admin/index.html 200\n';
-fs.writeFileSync(path.join(ADMIN_DIR, '_redirects'), REDIRECTS_CONTENT, 'utf8');
-fs.writeFileSync(path.join(ROOT, '_redirects'), REDIRECTS_CONTENT, 'utf8');
-
-// Thêm fallback thư mục con của Cloudflare Pages (admin/404.html = admin/index.html)
-fs.copyFileSync(INDEX_DEST, path.join(ADMIN_DIR, '404.html'));
-console.log('   ✅ Đã copy 404.html và tạo _redirects chuẩn \n');
-
 console.log('🚀 Build hoàn tất! Cloudflare Pages sẵn sàng deploy.\n');

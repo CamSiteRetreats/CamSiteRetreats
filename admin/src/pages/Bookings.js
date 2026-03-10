@@ -340,7 +340,6 @@ export const render = () => {
 
                   <form id="editForm" class="space-y-5">
                       <input type="hidden" id="edit-id">
-                      <input type="hidden" id="edit-customer-id">
 
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div>
@@ -673,13 +672,12 @@ export const afterRender = () => {
 
             const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
 
-            const deposit = parseInt(b.deposit) || 0;
             if (activeTab === 'consult') {
                 tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
             } else if (activeTab === 'pending') {
-                tabMatch = (deposit === 0) && (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
+                tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-                tabMatch = (deposit > 0 || (b.status && b.status.includes('Đã cọc'))) && !isFullyPaid && b.status !== 'Hoàn thành' && b.status !== 'Chờ tư vấn' && !isDonePast;
+                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
             } else if (activeTab === 'ready') {
                 tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
             } else if (activeTab === 'completed') {
@@ -1356,7 +1354,6 @@ export const afterRender = () => {
 
         // Nạp data vào các trường của Edit Form
         document.getElementById('edit-id').value = bookingId;
-        document.getElementById('edit-customer-id').value = booking.customer_id || '';
         document.getElementById('edit-name').value = booking.name || '';
         document.getElementById('edit-phone').value = booking.phone || '';
         document.getElementById('edit-medal-name').value = booking.medal_name || '';
@@ -1933,7 +1930,6 @@ export const afterRender = () => {
                 // Nếu có editingId tức là đang ở Mode EDIT Đơn Hàng => Truyền id vào Payloads
                 if (editingId) {
                     bookingPayload.id = editingId;
-                    bookingPayload.action = 'update';
                     delete bookingPayload.status;
                     delete bookingPayload.deposit;
                     delete bookingPayload.sale_id;
@@ -2028,8 +2024,6 @@ export const afterRender = () => {
 
                 const bookingPayload = {
                     id: bookingId,
-                    action: 'update',
-                    customer_id: document.getElementById('edit-customer-id').value || null,
                     name: name,
                     phone: phone,
                     medal_name: medalName,

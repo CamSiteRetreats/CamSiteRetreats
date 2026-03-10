@@ -228,7 +228,7 @@ async function handlePaymentStatus({ request, env }) {
         booking.status === 'Hoàn thành' ||
         booking.status === 'Đã thanh toán' ||
         (totalPrice > 0 && currentDeposit >= (parseInt(booking.deposit_required) || 1000000))
-    ) || currentDeposit > 0; // Fallback: any deposit received counts as paid
+    );
 
     const isFullyPaid = booking.status === 'Hoàn tất' ||
         booking.status === 'Hoàn thành' ||
