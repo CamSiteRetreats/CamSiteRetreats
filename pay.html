@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Global Error Guard to prevent blank screens
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            console.error('CRITICAL ERROR:', msg, url, lineNo);
+            const errorDiv = document.createElement('div');
+            errorDiv.style = "position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:15px;text-align:center;z-index:9999;font-weight:bold;font-family:sans-serif;";
+            errorDiv.innerHTML = "Có lỗi xảy ra khi tải trang. Vui lòng nhấn <b>Tải lại trang</b> hoặc liên hệ hỗ trợ. <br><small>" + msg + "</small>";
+            errorDiv.onclick = function () { location.reload(); };
+            document.documentElement.appendChild(errorDiv);
+            return false;
+        };
+    </script>
     <title>Thanh toán - CAM SITE RETREATS</title>
 
     <!-- Open Graph Meta Tags -->
