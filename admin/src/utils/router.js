@@ -1,23 +1,14 @@
-// Route permissions: which roles can access each route
-// If a route is not listed, ALL authenticated users can access it
+// Route permissions: chỉ activity-log và trash là admin-only
+// Các route khác: mọi user đã đăng nhập đều vào được
 const ROUTE_PERMISSIONS = {
-    '/admin/': ['admin'],
-    '/admin/bookings': ['admin'],
-    '/admin/customers': ['admin'],
-    '/admin/reports': ['admin'],
-    '/admin/users': ['admin'],
-    '/admin/roster': ['admin'],
     '/admin/activity-log': ['admin'],
     '/admin/trash': ['admin'],
-    '/admin/tours': ['admin', 'sale'],
-    '/admin/schedules': ['admin', 'sale'],
-    '/admin/profile': ['admin', 'sale'],
 };
 
-// Default redirect for each role if they don't have access
+// Default redirect nếu không có quyền
 const ROLE_DEFAULT_PAGE = {
     'admin': '/admin/',
-    'sale': '/admin/tours',
+    'sale': '/admin/',
 };
 
 export const initRouter = () => {

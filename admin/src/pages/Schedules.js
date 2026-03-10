@@ -2,6 +2,10 @@ import { Sidebar } from '../components/Sidebar.js';
 import { Header } from '../components/Header.js';
 
 export const render = () => {
+    let user = { role: 'sale' };
+    try { const s = localStorage.getItem('csr_user'); if (s) user = JSON.parse(s); } catch (e) { }
+    const isAdmin = user.role === 'admin';
+
     return `
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${Sidebar()}
@@ -12,15 +16,20 @@ export const render = () => {
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-7xl mx-auto space-y-6">
                   
+                  ${!isAdmin ? `<div class="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-3 text-sm font-medium">
+                      <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                      Bạn đang ở chế độ <strong class="ml-1">Chỉ xem</strong>. Liên hệ Admin để chỉnh sửa dữ liệu.
+                  </div>` : ''}
+
                   <div class="flex justify-between items-end">
                       <div>
                           <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Lịch Trình</h1>
                           <p class="text-gray-500 text-sm">Cập nhật ngày khởi hành, số chỗ — đồng bộ trực tiếp với form đặt chỗ trên website.</p>
                       </div>
-                      <button id="addScheduleBtn" class="btn-primary flex items-center gap-2">
+                      ${isAdmin ? `<button id="addScheduleBtn" class="btn-primary flex items-center gap-2">
                           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                           Tạo Lịch Trình
-                      </button>
+                      </button>` : ''}
                   </div>
 
                   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -161,10 +170,16 @@ export const afterRender = () => {
         setTimeout(() => { scheduleModal.classList.add('hidden'); }, 200);
     };
 
-    document.getElementById('addScheduleBtn').addEventListener('click', () => openModal());
-    document.getElementById('closeScheduleModalBtn').addEventListener('click', closeModal);
-    document.getElementById('cancelScheduleBtn').addEventListener('click', closeModal);
-    scheduleModal.addEventListener('click', (e) => { if (e.target === scheduleModal) closeModal(); });
+    let user = { role: 'sale' };
+    try { const s = localStorage.getItem('csr_user'); if (s) user = JSON.parse(s); } catch (e) { }
+    const isAdmin = user.role === 'admin';
+
+    if (isAdmin) {
+        document.getElementById('addScheduleBtn')?.addEventListener('click', () => openModal());
+        document.getElementById('closeScheduleModalBtn')?.addEventListener('click', closeModal);
+        document.getElementById('cancelScheduleBtn')?.addEventListener('click', closeModal);
+        scheduleModal?.addEventListener('click', (e) => { if (e.target === scheduleModal) closeModal(); });
+    }
 
     // --- LOAD TOUR OPTIONS (for Filter + Modal) ---
     const loadTourOptions = async () => {
