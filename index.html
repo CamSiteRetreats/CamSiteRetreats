@@ -270,8 +270,8 @@
                 </a>
             </div>
 
-            <!-- Schedule Table -->
-            <div id="schedule-list" class="space-y-2">
+            <!-- Schedule Grid 3 cols -->
+            <div id="schedule-list">
                 <div class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
             </div>
 
@@ -284,84 +284,75 @@
         </div>
     </section>
 
-    <style>
-        .schedule-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #f0f0f0;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .schedule-row:hover {
-            border-color: #E85D04;
-            box-shadow: 0 4px 20px rgba(232, 93, 4, 0.08);
-            transform: translateY(-1px);
-        }
-
-        .schedule-date-badge {
-            font-size: 13px;
-            font-weight: 800;
-            color: #E85D04;
-            background: #FFF8F0;
-            padding: 5px 12px;
-            border-radius: 999px;
-            border: 1.5px solid #E85D0420;
-            white-space: nowrap;
-            min-width: 90px;
-            text-align: center;
-        }
-
-        .schedule-tour-tag {
-            font-size: 12px;
-            font-weight: 700;
-            color: #374151;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .schedule-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
-
-        .status-green {
-            background: #ECFDF5;
-            color: #059669;
-        }
-
-        .status-orange {
-            background: #FFF7ED;
-            color: #D97706;
-        }
-
-        .status-red {
-            background: #FEF2F2;
-            color: #DC2626;
-        }
-
-        .schedule-arrow {
-            color: #D1D5DB;
-            flex-shrink: 0;
-        }
-
-        .month-label {
-            font-size: 11px;
-            font-weight: 800;
-            color: #9CA3AF;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding: 4px 0 2px;
-        }
+    .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+    }
+    @media (max-width: 768px) {
+    .schedule-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+    .schedule-grid { grid-template-columns: 1fr; }
+    }
+    .schedule-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    min-width: 0;
+    }
+    .schedule-row:hover {
+    border-color: #E85D04;
+    box-shadow: 0 2px 12px rgba(232,93,4,0.10);
+    transform: translateY(-1px);
+    }
+    .schedule-date-badge {
+    font-size: 11px;
+    font-weight: 800;
+    color: #E85D04;
+    background: #FFF8F0;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    }
+    .schedule-tour-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #374151;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    }
+    .schedule-status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    }
+    .status-green { background: #ECFDF5; color: #059669; }
+    .status-orange { background: #FFF7ED; color: #D97706; }
+    .status-red { background: #FEF2F2; color: #DC2626; }
+    .month-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    margin-top: 4px;
+    }
     </style>
 
     <script>
@@ -405,46 +396,46 @@
                     return;
                 }
 
-                let html = '';
-                let lastMonth = '';
-
+                // Group by month, render each month as a block with a 3-col grid
+                const groupedByMonth = {};
                 upcoming.forEach(s => {
                     const month = monthLabel(s.start_date);
-                    if (month !== lastMonth) {
-                        html += `<div class="month-label">${month}</div>`;
-                        lastMonth = month;
-                    }
+                    if (!groupedByMonth[month]) groupedByMonth[month] = [];
+                    groupedByMonth[month].push(s);
+                });
 
-                    const booked = parseInt(s.booked_count) || 0;
-                    const slots = parseInt(s.slots) || 0;
-                    const remaining = Math.max(0, slots - booked);
+                let html = '';
+                Object.entries(groupedByMonth).forEach(([month, items]) => {
+                    html += `<div class="month-label">${month}</div><div class="schedule-grid">`;
+                    items.forEach(s => {
+                        const booked = parseInt(s.booked_count) || 0;
+                        const slots = parseInt(s.slots) || 0;
+                        const remaining = Math.max(0, slots - booked);
 
-                    let statusHTML = '';
-                    let statusText = '';
-                    if (remaining <= 0) {
-                        statusHTML = '<span class="schedule-status status-red">Hết chỗ</span>';
-                        statusText = 'Hết chỗ';
-                    } else if (remaining <= 3) {
-                        statusHTML = `<span class="schedule-status status-orange">Còn ${remaining} chỗ</span>`;
-                    } else {
-                        statusHTML = `<span class="schedule-status status-green">Còn ${remaining} chỗ</span>`;
-                    }
+                        let statusHTML = '';
+                        if (remaining <= 0) {
+                            statusHTML = '<span class="schedule-status status-red">Hết chỗ</span>';
+                        } else if (remaining <= 3) {
+                            statusHTML = `<span class="schedule-status status-orange">Còn ${remaining}</span>`;
+                        } else {
+                            statusHTML = `<span class="schedule-status status-green">Còn ${remaining}</span>`;
+                        }
 
-                    const startFmt = fmtDate(s.start_date);
-                    const endFmt = s.end_date ? fmtDate(s.end_date) : '';
-                    const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt} – ${endFmt}` : startFmt;
+                        const startFmt = fmtDate(s.start_date);
+                        const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}–${endFmt}` : startFmt;
 
-                    const link = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k))
-                        ? tourLinks[Object.keys(tourLinks).find(k => s.tour_name.includes(k))]
-                        : '#';
+                        const link = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k))
+                            ? tourLinks[Object.keys(tourLinks).find(k => s.tour_name.includes(k))]
+                            : '#';
 
-                    html += `
-                        <a class="schedule-row" href="${link}">
+                        html += `<a class="schedule-row" href="${link}">
                             <span class="schedule-date-badge">${dateLabel}</span>
                             <span class="schedule-tour-tag">${s.tour_name}</span>
                             ${statusHTML}
-                            <i data-lucide="chevron-right" class="schedule-arrow w-4 h-4"></i>
                         </a>`;
+                    });
+                    html += `</div>`;
                 });
 
                 container.innerHTML = html;
