@@ -2,15 +2,17 @@ import { Sidebar } from '../components/Sidebar.js';
 import { Header } from '../components/Header.js';
 
 export const render = () => {
-    let user = { role: 'sale', fullName: 'Guest' };
+    let user = { role: 'sale', fullName: 'Guest', id: null };
     try {
         const stored = localStorage.getItem('csr_user');
         if (stored) user = JSON.parse(stored);
     } catch (e) { }
 
     const isAdmin = user.role === 'admin';
-    const currentDate = new Date();
-    const currentMonthVal = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const toDateStr = today.toISOString().split('T')[0];
+    const fromDateStr = firstDay.toISOString().split('T')[0];
 
     return `
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
@@ -22,16 +24,26 @@ export const render = () => {
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-7xl mx-auto space-y-8">
                   
-                  <div class="flex justify-between items-end">
+                  <div class="flex justify-between items-end flex-wrap gap-4">
                       <div>
-                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Báo Cáo & Hiệu Suất</h1>
+                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Báo Cáo &amp; Hiệu Suất</h1>
                           <p class="text-gray-500 text-sm">
-                            ${isAdmin ? 'Quản lý hoa hồng, doanh thu tổng và xếp hạng Sales.' : 'Bảng xếp hạng doanh số và theo dõi hoa hồng.'}
+                            ${isAdmin ? 'Quản lý hoa hồng, doanh thu tổng và xếp hạng Sales.' : 'Bảng xếp hạng doanh số và theo dõi hoa hồng của bạn.'}
                           </p>
                       </div>
-                      <div class="flex items-center gap-3">
-                          <label class="text-sm font-bold text-gray-500 uppercase">Kỳ Báo Cáo:</label>
-                          <input type="month" id="reportMonth" class="input-field text-sm w-48 font-bold" value="${currentMonthVal}">
+                      <div class="flex items-center gap-3 flex-wrap">
+                          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
+                              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                              <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Từ ngày</label>
+                              <input type="date" id="reportDateFrom" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${fromDateStr}">
+                          </div>
+                          <span class="text-gray-400 font-bold">→</span>
+                          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
+                              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                              <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Đến ngày</label>
+                              <input type="date" id="reportDateTo" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${toDateStr}">
+                          </div>
+                          <button id="reportApplyBtn" class="bg-gray-900 hover:bg-csr-orange text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">Lọc</button>
                       </div>
                   </div>
 
@@ -41,18 +53,17 @@ export const render = () => {
                       <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
                           <div>
                               <h2 class="text-lg font-bold text-gray-900">1. Cài Đặt Mức Hoa Hồng Tour</h2>
-                              <p class="text-xs text-gray-500 mt-1">Lưu ý: Mức hoa hồng này sẽ được tính ngay lập tức cho các đơn hàng của tour tương ứng.</p>
+                              <p class="text-xs text-gray-500 mt-1">Mức hoa hồng này được tính cho các đơn hàng của tour tương ứng.</p>
                           </div>
                       </div>
                       <div class="p-4" id="commissionSetupContainer">
-                          <!-- Tour list rendered here -->
                           <div class="text-center text-gray-400 py-4 text-sm">Đang tải danh sách Tour...</div>
                       </div>
                   </div>
 
                   <!-- PHẦN 2: DOANH THU TỔNG (ADMIN ONLY) -->
                   <div>
-                      <h2 class="text-lg font-bold text-gray-900 mb-4">2. Thống Kê Doanh Thu Tổng (Tháng Chọn)</h2>
+                      <h2 class="text-lg font-bold text-gray-900 mb-4">2. Thống Kê Doanh Thu Tổng (Kỳ Chọn)</h2>
                       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div class="glass-panel p-6 border-l-4 border-csr-orange">
                               <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Số Khởi Hành (Chuyến)</h3>
@@ -74,7 +85,7 @@ export const render = () => {
                       <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
                           <div>
                               <h2 class="text-lg font-bold text-gray-900">3. Bảng Xếp Hạng Đội Ngũ Sales</h2>
-                              <p class="text-xs text-gray-500 mt-1">Tính theo các đơn hàng "Đã cọc" hoặc "Hoàn tất" khởi hành trong tháng.</p>
+                              <p class="text-xs text-gray-500 mt-1">Tính theo đơn "Đã cọc" hoặc "Hoàn tất". Gộp theo ID người dùng (tránh lỗi đổi tên).</p>
                           </div>
                       </div>
                       <div class="overflow-x-auto">
@@ -98,21 +109,29 @@ export const render = () => {
                   ` : `
                   <!-- MÀN HÌNH RIÊNG DÀNH CHO ROLE SALE -->
                   
-                  <!-- PHẦN 1: THỐNG KÊ CÁ NHÂN (SALE ONLY) -->
+                  <!-- PHẦN 1: THỐNG KÊ CÁ NHÂN (SALE ONLY) — 4 CARDS -->
                   <div>
-                      <h2 class="text-lg font-bold text-gray-900 mb-4">1. Thống Kê Doanh Thu Đơn Của Tôi</h2>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <h2 class="text-lg font-bold text-gray-900 mb-4">1. Thống Kê Của Tôi</h2>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                           <div class="glass-panel p-6 border-l-4 border-gray-400">
-                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Số Khách Tiếp Nhận</h3>
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide leading-tight">Số Khách Tiếp Nhận</h3>
                               <p class="text-4xl font-black text-gray-900 mt-2" id="sale-stat-total-pax">...</p>
+                              <p class="text-[10px] text-gray-400 mt-1">Tổng đơn trong kỳ (mọi trạng thái)</p>
                           </div>
                           <div class="glass-panel p-6 border-l-4 border-blue-500">
-                              <h3 class="text-xs font-bold text-blue-500 uppercase tracking-wide">Số Khách Đã Hoàn Thành</h3>
+                              <h3 class="text-xs font-bold text-blue-500 uppercase tracking-wide leading-tight">Số Khách Hoàn Thành</h3>
                               <p class="text-4xl font-black text-blue-600 mt-2" id="sale-stat-success-pax">...</p>
+                              <p class="text-[10px] text-gray-400 mt-1">Đã đủ chi phí &amp; đã khởi hành</p>
                           </div>
                           <div class="glass-panel p-6 border-l-4 border-csr-orange">
-                              <h3 class="text-xs font-bold text-csr-orange uppercase tracking-wide">Tổng Doanh Thu Của Tôi</h3>
-                              <p class="text-4xl font-black text-csr-orange mt-2" id="sale-stat-revenue">...</p>
+                              <h3 class="text-xs font-bold text-csr-orange uppercase tracking-wide leading-tight">Tổng Doanh Thu</h3>
+                              <p class="text-3xl font-black text-csr-orange mt-2" id="sale-stat-revenue">...</p>
+                              <p class="text-[10px] text-gray-400 mt-1">Đơn Đã cọc + Hoàn tất trong kỳ</p>
+                          </div>
+                          <div class="glass-panel p-6 border-l-4 border-green-500">
+                              <h3 class="text-xs font-bold text-green-600 uppercase tracking-wide leading-tight">Hoa Hồng Thực Nhận</h3>
+                              <p class="text-3xl font-black text-green-600 mt-2" id="sale-stat-real-comm">...</p>
+                              <p class="text-[10px] text-gray-400 mt-1">Từ các khách đã hoàn thành</p>
                           </div>
                       </div>
                   </div>
@@ -121,8 +140,8 @@ export const render = () => {
                   <div class="glass-panel overflow-hidden mt-8">
                       <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
                           <div>
-                              <h2 class="text-lg font-bold text-gray-900">2. Báo Cáo Doanh Thu Tháng Theo Tuyến Tour</h2>
-                              <p class="text-xs text-gray-500 mt-1">Gom nhóm dựa trên tour đã chốt thành công trong tháng.</p>
+                              <h2 class="text-lg font-bold text-gray-900">2. Báo Cáo Doanh Thu Theo Tuyến Tour</h2>
+                              <p class="text-xs text-gray-500 mt-1">Gom nhóm dựa trên tour đã chốt thành công trong kỳ.</p>
                           </div>
                       </div>
                       <div class="overflow-x-auto">
@@ -182,17 +201,16 @@ export const render = () => {
                 </div>
                 ` : ''}
 
-                <!-- Bookings Table (2 Columns layout for Sales, standard for Admin) -->
+                <!-- Bookings Table -->
                 <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-gray-100 border-b border-gray-200 text-xs text-gray-600 uppercase font-bold">
-                            <!-- Layout 2 cột rõ ràng cho Sale View, Admin xem chung bảng cũ -->
                             <tr>
                                 <th class="p-4 w-1/2 border-r border-gray-200">
-                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Thông Khách Hàng</div>
+                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Thông Tin Khách Hàng</div>
                                 </th>
                                 <th class="p-4 w-1/2">
-                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> Chi Tiết Đơn Hàng & Hoa Hồng</div>
+                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> Chi Tiết Đơn Hàng &amp; Hoa Hồng</div>
                                 </th>
                             </tr>
                         </thead>
@@ -207,7 +225,7 @@ export const render = () => {
 };
 
 export const afterRender = () => {
-    let user = { role: 'sale', fullName: 'Guest' };
+    let user = { role: 'sale', fullName: 'Guest', id: null };
     try {
         const stored = localStorage.getItem('csr_user');
         if (stored) user = JSON.parse(stored);
@@ -216,23 +234,72 @@ export const afterRender = () => {
 
     let allTours = [];
     let allBookings = [];
-    let filteredBookings = []; // Bookings in selected month
+    let allUsers = [];   // [{id, full_name, fullName, role, ...}]
+    let filteredBookings = [];
 
-    const monthInput = document.getElementById('reportMonth');
+    const dateFromInput = document.getElementById('reportDateFrom');
+    const dateToInput = document.getElementById('reportDateTo');
+    const applyBtn = document.getElementById('reportApplyBtn');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Number formatter
     const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
 
-    // Load Data
+    // ----- Date Helpers -----
+    // Parse "dd/mm/yyyy hh:mm" or "dd/mm/yyyy" or "yyyy-mm-dd" → Date
+    const parseBookingDate = (dateStr) => {
+        if (!dateStr) return null;
+        // Could be "15/03/2026 - 16/03/2026", "15/03/2026", "2026-03-15"
+        const cleaned = dateStr.split('-')[0].trim(); // Take first part if range
+        if (cleaned.includes('/')) {
+            const parts = cleaned.split('/');
+            if (parts.length === 3) {
+                // dd/mm/yyyy
+                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+        } else if (cleaned.includes('-')) {
+            return new Date(cleaned);
+        }
+        return null;
+    };
+
+    const getDateRange = () => {
+        const from = dateFromInput.value ? new Date(dateFromInput.value) : null;
+        const to = dateToInput.value ? new Date(dateToInput.value) : null;
+        if (from) from.setHours(0, 0, 0, 0);
+        if (to) to.setHours(23, 59, 59, 999);
+        return { from, to };
+    };
+
+    const isInDateRange = (booking, from, to) => {
+        const d = parseBookingDate(booking.date);
+        if (!d) return false;
+        if (from && d < from) return false;
+        if (to && d > to) return false;
+        return true;
+    };
+
+    // ----- User Map: id → currentName -----
+    const buildUserMap = () => {
+        const map = {};
+        allUsers.forEach(u => {
+            map[String(u.id)] = u.full_name || u.fullName || u.username || `User #${u.id}`;
+        });
+        return map;
+    };
+
+    // ----- Load Data -----
     const loadData = async () => {
         try {
-            const [toursRes, bookingsRes] = await Promise.all([
-                fetch('/api/tours'),
-                fetch('/api/bookings')
+            const [toursRes, bookingsRes, usersRes] = await Promise.all([
+                fetch('/api/admin_tours'),
+                fetch('/api/bookings'),
+                fetch('/api/users'),
             ]);
-
-            allTours = toursRes.ok ? await toursRes.json() : [];
+            const toursData = toursRes.ok ? await toursRes.json() : {};
+            allTours = Array.isArray(toursData) ? toursData : (toursData.data || []);
             allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
+            allUsers = usersRes.ok ? await usersRes.json() : [];
 
             if (isAdmin) renderCommissionSetup();
             processReports();
@@ -242,18 +309,16 @@ export const afterRender = () => {
         }
     };
 
-    // Render Commission Setup (Admin)
+    // ----- Commission Setup (Admin) -----
     const renderCommissionSetup = () => {
         const container = document.getElementById('commissionSetupContainer');
         if (!container) return;
-
         if (allTours.length === 0) {
             container.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">Không có Tour nào trong hệ thống.</div>';
             return;
         }
-
         const gridHtml = allTours.map(t => {
-            const rate = t.commission_rate ?? 5; // Default 5%
+            const rate = t.commission_rate ?? 5;
             return `
                 <div class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:border-csr-orange/30 transition-colors">
                     <div class="font-medium text-sm text-gray-900 flex-1 truncate pr-4">${t.name}</div>
@@ -267,147 +332,136 @@ export const afterRender = () => {
                 </div>
             `;
         }).join('');
-
         container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${gridHtml}</div>`;
     };
 
-    // Save Commission Rate
     window.saveCommission = async (tourId) => {
         const input = document.getElementById(`comm_input_${tourId}`);
         if (!input) return;
         const rate = parseFloat(input.value);
-        if (isNaN(rate) || rate < 0 || rate > 100) {
-            alert('Tỉ lệ hoa hồng không hợp lệ (0-100)');
-            return;
-        }
-
+        if (isNaN(rate) || rate < 0 || rate > 100) { alert('Tỉ lệ hoa hồng không hợp lệ (0-100)'); return; }
         const btn = input.nextElementSibling;
         const oldText = btn.textContent;
-        btn.textContent = '...';
-        btn.disabled = true;
-
+        btn.textContent = '...'; btn.disabled = true;
         try {
-            const res = await fetch(`/api/tours?id=${tourId}`, {
+            const res = await fetch(`/api/admin_tours?id=${tourId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ commission_rate: rate })
             });
-
             if (res.ok) {
-                // Update local array
                 const t = allTours.find(x => x.id === tourId);
                 if (t) t.commission_rate = rate;
                 btn.classList.add('bg-green-500');
                 btn.textContent = 'Đã lưu!';
-                setTimeout(() => {
-                    btn.classList.remove('bg-green-500');
-                    btn.textContent = oldText;
-                    btn.disabled = false;
-                }, 1500);
-
-                // Recalculate reports since rate changed
+                setTimeout(() => { btn.classList.remove('bg-green-500'); btn.textContent = oldText; btn.disabled = false; }, 1500);
                 processReports();
-            } else {
-                throw new Error('Lỗi cập nhật');
-            }
+            } else { throw new Error('Lỗi cập nhật'); }
         } catch (err) {
             alert('Lỗi khi lưu tỉ lệ hoa hồng!');
-            btn.textContent = oldText;
-            btn.disabled = false;
+            btn.textContent = oldText; btn.disabled = false;
         }
     };
 
-    // --- PROCESS DATA ---
+    // ----- Process / Filter Data -----
     const processReports = () => {
-        const monthVal = monthInput.value; // "YYYY-MM"
-        if (!monthVal) return;
+        const { from, to } = getDateRange();
+        const userMap = buildUserMap(); // id → currentName
 
-        let myRawBookingsInMonth = []; // Dành cho Sale đếm số khách vãng lai/tiếp nhận
+        // Filter by date range AND valid status
+        let myRawBookingsInRange = []; // Tất cả đơn của sale trong kỳ (mọi status)
 
-        // Filter bookings by selected month AND valid status
         filteredBookings = allBookings.filter(b => {
-            // Xử lý convert ngày của Booking sang format YYYY-MM
-            if (!b.date) return false;
-            let bYear, bMonth;
-            if (b.date.includes('/')) {
-                const firstDatePart = b.date.split('-')[0].trim();
-                const parts = firstDatePart.split('/');
-                if (parts.length === 3) {
-                    bYear = parts[2];
-                    bMonth = parts[1].padStart(2, '0');
+            if (!isInDateRange(b, from, to)) return false;
+
+            // Nếu là Sale: thu thập mọi đơn của mình để đếm "Tiếp nhận"
+            if (!isAdmin) {
+                const bSaleId = String(b.sale_id || '');
+                const myId = String(user.id || user.userId || '');
+                const nameMatch = b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase();
+                const idMatch = myId && bSaleId === myId;
+                if (idMatch || (!myId && nameMatch)) {
+                    myRawBookingsInRange.push(b);
                 }
-            } else if (b.date.includes('-')) {
-                const parts = b.date.split('-');
-                bYear = parts[0];
-                bMonth = parts[1];
-            }
-            if (!bYear || !bMonth) return false;
-            const bMonthStr = `${bYear}-${bMonth}`;
-
-            if (bMonthStr !== monthVal) return false;
-
-            // Nếu là Sale, lưu lại những đơn (mọi status) của chính nó trong tháng để đếm "Tiếp nhận"
-            if (!isAdmin && b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase()) {
-                myRawBookingsInMonth.push(b);
             }
 
-            // Chỉ lấy các đơn đã thành công ("Đã cọc", "Hoàn tất") để tính Doanh thu báo cáo
-            if (!b.status || (!b.status.includes('Đã cọc') && !b.status.includes('Hoàn tất'))) return false;
+            // Chỉ lấy đơn đã thành công để tính DT
+            if (!b.status || (!b.status.includes('Đã cọc') && !b.status.includes('Hoàn tất') && !b.status.includes('Hoàn thành'))) return false;
             return true;
         });
 
-        // Map commission rate to each booking
+        // Map commission rate
         filteredBookings.forEach(b => {
             const tourConf = allTours.find(t => t.name === b.tour);
-            b._rate = tourConf && tourConf.commission_rate !== undefined ? tourConf.commission_rate : 5;
+            b._rate = tourConf?.commission_rate ?? 5;
             b._commission = (b.total_price || 0) * (b._rate / 100);
-            b._saleName = b.sale_name || 'Admin / Tự Đặt';
+
+            // Resolve sale display name by ID (fix for name changes)
+            const saleIdStr = String(b.sale_id || '');
+            if (saleIdStr && userMap[saleIdStr]) {
+                b._displaySaleName = userMap[saleIdStr];
+                b._saleIdStr = saleIdStr;
+            } else {
+                b._displaySaleName = b.sale_name || 'Admin / Tự Đặt';
+                b._saleIdStr = saleIdStr || b.sale_name || 'no-id';
+            }
         });
+
+        const rangeLabel = dateFromInput.value && dateToInput.value
+            ? `${dateFromInput.value.split('-').reverse().join('/')} → ${dateToInput.value.split('-').reverse().join('/')}`
+            : '';
 
         if (isAdmin) {
             renderAdminStats();
-            renderAdminLeaderboard();
+            renderAdminLeaderboard(rangeLabel);
         } else {
-            renderSaleView(myRawBookingsInMonth);
+            renderSaleView(myRawBookingsInRange);
         }
     };
 
-    // --- ADMIN SPECIFIC RENDERS ---
+    // ----- Admin Stats -----
     const renderAdminStats = () => {
         const statDepartures = document.getElementById('stat-departures');
         const statPax = document.getElementById('stat-pax');
         const statRevenue = document.getElementById('stat-revenue');
-
         if (!statDepartures) return;
         const trips = new Set();
         filteredBookings.forEach(b => trips.add(b.tour + '|' + b.date));
-        const totalPax = filteredBookings.length;
-        const totalRev = filteredBookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
-
         statDepartures.textContent = trips.size;
-        statPax.textContent = totalPax;
-        statRevenue.textContent = formatVND(totalRev);
+        statPax.textContent = filteredBookings.length;
+        statRevenue.textContent = formatVND(filteredBookings.reduce((s, b) => s + (Number(b.total_price) || 0), 0));
     };
 
-    const renderAdminLeaderboard = () => {
+    // ----- Admin Leaderboard — Group by sale_id -----
+    const renderAdminLeaderboard = (rangeLabel) => {
         const tbody = document.getElementById('salesTableBody');
         if (!tbody) return;
 
+        // Group by _saleIdStr (which is the sale_id or fallback to sale_name)
         const salesMap = {};
         filteredBookings.forEach(b => {
-            const sName = b._saleName;
-            if (!salesMap[sName]) salesMap[sName] = { name: sName, bookings: [], totalRev: 0, totalComm: 0 };
-            salesMap[sName].bookings.push(b);
-            salesMap[sName].totalRev += (Number(b.total_price) || 0);
-            salesMap[sName].totalComm += b._commission;
+            const key = b._saleIdStr;
+            if (!salesMap[key]) {
+                salesMap[key] = {
+                    key,
+                    name: b._displaySaleName,
+                    bookings: [],
+                    totalRev: 0,
+                    totalComm: 0
+                };
+            }
+            salesMap[key].bookings.push(b);
+            salesMap[key].totalRev += (Number(b.total_price) || 0);
+            salesMap[key].totalComm += b._commission;
         });
 
         let salesArr = Object.values(salesMap).sort((a, b) => b.totalRev - a.totalRev);
         window._currentDetailMode = 'admin';
         window._currentDetailList = salesArr;
+        window._reportRangeLabel = rangeLabel;
 
         if (salesArr.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Chưa có dữ liệu nào trong tháng này.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Chưa có dữ liệu nào trong kỳ này.</td></tr>';
             return;
         }
 
@@ -417,7 +471,6 @@ export const afterRender = () => {
             if (rank === 1) rankHtml = `<div class="w-8 h-8 rounded-full bg-yellow-100 border border-yellow-300 flex items-center justify-center text-yellow-600 font-bold mx-auto text-xs">🥇1</div>`;
             else if (rank === 2) rankHtml = `<div class="w-8 h-8 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-gray-600 font-bold mx-auto text-xs">🥈2</div>`;
             else if (rank === 3) rankHtml = `<div class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-orange-600 font-bold mx-auto text-xs">🥉3</div>`;
-
             return `
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="p-4 border-b border-gray-100">${rankHtml}</td>
@@ -433,23 +486,37 @@ export const afterRender = () => {
         }).join('');
     };
 
+    // ----- Sale View -----
+    const renderSaleView = (myRawBookingsInRange) => {
+        // Tổng tiếp nhận = mọi đơn của mình trong kỳ
+        const totalPaxReceived = myRawBookingsInRange.length;
 
-    // --- SALE SPECIFIC RENDERS ---
-    const renderSaleView = (myRawBookingsInMonth) => {
-        // 1. Chỉ số cá nhân
-        // Tính tổng khách tiếp nhận (bao gồm cả đơn nháp/chờ, v.v)
-        const totalPaxReceived = myRawBookingsInMonth.length;
+        // Đơn hợp lệ (Đã cọc / Hoàn tất) của mình
+        const myId = String(user.id || user.userId || '');
+        const myValidBookings = filteredBookings.filter(b => {
+            const bSaleId = String(b.sale_id || '');
+            const nameMatch = b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase();
+            return myId ? bSaleId === myId : nameMatch;
+        });
 
-        // Lấy riêng list đơn Hợp lệ ("Hoàn tất", "Đã cọc") của mình
-        const myValidBookings = filteredBookings.filter(b => b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase());
-        const totalPaxSuccess = myValidBookings.length;
-        const totalRev = myValidBookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
+        // Khách hoàn thành = status "Hoàn tất" / "Hoàn thành" + ngày khởi hành < hôm nay
+        const myCompletedBookings = myValidBookings.filter(b => {
+            const isFullyPaid = b.status && (b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
+            if (!isFullyPaid) return false;
+            const departDate = parseBookingDate(b.date);
+            return departDate && departDate < today;
+        });
+
+        const totalPaxSuccess = myCompletedBookings.length;
+        const totalRev = myValidBookings.reduce((s, b) => s + (Number(b.total_price) || 0), 0);
+        const totalRealComm = myCompletedBookings.reduce((s, b) => s + b._commission, 0);
 
         document.getElementById('sale-stat-total-pax').textContent = totalPaxReceived;
         document.getElementById('sale-stat-success-pax').textContent = totalPaxSuccess;
         document.getElementById('sale-stat-revenue').textContent = formatVND(totalRev);
+        document.getElementById('sale-stat-real-comm').textContent = formatVND(totalRealComm);
 
-        // 2. Bảng gom theo Tour
+        // Bảng gom theo Tour
         const tbody = document.getElementById('saleTourTableBody');
         if (!tbody) return;
 
@@ -467,7 +534,7 @@ export const afterRender = () => {
         window._currentDetailList = tourArr;
 
         if (tourArr.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Bạn chưa có đơn hàng nào chốt thành công trong tháng này.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Bạn chưa có đơn hàng nào chốt thành công trong kỳ này.</td></tr>';
             return;
         }
 
@@ -485,8 +552,7 @@ export const afterRender = () => {
         `).join('');
     };
 
-
-    // --- MODAL HANDLE ---
+    // ----- Modal -----
     const modal = document.getElementById('saleDetailModal');
     const modalContent = document.getElementById('saleDetailContent');
 
@@ -500,46 +566,47 @@ export const afterRender = () => {
         const item = window._currentDetailList[idx];
         if (!item) return;
 
+        const rangeLabel = window._reportRangeLabel || '';
+
         if (window._currentDetailMode === 'admin') {
-            // ADMIN MODE: Xem lịch sử của Sales
-            document.getElementById('modalSaleName').innerHTML = `Lịch sử đơn của Sale: <span class="text-csr-orange">${item.name}</span>`;
-            document.getElementById('modalMonthText').textContent = `Thống kê Tháng ${monthInput.value}`;
+            document.getElementById('modalSaleName').innerHTML = `Lịch sử đơn của: <span class="text-csr-orange">${item.name}</span>`;
+            document.getElementById('modalMonthText').textContent = `Kỳ: ${rangeLabel}`;
             document.getElementById('modalTotalBookings').textContent = item.bookings.length;
             document.getElementById('modalTotalRevenue').textContent = formatVND(item.totalRev);
             document.getElementById('modalTotalCommission').textContent = formatVND(item.totalComm);
         } else {
-            // SALE MODE: Xem danh sách Khách của Tour
-            document.getElementById('modalSaleName').innerHTML = `Trích xuất đơn chốt - Tuyến Tour: <span class="text-csr-orange">${item.tourName}</span>`;
-            document.getElementById('modalMonthText').textContent = `Kỳ Báo Cáo ${monthInput.value}`;
+            document.getElementById('modalSaleName').innerHTML = `Đơn chốt - Tuyến Tour: <span class="text-csr-orange">${item.tourName}</span>`;
+            document.getElementById('modalMonthText').textContent = `Kỳ Báo Cáo: ${rangeLabel}`;
         }
 
         const tbody = document.getElementById('modalBookingsBody');
-        tbody.innerHTML = item.bookings.map(b => {
-            // Design mới 2 cột cho danh sách (Phần Trái là Khách, Phần Phải là Tiền)
-            return `
-                <tr class="hover:bg-blue-50/20 transition-colors">
-                    <td class="p-4 border-r border-gray-100 border-b align-top">
-                        <div class="font-bold text-gray-900 text-base mb-1">${b.name}</div>
-                        <div class="text-xs text-gray-500 flex items-center gap-1">
-                            Mã số: <span class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-mono tracking-wider">${b.phone || 'N/A'}</span>
+        tbody.innerHTML = item.bookings.map(b => `
+            <tr class="hover:bg-blue-50/20 transition-colors">
+                <td class="p-4 border-r border-gray-100 border-b align-top">
+                    <div class="font-bold text-gray-900 text-base mb-1">${b.name}</div>
+                    <div class="text-xs text-gray-500 flex items-center gap-1">
+                        SĐT: <span class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-mono tracking-wider">${b.phone || 'N/A'}</span>
+                    </div>
+                    ${window._currentDetailMode === 'admin' ? `<div class="text-[10px] text-gray-400 mt-1">Sale: ${b._displaySaleName}</div>` : ''}
+                </td>
+                <td class="p-4 border-b border-gray-100 align-top">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">${b.tour}</span>
+                        <span class="text-xs text-gray-400">Khởi hành: ${b.date}</span>
+                    </div>
+                    <div class="text-xs mb-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${b.status && b.status.includes('Hoàn tất') ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">${b.status || '-'}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm mt-3 border-t border-gray-100 border-dashed pt-3">
+                        <div class="text-gray-500">Giá trị đơn: <span class="font-bold text-gray-900">${formatVND(b.total_price)}</span></div>
+                        <div class="flex gap-4">
+                            <div class="text-gray-500">Tỉ lệ HH: <span class="font-bold text-gray-900">${b._rate}%</span></div>
+                            <div class="text-csr-orange bg-orange-50 px-2 py-0.5 rounded font-black border border-orange-100">+ ${formatVND(b._commission)}</div>
                         </div>
-                    </td>
-                    <td class="p-4 border-b border-gray-100 align-top">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">${b.tour}</span>
-                            <span class="text-xs text-gray-400">Khởi hành: ${b.date}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm mt-3 border-t border-gray-100 border-dashed pt-3">
-                            <div class="text-gray-500">Giá trị đơn: <span class="font-bold text-gray-900">${formatVND(b.total_price)}</span></div>
-                            <div class="flex gap-4">
-                                <div class="text-gray-500">Tỉ lệ HH: <span class="font-bold text-gray-900">${b._rate}%</span></div>
-                                <div class="text-csr-orange bg-orange-50 px-2 py-0.5 rounded font-black border border-orange-100">+ ${formatVND(b._commission)}</div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+                    </div>
+                </td>
+            </tr>
+        `).join('');
 
         modal.classList.remove('hidden');
         requestAnimationFrame(() => {
@@ -549,9 +616,10 @@ export const afterRender = () => {
     };
 
     // Events
-    monthInput.addEventListener('change', () => {
-        processReports();
-    });
+    applyBtn.addEventListener('click', processReports);
+    // Also allow pressing Enter in date inputs
+    dateFromInput.addEventListener('keydown', e => { if (e.key === 'Enter') processReports(); });
+    dateToInput.addEventListener('keydown', e => { if (e.key === 'Enter') processReports(); });
 
     if (modal) {
         modal.addEventListener('click', (e) => {
