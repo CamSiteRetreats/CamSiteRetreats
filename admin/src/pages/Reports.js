@@ -391,20 +391,40 @@ export const afterRender = () => {
             return true;
         });
 
-        // Map commission rate
+        // Map commission rate + resolve canonical sale identity
+        // Build a reverse map: full_name (lowercase) → userId for fallback matching
+        const nameToUserId = {};
+        allUsers.forEach(u => {
+            const name = (u.full_name || u.fullName || '').trim().toLowerCase();
+            if (name) nameToUserId[name] = String(u.id);
+        });
+
         filteredBookings.forEach(b => {
             const tourConf = allTours.find(t => t.name === b.tour);
             b._rate = tourConf?.commission_rate ?? 5;
             b._commission = (b.total_price || 0) * (b._rate / 100);
 
-            // Resolve sale display name by ID (fix for name changes)
-            const saleIdStr = String(b.sale_id || '');
+            const saleIdStr = String(b.sale_id || '').trim();
+
             if (saleIdStr && userMap[saleIdStr]) {
+                // Best case: sale_id exists and matches a user
                 b._displaySaleName = userMap[saleIdStr];
                 b._saleIdStr = saleIdStr;
             } else {
-                b._displaySaleName = b.sale_name || 'Admin / Tự Đặt';
-                b._saleIdStr = saleIdStr || b.sale_name || 'no-id';
+                // Fallback: try to find user by sale_name (handles old bookings with no sale_id
+                // or bookings made when the user had their current name)
+                const saleNameLower = (b.sale_name || '').trim().toLowerCase();
+                const foundUserId = saleNameLower ? nameToUserId[saleNameLower] : null;
+
+                if (foundUserId && userMap[foundUserId]) {
+                    // Matched by name → use canonical userId so it groups with ID-based bookings
+                    b._displaySaleName = userMap[foundUserId];
+                    b._saleIdStr = foundUserId;
+                } else {
+                    // No match at all
+                    b._displaySaleName = b.sale_name || 'Admin / Tự Đặt';
+                    b._saleIdStr = saleIdStr || b.sale_name || 'no-id';
+                }
             }
         });
 
