@@ -280,7 +280,7 @@ const BookingFlow = {
         document.getElementById('bf-terms').checked = false;
         document.getElementById('bf-btn-confirm').classList.add('opacity-50', 'cursor-not-allowed');
         document.getElementById('bf-terms-step3').checked = false;
-        document.getElementById('bf-btn-complete').classList.add('opacity-50', 'cursor-not-allowed');
+        // bf-btn-complete removed (step 3 auto-confirms via polling)
 
         if (this.depositPollInterval) {
             clearInterval(this.depositPollInterval);
