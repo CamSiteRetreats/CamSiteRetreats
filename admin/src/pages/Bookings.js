@@ -678,7 +678,8 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+                // 'Chờ xác nhận cọc' thuộc về tab pending, không được hiện ở đây
+                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && b.status !== 'Chờ xác nhận cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
             } else if (activeTab === 'ready') {
                 tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
             } else if (activeTab === 'completed') {
