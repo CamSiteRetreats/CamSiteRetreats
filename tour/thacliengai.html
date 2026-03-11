@@ -1101,8 +1101,6 @@
             }
         }
 
-        const LIENGAI_DEFAULT_PRICE = 3750000; // Giá mặc định Thác Liêng Ài
-
         function getCurrentTourData() {
             // Use TourManager instead of raw localStorage to ensure defaults and API sync
             const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
@@ -1114,15 +1112,8 @@
             );
 
             if (!currentTour) {
-                currentTour = { id: 3, name: 'Thác Liêng Ài', price: LIENGAI_DEFAULT_PRICE };
+                currentTour = { id: 3, name: 'Thác Liêng Ài', price: null };
             }
-
-            // Đảm bảo price luôn là số hợp lệ (không phải null, 0, 'Update', ...)
-            const numericPrice = parseInt(currentTour.price);
-            if (!numericPrice || isNaN(numericPrice)) {
-                currentTour.price = LIENGAI_DEFAULT_PRICE;
-            }
-
             return currentTour;
         }
 
