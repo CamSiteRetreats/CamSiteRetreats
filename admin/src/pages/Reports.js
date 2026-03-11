@@ -11,7 +11,8 @@ export const render = () => {
     const isAdmin = user.role === 'admin';
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    const toDateStr = today.toISOString().split('T')[0];
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
+    const toDateStr = lastDay.toISOString().split('T')[0];
     const fromDateStr = firstDay.toISOString().split('T')[0];
 
     return `
