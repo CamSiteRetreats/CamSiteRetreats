@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node -e \"require('fs').copyFileSync('index.src.html','index.html')\"",
     "build": "vite build",
+    "postbuild": "node -e \"require('fs').copyFileSync('dist/index.html','index.html');require('fs').cpSync('dist/assets','assets',{recursive:true,force:true})\"",
     "preview": "vite preview"
   },
   "devDependencies": {
