@@ -2047,7 +2047,15 @@ export const afterRender = () => {
                 const phone = document.getElementById('edit-phone').value;
                 const medalName = document.getElementById('edit-medal-name').value;
                 const tour = document.getElementById('edit-tour').value;
-                const date = document.getElementById('edit-date').value;
+                const rawEditDate = document.getElementById('edit-date').value;
+                // Parse "scheduleId::DD/MM/YYYY" format (same as add form)
+                let date = rawEditDate;
+                let editScheduleId = undefined;
+                if (rawEditDate && rawEditDate.includes('::')) {
+                    const parts = rawEditDate.split('::');
+                    editScheduleId = parseInt(parts[0]) || null;
+                    date = parts[1];
+                }
                 const dob = document.getElementById('edit-dob').value;
                 const gender = document.getElementById('edit-gender').value;
                 const status = document.getElementById('edit-status').value;
@@ -2098,7 +2106,9 @@ export const afterRender = () => {
                     total_price: basePrice - discount,
                     discount: discount,
                     deposit: deposit,
-                    deposit_required: deposit_required
+                    deposit_required: deposit_required,
+                    // If a grouped schedule was selected → update schedule_id
+                    ...(editScheduleId !== undefined ? { schedule_id: editScheduleId } : {})
                 };
 
                 // Chỉ Call Update API Bookings
