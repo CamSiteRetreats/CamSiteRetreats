@@ -8,13 +8,6 @@ const TOURS_KEY = 'cam_site_tours';
 const TourManager = {
     // Get all tours from LocalStorage or API
     getAllTours: function () {
-        // Invalidate cache nếu còn chứa .png paths (đã convert sang .jpg)
-        const cached = localStorage.getItem(TOURS_KEY);
-        if (cached && cached.includes('.png')) {
-            localStorage.removeItem(TOURS_KEY);
-            localStorage.removeItem('cam_site_last_fetch');
-            console.log('[TourManager] Cleared stale PNG cache → will reload from API/defaults');
-        }
 
         // Try to fetch from API in background to update cache
         this.fetchToursFromAPI();
