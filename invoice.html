@@ -267,27 +267,45 @@
                 document.getElementById('tour-name').textContent = b.tour || 'Tour Sinh Tồn / Trekking';
                 document.getElementById('tour-date').textContent = b.date || 'Đang cập nhật';
 
+                const hasPrice = b.total_price != null && b.total_price !== 0 && b.total_price !== '0';
                 const total = parseInt(b.total_price) || 0;
                 const discount = parseInt(b.discount) || 0;
                 const basePrice = total + discount;
                 const deposit = parseInt(b.deposit) || 0;
                 const remain = total - deposit;
 
-                document.getElementById('tour-price').textContent = formatVND(basePrice);
-                document.getElementById('base-price').textContent = formatVND(basePrice);
-
-                if (discount > 0) {
-                    const dRow = document.getElementById('discount-row');
-                    const dAmt = document.getElementById('discount-amount');
-                    if (dRow && dAmt) {
-                        dRow.classList.remove('hidden');
-                        dAmt.textContent = '- ' + formatVND(discount);
+                if (!hasPrice) {
+                    document.getElementById('tour-price').textContent = 'Đang cập nhật';
+                    document.getElementById('base-price').textContent = 'Đang cập nhật';
+                    document.getElementById('total-price').textContent = 'Đang cập nhật';
+                    document.getElementById('remaining-price').textContent = 'Đang cập nhật';
+                    
+                    if (discount > 0) {
+                        const dRow = document.getElementById('discount-row');
+                        const dAmt = document.getElementById('discount-amount');
+                        if (dRow && dAmt) {
+                            dRow.classList.remove('hidden');
+                            dAmt.textContent = '- ' + formatVND(discount);
+                        }
                     }
-                }
+                    document.getElementById('deposit-paid').textContent = deposit > 0 ? '- ' + formatVND(deposit) : '- 0đ';
+                } else {
+                    document.getElementById('tour-price').textContent = formatVND(basePrice);
+                    document.getElementById('base-price').textContent = formatVND(basePrice);
 
-                document.getElementById('total-price').textContent = formatVND(total);
-                document.getElementById('deposit-paid').textContent = '- ' + formatVND(deposit);
-                document.getElementById('remaining-price').textContent = remain > 0 ? formatVND(remain) : '0đ';
+                    if (discount > 0) {
+                        const dRow = document.getElementById('discount-row');
+                        const dAmt = document.getElementById('discount-amount');
+                        if (dRow && dAmt) {
+                            dRow.classList.remove('hidden');
+                            dAmt.textContent = '- ' + formatVND(discount);
+                        }
+                    }
+
+                    document.getElementById('total-price').textContent = formatVND(total);
+                    document.getElementById('deposit-paid').textContent = '- ' + formatVND(deposit);
+                    document.getElementById('remaining-price').textContent = remain > 0 ? formatVND(remain) : '0đ';
+                }
 
                 // Gen QR code to self URL
                 const selfUrl = window.location.origin + `/invoice.html?id=${bookingId}`;

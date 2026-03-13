@@ -21,7 +21,14 @@ export async function onRequest(context) {
     try {
         let response;
         if (method === 'GET') {
-            const rows = await sql`SELECT * FROM bookings ORDER BY created_at DESC`;
+            const rows = await sql`
+                SELECT 
+                    b.*,
+                    COALESCE(b.total_price, t.price) AS total_price
+                FROM bookings b
+                LEFT JOIN tours t ON LOWER(TRIM(b.tour)) = LOWER(TRIM(t.name))
+                ORDER BY b.created_at DESC
+            `;
             response = Response.json(rows);
         } else if (method === 'POST') {
             const body = await request.json();
