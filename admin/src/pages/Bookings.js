@@ -859,7 +859,15 @@ export const afterRender = () => {
 
             if (isDetailView) {
                 // =============== LAYOUT 8 CỘT CHI TIẾT ===============
-                const totalPrice = parseInt(b.total_price) || 0;
+                // Auto-fill price from tour list if missing
+                let totalPrice = parseInt(b.total_price) || 0;
+                if (totalPrice === 0 && b.tour && allTours && allTours.length > 0) {
+                    const matchedTour = allTours.find(t => t.name && b.tour && 
+                        t.name.toLowerCase().trim() === b.tour.toLowerCase().trim());
+                    if (matchedTour && parseInt(matchedTour.price) > 0) {
+                        totalPrice = parseInt(matchedTour.price);
+                    }
+                }
                 const depositPrice = parseInt(b.deposit) || 0;
                 const remainPrice = totalPrice - depositPrice;
 
