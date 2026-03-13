@@ -26,9 +26,12 @@ export async function onRequest(context) {
                     (SELECT COUNT(*) FROM bookings b 
                      WHERE b.status NOT IN ('Đã hủy', 'Cancelled')
                      AND (
+                         -- Priority 1: Booking được gắn trực tiếp vào lịch này
                          (b.schedule_id = s.id)
                          OR 
-                         (b.schedule_id IS NULL AND 
+                         -- Fallback: chỉ dùng khi đây là lịch DUY NHẤT trong ngày (không có group_label)
+                         -- Nếu có group_label → chỉ đếm bằng schedule_id, không fallback
+                         (b.schedule_id IS NULL AND s.group_label IS NULL AND
                           (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour) AND 
                           (
                               (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
