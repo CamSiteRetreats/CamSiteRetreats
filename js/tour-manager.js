@@ -8,6 +8,14 @@ const TOURS_KEY = 'cam_site_tours';
 const TourManager = {
     // Get all tours from LocalStorage or API
     getAllTours: function () {
+        // Invalidate cache nếu còn chứa .png paths (đã convert sang .jpg)
+        const cached = localStorage.getItem(TOURS_KEY);
+        if (cached && cached.includes('.png')) {
+            localStorage.removeItem(TOURS_KEY);
+            localStorage.removeItem('cam_site_last_fetch');
+            console.log('[TourManager] Cleared stale PNG cache → will reload from API/defaults');
+        }
+
         // Try to fetch from API in background to update cache
         this.fetchToursFromAPI();
         this.fetchSchedulesFromAPI(); // NEW: Fetch schedules too
@@ -133,7 +141,7 @@ const TourManager = {
 
                 // If bookedCount is missing (legacy/fallback), try local calculation
                 if (booked === undefined) {
-                    const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots);
+                    const availability = this.getScheduleAvailability(tour.name, sch.startDate, sch.slots, sch.id);
                     booked = availability.booked;
                     remaining = availability.remaining;
                 }
@@ -150,7 +158,7 @@ const TourManager = {
     },
 
     // NEW: Calculate real-time availability
-    getScheduleAvailability: function (tourName, startDateStr, maxSlots) {
+    getScheduleAvailability: function (tourName, startDateStr, maxSlots, scheduleId) {
         const bookings = JSON.parse(localStorage.getItem('cam_site_bookings')) || [];
 
         // Helper to extract "DD/MM" from various formats
@@ -180,6 +188,12 @@ const TourManager = {
         const targetDM = getDayMonth(startDateStr);
 
         const bookedCount = bookings.filter(b => {
+            // Priority: Match by scheduleId if available
+            if (scheduleId && b.schedule_id) {
+                return String(b.schedule_id) === String(scheduleId) && b.status !== 'Đã hủy';
+            }
+
+            // Fallback for old bookings: Match by Date and Tour Name
             // Handle Tour Name mismatch (sometimes "Tà Năng" vs "Tà Năng - Phan Dũng")
             const isTourMatch = b.tour && (b.tour === tourName || b.tour.includes(tourName) || tourName.includes(b.tour));
 
@@ -218,9 +232,9 @@ const TourManager = {
             {
                 id: 1,
                 name: 'Tà Năng - Phan Dũng',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.jpg',
+                image2: 'tour/Tanang/thumb2.jpg',
+                image3: 'tour/Tanang/thumb3.jpg',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'TREKKING',
@@ -239,9 +253,9 @@ const TourManager = {
             {
                 id: 2,
                 name: 'Bidoup Tà Giang',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.jpg',
+                image2: 'tour/Tanang/thumb2.jpg',
+                image3: 'tour/Tanang/thumb3.jpg',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'TREKKING',
@@ -259,10 +273,10 @@ const TourManager = {
             {
                 id: 3,
                 name: 'Thác Liêng Ài',
-                image: 'tour/liengai/12.png',
-                image2: 'tour/liengai/3.png',
-                image3: 'tour/liengai/7.png',
-                image4: 'tour/liengai/4.png',
+                image: 'tour/liengai/12.jpg',
+                image2: 'tour/liengai/3.jpg',
+                image3: 'tour/liengai/7.jpg',
+                image4: 'tour/liengai/4.jpg',
                 region: 'Miền Nam',
                 type: 'CANYONING | ZIPLINE',
                 duration: '1 Ngày 1 Đêm',
@@ -277,9 +291,9 @@ const TourManager = {
             {
                 id: 4,
                 name: 'Langbiang',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.jpg',
+                image2: 'tour/Tanang/thumb2.jpg',
+                image3: 'tour/Tanang/thumb3.jpg',
                 image4: null,
                 region: 'Miền Trung',
                 type: 'HIKING',
@@ -295,9 +309,9 @@ const TourManager = {
             {
                 id: 5,
                 name: 'Mũi Kê Gà',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.jpg',
+                image2: 'tour/Tanang/thumb2.jpg',
+                image3: 'tour/Tanang/thumb3.jpg',
                 image4: null,
                 region: 'Miền Nam',
                 type: 'CAMPING',
@@ -313,10 +327,10 @@ const TourManager = {
             {
                 id: 14,
                 name: 'Thác Mưa Bay',
-                image: 'tour/thacmuabay/muabay (3).png',
-                image2: 'tour/thacmuabay/muabay (10).png',
-                image3: 'tour/thacmuabay/muabay (8).png',
-                image4: 'tour/thacmuabay/muabay (2).png',
+                image: 'tour/thacmuabay/muabay (3).jpg',
+                image2: 'tour/thacmuabay/muabay (10).jpg',
+                image3: 'tour/thacmuabay/muabay (8).jpg',
+                image4: 'tour/thacmuabay/muabay (2).jpg',
                 region: 'Miền Nam',
                 type: 'TREKKING',
                 duration: '1 Ngày 1 Đêm',
@@ -332,9 +346,9 @@ const TourManager = {
             {
                 id: 7,
                 name: 'Ky Quan San',
-                image: 'tour/Tanang/thumb1.png',
-                image2: 'tour/Tanang/thumb2.png',
-                image3: 'tour/Tanang/thumb3.png',
+                image: 'tour/Tanang/thumb1.jpg',
+                image2: 'tour/Tanang/thumb2.jpg',
+                image3: 'tour/Tanang/thumb3.jpg',
                 image4: null,
                 region: 'Miền Bắc',
                 type: 'TREKKING',
@@ -532,13 +546,15 @@ const TourManager = {
         };
 
         if (images.length <= 1) {
-            return `<img src="${resolvePath(tour.image)}" loading="lazy" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
+            return `<img src="${resolvePath(tour.image)}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
         }
 
         let imgsHTML = '';
         images.forEach((img, index) => {
             const resolvedImg = resolvePath(img);
-            imgsHTML += `<img src="${resolvedImg}" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
+            // Ảnh đầu tiên: eager (hiển thị ngay khi card xuất hiện), còn lại lazy
+            const loadAttr = index === 0 ? 'loading="eager"' : 'loading="lazy"';
+            imgsHTML += `<img src="${resolvedImg}" ${loadAttr} decoding="async" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
         });
 
         return `<div class="slideshow absolute inset-0">${imgsHTML}</div>`;

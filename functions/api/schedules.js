@@ -24,15 +24,21 @@ export async function onRequest(context) {
                 SELECT 
                     s.*, 
                     (SELECT COUNT(*) FROM bookings b 
-                     WHERE (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour)
-                     AND b.status NOT IN ('Đã hủy', 'Cancelled')
+                     WHERE b.status NOT IN ('Đã hủy', 'Cancelled')
                      AND (
-                         (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR
-                         (b.date LIKE '%' || TO_CHAR(s.start_date, 'FMDD/FMMM') || '%') OR
-                         (b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || ' - %') OR
-                         (b.date LIKE '% - ' || TO_CHAR(s.start_date, 'FMDD/FMMM')) OR
-                         (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
+                         (b.schedule_id = s.id)
+                         OR 
+                         (b.schedule_id IS NULL AND 
+                          (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour) AND 
+                          (
+                              (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
+                              (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR
+                              (b.date LIKE '%' || TO_CHAR(s.start_date, 'FMDD/FMMM') || '%') OR
+                              (b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || ' - %') OR
+                              (b.date LIKE '% - ' || TO_CHAR(s.start_date, 'FMDD/FMMM')) OR
+                              (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
+                          )
+                         )
                      )
                     ) as booked_count
                 FROM schedules s

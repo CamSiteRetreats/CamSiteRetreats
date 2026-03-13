@@ -174,6 +174,7 @@ export const afterRender = async () => {
     const params = new URLSearchParams(window.location.search);
     const targetTour = params.get('tour') || '';
     const targetDateStr = params.get('date') || ''; // Ex: 2025-03-01
+    const targetScheduleId = params.get('scheduleId') || '';
     let targetDateFormated = targetDateStr;
 
     // Convert to DD/MM/YYYY for title and robust comparison
@@ -326,6 +327,12 @@ export const afterRender = async () => {
 
             // Lọc theo Tour và Ngày (so sánh linh hoạt: range, no-year, chuẩn)
             allBookings = data.filter(b => {
+                // Priority: If we have a targetScheduleId, and the booking has a schedule_id, they must match
+                if (targetScheduleId && b.schedule_id) {
+                    return String(b.schedule_id) === String(targetScheduleId);
+                }
+
+                // Fallback / legacy matching:
                 let mTour = true, mDate = true;
                 if (targetTour) {
                     const normB = normalizeText(b.tour);
