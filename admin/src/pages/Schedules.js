@@ -98,6 +98,11 @@ export const render = () => {
                               </select>
                           </div>
                       </div>
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Nhãn Nhóm <span class="text-gray-400 normal-case font-normal">(tùy chọn, dùng khi có 2+ nhóm cùng ngày)</span></label>
+                          <input type="text" id="sch-group-label" class="input-field bg-blue-50/50 font-bold text-blue-700 border-blue-200" placeholder="VD: Nhóm 1, VIP, Budget...">
+                          <p class="text-[10px] text-gray-400 mt-1 italic">Nhập nhãn nếu mở nhiều đoàn cùng ngày để phân biệt trong form đặt chỗ.</p>
+                      </div>
                       <div class="pt-3 flex gap-3">
                           <button type="button" id="cancelScheduleBtn" class="flex-1 px-6 py-3 border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-all">
                               Hủy
@@ -140,6 +145,7 @@ export const afterRender = () => {
             document.getElementById('sch-end-date').value = safeDate(editData.end_date);
             document.getElementById('sch-slots').value = editData.slots;
             document.getElementById('sch-status').value = editData.status || 'Đang mở';
+            document.getElementById('sch-group-label').value = editData.group_label || '';
         } else {
             title.textContent = 'Thêm Lịch Khởi Hành';
             scheduleForm.reset();
@@ -292,6 +298,11 @@ export const afterRender = () => {
             const remaining = Math.max(0, slots - booked);
             const percent = slots > 0 ? Math.min(100, Math.round((booked / slots) * 100)) : 0;
 
+            // Group label badge
+            const groupBadge = item.group_label
+                ? `<span class="ml-2 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border bg-blue-50 text-blue-600 border-blue-200">${item.group_label}</span>`
+                : '';
+
             // Auto-detect status
             let status = item.status || 'Đang mở';
             if (remaining <= 0) status = 'Hết chỗ';
@@ -315,7 +326,7 @@ export const afterRender = () => {
                                 <div class="text-xl font-black">${dayMonth}</div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-bold text-gray-900 mb-1 tracking-wide truncate">${item.tour_name}</h3>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1 tracking-wide truncate">${item.tour_name}${groupBadge}</h3>
                                 <div class="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                                     <span class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -410,7 +421,8 @@ export const afterRender = () => {
             start_date: document.getElementById('sch-start-date').value,
             end_date: document.getElementById('sch-end-date').value,
             slots: parseInt(document.getElementById('sch-slots').value),
-            status: document.getElementById('sch-status').value
+            status: document.getElementById('sch-status').value,
+            group_label: document.getElementById('sch-group-label').value.trim() || null
         };
 
         try {

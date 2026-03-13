@@ -32,7 +32,7 @@ export async function onRequest(context) {
                 const possibleFields = [
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit', 'discount',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
-                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required'
+                    'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required', 'schedule_id'
                 ];
 
                 const fields = [];
@@ -59,16 +59,16 @@ export async function onRequest(context) {
                 const {
                     name, phone, tour, date, status, total_price, deposit, discount,
                     sale_id, sale_name, customer_id, dob, gender, address,
-                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
+                    id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, schedule_id
                 } = body;
 
                 const query = `
                     INSERT INTO bookings (
                         name, phone, tour, date, status, total_price, deposit, discount,
                         sale_id, sale_name, customer_id, dob, gender, address, 
-                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required
+                        id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required, schedule_id
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
                     RETURNING *
                 `;
                 const values = [
@@ -76,7 +76,7 @@ export async function onRequest(context) {
                     total_price ?? null, deposit ?? null, discount ?? 0, sale_id ?? null, sale_name ?? null,
                     customer_id ?? null, dob ?? null, gender ?? null, address ?? null, id_card ?? null,
                     diet ?? null, trekking_pole ?? null, allergy ?? null, special ?? null,
-                    medal_name ?? null, commitments ?? null, deposit_required ?? 1000000
+                    medal_name ?? null, commitments ?? null, deposit_required ?? 1000000, schedule_id ?? null
                 ];
 
                 const rows = await sql.query(query, values);

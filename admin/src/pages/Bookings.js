@@ -542,7 +542,7 @@ export const afterRender = () => {
             });
     };
 
-    const populateDateDropdown = (dateSelectId, tourName, currentDateVal) => {
+    const populateDateDropdown = (dateSelectId, tourName, currentDateVal, currentScheduleId) => {
         const dateSelect = document.getElementById(dateSelectId);
         if (!dateSelect) return;
         dateSelect.innerHTML = '<option value="">-- Chọn Lịch --</option>';
@@ -571,35 +571,68 @@ export const afterRender = () => {
                 const eDate = s.end_date ? new Date(s.end_date) : null;
                 const fmtDate = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 
+                // Label: "30/04 - 01/05 · Nhóm 1 (5 chỗ trống)"
                 let label = fmtDate(sDate);
                 if (eDate) label += ' - ' + fmtDate(eDate);
+                if (s.group_label) label += ` · ${s.group_label}`;
                 label += ` (${remaining >= 0 ? remaining : 0} chỗ trống)`;
 
                 const opt = document.createElement('option');
-                // Value = format giống với booking.date (DD/MM/YYYY)
-                opt.value = `${sDate.getDate().toString().padStart(2, '0')}/${(sDate.getMonth() + 1).toString().padStart(2, '0')}/${sDate.getFullYear()}`;
+                // Value = "scheduleId::DD/MM/YYYY" — phân biệt 2 lịch cùng ngày
+                const dateStr = `${sDate.getDate().toString().padStart(2, '0')}/${(sDate.getMonth() + 1).toString().padStart(2, '0')}/${sDate.getFullYear()}`;
+                opt.value = `${s.id}::${dateStr}`;
+                opt.dataset.scheduleId = s.id;
+                opt.dataset.date = dateStr;
                 opt.textContent = label;
+
                 if (remaining <= 0) {
                     opt.disabled = true;
                     opt.textContent = label.replace('chỗ trống', 'HẾT CHỖ');
                 }
-                // Auto-select nếu match giá trị hiện tại
-                if (currentDateVal && opt.value === currentDateVal) opt.selected = true;
+                // Auto-select: ưu tiên match schedule_id, fallback match date
+                if (currentScheduleId && String(s.id) === String(currentScheduleId)) {
+                    opt.selected = true;
+                } else if (!currentScheduleId && currentDateVal && dateStr === currentDateVal) {
+                    opt.selected = true;
+                }
                 dateSelect.appendChild(opt);
             });
     };
 
-    // Gắn event: khi chọn tour → cập nhật dropdown ngày
+
+    // Gắn event: khi chọn tour → cập nhật dropdown ngày + auto-fill giá từ quản lý tour
     const addTourSelect = document.getElementById('addTourName');
     if (addTourSelect) {
         addTourSelect.addEventListener('change', (e) => {
-            populateDateDropdown('addTourDate', e.target.value);
+            const tourName = e.target.value;
+            populateDateDropdown('addTourDate', tourName);
+            // Auto-fill giá từ danh sách tour (admin_tours)
+            const selectedTour = allTours.find(t => t.name === tourName);
+            const pIn = document.getElementById('addTourPrice');
+            if (selectedTour && pIn) {
+                const tourPrice = parseInt(selectedTour.price) || 0;
+                pIn.value = tourPrice;
+                // Cập nhật hiển thị tổng tiền
+                const dIn = document.getElementById('addDiscount');
+                const tDisp = document.getElementById('addTotalPriceDisplay');
+                const discount = parseInt(dIn ? dIn.value : 0) || 0;
+                const total = tourPrice - discount;
+                if (tDisp) tDisp.textContent = (total > 0 ? total : 0).toLocaleString('vi-VN') + 'đ';
+            }
         });
     }
     const editTourSelect = document.getElementById('edit-tour');
     if (editTourSelect) {
         editTourSelect.addEventListener('change', (e) => {
-            populateDateDropdown('edit-date', e.target.value);
+            const tourName = e.target.value;
+            populateDateDropdown('edit-date', tourName);
+            // Auto-fill giá vào form edit nếu giá hiện tại = 0
+            const selectedTour = allTours.find(t => t.name === tourName);
+            const editTotalInput = document.getElementById('edit-total');
+            if (selectedTour && editTotalInput && (parseInt(editTotalInput.value) === 0 || !editTotalInput.value)) {
+                editTotalInput.value = parseInt(selectedTour.price) || 0;
+                if (typeof window.updateEditRemaining === 'function') window.updateEditRemaining();
+            }
         });
     }
 
@@ -1365,7 +1398,7 @@ export const afterRender = () => {
         // Tour & Lịch trình (populate dropdown date theo tour)
         document.getElementById('edit-tour').value = booking.tour || '';
         if (typeof populateDateDropdown === 'function') {
-            populateDateDropdown('edit-date', booking.tour || '', booking.date || '');
+            populateDateDropdown('edit-date', booking.tour || '', booking.date || '', booking.schedule_id || null);
         }
 
         // Các trường mở rộng - LUÔN ƯU TIÊN LẤY TỪ CRM NẾU TRỐNG
@@ -1436,7 +1469,16 @@ export const afterRender = () => {
         }
 
         // Tài chính
-        document.getElementById('edit-total').value = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+        const existingTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+        // Nếu đơn chưa có giá (total_price = 0 hoặc null), tự động look up giá từ tour
+        let fillTotal = existingTotal;
+        if (fillTotal === 0 && booking.tour) {
+            const matchedTour = allTours.find(t => t.name === booking.tour);
+            if (matchedTour && parseInt(matchedTour.price) > 0) {
+                fillTotal = parseInt(matchedTour.price);
+            }
+        }
+        document.getElementById('edit-total').value = fillTotal;
         document.getElementById('edit-discount').value = booking.discount || 0;
         document.getElementById('edit-deposit').value = booking.deposit || 0;
         document.getElementById('edit-deposit-required').value = booking.deposit_required || 1000000;
@@ -1817,16 +1859,7 @@ export const afterRender = () => {
     if (pInput) pInput.addEventListener('input', updateCalculatedTotal);
     if (dInput) dInput.addEventListener('input', updateCalculatedTotal);
 
-    if (tSelect) {
-        tSelect.addEventListener('change', (e) => {
-            const tourName = e.target.value;
-            const selectedTour = allTours.find(t => t.name === tourName);
-            if (selectedTour && pInput) {
-                pInput.value = selectedTour.price || 0;
-                updateCalculatedTotal();
-            }
-        });
-    }
+    // NOTE: Event listener auto-fill giá đã được gắn ở block trên (addTourSelect / editTourSelect)
 
     // Nút Search Btn (Trigger Smart Search Manual)
     const searchBtn = document.getElementById('searchBtn');
@@ -1854,7 +1887,16 @@ export const afterRender = () => {
                 const fullName = document.getElementById('addFullName').value;
                 const phone = document.getElementById('addPhone').value;
                 const tourName = document.getElementById('addTourName').value;
-                const tourDate = document.getElementById('addTourDate').value;
+                const rawTourDate = document.getElementById('addTourDate').value;
+
+                // Parse value dạng "scheduleId::DD/MM/YYYY" hoặc thuần "DD/MM/YYYY" (backward compat)
+                let scheduleId = null;
+                let tourDate = rawTourDate;
+                if (rawTourDate && rawTourDate.includes('::')) {
+                    const parts = rawTourDate.split('::');
+                    scheduleId = parseInt(parts[0]) || null;
+                    tourDate = parts[1];
+                }
 
                 // Thu thập các trường chi tiết mới
                 const dob = document.getElementById('addDob').value;
@@ -1899,6 +1941,7 @@ export const afterRender = () => {
                     customer_id: csrCode,
                     deposit_required: depositRequired,
                     commitments: true,
+                    schedule_id: scheduleId,  // ID lịch cụ thể để phân biệt đoàn cùng ngày
                     // Gán các trường chi tiết
                     dob: dob,
                     gender: gender,
