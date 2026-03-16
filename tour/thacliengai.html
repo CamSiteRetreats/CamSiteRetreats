@@ -1101,19 +1101,64 @@
             }
         }
 
+        // Biến lưu dữ liệu tour lấy trực tiếp từ API (không qua localStorage)
+        window._liengAiTourData = null;
+
+        // Fetch tour từ API DB để lấy giá chính xác (không dùng localStorage)
+        async function fetchTourDataFromAPI() {
+            try {
+                const res = await fetch('/api/tours?t=' + Date.now());
+                if (!res.ok) throw new Error('API Error ' + res.status);
+                const tours = await res.json();
+
+                // Tìm Tour Thác Liêng Ài trong kết quả từ DB
+                const matchingTours = tours.filter(t =>
+                    (t.name && t.name.toLowerCase().includes('li\u00eang \u00e0i')) ||
+                    (t.url && t.url.toLowerCase().includes('thacliengai'))
+                );
+
+                // Ưu tiên tour có giá hợp lệ (> 0 và không phải 'Update')
+                let found = matchingTours.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
+                if (!found && matchingTours.length > 0) found = matchingTours[0];
+
+                if (found) {
+                    window._liengAiTourData = found;
+                    console.log('[ThacLiengAi] Giá từ DB:', found.price, '/ Tên:', found.name);
+
+                    // Cập nhật ngay giá hiển thị trên trang
+                    const formattedPrice = TourManager.formatPrice(found.price);
+                    const priceDisplay = document.getElementById('tour-price-display');
+                    const mobilePriceDisplay = document.getElementById('mobile-tour-price-display');
+                    if (priceDisplay) priceDisplay.textContent = formattedPrice;
+                    if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
+                }
+            } catch (err) {
+                console.warn('[ThacLiengAi] Không fetch được API tours:', err);
+            }
+        }
+
         function getCurrentTourData() {
-            // Use TourManager instead of raw localStorage to ensure defaults and API sync
+            // Ưu tiên 1: Dữ liệu fresh từ API vừa fetch
+            if (window._liengAiTourData) {
+                return window._liengAiTourData;
+            }
+
+            // Ưu tiên 2: Thử tìm trong TourManager (localStorage cache)
             const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
-            let currentTour = tours.find(t =>
-                t.id == 3 || // Thác Liêng Ài Default ID
-                t.name === 'Thác Liêng Ài' ||
-                (t.url && t.url.includes('thacliengai')) ||
-                (t.custom_domain && t.custom_domain.includes('thacliengai'))
+            const matchingTours = tours.filter(t =>
+                (t.name && t.name.toLowerCase().includes('li\u00eang \u00e0i')) ||
+                (t.url && t.url.toLowerCase().includes('thacliengai'))
             );
 
+            let currentTour = matchingTours.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
+            if (!currentTour && matchingTours.length > 0) currentTour = matchingTours[0];
+
+            // Fallback cuối: trả object rỗng không có hardcode giá
+            // (sẽ hiện Chưa định giá trên hóa đơn -- đúng hơn là sai giá)
             if (!currentTour) {
-                currentTour = { id: 3, name: 'Thác Liêng Ài', price: null };
+                currentTour = { id: 3, name: 'Th\u00e1c Li\u00eang \u00c0i', price: null };
             }
+
             return currentTour;
         }
 
@@ -1126,9 +1171,14 @@
 
             const currentTour = getCurrentTourData();
 
+            if (!currentTour.price || currentTour.price === 'Update') {
+                console.warn('[ThacLiengAi] Giá tour chưa xác định, sẽ ghi null vào DB.');
+            }
+
             if (window.BookingFlow) {
-                // Pass correct Name, Price, and Date
-                window.BookingFlow.open(currentTour.name, currentTour.price, dateStr);
+                // Truyền giá từ DB (hoặc null nếu chưa thiết lập)
+                const priceToSend = (currentTour.price && currentTour.price !== 'Update') ? parseFloat(currentTour.price) : null;
+                window.BookingFlow.open(currentTour.name, priceToSend, dateStr);
             } else {
                 alert('Lỗi: Không tìm thấy module BookingFlow. Vui lòng tải lại trang.');
             }
@@ -1136,6 +1186,9 @@
 
         // Initialize Data & Recommendations
         document.addEventListener('DOMContentLoaded', () => {
+            // Fetch giá từ API DB ngay khi trang load (ưu tiên DB hơn localStorage)
+            fetchTourDataFromAPI();
+
             loadTourOptions();
             filterSchedules(); // Initial load
 
@@ -1176,7 +1229,7 @@
                 if (priceDisplay) priceDisplay.textContent = formattedPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
             } else {
-                const defaultPrice = '3.200.000đ';
+                const defaultPrice = '3.750.000đ';
                 if (priceDisplay) priceDisplay.textContent = defaultPrice;
                 if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
             }

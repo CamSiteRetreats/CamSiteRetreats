@@ -24,6 +24,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Preload ảnh hero lớn nhất để tải tài nguyên nhanh hơn, tránh chờ quá lâu -->
+    <link rel="preload" as="image" href="anhbia.jpg">
+
     <script src="js/tour-manager.js?v=2"></script>
     <script src="js/ui-components.js?v=2"></script>
     <style>
@@ -162,13 +166,13 @@
         .hero-img-wrap {
             position: absolute;
             inset: 0;
-            background: #1a1008;
+            background: #e4dcd3; /* Thay thế màu đen kịt bằng màu be sáng mềm mại */
         }
         .hero-img-wrap::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, #1a1008 0%, #2d1c0e 40%, #1a1008 80%);
+            background: linear-gradient(90deg, #e4dcd3 0%, #f4eee9 40%, #e4dcd3 80%);
             background-size: 200% 100%;
             animation: heroShimmer 1.8s infinite;
             z-index: 1;

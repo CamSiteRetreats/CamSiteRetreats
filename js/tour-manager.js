@@ -538,16 +538,22 @@ const TourManager = {
             return path;
         };
 
+        const skeletonHTML = `<div class="absolute inset-0 bg-[#e4dcd3] animate-pulse skeleton-layer" style="z-index: 0;"></div>`;
+
         if (images.length <= 1) {
-            return `<img src="${resolvePath(tour.image)}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">`;
+            return `
+                ${skeletonHTML}
+                <img src="${resolvePath(tour.image)}" loading="lazy" decoding="async" onload="if(this.previousElementSibling) this.previousElementSibling.style.display='none'" class="relative w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" style="z-index: 1;" alt="${tour.name}">
+            `;
         }
 
-        let imgsHTML = '';
+        let imgsHTML = skeletonHTML;
         images.forEach((img, index) => {
             const resolvedImg = resolvePath(img);
             // Ảnh đầu tiên: eager (hiển thị ngay khi card xuất hiện), còn lại lazy
             const loadAttr = index === 0 ? 'loading="eager"' : 'loading="lazy"';
-            imgsHTML += `<img src="${resolvedImg}" ${loadAttr} decoding="async" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" alt="${tour.name} ${index + 1}">`;
+            const onloadAttr = index === 0 ? `onload="const skel = this.parentElement.querySelector('.skeleton-layer'); if(skel) skel.style.display='none';"` : '';
+            imgsHTML += `<img src="${resolvedImg}" ${loadAttr} ${onloadAttr} decoding="async" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 ${index === 0 ? 'opacity-100' : 'opacity-0'}" style="z-index: 1;" alt="${tour.name} ${index + 1}">`;
         });
 
         return `<div class="slideshow absolute inset-0">${imgsHTML}</div>`;

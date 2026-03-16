@@ -402,7 +402,7 @@ const BookingFlow = {
             phone: this.bookingData.phone,
             tour: this.tourData.name,
             date: this.selectedDate,
-            total_price: this.tourData.price || 0,
+            total_price: this.tourData.price || null,
             deposit_required: 1000000,
             status: "Chờ xác nhận cọc",
             dob: this.bookingData.dob,
