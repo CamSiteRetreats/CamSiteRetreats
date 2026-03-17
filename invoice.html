@@ -267,8 +267,26 @@
                 document.getElementById('tour-name').textContent = b.tour || 'Tour Sinh Tồn / Trekking';
                 document.getElementById('tour-date').textContent = b.date || 'Đang cập nhật';
 
-                const hasPrice = b.total_price != null && b.total_price !== 0 && b.total_price !== '0';
-                const total = parseInt(b.total_price) || 0;
+                let total = parseInt(b.total_price) || 0;
+
+                // Auto-fill price from tour list if missing
+                if (total === 0 && b.tour) {
+                    try {
+                        const toursRes = await fetch('/api/tours');
+                        if (toursRes.ok) {
+                            const allTours = await toursRes.json();
+                            const matchedTour = allTours.find(t => t.name && 
+                                t.name.toLowerCase().trim() === b.tour.toLowerCase().trim());
+                            if (matchedTour && parseInt(matchedTour.price) > 0) {
+                                total = parseInt(matchedTour.price);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Lỗi tự động điền giá tour:', e);
+                    }
+                }
+
+                const hasPrice = total > 0;
                 const discount = parseInt(b.discount) || 0;
                 const basePrice = total + discount;
                 const deposit = parseInt(b.deposit) || 0;
