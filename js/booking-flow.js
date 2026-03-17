@@ -29,7 +29,7 @@ const BookingFlow = {
                     <!-- Header -->
                     <div class="flex items-center justify-between p-6 border-b border-gray-100">
                         <div>
-                            <h3 class="text-xl font-black text-gray-800 uppercase" id="bf-modal-title">Đăng ký Tour</h3>
+                            <h3 class="text-xl font-black text-gray-800 uppercase" id="bf-modal-title">Yêu cầu tư vấn Tour</h3>
                             <p class="text-sm font-medium text-gray-500 mt-1" id="bf-tour-name">...</p>
                         </div>
                         <button onclick="BookingFlow.close()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -39,25 +39,20 @@ const BookingFlow = {
 
                     <!-- Stepper -->
                     <div class="px-8 mt-6">
-                        <div class="flex items-center justify-between relative">
+                        <div class="flex items-center justify-center relative">
                             <!-- Horizontal Line under numbers -->
-                            <div class="absolute left-[10%] right-[10%] top-[calc(1rem+8px)] h-0.5 bg-gray-100 -z-10 rounded-full"></div>
-                            <div id="bf-progress-bar" class="absolute left-[10%] right-[10%] top-[calc(1rem+8px)] h-0.5 bg-primary -z-10 transition-all duration-300 rounded-full" style="width: 0%"></div>
+                            <div class="absolute left-[20%] right-[20%] top-[calc(1rem+8px)] h-0.5 bg-gray-100 -z-10 rounded-full"></div>
+                            <div id="bf-progress-bar" class="absolute left-[20%] right-[20%] top-[calc(1rem+8px)] h-0.5 bg-primary -z-10 transition-all duration-300 rounded-full" style="width: 0%"></div>
                             
                             <!-- Step 1 -->
-                            <div class="flex flex-col items-center gap-2 relative z-10 bg-white px-2">
+                            <div class="flex flex-col items-center gap-2 relative z-10 bg-white px-8">
                                 <div id="bf-step-1-circle" class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-md transition-colors">1</div>
                                 <span class="text-[10px] font-bold text-gray-500 uppercase">Thông tin</span>
                             </div>
                             <!-- Step 2 -->
-                            <div class="flex flex-col items-center gap-2 relative z-10 bg-white px-2">
+                            <div class="flex flex-col items-center gap-2 relative z-10 bg-white px-8">
                                 <div id="bf-step-2-circle" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm transition-colors">2</div>
                                 <span class="text-[10px] font-bold text-gray-400 uppercase">Xác nhận</span>
-                            </div>
-                            <!-- Step 3 -->
-                            <div class="flex flex-col items-center gap-2 relative z-10 bg-white px-2">
-                                <div id="bf-step-3-circle" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm transition-colors">3</div>
-                                <span class="text-[10px] font-bold text-gray-400 uppercase">Thanh toán</span>
                             </div>
                         </div>
                     </div>
@@ -115,7 +110,7 @@ const BookingFlow = {
                         <!-- STEP 2: CONFIRMATION -->
                         <div id="bf-step-2-content" class="hidden space-y-6 animate-[fadeIn_0.3s_ease-out]">
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
-                                <h4 class="text-sm font-black text-gray-800 uppercase border-b border-gray-200 pb-2">Xác Nhận Đơn Hàng</h4>
+                                <h4 class="text-sm font-black text-gray-800 uppercase border-b border-gray-200 pb-2">Xác Nhận Yêu Cầu</h4>
                                 
                                 <div class="flex justify-between text-sm">
                                     <span class="font-medium text-gray-500">Khách hàng:</span>
@@ -134,12 +129,8 @@ const BookingFlow = {
                                 </div>
                                 
                                 <div class="flex justify-between text-sm items-center mt-2 pt-2 border-t border-gray-200">
-                                    <span class="font-bold text-gray-500 uppercase text-xs">Tổng tiền Tour:</span>
+                                    <span class="font-bold text-gray-500 uppercase text-xs">Giá tour:</span>
                                     <span class="font-black text-xl text-gray-800" id="bf-confirm-price">...</span>
-                                </div>
-                                <div class="flex justify-between text-sm items-center mt-1">
-                                    <span class="font-bold text-gray-500 uppercase text-xs">Cọc trước đăng ký:</span>
-                                    <span class="font-black text-xl text-orange-500">1.000.000đ</span>
                                 </div>
                             </div>
 
@@ -158,63 +149,8 @@ const BookingFlow = {
                                     Quay Lại
                                 </button>
                                 <button onclick="BookingFlow.handleStep2Submit()" id="bf-btn-confirm" class="w-2/3 bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-primary/20 opacity-50 cursor-not-allowed">
-                                    Thanh Toán Cọc
+                                    Gửi Yêu Cầu
                                 </button>
-                            </div>
-                        </div>
-
-                        <!-- STEP 3: PAYMENT -->
-                        <div id="bf-step-3-content" class="hidden space-y-6 animate-[fadeIn_0.3s_ease-out]">
-                            <div class="text-center space-y-2">
-                                <h4 class="text-lg font-black text-gray-800 uppercase">Thanh Toán Chuyển Khoản</h4>
-                                <p class="text-sm font-medium text-gray-500">Vui lòng thanh toán số tiền cọc để giữ chỗ cho chuyến đi này.</p>
-                            </div>
-
-                            <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                                <!-- Deposit Amount Box -->
-                                <div class="bg-white px-8 py-3 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col items-center w-full">
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Số tiền cọc</span>
-                                    <span class="text-3xl font-black text-primary" id="bf-deposit-amount">1.000.000đ</span>
-                                </div>
-
-                                <!-- QR Code Container -->
-                                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 w-48 h-48 flex items-center justify-center mb-6 relative overflow-hidden" id="bf-qr-container">
-                                    <!-- QR Image will be injected here -->
-                                    <div class="animate-pulse flex space-x-4">
-                                        <div class="rounded bg-gray-200 h-32 w-32"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Bank Details Transfer -->
-                                <div class="w-full space-y-3 bg-white p-4 rounded-xl border border-gray-100 mb-6">
-                                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition" onclick="BookingFlow.copyText('96247CAMSITERETREAT', 'Số tài khoản')">
-                                        <div>
-                                            <p class="text-[10px] uppercase font-bold text-gray-400 mb-0.5">Số tài khoản (BIDV)</p>
-                                            <p class="font-bold text-gray-800">96247CAMSITERETREAT</p>
-                                        </div>
-                                        <i data-lucide="copy" class="w-5 h-5 text-gray-400"></i>
-                                    </div>
-
-                                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition" onclick="BookingFlow.copyText(document.getElementById('bf-transfer-content').innerText, 'Nội dung CK')">
-                                        <div>
-                                            <p class="text-[10px] uppercase font-bold text-gray-400 mb-0.5">Nội dung chuyển khoản</p>
-                                            <p class="font-bold text-gray-800" id="bf-transfer-content">...</p>
-                                        </div>
-                                        <i data-lucide="copy" class="w-5 h-5 text-gray-400"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Terms and Policies (Step 3) -->
-                                <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex gap-3 items-start w-full text-left mb-6">
-                                    <div class="mt-0.5">
-                                        <input type="checkbox" id="bf-terms-step3" class="w-5 h-5 accent-primary cursor-pointer border-gray-300">
-                                    </div>
-                                    <label for="bf-terms-step3" class="text-[12px] text-gray-600 font-medium leading-relaxed cursor-pointer select-none">
-                                        Tôi đã đọc và đồng ý với <a href="../chinh-sach.html#an-toan" target="_blank" class="text-primary font-bold hover:underline">Quy định an toàn</a>, <a href="../chinh-sach.html#mien-tru" target="_blank" class="text-primary font-bold hover:underline">Miễn trừ trách nhiệm</a> và <a href="../chinh-sach.html#hoan-huy" target="_blank" class="text-primary font-bold hover:underline">Chính sách hủy/hoàn tour</a> của CAM SITE RETREATS.
-                                    </label>
-                                </div>
-
-                                <p class="text-xs text-gray-400 font-medium italic mt-3 text-center">Hệ thống sẽ tự động xác nhận và chuyển hướng khi nhận được thanh toán.</p>
                             </div>
                         </div>
 
@@ -223,10 +159,10 @@ const BookingFlow = {
                             <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <i data-lucide="check-circle-2" class="w-12 h-12 text-green-500"></i>
                             </div>
-                            <h3 class="text-2xl font-black text-gray-800 uppercase">Đăng Ký Thành Công!</h3>
+                            <h3 class="text-2xl font-black text-gray-800 uppercase">Gửi Yêu Cầu Thành Công!</h3>
                             <p class="text-gray-500 font-medium leading-relaxed max-w-sm mx-auto">
-                                Cảm ơn <span id="bf-success-name" class="font-bold text-gray-800">...</span>.<br>
-                                Hệ thống đã ghi nhận đơn đăng ký của bạn. Bộ phận vận hành sẽ liên hệ qua SĐT để xác nhận đơn cọc và gửi thông tin chi tiết về chuyến đi.
+                                Cảm ơn <span id="bf-success-name" class="font-bold text-gray-800">...</span> đã quan tâm.<br>
+                                Đội ngũ tư vấn của CAM SITE RETREATS sẽ liên hệ với bạn trong thời gian sớm nhất để trao đổi chi tiết về chuyến đi.
                             </p>
                             <button onclick="BookingFlow.close()" class="bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors mt-4">
                                 Đóng
@@ -334,9 +270,6 @@ const BookingFlow = {
         } else if (step === 2) {
             document.getElementById('bf-step-2-content').classList.remove('hidden');
             this.renderConfirmation();
-        } else if (step === 3) {
-            document.getElementById('bf-step-3-content').classList.remove('hidden');
-            this.renderPayment();
         }
 
         if (typeof lucide !== 'undefined') {
@@ -403,8 +336,7 @@ const BookingFlow = {
             tour: this.tourData.name,
             date: this.selectedDate,
             total_price: this.tourData.price || null,
-            deposit_required: 1000000,
-            status: "Chờ xác nhận cọc",
+            status: "Chờ tư vấn", // Đổi từ "Chờ xác nhận cọc"
             dob: this.bookingData.dob,
             id_card: this.bookingData.idCard,
             address: this.bookingData.address,
@@ -447,99 +379,36 @@ const BookingFlow = {
             if (!res.ok) throw new Error('API Error');
             const savedBooking = await res.json();
 
-            // Save Real DB ID to generate Accurate SePay Code
-            this.bookingDbId = savedBooking.id;
-
             btn.innerText = ogText;
             btn.disabled = false;
-            this.setStep(3);
+
+            // Show Success instead of Step 3
+            document.getElementById('bf-step-2-content').classList.add('hidden');
+            document.getElementById('bf-success-name').textContent = this.bookingData.name;
+            document.getElementById('bf-success-content').classList.remove('hidden');
+            
+            // Update Stepper to completed state for all circles
+            [1, 2].forEach(i => {
+                const circle = document.getElementById(`bf-step-${i}-circle`);
+                circle.className = 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-md transition-colors';
+                circle.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+            });
+            document.getElementById('bf-progress-bar').style.width = `100%`;
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
         } catch (error) {
             console.error('Error saving booking:', error);
-            alert('Có lỗi xảy ra khi tạo đơn hàng, vui lòng thử lại.');
+            alert('Có lỗi xảy ra khi gửi yêu cầu, vui lòng thử lại.');
             btn.innerText = ogText;
             btn.disabled = false;
         }
-    },
-
-    renderPayment: function () {
-        const depositAmount = 1000000; // Fixed deposit 1M
-        const amountStr = TourManager.formatPrice(depositAmount);
-
-        document.getElementById('bf-deposit-amount').textContent = amountStr;
-
-        // Generate a pseudo-unique code based on DB ID to ensure SePay matching
-        function normalizeVN(str) {
-            return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
-        }
-        const cleanName = normalizeVN(this.bookingData.name || 'khach');
-        const cleanTour = normalizeVN((this.tourData.name || 'Tour').split('-')[0].trim());
-
-        // Format: CSR{id} {tour} {name} coc (This matches strategy 1 & 2 in SePay webhook)
-        const bookingCode = `CSR${this.bookingDbId} ${cleanTour} ${cleanName} coc`;
-        document.getElementById('bf-transfer-content').textContent = bookingCode;
-
-        // Generate SePay QR
-        const qrUrl = `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=${depositAmount}&des=${encodeURIComponent(bookingCode)}`;
-
-        const qrContainer = document.getElementById('bf-qr-container');
-        qrContainer.innerHTML = `<img src="${qrUrl}" class="w-full h-full object-contain mix-blend-multiply" alt="QR Code">`;
-
-        // Add a listening indicator text
-        let oldWaiting = document.getElementById('bf-payment-listening');
-        if (!oldWaiting) {
-            const waitingHtml = `
-            <div id="bf-payment-listening" class="flex items-center justify-center gap-2 mb-4 mt-4 text-xs font-medium text-green-600 animate-pulse bg-green-50 p-2 rounded-lg border border-green-100 w-full">
-                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
-                <span>Hệ thống đang chờ nhận tiền... (Tự động xác nhận)</span>
-            </div>`;
-            document.getElementById('bf-qr-container').insertAdjacentHTML('afterend', waitingHtml);
-        }
-
-        this.startDepositPolling();
-    },
-
-    startDepositPolling: function () {
-        if (this.depositPollInterval) clearInterval(this.depositPollInterval);
-        if (!this.bookingDbId) return;
-
-        this.depositPollInterval = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/payment?action=status&id=${this.bookingDbId}`);
-                if (!res.ok) return;
-                const data = await res.json();
-
-                // If paid, auto redirect and stop
-                if (data.isPaid) {
-                    clearInterval(this.depositPollInterval);
-                    this.handlePaymentSuccess();
-                }
-            } catch (err) { console.warn('Poll error:', err); }
-        }, 5000);
-    },
-
-    handlePaymentSuccess: function () {
-        // Redirect completely to invoice layout
-        window.location.href = `/invoice.html?id=${this.bookingDbId}`;
     },
 
     copyText: function (text, type) {
         navigator.clipboard.writeText(text).then(() => {
             alert(`Đã copy ${type}: ${text}`);
         });
-    },
-
-    completeBooking: async function () {
-        const btn = document.getElementById('bf-btn-complete');
-        btn.innerText = 'ĐANG XỬ LÝ...';
-        btn.disabled = true;
-
-        // Just stop polling and show success screen since booking is already in DB
-        if (this.depositPollInterval) clearInterval(this.depositPollInterval);
-
-        // Small delay to make it feel natural
-        setTimeout(() => {
-            this.handlePaymentSuccess();
-        }, 800);
     }
 };
 
