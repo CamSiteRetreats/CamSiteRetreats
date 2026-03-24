@@ -145,8 +145,8 @@
                             name: data.name || '',
                             phone: data.phone || '',
                         };
-                        // Jump to payment step
-                        BookingEngine._renderStep(4);
+                        // Jump to payment step (step 5 in new 5-step flow)
+                        BookingEngine._renderStep(5);
                     });
                 })
                 .catch(err => {
