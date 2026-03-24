@@ -31,7 +31,8 @@ export async function onRequest(context) {
                 image2, image3, image4,
                 shortDesc, short_desc,
                 region, type, altitude,
-                sort_order, custom_domain, is_visible
+                sort_order, custom_domain, is_visible,
+                form_config, pickup_points, services
             } = body;
 
             if (!name || !duration || !level || !image) {
@@ -43,16 +44,24 @@ export async function onRequest(context) {
 
             const desc = shortDesc || short_desc || null;
             const visible = is_visible !== false ? true : false;
+            const fConfig = form_config ? JSON.stringify(form_config) : JSON.stringify({
+                step2: { show_pickup: true, show_medal_name: true, show_vegetarian: true, show_trekking_pole: true, show_special_request: true },
+                step3: { show_coupon: true }
+            });
+            const pPoints = pickup_points ? JSON.stringify(pickup_points) : '[]';
+            const srvs = services ? JSON.stringify(services) : '[]';
 
             const rows = await sql`
                 INSERT INTO tours 
                     (name, duration, level, price, image, image2, image3, image4,
-                     short_desc, region, type, altitude, sort_order, custom_domain, is_visible) 
+                     short_desc, region, type, altitude, sort_order, custom_domain, is_visible,
+                     form_config, pickup_points, services) 
                 VALUES 
                     (${name}, ${duration}, ${level}, ${price || null}, ${image},
                      ${image2 || null}, ${image3 || null}, ${image4 || null},
                      ${desc}, ${region || 'Miền Nam'}, ${type || 'TREKKING'},
-                     ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${visible})
+                     ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${visible},
+                     ${fConfig}::jsonb, ${pPoints}::jsonb, ${srvs}::jsonb)
                 RETURNING *
             `;
             response = Response.json({ success: true, message: 'Thêm Tour thành công', data: rows[0] }, { status: 201, headers: corsHeaders });
@@ -67,7 +76,7 @@ export async function onRequest(context) {
                 shortDesc, short_desc,
                 region, type, altitude,
                 sort_order, custom_domain, is_visible,
-                commission_rate
+                commission_rate, form_config, pickup_points, services
             } = body;
 
             // Nếu chỉ update commission_rate (từ trang Reports)
@@ -79,6 +88,24 @@ export async function onRequest(context) {
                     return Response.json({ success: false, message: 'Không tìm thấy Tour.' }, { status: 404, headers: corsHeaders });
                 }
                 response = Response.json({ success: true, message: 'Cập nhật hoa hồng thành công', data: rows[0] }, { headers: corsHeaders });
+            } else if (form_config !== undefined || pickup_points !== undefined || services !== undefined) {
+                // Chỉ cập nhật form_config (từ trang TourSettings)
+                const fConfig = form_config ? JSON.stringify(form_config) : undefined;
+                const pPoints = pickup_points ? JSON.stringify(pickup_points) : undefined;
+                const srvs = services ? JSON.stringify(services) : undefined;
+
+                let setClauses = [];
+                let vals = [];
+                let i = 1;
+                if (fConfig !== undefined) { setClauses.push(`form_config=$${i++}::jsonb`); vals.push(fConfig); }
+                if (pPoints !== undefined) { setClauses.push(`pickup_points=$${i++}::jsonb`); vals.push(pPoints); }
+                if (srvs !== undefined) { setClauses.push(`services=$${i++}::jsonb`); vals.push(srvs); }
+                vals.push(id);
+
+                const q = `UPDATE tours SET ${setClauses.join(', ')} WHERE id=$${i} RETURNING *`;
+                const rows = await sql.query(q, vals);
+                if (rows.length === 0) return Response.json({ success: false, message: 'Không tìm thấy Tour.' }, { status: 404, headers: corsHeaders });
+                response = Response.json({ success: true, message: 'Cập nhật cấu hình thành công', data: rows[0] }, { headers: corsHeaders });
             } else {
                 const desc = shortDesc || short_desc || null;
                 const visible = is_visible !== false ? true : false;

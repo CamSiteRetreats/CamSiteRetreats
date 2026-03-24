@@ -2,20 +2,23 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = 8889;
+
+// Root project dir (one level up from dev_tools)
+const rootDir = path.resolve(__dirname, '..');
 
 // Middleware CORS cho phép Localhost gọi
 app.use(cors());
 // Parse JSON body
 app.use(express.json());
-// Khai báo Static Folder để Nodejs Host trang web tĩnh ra ngoài qua Port 8888
-app.use(express.static(__dirname));
+// Khai báo Static Folder để Nodejs Host trang web tĩnh ra ngoài qua Port 8889
+app.use(express.static(rootDir));
 
 // Load dynamic serverless functions from /api folder
-const apiPath = path.join(__dirname, 'api');
+const apiPath = path.join(rootDir, 'api');
 fs.readdirSync(apiPath).forEach(file => {
     if (file.endsWith('.js')) {
         const route = file.replace('.js', '');

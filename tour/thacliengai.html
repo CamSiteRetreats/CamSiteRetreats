@@ -43,6 +43,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../js/tour-manager.js?v=2"></script>
 <script src="../js/ui-components.js?v=2"></script>
+<script src="../js/booking-engine.js?v=2"></script>
 <script src="../js/booking-flow.js?v=2"></script>
 
 <style>
@@ -1178,7 +1179,7 @@
             if (window.BookingFlow) {
                 // Truyền giá từ DB (hoặc null nếu chưa thiết lập)
                 const priceToSend = (currentTour.price && currentTour.price !== 'Update') ? parseFloat(currentTour.price) : null;
-                window.BookingFlow.open(currentTour.name, priceToSend, dateStr);
+                window.BookingFlow.open(currentTour.name, priceToSend, dateStr, currentTour.id || null);
             } else {
                 alert('Lỗi: Không tìm thấy module BookingFlow. Vui lòng tải lại trang.');
             }

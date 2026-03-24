@@ -6,6 +6,7 @@ export const initRouter = () => {
         '/admin/bookings': () => import('../pages/Bookings.js'),
         '/admin/customers': () => import('../pages/Customers.js'),
         '/admin/tours': () => import('../pages/Tours.js'),
+        '/admin/tour-settings': () => import('../pages/TourSettings.js'),
         '/admin/schedules': () => import('../pages/Schedules.js'),
         '/admin/reports': () => import('../pages/Reports.js'),
         '/admin/users': () => import('../pages/Users.js'),
