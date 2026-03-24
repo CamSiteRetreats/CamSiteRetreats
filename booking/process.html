@@ -115,13 +115,18 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
             const params = new URLSearchParams(window.location.search);
-            const tourId = params.get('tour') || params.get('tourId');
+            const tourId   = params.get('tour') || params.get('tourId');
             const tourName = params.get('name') || '';
             const tourDate = params.get('date') || '';
-            const tourPrice = params.get('price') || '';
+            const tourPrice= params.get('price') || '';
+            const bookingId= params.get('id'); // đơn thủ công hoặc link gửi lại
 
-            // Luôn bắt đầu từ bước 1 — khách phải điền đầy đủ thông tin
             const container = document.getElementById('booking-container');
+
+            if (typeof BookingEngine === 'undefined') {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;font-weight:600;">Không thể tải form. Vui lòng tải lại trang.</div>';
+                return;
+            }
 
             const fallbackTourData = tourName ? {
                 id: tourId || null,
@@ -135,17 +140,61 @@
                 services: []
             } : null;
 
-            if (typeof BookingEngine === 'undefined') {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;font-weight:600;">Không thể tải form. Vui lòng tải lại trang.</div>';
-                return;
-            }
-
-            BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
+            // Luôn mount từ bước 1
+            const mountPromise = BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
                 tourData: fallbackTourData,
                 onSuccess: (saved) => {
-                    console.log('Booking saved, polling for payment:', saved.id);
+                    console.log('Booking saved:', saved.id);
                 }
             });
+
+            // Nếu có bookingId (lên đơn thủ công / gửi link lại) → pre-fill sau khi mount
+            if (bookingId) {
+                const doFill = () => {
+                    fetch(`/api/bookings?id=${bookingId}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            const b = data.data || data;
+                            if (!b || !b.name) return;
+
+                            // Pre-fill bookingData
+                            BookingEngine.bookingData = {
+                                name:          b.name         || '',
+                                phone:         b.phone        || '',
+                                dob:           b.dob          || '',
+                                gender:        b.gender       || '',
+                                idCard:        b.id_card      || '',
+                                address:       b.address      || '',
+                                pickupPoint:   b.pickup_point || '',
+                                medalName:     b.medal_name   || '',
+                                vegetarian:    b.diet === 'Ăn chay',
+                                trekkingPole:  b.trekking_pole === 'Có',
+                                specialRequest:b.special      || '',
+                            };
+
+                            // Set tour name/date nếu chưa có từ URL
+                            if (!BookingEngine.tourData?.name && b.tour) {
+                                BookingEngine.tourData = BookingEngine.tourData || {};
+                                BookingEngine.tourData.name = b.tour;
+                                BookingEngine.tourData.price = b.total_price || 0;
+                            }
+                            if (!BookingEngine.selectedDate && b.date) {
+                                BookingEngine.selectedDate = b.date;
+                            }
+
+                            // Re-render bước 1 với dữ liệu đã fill
+                            BookingEngine._renderStep(1);
+                        })
+                        .catch(err => console.warn('Pre-fill error:', err));
+                };
+
+                // Chờ mount() hoàn thành (async) rồi mới fill
+                if (mountPromise && typeof mountPromise.then === 'function') {
+                    mountPromise.then(doFill);
+                } else {
+                    setTimeout(doFill, 500);
+                }
+            }
         });
 </script>
 </body>
