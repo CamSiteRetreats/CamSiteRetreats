@@ -120,66 +120,27 @@
         const tourPrice = params.get('price') || '';
         const bookingId = params.get('id'); // Existing booking ID for payment
 
-        // If we have a bookingId, redirect to payment page directly
-        if (bookingId && !tourId && !tourName) {
-            // Load from DB and go straight to step 4
-            fetch(`/api/payment?action=link&id=${bookingId}`)
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById('booking-container');
-                    BookingEngine.mount(container, null, data.date, {
-                        tourData: {
-                            id: null,
-                            name: data.tour,
-                            price: data.total_price || 0,
-                            form_config: {},
-                            pickup_points: [],
-                            services: []
-                        },
-                        onSuccess: (saved) => {
-                            console.log('Booking saved:', saved);
-                        }
-                    }).then(() => {
-                        // Pre-fill data
-                        BookingEngine.bookingData = {
-                            name: data.name || '',
-                            phone: data.phone || '',
-                        };
-                        // Jump to payment step (step 5 in new 5-step flow)
-                        BookingEngine._renderStep(5);
-                    });
-                })
-                .catch(err => {
-                    document.getElementById('booking-container').innerHTML = `
-                        <div class="error-state">
-                            <p style="color:#dc2626;font-weight:700;">Không thể tải dữ liệu đặt chỗ.</p>
-                            <a href="../index.html" style="color:#E85D04;font-weight:600;text-decoration:none;margin-top:12px;display:inline-block;">← Về trang chủ</a>
-                        </div>`;
-                });
-        } else {
-            // Normal booking flow from a tour page
-            const container = document.getElementById('booking-container');
+        // Luôn bắt đầu từ bước 1 — khách phải điền đầy đủ thông tin
+        const container = document.getElementById('booking-container');
 
-            // Build tourData from URL params if no ID
-            const fallbackTourData = tourName ? {
-                id: tourId || null,
-                name: decodeURIComponent(tourName),
-                price: tourPrice ? parseInt(tourPrice) : 0,
-                form_config: {
-                    step2: { show_pickup: true, show_medal_name: true, show_vegetarian: true, show_trekking_pole: true, show_special_request: true },
-                    step3: { show_coupon: true }
-                },
-                pickup_points: [],
-                services: []
-            } : null;
+        const fallbackTourData = tourName ? {
+            id: tourId || null,
+            name: decodeURIComponent(tourName),
+            price: tourPrice ? parseInt(tourPrice) : 0,
+            form_config: {
+                step2: { show_pickup: true, show_medal_name: true, show_vegetarian: true, show_trekking_pole: true, show_special_request: true },
+                step3: { show_coupon: true }
+            },
+            pickup_points: [],
+            services: []
+        } : null;
 
-            BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
-                tourData: fallbackTourData,
-                onSuccess: (saved) => {
-                    console.log('Booking saved, polling for payment:', saved.id);
-                }
-            });
-        }
+        BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
+            tourData: fallbackTourData,
+            onSuccess: (saved) => {
+                console.log('Booking saved, polling for payment:', saved.id);
+            }
+        });
     </script>
 </body>
 
