@@ -39,6 +39,9 @@ export const initRouter = () => {
             const { render } = await matchedRoute();
             document.getElementById('app').innerHTML = render();
 
+            // Init sidebar toggle (must run after DOM is updated)
+            initSidebar();
+
             // Call after render hook if it exists
             const { afterRender } = await matchedRoute();
             if (afterRender) afterRender();
@@ -72,3 +75,50 @@ export const initRouter = () => {
     router();
     return { navigateTo };
 };
+
+// Sidebar toggle - called after each route render
+function initSidebar() {
+    const mobileBtn   = document.getElementById('mobileMenuBtn');
+    const closeBtn    = document.getElementById('closeSidebarBtn');
+    const sidebar     = document.getElementById('adminSidebar');
+    const backdrop    = document.getElementById('sidebarBackdrop');
+
+    if (!mobileBtn || !sidebar || !backdrop) return;
+
+    const openMenu = () => {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden', 'opacity-0');
+        backdrop.classList.add('opacity-100');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeMenu = () => {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 300);
+    };
+
+    // Remove old listeners by replacing with clones
+    const newBtn = mobileBtn.cloneNode(true);
+    mobileBtn.parentNode.replaceChild(newBtn, mobileBtn);
+    newBtn.addEventListener('click', openMenu);
+
+    if (closeBtn) {
+        const newClose = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newClose, closeBtn);
+        newClose.addEventListener('click', closeMenu);
+    }
+
+    backdrop.addEventListener('click', closeMenu);
+
+    // Auto-close when a nav link is clicked on mobile
+    sidebar.querySelectorAll('a[data-link]').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 768) closeMenu();
+        });
+    });
+}

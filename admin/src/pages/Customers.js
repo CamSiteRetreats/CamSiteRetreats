@@ -37,16 +37,16 @@ export const render = () => {
 
                   <!-- Search -->
                   <div class="glass-panel overflow-hidden">
-                      <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-                          <div class="relative w-80">
+                      <div class="p-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50/50 gap-4">
+                          <div class="relative w-full md:w-80">
                               <svg class="w-4 h-4 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                              <input type="text" id="crmSearchInput" placeholder="Tìm theo Mã #CSR, SĐT, Họ tên..." class="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm text-gray-900 focus:border-csr-orange focus:outline-none transition-colors">
+                              <input type="text" id="crmSearchInput" placeholder="Tìm kiếm khách hàng..." class="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 md:py-2 text-sm text-gray-900 focus:border-csr-orange focus:outline-none focus:ring-2 focus:ring-csr-orange/20 transition-all">
                           </div>
-                          <div class="text-sm text-gray-400" id="resultCount"></div>
+                          <div class="text-[11px] md:text-sm text-gray-400 font-medium" id="resultCount"></div>
                       </div>
                       <div class="overflow-x-auto">
-                          <table class="w-full text-left border-collapse">
-                              <thead>
+                          <table class="w-full text-left border-collapse md:table block">
+                              <thead class="hidden md:table-header-group">
                                   <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider text-gray-400">
                                       <th class="p-4 font-medium">Mã KH</th>
                                       <th class="p-4 font-medium">Khách Hàng</th>
@@ -56,7 +56,7 @@ export const render = () => {
                                       <th class="p-4 font-medium text-center">Thao Tác</th>
                                   </tr>
                               </thead>
-                              <tbody id="crmTableBody" class="divide-y divide-gray-100">
+                              <tbody id="crmTableBody" class="divide-y divide-gray-100 block md:table-row-group">
                               </tbody>
                           </table>
                       </div>
@@ -67,8 +67,8 @@ export const render = () => {
       </div>
 
       <!-- DETAIL MODAL -->
-      <div id="customerDetailModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
-          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300" id="customerDetailContent">
+      <div id="customerDetailModal" class="fixed inset-0 z-[60] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 md:p-4 opacity-0 transition-opacity duration-200">
+          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl max-h-[95vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300" id="customerDetailContent">
               <div class="sticky top-0 bg-white/95 backdrop-blur z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                   <h2 class="text-lg font-bold text-gray-900">Chi Tiết Khách Hàng</h2>
                   <button type="button" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors" onclick="window.closeCustomerDetail()">
@@ -166,30 +166,48 @@ export const afterRender = () => {
                 : '<span class="text-gray-300">0</span>';
 
             return `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="p-4">
-                        <span class="font-mono text-csr-orange bg-csr-orange/10 px-2 py-1 rounded text-xs font-bold cursor-pointer hover:bg-csr-orange/20 transition-colors" title="Click để copy" onclick="navigator.clipboard.writeText('${c.csr_code || ''}'); this.textContent='Đã copy!'; setTimeout(() => this.textContent='${c.csr_code || '-'}', 1500)">${c.csr_code || '-'}</span>
+                <tr class="hover:bg-gray-50 transition-colors block md:table-row p-4 md:p-0 mb-4 md:mb-0 glass-panel md:glass-none border-l-4 border-csr-orange md:border-none relative">
+                    <td class="p-0 md:p-4 block md:table-cell mb-3 md:mb-0">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Mã KH</span>
+                            <span class="font-mono text-csr-orange bg-csr-orange/10 px-2 py-1 rounded text-[11px] md:text-xs font-bold cursor-pointer hover:bg-csr-orange/20 transition-colors" title="Click để copy" onclick="navigator.clipboard.writeText('${c.csr_code || ''}'); this.textContent='Đã copy!'; setTimeout(() => this.textContent='${c.csr_code || '-'}', 1500)">${c.csr_code || '-'}</span>
+                        </div>
                     </td>
-                    <td class="p-4">
+                    <td class="p-0 md:p-4 block md:table-cell mb-4 md:mb-0 pt-3 border-t md:border-none border-gray-50">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full ${bgColor} flex items-center justify-center text-white text-sm font-bold shrink-0">${initial}</div>
-                            <div>
-                                <div class="font-medium text-gray-900 text-sm">${c.full_name || '-'}</div>
-                                <div class="text-[11px] text-gray-400">${c.phone || '-'}</div>
+                            <div class="w-12 h-12 md:w-9 md:h-9 rounded-full ${bgColor} flex items-center justify-center text-white text-base md:text-sm font-bold shrink-0">${initial}</div>
+                            <div class="min-w-0">
+                                <div class="font-bold md:font-medium text-gray-900 text-base md:text-sm truncate">${c.full_name || '-'}</div>
+                                <div class="text-xs md:text-[11px] text-gray-500 font-medium">${c.phone || '-'}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="p-4">${tourBadge}</td>
-                    <td class="p-4 text-center">${tourCountBadge}</td>
-                    <td class="p-4">${discountBadge}</td>
-                    <td class="p-4 text-center">
+                    <td class="py-2 md:p-4 block md:table-cell">
+                        <div class="flex justify-between md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Tour gần nhất</span>
+                            <div class="text-right md:text-left">${tourBadge}</div>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 block md:table-cell">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Số Tour tham gia</span>
+                            <div class="text-right md:text-center">${tourCountBadge}</div>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 block md:table-cell">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Hạng mức</span>
+                            <div class="text-right">${discountHtml ? discountBadge : '—'}</div>
+                        </div>
+                    </td>
+                    <td class="py-4 md:p-4 block md:table-cell border-t md:border-none border-gray-50 mt-2">
                         <div class="flex items-center justify-center gap-2">
-                             <button class="detail-btn text-csr-orange hover:text-orange-700 hover:bg-csr-orange/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors" data-idx="${idx}">
-                                 Xem Chi Tiết
+                             <button class="detail-btn bg-csr-orange hover:bg-orange-600 text-white md:bg-transparent md:text-csr-orange md:hover:bg-csr-orange/10 px-4 py-2.5 md:px-3 md:py-1.5 rounded-xl md:rounded-lg text-xs font-bold transition-colors flex-1 md:flex-none flex justify-center items-center" data-idx="${idx}">
+                                 Chi Tiết
                              </button>
                              ${userRole === 'admin' ? `
-                                 <button class="delete-customer-btn text-red-500 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors border border-transparent hover:border-red-600 shadow-sm" data-id="${c.id}" title="Xoá Khách Hàng Này">
-                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                 <button class="delete-customer-btn bg-red-50 text-red-500 hover:text-white hover:bg-red-500 px-3 py-2.5 md:py-1.5 rounded-xl md:rounded-lg text-xs font-bold transition-colors border border-red-100 md:border-transparent hover:border-red-600 shadow-sm flex items-center justify-center shrink-0" data-id="${c.id}" title="Xoá Khách Hàng Này">
+                                     <svg class="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                  </button>
                              ` : ''}
                         </div>

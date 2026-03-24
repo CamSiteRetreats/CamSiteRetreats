@@ -25,22 +25,22 @@ export const render = () => {
                   </div>
 
                   <!-- Tab Navigation -->
-                  <div class="border-b border-gray-200">
-                      <nav class="-mb-px flex space-x-8" aria-label="Tabs" id="bookingTabsNav">
-                          <button data-tab="consult" class="tab-btn border-csr-orange text-csr-orange whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                  <div class="border-b border-gray-200 -mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto custom-scrollbar no-scrollbar">
+                      <nav class="-mb-px flex space-x-6 min-w-max pb-1" aria-label="Tabs" id="bookingTabsNav">
+                          <button data-tab="consult" class="tab-btn border-csr-orange text-csr-orange whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm">
                               Khách Hàng Tư Vấn
                           </button>
-                          <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                              Khách Hàng Đăng Ký (Chờ Cọc)
+                          <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                              Chờ Cọc
                           </button>
-                          <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                              Khách Sắp Tham Gia
+                          <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                              Sắp Tham Gia
                           </button>
-                          <button data-tab="ready" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                              Khách Chờ Lên Xe
+                          <button data-tab="ready" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                              Chờ Lên Xe
                           </button>
-                          <button data-tab="completed" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                              Lịch Sử (Đã Đi)
+                          <button data-tab="completed" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                              Lịch Sử
                           </button>
                       </nav>
                   </div>
@@ -112,10 +112,10 @@ export const render = () => {
                   <div class="glass-panel overflow-hidden">
                       <div class="overflow-x-auto">
                           <table class="w-full text-left border-collapse">
-                              <thead id="bookingsTableHead">
+                              <thead id="bookingsTableHead" class="hidden md:table-header-group">
                                   <!-- Sẽ được render động bằng JavaScript -->
                               </thead>
-                              <tbody id="bookingsTableBody" class="divide-y divide-csr-border">
+                              <tbody id="bookingsTableBody" class="divide-y divide-csr-border block md:table-row-group">
                                   <tr>
                                       <td colspan="4" class="p-8 text-center text-gray-500">
                                           <svg class="animate-spin h-6 w-6 text-csr-orange mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -132,7 +132,7 @@ export const render = () => {
       </div>
 
       <!-- ROW ACTION MODAL (Hiển thị khi click vào Dòng Khách Hàng) -->
-      <div id="rowActionModal" class="fixed inset-0 z-[60] bg-gray-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div id="rowActionModal" class="fixed inset-0 z-[70] bg-gray-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
           <div class="bg-white rounded-[16px] shadow-2xl max-w-[320px] w-full transform transition-all">
               <div class="px-5 pt-6 pb-4 flex justify-between items-start">
                   <div>
@@ -153,10 +153,10 @@ export const render = () => {
       </div>
 
       <!-- Add Manual Booking Modal with Auto-Fill capability -->
-      <div id="bookingModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-          <div class="bg-gray-50 border border-gray-200 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform" id="bookingModalContent">
-              <div class="sticky top-0 bg-gray-50/95 backdrop-blur z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                  <h2 class="text-xl font-bold text-gray-900">Thêm Khách Hàng (Tạo Đơn)</h2>
+      <div id="bookingModal" class="fixed inset-0 z-[60] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 md:p-4 opacity-0 transition-opacity duration-300">
+          <div class="bg-gray-50 border border-gray-200 rounded-xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform" id="bookingModalContent">
+              <div class="sticky top-0 bg-gray-50/95 backdrop-blur z-10 px-4 md:px-6 py-3 md:py-4 border-b border-gray-200 flex justify-between items-center">
+                  <h2 class="text-lg md:text-xl font-bold text-gray-900">Thêm Khách Hàng (Tạo Đơn)</h2>
                   <button type="button" class="text-gray-500 hover:text-gray-900" onclick="window.closeModal()">
                       <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>
@@ -892,26 +892,52 @@ export const afterRender = () => {
                 }
 
                 return `
-                <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
-                    <td class="p-4 align-top">
-                        <div class="font-medium text-gray-900">${b.name}</div>
-                        ${b.customer_id
-                        ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
-                        : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
-                    }
+                <tr class="${rowClass} cursor-pointer row-clickable block md:table-row p-4 md:p-0 mb-4 md:mb-0 glass-panel md:glass-none border-l-4 border-green-500 md:border-none relative" data-id="${b.id}">
+                    <td class="p-0 md:p-4 align-top block md:table-cell mb-2 md:mb-0">
+                        <div class="flex justify-between items-start md:block">
+                            <div>
+                                <div class="font-bold text-gray-900 text-base md:text-sm">${b.name}</div>
+                                ${b.customer_id
+                                    ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
+                                    : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
+                                }
+                            </div>
+                            <div class="md:hidden text-right">
+                                <div class="text-[10px] text-gray-400 uppercase font-medium">Trạng thái</div>
+                                <div class="mt-1">${statusBadge}</div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="p-4 align-top text-sm">
-                        <div class="text-gray-700 font-medium">${b.tour}</div>
+                    <td class="py-2 md:p-4 align-top text-sm block md:table-cell border-t md:border-none border-gray-100 mt-2 md:mt-0 pt-2 md:pt-4">
+                        <div class="md:hidden text-[10px] text-gray-400 uppercase font-medium mb-1">Thông tin Tour</div>
+                        <div class="text-gray-700 font-bold md:font-medium">${b.tour}</div>
                         <div class="text-gray-500 text-xs whitespace-nowrap">${b.date}</div>
                     </td>
-                    <td class="p-4 align-top text-sm text-gray-600">${b.sale_name || 'Website'}</td>
-                    <td class="p-4 align-top text-center">${statusBadge}${invoiceLink}</td>
-                    <td class="p-4 align-top text-right text-sm font-medium text-gray-700">${formatedTotal}</td>
-                    <td class="p-4 align-top text-right text-sm font-medium text-green-600">${formatedDeposit}</td>
-                    <td class="p-4 align-top text-right text-sm font-bold text-red-500">${formatedRemain}</td>
-                    <td class="p-4 align-top text-right">
-                        <div class="flex flex-col gap-1.5 items-end">
-                            <button class="action-btn payment-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">Thanh toán</button>
+                    <td class="p-4 align-top text-sm text-gray-600 hidden md:table-cell">${b.sale_name || 'Website'}</td>
+                    <td class="p-4 align-top text-center hidden md:table-cell">${statusBadge}${invoiceLink}</td>
+                    
+                    <td class="py-2 md:p-4 align-top text-right text-sm font-medium text-gray-700 block md:table-cell border-t md:border-none border-gray-100 pt-2 md:pt-4">
+                        <div class="flex justify-between md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Tổng tiền</span>
+                            <span>${formatedTotal}</span>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 align-top text-right text-sm font-medium text-green-600 block md:table-cell">
+                        <div class="flex justify-between md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Đã cọc</span>
+                            <span>${formatedDeposit}</span>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 align-top text-right text-sm font-bold text-red-500 block md:table-cell">
+                        <div class="flex justify-between md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Còn lại</span>
+                            <span>${formatedRemain}</span>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 align-top text-right block md:table-cell border-t md:border-none border-gray-100 pt-2 md:pt-4">
+                        <div class="flex justify-between items-center md:justify-end gap-2">
+                             <div class="md:hidden">${invoiceLink}</div>
+                             <button class="action-btn payment-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 md:px-3 md:py-1.5 rounded-lg md:rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">Thanh toán</button>
                         </div>
                     </td>
                 </tr>
@@ -937,27 +963,33 @@ export const afterRender = () => {
                 `;
 
                 return `
-                <tr class="${rowClass} cursor-pointer row-clickable" data-id="${b.id}">
-                    <td class="p-4 align-top">
+                <tr class="${rowClass} cursor-pointer row-clickable block md:table-row p-4 md:p-0 mb-4 md:mb-0 glass-panel md:glass-none border-l-4 border-csr-orange md:border-none relative" data-id="${b.id}">
+                    <td class="p-0 md:p-4 align-top block md:table-cell">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-csr-orange/20 text-csr-orange flex items-center justify-center font-bold">${avtChar}</div>
-                            <div>
-                                <div class="font-medium text-gray-900">${b.name}</div>
+                            <div class="w-12 h-12 md:w-10 md:h-10 rounded-full bg-csr-orange/20 text-csr-orange flex items-center justify-center font-bold text-base md:text-sm shrink-0">${avtChar}</div>
+                            <div class="min-w-0">
+                                <div class="font-bold text-gray-900 text-base md:text-sm truncate">${b.name}</div>
                                 ${b.customer_id
-                        ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
-                        : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
-                    }
+                                    ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
+                                    : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
+                                }
                             </div>
                         </div>
                     </td>
-                    <td class="p-4 align-top">
-                        <div class="text-sm text-gray-600">${b.tour || '(Chưa rõ)'}</div>
+                    <td class="py-3 md:p-4 align-top block md:table-cell border-t md:border-none border-gray-100 mt-3 md:mt-0 pt-3 md:pt-4">
+                        <div class="md:hidden text-[10px] text-gray-400 uppercase font-medium mb-1">Đăng ký Tour</div>
+                        <div class="text-sm text-gray-700 font-bold md:font-medium">${b.tour || '(Chưa rõ)'}</div>
                         <div class="text-xs text-gray-500 mt-1">Lịch: ${b.date || '(Chưa chọn)'}</div>
-                        ${isConsultTab && b.special ? `<div class="text-xs text-blue-500 mt-1 italic">💬 ${b.special}</div>` : ''}
+                        ${isConsultTab && b.special ? `<div class="text-xs text-blue-500 mt-1 italic bg-blue-50 md:bg-transparent p-2 md:p-0 rounded">💬 ${b.special}</div>` : ''}
                     </td>
-                    <td class="p-4 align-top">${saleCell}</td>
-                    <td class="p-4 align-top text-right">
-                        <div class="flex flex-col gap-1.5 items-end">
+                    <td class="py-2 md:p-4 align-top block md:table-cell">
+                        <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Phụ trách</span>
+                            <div>${saleCell}</div>
+                        </div>
+                    </td>
+                    <td class="py-3 md:p-4 align-top text-right block md:table-cell border-t md:border-none border-gray-100 mt-2 md:mt-0 pt-3 md:pt-4">
+                        <div class="flex flex-row md:flex-col gap-2 justify-end">
                             ${actionBtn}
                         </div>
                     </td>

@@ -80,8 +80,8 @@ export const render = () => {
                             <a href="/admin_v2/bookings" class="text-csr-orange text-xs font-bold hover:underline">Xem tất cả →</a>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="bg-gray-50 text-[10px] uppercase tracking-wider text-gray-400">
+                            <table class="w-full text-left md:table block">
+                                <thead class="bg-gray-50 text-[10px] uppercase tracking-wider text-gray-400 hidden md:table-header-group">
                                     <tr>
                                         <th class="px-4 py-3 font-medium">Khách Hàng</th>
                                         <th class="px-4 py-3 font-medium">Tour</th>
@@ -89,7 +89,7 @@ export const render = () => {
                                         <th class="px-4 py-3 font-medium">Trạng Thái</th>
                                     </tr>
                                 </thead>
-                                <tbody id="recentBookingsBody" class="divide-y divide-gray-100">
+                                <tbody id="recentBookingsBody" class="divide-y divide-gray-100 block md:table-row-group">
                                     <tr><td colspan="4" class="text-center py-6 text-gray-400 text-sm">Đang tải...</td></tr>
                                 </tbody>
                             </table>
@@ -310,19 +310,32 @@ export const afterRender = () => {
                     const color = colors[Math.abs(initial.charCodeAt(0)) % colors.length];
 
                     return `
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-full ${color} flex items-center justify-center text-white text-[10px] font-bold shrink-0">${initial}</div>
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-medium text-gray-900 truncate">${b.name || '-'}</div>
-                                        <div class="text-[10px] text-gray-400">${b.phone || ''}</div>
+                        <tr class="hover:bg-gray-50 transition-colors block md:table-row p-3 md:p-0">
+                            <td class="px-0 md:px-4 py-1 md:py-3 block md:table-cell">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 md:w-7 md:h-7 rounded-full ${color} flex items-center justify-center text-white text-xs md:text-[10px] font-bold shrink-0">${initial}</div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-sm font-bold md:font-medium text-gray-900 truncate">${b.name || '-'}</div>
+                                        <div class="text-[11px] text-gray-400 md:hidden">${b.phone || ''}</div>
+                                    </div>
+                                    <div class="md:hidden">
+                                        <span class="${statusClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${b.status || 'Mới'}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-600 truncate max-w-[150px]">${b.tour || '-'}</td>
-                            <td class="px-4 py-3 text-sm text-gray-500">${b.date || '-'}</td>
-                            <td class="px-4 py-3">
+                            <td class="px-0 md:px-4 py-2 md:py-3 text-sm text-gray-600 block md:table-cell border-t md:border-none border-gray-50 mt-2 md:mt-0 pt-2 md:pt-3">
+                                <div class="flex justify-between md:block">
+                                    <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Tour</span>
+                                    <span class="truncate max-w-[200px] md:max-w-[150px] font-medium md:font-normal">${b.tour || '-'}</span>
+                                </div>
+                            </td>
+                            <td class="px-0 md:px-4 py-1 md:py-3 text-sm text-gray-500 block md:table-cell">
+                                <div class="flex justify-between md:block">
+                                    <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Ngày đi</span>
+                                    <span>${b.date || '-'}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 hidden md:table-cell">
                                 <span class="${statusClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${b.status || 'Mới'}</span>
                             </td>
                         </tr>

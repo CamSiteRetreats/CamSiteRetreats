@@ -38,12 +38,19 @@ export const Sidebar = () => {
     `).join('');
 
     return `
-      <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col transition-all duration-300 relative z-20">
+      <!-- Backdrop for Mobile -->
+      <div id="sidebarBackdrop" class="fixed inset-0 bg-gray-900/50 z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+
+      <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50 shadow-xl md:shadow-none">
           <!-- Logo Area -->
-          <!-- Logo Area -->
-          <a href="/admin/" data-link class="h-16 flex items-center justify-center border-b border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
-              <span class="text-xl font-bold bg-gradient-to-r from-csr-light to-csr-orange bg-clip-text text-transparent">CAM SITE RETREATS</span>
-          </a>
+          <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 bg-gray-50">
+              <a href="/admin/" data-link class="flex items-center hover:opacity-80 transition-opacity">
+                  <span class="text-lg font-bold bg-gradient-to-r from-csr-light to-csr-orange bg-clip-text text-transparent">CAM SITE RETREATS</span>
+              </a>
+              <button id="closeSidebarBtn" class="md:hidden p-2 text-gray-400 hover:text-gray-600">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+          </div>
   
           <!-- Navigation -->
           <nav class="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
@@ -62,5 +69,7 @@ export const Sidebar = () => {
               </button>
           </div>
       </aside>
+
+      <script>/* sidebar logic handled by initSidebar() in router.js */<\/script>
     `;
 };
