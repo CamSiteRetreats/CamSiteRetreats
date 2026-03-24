@@ -1,4 +1,4 @@
-import{S as j,H as A}from"./Header-DflOc6ij.js";const K=()=>{let x={role:"sale",fullName:"Guest",id:null};try{const h=localStorage.getItem("csr_user");h&&(x=JSON.parse(h))}catch{}const y=x.role==="admin",p=new Date,k=new Date(p.getFullYear(),p.getMonth(),1),u=new Date(p.getFullYear(),p.getMonth()+1,0).toISOString().split("T")[0],v=k.toISOString().split("T")[0];return`
+import{S as j,H as A}from"./Header-CKJNmtLR.js";const K=()=>{let x={role:"sale",fullName:"Guest",id:null};try{const h=localStorage.getItem("csr_user");h&&(x=JSON.parse(h))}catch{}const y=x.role==="admin",p=new Date,k=new Date(p.getFullYear(),p.getMonth(),1),u=new Date(p.getFullYear(),p.getMonth()+1,0).toISOString().split("T")[0],v=k.toISOString().split("T")[0];return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${j()}
         

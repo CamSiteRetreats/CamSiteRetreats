@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Chuyến Đi | CAM SITE RETREATS</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --orange: #F26A1B;
+            --orange-light: #FEF0E6;
+            --green: #22C55E;
+            --gray: #F8F9FA;
+            --text: #1A1A2E;
+            --muted: #6B7280;
+            --border: #E5E7EB;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #FFF7F0 0%, #FEF0E6 50%, #FFF 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding-bottom: 48px;
+        }
+
+        /* ===== HEADER ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--orange) 0%, #D14E00 100%);
+            color: white;
+            padding: 40px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .logo { font-size: 13px; font-weight: 700; letter-spacing: 2px; opacity: 0.85; margin-bottom: 12px; text-transform: uppercase; }
+        .hero-title { font-size: clamp(22px, 5vw, 32px); font-weight: 800; margin-bottom: 6px; }
+        .hero-sub { font-size: 14px; opacity: 0.85; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25);
+            border-radius: 50px; padding: 6px 16px; font-size: 13px; font-weight: 600;
+            margin-top: 16px; backdrop-filter: blur(4px);
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            padding: 28px 24px;
+            margin: -24px 16px 20px;
+            position: relative;
+            z-index: 2;
+        }
+        @media (min-width: 600px) {
+            .card { max-width: 620px; margin: -24px auto 24px; padding: 36px 40px; }
+        }
+
+        /* ===== TOUR INFO ===== */
+        .tour-info {
+            background: var(--orange-light);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid var(--orange);
+            margin-bottom: 28px;
+        }
+        .tour-info h2 { font-size: 18px; font-weight: 700; color: var(--orange); margin-bottom: 4px; }
+        .tour-info p { font-size: 13px; color: var(--muted); }
+
+        /* ===== SECTION ===== */
+        .section-title {
+            font-size: 15px; font-weight: 700; color: var(--text);
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px; padding-bottom: 8px;
+            border-bottom: 2px solid var(--orange-light);
+        }
+        .section-icon { font-size: 20px; }
+        .section-block { margin-bottom: 28px; }
+
+        /* ===== STAR RATING ===== */
+        .star-row { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 6px; margin-bottom: 10px; }
+        .star-row input { display: none; }
+        .star-row label {
+            font-size: 32px; cursor: pointer; color: #D1D5DB;
+            transition: color .15s, transform .15s;
+            user-select: none;
+        }
+        .star-row label:hover,
+        .star-row label:hover ~ label,
+        .star-row input:checked ~ label { color: #F59E0B; }
+        .star-row label:hover { transform: scale(1.15); }
+
+        .rating-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+        /* ===== TEXTAREA ===== */
+        textarea, input[type=text] {
+            width: 100%; border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 12px 14px;
+            font-family: inherit; font-size: 15px; color: var(--text);
+            resize: none; transition: border-color .2s, box-shadow .2s;
+            background: var(--gray);
+            outline: none;
+        }
+        textarea:focus, input[type=text]:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(242,106,27,.12);
+            background: white;
+        }
+        textarea { min-height: 80px; }
+
+        /* ===== CHECKBOX ===== */
+        .check-group {
+            display: flex; align-items: center; gap: 12px;
+            background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+            border: 1.5px solid #BBF7D0; border-radius: 12px;
+            padding: 14px 16px; cursor: pointer; margin-bottom: 20px;
+            transition: border-color .2s;
+        }
+        .check-group:has(input:checked) { border-color: var(--green); }
+        .check-group label { cursor: pointer; font-size: 14px; font-weight: 500; color: #166534; }
+        .check-group input[type=checkbox] { accent-color: var(--green); width: 20px; height: 20px; cursor: pointer; }
+
+        /* ===== NAME INPUT ===== */
+        #nameBlock { margin-bottom: 20px; }
+        #nameBlock label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .btn-submit {
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, var(--orange) 0%, #D14E00 100%);
+            color: white; border: none; border-radius: 14px;
+            font-family: inherit; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all .2s;
+            box-shadow: 0 6px 20px rgba(242,106,27,.35);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(242,106,27,.45); }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* ===== THANK YOU ===== */
+        #thankYou {
+            text-align: center; padding: 40px 24px; display: none;
+        }
+        .ty-icon { font-size: 72px; margin-bottom: 16px; }
+        .ty-title { font-size: 26px; font-weight: 800; color: var(--orange); margin-bottom: 8px; }
+        .ty-msg { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+        /* ===== LOADING / ERROR ===== */
+        #loadingState { text-align: center; padding: 60px 20px; color: var(--muted); }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #errorState { text-align: center; padding: 60px 20px; }
+        .error-icon { font-size: 56px; margin-bottom: 12px; }
+        .error-msg { font-size: 15px; color: var(--muted); }
+
+        .divider { border: none; border-top: 1.5px solid var(--border); margin: 24px 0; }
+
+        .form-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; }
+
+        /* Already reviewed info */
+        .review-count-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+            border-radius: 50px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="hero">
+        <div class="logo">CAM SITE RETREATS</div>
+        <h1 class="hero-title">✨ Đánh Giá Chuyến Đi</h1>
+        <p class="hero-sub">Chia sẻ trải nghiệm của bạn giúp chúng tôi phục vụ tốt hơn</p>
+        <span class="hero-badge">🏕️ Cam Site Retreats — Trải nghiệm khác biệt</span>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+
+        <!-- LOADING -->
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <p>Đang tải thông tin chuyến đi...</p>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorState" style="display:none">
+            <div class="error-icon">⚠️</div>
+            <p class="error-msg">Không tìm thấy chuyến đi.<br>Vui lòng kiểm tra lại đường link.</p>
+        </div>
+
+        <!-- FORM -->
+        <form id="reviewForm" style="display:none" novalidate>
+
+            <!-- Tour Info -->
+            <div class="tour-info" id="tourInfo">
+                <h2 id="tourName">Đang tải...</h2>
+                <p id="tourDate"></p>
+                <span class="review-count-badge" id="reviewCount"></span>
+            </div>
+
+            <!-- ANONYMOUS TOGGLE -->
+            <div class="check-group">
+                <input type="checkbox" id="isAnonymous">
+                <label for="isAnonymous">🙈 Gửi ẩn danh — Không hiển thị tên của tôi</label>
+            </div>
+
+            <!-- NAME INPUT -->
+            <div id="nameBlock">
+                <label for="reviewerName">Họ và tên của bạn</label>
+                <input type="text" id="reviewerName" placeholder="Nhập họ tên (không bắt buộc)" maxlength="100">
+            </div>
+
+            <hr class="divider">
+
+            <!-- ===== 1. XE CỘ ===== -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span class="section-icon">🚐</span> Dịch vụ Xe cộ
+                </div>
+                <div class="rating-label">Chọn mức độ hài lòng</div>
+                <div class="star-row" id="stars-vehicle">
+                    <input type="radio" name="rating_vehicle" id="v5" value="5"><label for="v5" title="Xuất sắc">★</label>
+                    <input type="radio" name="rating_vehicle" id="v4" value="4"><label for="v4" title="Tốt">★</label>
+                    <input type="radio" name="rating_vehicle" id="v3" value="3"><label for="v3" title="Bình thường">★</label>
+                    <input type="radio" name="rating_vehicle" id="v2" value="2"><label for="v2" title="Chưa hài lòng">★</label>
+                    <input type="radio" name="rating_vehicle" id="v1" value="1"><label for="v1" title="Rất tệ">★</label>
+                </div>
+                <label class="form-label" for="comment_vehicle">Nhận xét về xe và tài xế</label>
+                <textarea id="comment_vehicle" placeholder="Ví dụ: Xe rộng, mát, tài xế nhiệt tình..." rows="3"></textarea>
+            </div>
+
+            <!-- ===== 2. HƯỚNG DẪN ===== -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span class="section-icon">🧭</span> Hướng dẫn viên
+                </div>
+                <div class="rating-label">Chọn mức độ hài lòng</div>
+                <div class="star-row" id="stars-guide">
+                    <input type="radio" name="rating_guide" id="g5" value="5"><label for="g5">★</label>
+                    <input type="radio" name="rating_guide" id="g4" value="4"><label for="g4">★</label>
+                    <input type="radio" name="rating_guide" id="g3" value="3"><label for="g3">★</label>
+                    <input type="radio" name="rating_guide" id="g2" value="2"><label for="g2">★</label>
+                    <input type="radio" name="rating_guide" id="g1" value="1"><label for="g1">★</label>
+                </div>
+                <label class="form-label" for="comment_guide">Nhận xét về hướng dẫn viên</label>
+                <textarea id="comment_guide" placeholder="Ví dụ: Nhiệt tình, kiến thức phong phú, hài hước..." rows="3"></textarea>
+            </div>
+
+            <!-- ===== 3. BỮA ĂN ===== -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span class="section-icon">🍽️</span> Bữa ăn
+                </div>
+                <div class="rating-label">Chọn mức độ hài lòng</div>
+                <div class="star-row" id="stars-meals">
+                    <input type="radio" name="rating_meals" id="m5" value="5"><label for="m5">★</label>
+                    <input type="radio" name="rating_meals" id="m4" value="4"><label for="m4">★</label>
+                    <input type="radio" name="rating_meals" id="m3" value="3"><label for="m3">★</label>
+                    <input type="radio" name="rating_meals" id="m2" value="2"><label for="m2">★</label>
+                    <input type="radio" name="rating_meals" id="m1" value="1"><label for="m1">★</label>
+                </div>
+                <label class="form-label" for="comment_meals">Nhận xét về bữa ăn</label>
+                <textarea id="comment_meals" placeholder="Ví dụ: Đồ ăn ngon, đủ phần, hợp khẩu vị..." rows="3"></textarea>
+            </div>
+
+            <!-- ===== 4. TỔNG THỂ ===== -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span class="section-icon">⭐</span> Trải nghiệm Tổng thể
+                </div>
+                <div class="rating-label">Chọn mức độ hài lòng chung</div>
+                <div class="star-row" id="stars-overall">
+                    <input type="radio" name="rating_overall" id="o5" value="5"><label for="o5">★</label>
+                    <input type="radio" name="rating_overall" id="o4" value="4"><label for="o4">★</label>
+                    <input type="radio" name="rating_overall" id="o3" value="3"><label for="o3">★</label>
+                    <input type="radio" name="rating_overall" id="o2" value="2"><label for="o2">★</label>
+                    <input type="radio" name="rating_overall" id="o1" value="1"><label for="o1">★</label>
+                </div>
+                <label class="form-label" for="comment_general">Nhận xét chung về chuyến đi</label>
+                <textarea id="comment_general" placeholder="Ví dụ: Chuyến đi tuyệt vời, sẽ giới thiệu cho bạn bè..." rows="4"></textarea>
+            </div>
+
+            <!-- ===== 5. GÓP Ý / BỔ SUNG ===== -->
+            <div class="section-block" style="background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border-radius: 14px; padding: 20px; border: 1.5px dashed #7DD3FC;">
+                <div class="section-title" style="border-color: #BAE6FD;">
+                    <span class="section-icon">💡</span> Góp ý &amp; Mong muốn phát triển
+                </div>
+                <label class="form-label" for="suggestion" style="color: #0369A1;">Bạn muốn chúng tôi cải thiện điều gì? Có dịch vụ nào bạn mong muốn thêm không?</label>
+                <textarea id="suggestion" placeholder="Ví dụ: Thêm dịch vụ massage, kéo dài thời gian cắm trại, có thêm tour đêm..." rows="4" style="background: white;"></textarea>
+                <p style="font-size: 12px; color: #0369A1; margin-top: 8px;">💬 Mỗi góp ý của bạn đều có giá trị và được đội ngũ đọc kỹ!</p>
+            </div>
+
+            <!-- SUBMIT -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span>🎯</span>
+                <span>Gửi Đánh Giá</span>
+            </button>
+        </form>
+
+        <!-- THANK YOU -->
+        <div id="thankYou">
+            <div class="ty-icon">🎉</div>
+            <h2 class="ty-title">Cảm ơn bạn rất nhiều!</h2>
+            <p class="ty-msg">Đánh giá của bạn đã được ghi nhận.<br>Chúng tôi sẽ không ngừng cải thiện để mang lại trải nghiệm tốt hơn cho bạn trong những chuyến đi tiếp theo.</p>
+            <div style="margin-top: 28px; font-size: 36px; display: flex; gap: 8px; justify-content:center;">🏕️🌿🌟</div>
+        </div>
+
+    </div><!-- /card -->
+
+    <script>
+    (function() {
+        const params   = new URLSearchParams(window.location.search);
+        const scheduleId = params.get('schedule_id');
+
+        const loading  = document.getElementById('loadingState');
+        const errorEl  = document.getElementById('errorState');
+        const form     = document.getElementById('reviewForm');
+        const thankYou = document.getElementById('thankYou');
+        const anonCb   = document.getElementById('isAnonymous');
+        const nameBlock = document.getElementById('nameBlock');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Toggle name field
+        anonCb.addEventListener('change', () => {
+            nameBlock.style.display = anonCb.checked ? 'none' : 'block';
+        });
+
+        // Load schedule info
+        if (!scheduleId) {
+            loading.style.display = 'none';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        fetch('/api/reviews?schedule_id=' + scheduleId)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) throw new Error(data.error);
+
+                document.getElementById('tourName').textContent = data.tour_name;
+                const d = new Date(data.start_date);
+                document.getElementById('tourDate').textContent =
+                    '📅 Ngày khởi hành: ' + d.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('reviewCount').textContent =
+                    data.review_count + ' người đã đánh giá';
+
+                loading.style.display = 'none';
+                form.style.display    = 'block';
+            })
+            .catch(() => {
+                loading.style.display = 'none';
+                errorEl.style.display = 'block';
+            });
+
+        // Submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const getRating = (name) => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                return el ? parseInt(el.value) : null;
+            };
+
+            const body = {
+                schedule_id:     parseInt(scheduleId),
+                reviewer_name:   document.getElementById('reviewerName').value.trim() || null,
+                is_anonymous:    anonCb.checked,
+                rating_vehicle:  getRating('rating_vehicle'),
+                rating_guide:    getRating('rating_guide'),
+                rating_meals:    getRating('rating_meals'),
+                rating_overall:  getRating('rating_overall'),
+                comment_vehicle: document.getElementById('comment_vehicle').value.trim() || null,
+                comment_guide:   document.getElementById('comment_guide').value.trim() || null,
+                comment_meals:   document.getElementById('comment_meals').value.trim() || null,
+                comment_general: document.getElementById('comment_general').value.trim() || null,
+                suggestion:      document.getElementById('suggestion').value.trim() || null,
+            };
+
+            // Must rate at least overall
+            if (!body.rating_overall) {
+                alert('⭐ Vui lòng chọn điểm Trải nghiệm Tổng thể trước khi gửi!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span style="border:2px solid white;border-top-color:transparent;border-radius:50%;width:18px;height:18px;animation:spin .7s linear infinite;display:inline-block"></span><span>Đang gửi...</span>';
+
+            try {
+                const res  = await fetch('/api/reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const data = await res.json();
+                if (data.success) {
+                    form.style.display    = 'none';
+                    thankYou.style.display = 'block';
+                } else {
+                    alert('❌ Lỗi: ' + (data.error || 'Không thể gửi đánh giá'));
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>🎯</span><span>Gửi Đánh Giá</span>';
+                }
+            } catch {
+                alert('❌ Lỗi kết nối. Vui lòng thử lại!');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>🎯</span><span>Gửi Đánh Giá</span>';
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

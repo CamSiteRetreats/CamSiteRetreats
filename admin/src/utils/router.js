@@ -11,6 +11,7 @@ export const initRouter = () => {
         '/admin/reports': () => import('../pages/Reports.js'),
         '/admin/users': () => import('../pages/Users.js'),
         '/admin/roster': () => import('../pages/Roster.js'),
+        '/admin/reviews': () => import('../pages/Reviews.js'),
     };
 
     const navigateTo = async (url) => {

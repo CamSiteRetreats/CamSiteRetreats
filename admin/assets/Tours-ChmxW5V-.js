@@ -1,4 +1,4 @@
-import{S as h,H as y}from"./Header-DflOc6ij.js";const B=()=>`
+import{S as h,H as y}from"./Header-CKJNmtLR.js";const B=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${h()}
         

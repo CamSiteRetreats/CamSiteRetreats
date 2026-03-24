@@ -1,4 +1,4 @@
-import{S as gt,H as ht}from"./Header-DflOc6ij.js";console.log("Bookings V3 - Cache Busted!");const xt=()=>`
+import{S as gt,H as ht}from"./Header-CKJNmtLR.js";console.log("Bookings V3 - Cache Busted!");const xt=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${gt()}
         
