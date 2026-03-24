@@ -1,4 +1,4 @@
-import{S as C,H as $}from"./Header-n5pNPUhI.js";const F=()=>`
+import{S as C,H as $}from"./Header-BkqStZbn.js";const F=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${C()}
         

@@ -1,4 +1,4 @@
-import{S as mt,H as ht}from"./Header-n5pNPUhI.js";console.log("Bookings V3 - Cache Busted!");const yt=()=>`
+import{S as mt,H as ht}from"./Header-BkqStZbn.js";console.log("Bookings V3 - Cache Busted!");const yt=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${mt()}
         
