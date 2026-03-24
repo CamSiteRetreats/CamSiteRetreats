@@ -97,9 +97,8 @@ const BookingFlow = {
                 const p = isoDate.split('/');
                 isoDate = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
             }
-            const eng = Object.create(BookingEngine);
-            Object.assign(eng, BookingEngine);
-            eng.mount(container, tourId, isoDate, {
+            // Dùng trực tiếp global BookingEngine để tất cả onclick handler tham chiếu đúng
+            BookingEngine.mount(container, tourId, isoDate, {
                 tourData: fallback,
                 onSuccess: (saved) => {
                     console.log('[BookingFlow] Booking saved:', saved.id);

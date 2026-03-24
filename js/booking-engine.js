@@ -623,8 +623,8 @@ const BookingEngine = {
             });
         }
         if (step === 5) {
-            // Auto-submit sau khi render step 5 (đã xác nhận điều khoản ở step 4)
-            this._submit();
+            // Không auto-submit — người dùng tự bấm nút "Gửi đăng ký"
+            // _submit() sẽ được gọi khi click button id="be-submit-btn"
         }
     },
 
