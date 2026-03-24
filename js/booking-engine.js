@@ -117,12 +117,14 @@ const BookingEngine = {
         </style>
 
         <!-- Stepper -->
-        <div style="padding: 0 0 20px; position: relative;">
-            <div style="position: absolute; top: 16px; left: 16%; right: 16%; height: 2px; background: #e5e7eb; z-index: 0; border-radius: 2px;"></div>
-            <div id="be-progress-line" style="position: absolute; top: 16px; left: 16%; height: 2px; background: #E85D04; z-index: 1; border-radius: 2px; transition: width 0.4s ease; width: 0%;"></div>
+        <div style="padding: 0 0 24px; position: relative;">
+            <!-- Track container: overflow hidden đảm bảo fill không vượt khung -->
+            <div style="position: absolute; top: 17px; left: calc(10% + 17px); right: calc(10% + 17px); height: 2px; background: #e5e7eb; border-radius: 2px; overflow: hidden; z-index: 0;">
+                <div id="be-progress-line" style="height: 100%; background: #E85D04; border-radius: 2px; transition: width 0.4s ease; width: 0%;"></div>
+            </div>
             <div style="display: flex; justify-content: space-between; position: relative; z-index: 2;">
                 ${steps.map(s => `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; background: transparent; padding: 0 8px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 20%;">
                         <div id="be-step-circle-${s.n}" style="
                             width: 34px; height: 34px; border-radius: 50%;
                             background: ${s.n === 1 ? '#E85D04' : '#e5e7eb'};
@@ -133,7 +135,7 @@ const BookingEngine = {
                         ">${s.n}</div>
                         <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
                             color: ${s.n === 1 ? '#E85D04' : '#9ca3af'}; letter-spacing: 0.04em;
-                            transition: color 0.3s;"
+                            transition: color 0.3s; text-align: center;"
                             id="be-step-label-${s.n}">${s.label}</span>
                     </div>
                 `).join('')}
