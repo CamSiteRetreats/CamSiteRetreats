@@ -501,7 +501,8 @@ const BookingEngine = {
         const deposit = this.getDepositAmount();
         const remaining = Math.max(0, grand - deposit);
         const d = this.bookingData;
-        const transferCode = this._generateTransferCode();
+        // Placeholder transfer code (chưa có CSR id) - chỉ dùng để hiển thị preview
+        const previewCode = this._generateTransferCode();
 
         return `
         <div style="display:flex; flex-direction:column; gap:16px;">
@@ -528,11 +529,15 @@ const BookingEngine = {
                     <span style="font-weight:900; font-size:22px; color:#E85D04;">${this.formatVND(deposit)}</span>
                 </div>
             </div>
-            <!-- QR SePay -->
+            <!-- QR SePay — Phase 1: Placeholder (ẩn trước khi submit) -->
             <div style="background:white; border: 1.5px solid #e5e7eb; border-radius:16px; padding:18px; text-align:center;">
                 <p style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:12px;">Quét mã QR để thanh toán cọc</p>
-                <div style="width:180px; height:180px; margin:0 auto 16px; border-radius:12px; overflow:hidden; border:3px solid rgba(232,93,4,.15); box-shadow: 0 4px 16px rgba(0,0,0,.06);">
-                    <img id="be-qr-img" src="${this._getQRUrl(deposit, transferCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain;">
+                <!-- QR Container với overlay -->
+                <div style="position:relative; width:180px; height:180px; margin:0 auto 16px;">
+                    <img id="be-qr-img" src="${this._getQRUrl(deposit, previewCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:12px; border:3px solid rgba(232,93,4,.15); filter:blur(4px); opacity:0.4;">
+                    <div id="be-qr-overlay" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(255,255,255,0.6); border-radius:12px;">
+                        <span style="font-size:12px; font-weight:700; color:#E85D04; text-align:center; line-height:1.4;">Nhấn "Gửi đăng ký"<br>để nhận mã QR chính xác</span>
+                    </div>
                 </div>
                 <div style="background:#f9fafb; border-radius:12px; padding:14px; text-align:left;">
                     <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Ngân hàng</span><span style="font-weight:700;">BIDV</span></div>
@@ -541,16 +546,16 @@ const BookingEngine = {
                     <div style="background:#fff3e8; border-radius:8px; padding:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
                         <div>
                             <div style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:3px;">Nội dung chuyển khoản</div>
-                            <div style="font-weight:800; color:#E85D04; font-family:monospace; font-size:13px;" id="be-transfer-code">${transferCode}</div>
+                            <div style="font-weight:800; color:#9ca3af; font-family:monospace; font-size:13px;" id="be-transfer-code">Chờ xác nhận đơn...</div>
                         </div>
                         <button onclick="BookingEngine._copyCode()" style="background: white; border: 1.5px solid #e5e7eb; border-radius:8px; padding:8px; cursor:pointer; color:#9ca3af; transition:all .2s;" title="Copy">
                             <i data-lucide="copy" style="width:16px;height:16px;"></i>
                         </button>
                     </div>
                 </div>
-                <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; color:#6b7280; font-size:13px;">
-                    <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
-                    Đang chờ xác nhận thanh toán...
+                <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; color:#6b7280; font-size:13px;" id="be-payment-status-text">
+                    <span style="width:8px;height:8px;background:#f59e0b;border-radius:50%;display:inline-block;"></span>
+                    Nhấn "Gửi đăng ký" để ghi nhận đơn
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
@@ -803,14 +808,33 @@ const BookingEngine = {
             if (!res.ok) throw new Error('Server error');
             const saved = await res.json();
 
-            // ── Cập nhật QR code và nội dung CK với CSR{id} để webhook match chính xác ──
+            // ── Phase 2: Reveal QR thật với CSR{id} sau khi nhận booking ID ──
             if (saved.id) {
                 const depositAmt = this.getDepositAmount();
                 const newCode = `CSR${saved.id} ${this._generateTransferCode()}`;
+
+                // Update QR image — xóa blur và overlay
                 const qrImg = document.getElementById('be-qr-img');
-                if (qrImg) qrImg.src = this._getQRUrl(depositAmt, newCode);
+                if (qrImg) {
+                    qrImg.src = this._getQRUrl(depositAmt, newCode);
+                    qrImg.style.filter = '';
+                    qrImg.style.opacity = '1';
+                }
+                const qrOverlay = document.getElementById('be-qr-overlay');
+                if (qrOverlay) qrOverlay.remove();
+
+                // Update transfer code
                 const codeEl = document.getElementById('be-transfer-code');
-                if (codeEl) codeEl.textContent = newCode;
+                if (codeEl) {
+                    codeEl.textContent = newCode;
+                    codeEl.style.color = '#E85D04';
+                }
+
+                // Update status text → chờ thanh toán
+                const statusText = document.getElementById('be-payment-status-text');
+                if (statusText) {
+                    statusText.innerHTML = `<span style="width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span> Đang chờ xác nhận thanh toán...`;
+                }
             }
 
             // Increment coupon usage
