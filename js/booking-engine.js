@@ -490,22 +490,25 @@ const BookingEngine = {
 
             <div style="display:flex; gap:10px;">
                 <button onclick="BookingEngine._renderStep(3)" class="be-step-btn be-btn-secondary" style="width:30%;">← Quay lại</button>
-                <button id="be-step4-next" class="be-step-btn be-btn-primary" style="flex:1; opacity:.5; cursor:not-allowed;" disabled>Đồng ý &amp; Tiếp tục Thanh toán →</button>
+                <button id="be-step4-next" class="be-step-btn be-btn-primary" style="flex:1; opacity:.5; cursor:not-allowed;" disabled>Gửi đăng ký &amp; Xác nhận →</button>
             </div>
         </div>`;
     },
 
-    // ── Bước 5: Thanh toán ───────────────────────────────────────────────────
+    // ── Bước 5: Thanh toán (Sau khi submit thành công) ───────────────────────
     _step5() {
         const grand = this.getGrandTotal();
         const deposit = this.getDepositAmount();
         const remaining = Math.max(0, grand - deposit);
         const d = this.bookingData;
-        // Placeholder transfer code (chưa có CSR id) - chỉ dùng để hiển thị preview
-        const previewCode = this._generateTransferCode();
+        const savedId = this.bookingData.savedId || '';
+        const realCode = `CSR${savedId} ${this._generateTransferCode()}`;
 
         return `
         <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="background:#def7ec; color:#03543f; padding:16px; border-radius:12px; font-weight:600; font-size:14px; text-align:center; border:1px solid #c8ebdf;">
+                ✅ Gửi đăng ký thành công! Vui lòng thanh toán cọc để giữ chỗ.
+            </div>
             <!-- Tóm tắt đơn hàng -->
             <div style="background:#fff8f0; border: 1.5px solid #fde8d8; border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:8px;">
                 <div style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:6px;">Xác nhận đơn hàng</div>
@@ -529,15 +532,11 @@ const BookingEngine = {
                     <span style="font-weight:900; font-size:22px; color:#E85D04;">${this.formatVND(deposit)}</span>
                 </div>
             </div>
-            <!-- QR SePay — Phase 1: Placeholder (ẩn trước khi submit) -->
+            <!-- QR SePay — Phase 2: Thanh toán -->
             <div style="background:white; border: 1.5px solid #e5e7eb; border-radius:16px; padding:18px; text-align:center;">
                 <p style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:12px;">Quét mã QR để thanh toán cọc</p>
-                <!-- QR Container với overlay -->
-                <div style="position:relative; width:180px; height:180px; margin:0 auto 16px;">
-                    <img id="be-qr-img" src="${this._getQRUrl(deposit, previewCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:12px; border:3px solid rgba(232,93,4,.15); filter:blur(4px); opacity:0.4;">
-                    <div id="be-qr-overlay" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(255,255,255,0.6); border-radius:12px;">
-                        <span style="font-size:12px; font-weight:700; color:#E85D04; text-align:center; line-height:1.4;">Nhấn "Gửi đăng ký"<br>để nhận mã QR chính xác</span>
-                    </div>
+                <div style="width:180px; height:180px; margin:0 auto 16px;">
+                    <img id="be-qr-img" src="${this._getQRUrl(deposit, realCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain; border-radius:12px; border:3px solid rgba(232,93,4,.15);">
                 </div>
                 <div style="background:#f9fafb; border-radius:12px; padding:14px; text-align:left;">
                     <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Ngân hàng</span><span style="font-weight:700;">BIDV</span></div>
@@ -546,7 +545,7 @@ const BookingEngine = {
                     <div style="background:#fff3e8; border-radius:8px; padding:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
                         <div>
                             <div style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:3px;">Nội dung chuyển khoản</div>
-                            <div style="font-weight:800; color:#9ca3af; font-family:monospace; font-size:13px;" id="be-transfer-code">Chờ xác nhận đơn...</div>
+                            <div style="font-weight:800; color:#E85D04; font-family:monospace; font-size:13px;" id="be-transfer-code">${realCode}</div>
                         </div>
                         <button onclick="BookingEngine._copyCode()" style="background: white; border: 1.5px solid #e5e7eb; border-radius:8px; padding:8px; cursor:pointer; color:#9ca3af; transition:all .2s;" title="Copy">
                             <i data-lucide="copy" style="width:16px;height:16px;"></i>
@@ -554,13 +553,12 @@ const BookingEngine = {
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; color:#6b7280; font-size:13px;" id="be-payment-status-text">
-                    <span style="width:8px;height:8px;background:#f59e0b;border-radius:50%;display:inline-block;"></span>
-                    Nhấn "Gửi đăng ký" để ghi nhận đơn
+                    <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                    Đang chờ xác nhận thanh toán...
                 </div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="BookingEngine._renderStep(4)" class="be-step-btn be-btn-secondary" style="width:30%;">← Quay lại</button>
-                <button id="be-submit-btn" onclick="BookingEngine._submit()" class="be-step-btn be-btn-primary" style="flex:1;">Gửi đăng ký &amp; Xác nhận</button>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <a href="/" class="be-step-btn be-btn-primary" style="text-decoration:none; text-align:center; flex:1;">Về trang chủ</a>
             </div>
         </div>
         <style>@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }</style>`;
@@ -642,7 +640,7 @@ const BookingEngine = {
 
             if (nextBtn) nextBtn.addEventListener('click', () => {
                 const allChecked = checkboxes.every(id => document.getElementById(id)?.checked);
-                if (allChecked) this._renderStep(5);
+                if (allChecked) this._submit(); // Thay vì this._renderStep(5)
             });
         }
         if (step === 5) {
@@ -764,7 +762,7 @@ const BookingEngine = {
         if (this._submitting) return;
         this._submitting = true;
 
-        const btn = document.getElementById('be-submit-btn');
+        const btn = document.getElementById('be-step4-next');
         if (btn) { btn.textContent = 'Đang gửi...'; btn.disabled = true; }
 
         const payload = {
@@ -808,34 +806,11 @@ const BookingEngine = {
             if (!res.ok) throw new Error('Server error');
             const saved = await res.json();
 
-            // ── Phase 2: Reveal QR thật với CSR{id} sau khi nhận booking ID ──
-            if (saved.id) {
-                const depositAmt = this.getDepositAmount();
-                const newCode = `CSR${saved.id} ${this._generateTransferCode()}`;
-
-                // Update QR image — xóa blur và overlay
-                const qrImg = document.getElementById('be-qr-img');
-                if (qrImg) {
-                    qrImg.src = this._getQRUrl(depositAmt, newCode);
-                    qrImg.style.filter = '';
-                    qrImg.style.opacity = '1';
-                }
-                const qrOverlay = document.getElementById('be-qr-overlay');
-                if (qrOverlay) qrOverlay.remove();
-
-                // Update transfer code
-                const codeEl = document.getElementById('be-transfer-code');
-                if (codeEl) {
-                    codeEl.textContent = newCode;
-                    codeEl.style.color = '#E85D04';
-                }
-
-                // Update status text → chờ thanh toán
-                const statusText = document.getElementById('be-payment-status-text');
-                if (statusText) {
-                    statusText.innerHTML = `<span style="width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span> Đang chờ xác nhận thanh toán...`;
-                }
-            }
+            // ── Chuyển sang Phase 2: Render Step 5 với CSR{id} ──
+            this.bookingData.savedId = saved.id;
+            
+            // Render Step 5 ngay lập tức
+            this._renderStep(5);
 
             // Increment coupon usage
             if (this.coupon?.code) {
@@ -845,19 +820,12 @@ const BookingEngine = {
             // Poll payment
             this._startPolling(saved.id);
 
-            // Show success / QR screen (already on step 4, just update status text)
-            const statusEl = this._container?.querySelector('#be-step-body');
-            if (statusEl) {
-                const el = statusEl.querySelector('[style*="chờ xác nhận"]');
-                if (el) el.innerHTML = `<span style="color:#22c55e;">✅ Đơn đã được ghi nhận. Vui lòng chuyển khoản cọc để giữ chỗ!</span>`;
-            }
-
             if (this.onSuccess) this.onSuccess(saved);
         } catch(e) {
             console.error('Submit error:', e);
             this._submitting = false; // Reset để cho phép retry
             alert('Có lỗi xảy ra: ' + e.message);
-            if (btn) { btn.textContent = 'Gửi đăng ký'; btn.disabled = false; }
+            if (btn) { btn.textContent = 'Gửi đăng ký & Xác nhận →'; btn.disabled = false; }
         }
     },
 
