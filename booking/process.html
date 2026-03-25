@@ -184,6 +184,7 @@
                             };
 
                             const prefill = {
+                                savedId:        bookingId,
                                 name:           b.name          || '',
                                 phone:          b.phone         || '',
                                 dob:            b.dob           || '',
@@ -195,6 +196,7 @@
                                 vegetarian:     b.diet === 'Ăn chay',
                                 trekkingPole:   b.trekking_pole === 'Có',
                                 specialRequest: b.special       || '',
+                                depositRequired: parseInt(b.deposit_required), // Đồng bộ số tiền cọc
                             };
 
                             // Re-mount với đủ tourData (để sinh đúng form step 2 & 3)

@@ -30,8 +30,10 @@ const BookingEngine = {
         return Math.max(0, total - this.discountAmount);
     },
     getDepositAmount() {
-        // Tiền cọc cố định — khách chỉ cọc trước, phần còn lại thanh toán sau
-        return this.DEPOSIT_AMOUNT;
+        if (this.bookingData && this.bookingData.depositRequired !== undefined && !isNaN(this.bookingData.depositRequired)) {
+            return this.bookingData.depositRequired;
+        }
+        return 1000000;
     },
     formatVND(n) {
         return parseInt(n || 0).toLocaleString('vi-VN') + 'đ';
@@ -765,7 +767,9 @@ const BookingEngine = {
         const btn = document.getElementById('be-step4-next');
         if (btn) { btn.textContent = 'Đang gửi...'; btn.disabled = true; }
 
+        const isUpdate = !!this.bookingData.savedId;
         const payload = {
+            id: isUpdate ? this.bookingData.savedId : undefined,
             name: this.bookingData.name,
             phone: this.bookingData.phone,
             tour: this.tourData?.name || '',
@@ -782,11 +786,15 @@ const BookingEngine = {
             services_booked: JSON.stringify(Object.values(this.selectedServices)),
             coupon_code: this.coupon?.code || null,
             discount: this.discountAmount,
-            total_price: this.getGrandTotal(),       // Tổng giá trị đơn (tour + dịch vụ - coupon)
-            deposit_required: this.getDepositAmount(), // Tiền cọc cố định 1,000,000đ
+            total_price: this.getGrandTotal(), // Tổng giá trị đơn được tính lại
             commitments: true,
-            status: 'Chờ xác nhận cọc',
         };
+
+        if (!isUpdate) {
+            // Chỉ gán deposit và status mặc định khi TẠO MỚI, tránh ghi đè dữ liệu của Admin
+            payload.deposit_required = this.getDepositAmount();
+            payload.status = 'Chờ xác nhận cọc';
+        }
 
         try {
             // Sync CRM
