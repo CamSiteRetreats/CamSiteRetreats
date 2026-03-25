@@ -1004,7 +1004,7 @@
 
                             <button onclick="initiateBooking()" id="btn-book-now"
                                 class="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02] active:scale-95 transition-all mt-4 opacity-50 cursor-not-allowed">
-                                Nhận Tư Vấn Ngay
+                                Đăng Ký Ngay
                             </button>
                         </div>
                     </div>
@@ -1050,11 +1050,12 @@
             <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest leading-none mb-1">Giá tour từ</p>
             <p id="mobile-tour-price-display" class="text-xl font-black text-primary leading-none">3.200.000đ</p>
         </div>
-        <button onclick="document.getElementById('booking-form').scrollIntoView({behavior:'smooth', block:'center'})"
+        <button onclick="openBookingModal()"
             class="bg-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all uppercase text-sm tracking-widest">
-            Nhận Tư Vấn
+            Đăng Ký Ngay
         </button>
     </div>
+
 
     <!-- Footer Placeholder -->
     <div id="footer-placeholder"></div>
@@ -1184,6 +1185,9 @@
                 alert('Lỗi: Không tìm thấy module BookingFlow. Vui lòng tải lại trang.');
             }
         }
+
+        // Alias để mobile CTA button gọi được
+        window.openBookingModal = initiateBooking;
 
         // Initialize Data & Recommendations
         document.addEventListener('DOMContentLoaded', () => {
