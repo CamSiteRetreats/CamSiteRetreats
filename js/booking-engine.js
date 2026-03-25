@@ -736,7 +736,7 @@ const BookingEngine = {
         const normalize = str => (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '').trim();
         const tourPart = normalize((this.tourData?.name || 'tour').split('-')[0].trim()).slice(0, 8);
         const datePart = (this.selectedDate || '').replace(/[-\/]/g, '').slice(0, 8);
-        const namePart = normalize(this.bookingData.name || 'khach').slice(0, 10);
+        const namePart = normalize(this.bookingData.name || 'khach').slice(0, 20);
         return `${tourPart} ${datePart} ${namePart} coc`;
     },
 

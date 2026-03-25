@@ -178,14 +178,19 @@ async function handleSepayWebhook({ request, env }) {
         }
     }
 
-    // ── Strategy 2: Match by Customer Name + Tour Name (fallback) ──
+    // ── Strategy 2: Match by Customer Name + Tour Name (prefix-tolerant fallback) ──
+    // Dùng prefix match để handle trường hợp tên bị cắt trong QR code
     if (!matchedBooking) {
         for (const booking of bookings) {
             const bName = normalizeVN(booking.name);
             const bTour = normalizeVN((booking.tour || '').split('-')[0]);
 
-            if (bName.length >= 3 && cleanSearch.includes(bName) &&
-                bTour.length >= 2 && cleanSearch.includes(bTour)) {
+            // Lấy 8 ký tự đầu của tên để so khớp (đủ unique, chịu được cắt bớt cuối)
+            const namePrefix = bName.slice(0, 8);
+            const tourPrefix = bTour.slice(0, 6);
+
+            if (namePrefix.length >= 3 && cleanSearch.includes(namePrefix) &&
+                tourPrefix.length >= 2 && cleanSearch.includes(tourPrefix)) {
                 matchedBooking = booking;
                 break;
             }
