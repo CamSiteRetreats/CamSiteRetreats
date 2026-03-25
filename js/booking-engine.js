@@ -17,6 +17,8 @@ const BookingEngine = {
     discountAmount: 0,
 
     // ── Giá tính toán 
+    DEPOSIT_AMOUNT: 1000000, // Tiền cọc cố định: 1,000,000đ
+
     getServicesTotal() {
         return Object.values(this.selectedServices).reduce((s, sv) => s + (sv.price || 0), 0);
     },
@@ -26,6 +28,10 @@ const BookingEngine = {
     getGrandTotal() {
         const total = this.getBasePrice() + this.getServicesTotal();
         return Math.max(0, total - this.discountAmount);
+    },
+    getDepositAmount() {
+        // Tiền cọc cố định — khách chỉ cọc trước, phần còn lại thanh toán sau
+        return this.DEPOSIT_AMOUNT;
     },
     formatVND(n) {
         return parseInt(n || 0).toLocaleString('vi-VN') + 'đ';
@@ -492,6 +498,8 @@ const BookingEngine = {
     // ── Bước 5: Thanh toán ───────────────────────────────────────────────────
     _step5() {
         const grand = this.getGrandTotal();
+        const deposit = this.getDepositAmount();
+        const remaining = Math.max(0, grand - deposit);
         const d = this.bookingData;
         const transferCode = this._generateTransferCode();
 
@@ -507,16 +515,24 @@ const BookingEngine = {
                 <div class="be-summary-row"><span style="color:#9ca3af; padding-left:8px;">+ ${sv.label}</span><span style="color:#E85D04;">+${this.formatVND(sv.price)}</span></div>
                 `).join('')}
                 ${this.coupon ? `<div class="be-summary-row" style="color:#16a34a;"><span>Giảm giá (${this.coupon.code})</span><span>-${this.formatVND(this.discountAmount)}</span></div>` : ''}
+                <div class="be-summary-row" style="opacity:0.7;">
+                    <span style="color:#6b7280; font-size:13px;">Tổng giá trị đơn</span>
+                    <span style="font-weight:600; font-size:13px;">${this.formatVND(grand)}</span>
+                </div>
+                ${remaining > 0 ? `<div class="be-summary-row" style="opacity:0.6;">
+                    <span style="color:#9ca3af; font-size:12px; font-style:italic;">Còn lại thanh toán sau</span>
+                    <span style="color:#9ca3af; font-size:12px; font-style:italic;">${this.formatVND(remaining)}</span>
+                </div>` : ''}
                 <div style="border-top:2px dashed #fde8d8; margin-top:4px; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-weight:800; font-size:13px; text-transform:uppercase;">Số tiền cọc</span>
-                    <span style="font-weight:900; font-size:22px; color:#E85D04;">${this.formatVND(grand)}</span>
+                    <span style="font-weight:900; font-size:22px; color:#E85D04;">${this.formatVND(deposit)}</span>
                 </div>
             </div>
             <!-- QR SePay -->
             <div style="background:white; border: 1.5px solid #e5e7eb; border-radius:16px; padding:18px; text-align:center;">
                 <p style="font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:12px;">Quét mã QR để thanh toán cọc</p>
                 <div style="width:180px; height:180px; margin:0 auto 16px; border-radius:12px; overflow:hidden; border:3px solid rgba(232,93,4,.15); box-shadow: 0 4px 16px rgba(0,0,0,.06);">
-                    <img id="be-qr-img" src="${this._getQRUrl(grand, transferCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain;">
+                    <img id="be-qr-img" src="${this._getQRUrl(deposit, transferCode)}" alt="QR" style="width:100%; height:100%; object-fit:contain;">
                 </div>
                 <div style="background:#f9fafb; border-radius:12px; padding:14px; text-align:left;">
                     <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Ngân hàng</span><span style="font-weight:700;">BIDV</span></div>
@@ -759,8 +775,8 @@ const BookingEngine = {
             services_booked: JSON.stringify(Object.values(this.selectedServices)),
             coupon_code: this.coupon?.code || null,
             discount: this.discountAmount,
-            total_price: this.getGrandTotal(),
-            deposit_required: this.getGrandTotal(),
+            total_price: this.getGrandTotal(),       // Tổng giá trị đơn (tour + dịch vụ - coupon)
+            deposit_required: this.getDepositAmount(), // Tiền cọc cố định 1,000,000đ
             commitments: true,
             status: 'Chờ xác nhận cọc',
         };
