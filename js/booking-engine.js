@@ -790,10 +790,25 @@ const BookingEngine = {
             commitments: true,
         };
 
+        // Xử lý Ghi nhận Nguồn tạo đơn (Nếu là Admin/Sale đang đăng nhập mà giả lập tạo đơn hộ khách)
+        let sale_id = null, sale_name = null;
+        try {
+            const userStr = localStorage.getItem('csr_user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                sale_id = user.id;
+                sale_name = user.fullName || user.full_name || 'Admin';
+            }
+        } catch(e) {}
+
         if (!isUpdate) {
             // Chỉ gán deposit và status mặc định khi TẠO MỚI, tránh ghi đè dữ liệu của Admin
             payload.deposit_required = this.getDepositAmount();
             payload.status = 'Chờ xác nhận cọc';
+            if (sale_name) {
+                payload.sale_name = sale_name;
+                payload.sale_id = sale_id;
+            }
         }
 
         try {
