@@ -897,10 +897,10 @@ export const afterRender = () => {
                         <div class="flex justify-between items-start md:block">
                             <div>
                                 <div class="font-bold text-gray-900 text-base md:text-sm">${b.name}</div>
-                                ${b.customer_id
-                                    ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
-                                    : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
-                                }
+                                <div class="mt-1 flex items-center gap-2">
+                                    <div class="bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">#CSR${b.id}</div>
+                                    <div class="text-[11px] text-gray-500">${b.phone}</div>
+                                </div>
                             </div>
                             <div class="md:hidden text-right">
                                 <div class="text-[10px] text-gray-400 uppercase font-medium">Trạng thái</div>
@@ -969,10 +969,10 @@ export const afterRender = () => {
                             <div class="w-12 h-12 md:w-10 md:h-10 rounded-full bg-csr-orange/20 text-csr-orange flex items-center justify-center font-bold text-base md:text-sm shrink-0">${avtChar}</div>
                             <div class="min-w-0">
                                 <div class="font-bold text-gray-900 text-base md:text-sm truncate">${b.name}</div>
-                                ${b.customer_id
-                                    ? `<div class="mt-1 flex items-center bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">${b.customer_id.toUpperCase()}</div>`
-                                    : `<div class="text-[11px] text-gray-500 mt-0.5">${b.phone}</div>`
-                                }
+                                <div class="mt-1 flex items-center gap-2">
+                                    <div class="bg-orange-50 text-csr-orange text-[10px] md:text-xs font-bold px-2 py-0.5 rounded border border-orange-100 w-fit">#CSR${b.id}</div>
+                                    <div class="text-[11px] text-gray-500">${b.phone}</div>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -1230,7 +1230,7 @@ export const afterRender = () => {
             const rows = [headers];
             dataToExport.forEach(b => {
                 rows.push([
-                    b.customer_id || '',
+                    `"#CSR${b.id}"`,
                     `"${b.name || ''}"`,
                     `= "${b.phone || ''}"`, // Force Excel treat as text string
                     `"${b.tour || ''}"`,
@@ -1344,7 +1344,7 @@ export const afterRender = () => {
     // Modal Hành Động trên Dòng (Row Action Modal)
     window.openRowActionModal = (booking) => {
         document.getElementById('ramName').textContent = booking.name || 'Khách Hàng Này';
-        document.getElementById('ramPhone').textContent = booking.customer_id ? `🥇 ${booking.customer_id.toUpperCase()}` : (booking.phone || '');
+        document.getElementById('ramPhone').textContent = `#CSR${booking.id} - ${booking.phone || ''}`;
 
         const actionHtml = `
             <button class="w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-4 hover:bg-gray-50 transition-colors group" onclick="window.actionView(${booking.id})">
@@ -1391,7 +1391,7 @@ export const afterRender = () => {
            <div class="grid grid-cols-2 gap-y-3 gap-x-6 border-b pb-4">
                <p><strong class="text-gray-500 block">Họ và Tên:</strong> <span class="text-lg font-medium">${booking.name}</span></p>
                <p><strong class="text-gray-500 block">SĐT:</strong> <span class="text-lg">${booking.phone}</span></p>
-               <p><strong class="text-gray-500 block">Mã CRM:</strong> <span class="text-csr-orange font-mono">${booking.customer_id || 'Trống'}</span></p>
+               <p><strong class="text-gray-500 block">ID Đơn:</strong> <span class="text-csr-orange font-mono font-bold text-lg">#CSR${booking.id}</span></p>
                <p><strong class="text-gray-500 block">Huy Chương:</strong> <span class="text-csr-orange font-bold text-lg">${booking.medal_name || 'Theo Tên Thật'}</span></p>
            </div>
             <div class="grid grid-cols-2 gap-y-3 gap-x-6 border-b py-4 bg-gray-50/50 rounded-lg p-3">
