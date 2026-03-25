@@ -12,6 +12,7 @@ export const initRouter = () => {
         '/admin/users': () => import('../pages/Users.js'),
         '/admin/roster': () => import('../pages/Roster.js'),
         '/admin/reviews': () => import('../pages/Reviews.js'),
+        '/admin/blog': () => import('../pages/Blog.js'),
     };
 
     const navigateTo = async (url) => {
@@ -19,9 +20,18 @@ export const initRouter = () => {
         await router();
     };
 
+    const getRoute = (path) => {
+        const matched = routes[path];
+        if (!matched && path !== '/admin/login') {
+            const fallback = Object.keys(routes).find(r => r !== '/admin/' && path.startsWith(r));
+            if (fallback) return routes[fallback];
+        }
+        return matched || routes['/admin/'];
+    };
+
     const router = async () => {
         const path = location.pathname;
-        const matchedRoute = routes[path] || routes['/admin/'];
+        const matchedRoute = getRoute(path);
 
         // Mock Auth Guard
         const isAuthenticated = localStorage.getItem('csr_admin_token') !== null;

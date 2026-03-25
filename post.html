@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Bài viết - CAM SITE RETREATS</title>
+    <meta name="description" id="page-desc" content="Blog CAM SITE RETREATS">
+    <meta property="og:title" id="og-title" content="">
+    <meta property="og:description" id="og-desc" content="">
+    <meta property="og:image" id="og-image" content="">
+    <script>window.onerror=function(m){console.error(m);return false;}</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script src="/js/tour-manager.js?v=2"></script>
+    <script src="/js/ui-components.js?v=2"></script>
+    <style>
+        :root { --primary: #E85D04; --secondary: #FFF8F0; }
+        body { font-family: 'Montserrat', sans-serif; background: #fafaf8; }
+        .text-primary { color: var(--primary); }
+        .bg-primary { background: var(--primary); }
+
+        /* Hero ảnh bìa */
+        .post-hero {
+            height: 480px; position: relative;
+            background: linear-gradient(135deg, #1a0a00, #3d1a00);
+        }
+        .post-hero img {
+            width: 100%; height: 100%;
+            object-fit: cover; opacity: 0.7;
+        }
+        .post-hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+        }
+        .post-hero-content {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 40px 24px; max-width: 800px; margin: 0 auto;
+        }
+
+        /* Nội dung bài viết */
+        .post-body {
+            font-family: 'Lora', Georgia, serif;
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: #2d2d2d;
+        }
+        .post-body h2 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; margin: 2em 0 0.8em; color: #1a1a1a; }
+        .post-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 700; margin: 1.8em 0 0.6em; color: #333; }
+        .post-body p { margin: 0 0 1.4em; }
+        .post-body img { border-radius: 16px; max-width: 100%; height: auto; margin: 1.5em 0; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+        .post-body blockquote {
+            margin: 1.5em 0; padding: 1em 1.5em;
+            border-left: 4px solid #E85D04;
+            background: #fff8f0; border-radius: 0 12px 12px 0;
+            font-style: italic; color: #555;
+        }
+        .post-body ul, .post-body ol { padding-left: 1.5em; margin: 0.8em 0 1.4em; }
+        .post-body li { margin: 0.4em 0; }
+        .post-body strong { font-weight: 700; color: #1a1a1a; }
+        .post-body a { color: #E85D04; text-decoration: underline; }
+
+        /* Related posts */
+        .related-card {
+            border-radius: 16px; overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .related-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,93,4,0.12); }
+
+        /* TOC */
+        .toc-item { display: block; padding: 6px 0; color: #6b7280; font-size: 13px; text-decoration: none; transition: color 0.2s; }
+        .toc-item:hover, .toc-item.active { color: #E85D04; font-weight: 600; }
+
+        /* Progress bar */
+        #read-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, #E85D04, #f48c06);
+            transition: width 0.1s; z-index: 9999;
+            width: 0%;
+        }
+
+        /* Cat badge */
+        .cat-badge {
+            display: inline-block; padding: 3px 12px; border-radius: 999px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; background: rgba(232,93,4,0.15); color: #E85D04;
+        }
+
+        @media (max-width: 768px) {
+            .post-hero { height: 320px; }
+            .post-body { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Reading progress bar -->
+    <div id="read-progress"></div>
+
+    <div id="header-placeholder"></div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div class="w-12 h-12 rounded-full border-4 border-orange-100 border-t-orange-500 animate-spin mb-4"></div>
+        <p class="text-gray-400 text-sm font-medium">Đang tải bài viết...</p>
+    </div>
+
+    <!-- Post content (hidden until loaded) -->
+    <div id="post-content" class="hidden">
+        <!-- Hero -->
+        <div class="post-hero" id="post-hero">
+            <img id="post-thumbnail" src="" alt="" class="hidden">
+            <div class="post-hero-overlay"></div>
+            <div class="post-hero-content text-white" style="max-width:100%">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="cat-badge" id="post-category"></span>
+                        <span class="text-sm opacity-70" id="post-date"></span>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4" id="post-title">Đang tải...</h1>
+                    <p class="text-base md:text-lg opacity-80 line-clamp-2 max-w-2xl" id="post-excerpt"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <div class="bg-white border-b border-gray-100 py-3 px-6">
+            <div class="max-w-6xl mx-auto flex items-center gap-2 text-sm text-gray-400">
+                <a href="/" class="hover:text-primary transition-colors">Trang chủ</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <a href="/blog.html" class="hover:text-primary transition-colors">Blog</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <span class="text-gray-600 font-medium truncate max-w-xs" id="breadcrumb-title"></span>
+            </div>
+        </div>
+
+        <!-- Layout: article + sidebar -->
+        <div class="max-w-6xl mx-auto px-6 py-12">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Article -->
+                <article class="flex-1 min-w-0">
+                    <div class="post-body bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-50" id="post-body">
+                    </div>
+
+                    <!-- Share / Back -->
+                    <div class="mt-8 flex items-center justify-between flex-wrap gap-4">
+                        <a href="/blog.html" class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            Quay lại Blog
+                        </a>
+                        <button onclick="sharePost()" class="flex items-center gap-2 px-5 py-2 rounded-full bg-orange-50 text-primary font-bold text-sm hover:bg-primary hover:text-white transition-all">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                            Chia sẻ
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Sidebar: TOC + CTA -->
+                <aside class="lg:w-72 shrink-0">
+                    <!-- Table of Contents -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6 sticky top-20" id="toc-box">
+                        <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Mục lục</p>
+                        <nav id="toc-list"><p class="text-sm text-gray-400">Đang tải...</p></nav>
+                    </div>
+
+                    <!-- CTA Box -->
+                    <div class="rounded-2xl p-6 text-white" style="background: linear-gradient(135deg, #E85D04, #b84e00)">
+                        <p class="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Tham gia cùng chúng tôi</p>
+                        <h3 class="text-xl font-black mb-3 leading-tight">Sẵn sàng cho chuyến đi kế tiếp?</h3>
+                        <p class="text-sm opacity-80 mb-5 leading-relaxed">Khám phá các tour trekking sắp tới và đặt chỗ ngay hôm nay.</p>
+                        <a href="/#chuyen-di" class="block text-center py-3 rounded-xl font-bold text-primary bg-white hover:bg-orange-50 transition-all text-sm">
+                            Xem các tour →
+                        </a>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Related Posts -->
+            <div id="related-section" class="mt-16">
+                <h2 class="text-2xl font-black text-gray-800 mb-8 uppercase tracking-tight">Bài viết liên quan</h2>
+                <div id="related-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 404 state -->
+    <div id="not-found" class="hidden min-h-screen flex flex-col items-center justify-center text-center px-6">
+        <div class="text-6xl mb-4">📭</div>
+        <h2 class="text-2xl font-black text-gray-800 mb-3">Không tìm thấy bài viết</h2>
+        <p class="text-gray-400 mb-6">Bài viết này không tồn tại hoặc đã bị gỡ xuống.</p>
+        <a href="/blog.html" class="px-6 py-3 rounded-full bg-primary text-white font-bold">← Quay lại Blog</a>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // ─── Reading progress bar ──────────────────────────────
+        window.addEventListener('scroll', () => {
+            const doc = document.documentElement;
+            const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight) * 100;
+            document.getElementById('read-progress').style.width = scrolled + '%';
+        });
+
+        function fmtDate(iso) {
+            if (!iso) return '';
+            return new Date(iso).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        // ─── Build Table of Contents from headings ─────────────
+        function buildTOC(content) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = content;
+            const headings = tmp.querySelectorAll('h2, h3');
+            if (headings.length === 0) {
+                document.getElementById('toc-box').classList.add('hidden');
+                return;
+            }
+            const items = [];
+            headings.forEach((h, i) => {
+                const id = `heading-${i}`;
+                const isH3 = h.tagName === 'H3';
+                items.push({ id, text: h.textContent, isH3 });
+            });
+
+            // Apply IDs to actual rendered headings
+            const rendered = document.getElementById('post-body').querySelectorAll('h2, h3');
+            rendered.forEach((h, i) => { if (items[i]) h.id = items[i].id; });
+
+            document.getElementById('toc-list').innerHTML = items.map(item => `
+                <a href="#${item.id}" class="toc-item ${item.isH3 ? 'pl-4' : ''}">${item.text}</a>
+            `).join('');
+
+            // Scroll spy
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    const link = document.querySelector(`a[href="#${e.target.id}"]`);
+                    if (link) link.classList.toggle('active', e.isIntersecting);
+                });
+            }, { rootMargin: '-30% 0px -60% 0px' });
+            rendered.forEach(h => observer.observe(h));
+        }
+
+        // ─── Load post data ────────────────────────────────────
+        async function loadPost() {
+            const slug = new URLSearchParams(location.search).get('slug');
+            if (!slug) { showNotFound(); return; }
+
+            try {
+                const res = await fetch(`/api/blog?slug=${encodeURIComponent(slug)}`);
+                if (!res.ok) { showNotFound(); return; }
+                const { post, related } = await res.json();
+                if (!post) { showNotFound(); return; }
+
+                // Meta tags
+                document.getElementById('page-title').textContent = `${post.title} - CAM SITE RETREATS`;
+                document.getElementById('page-desc').content = post.excerpt || '';
+                document.getElementById('og-title').content = post.title;
+                document.getElementById('og-desc').content = post.excerpt || '';
+                if (post.thumbnail) document.getElementById('og-image').content = post.thumbnail;
+
+                // Hero
+                if (post.thumbnail) {
+                    const img = document.getElementById('post-thumbnail');
+                    img.src = post.thumbnail;
+                    img.alt = post.title;
+                    img.classList.remove('hidden');
+                    document.getElementById('post-hero').style.background = 'black';
+                }
+                document.getElementById('post-category').textContent = post.category || 'Blog';
+                document.getElementById('post-date').textContent = fmtDate(post.published_at || post.created_at);
+                document.getElementById('post-title').textContent = post.title;
+                document.getElementById('post-excerpt').textContent = post.excerpt || '';
+                document.getElementById('breadcrumb-title').textContent = post.title;
+
+                // Body
+                document.getElementById('post-body').innerHTML = post.content || '<p class="text-gray-400">Bài viết này chưa có nội dung.</p>';
+                buildTOC(post.content || '');
+
+                // Related
+                if (related && related.length > 0) {
+                    document.getElementById('related-grid').innerHTML = related.map(p => `
+                        <a href="/post.html?slug=${p.slug}" class="related-card block no-underline">
+                            <div style="height:160px; overflow:hidden; background:#fff0e6">
+                                ${p.thumbnail ? `<img src="${p.thumbnail}" class="w-full h-full object-cover" alt="${p.title}">` : '<div class="w-full h-full flex items-center justify-center text-4xl">📖</div>'}
+                            </div>
+                            <div class="p-4">
+                                <span style="font-size:10px;font-weight:800;color:#E85D04;text-transform:uppercase;">${p.category}</span>
+                                <h3 class="text-sm font-bold text-gray-800 mt-1 leading-snug" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</h3>
+                            </div>
+                        </a>
+                    `).join('');
+                } else {
+                    document.getElementById('related-section').classList.add('hidden');
+                }
+
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('post-content').classList.remove('hidden');
+                lucide.createIcons();
+            } catch (e) {
+                showNotFound();
+            }
+        }
+
+        function showNotFound() {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('not-found').classList.remove('hidden');
+        }
+
+        function sharePost() {
+            if (navigator.share) {
+                navigator.share({ title: document.title, url: location.href });
+            } else {
+                navigator.clipboard.writeText(location.href);
+                alert('Đã copy link bài viết!');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPost);
+
+        const s = document.createElement('style');
+        s.textContent = `.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}`;
+        document.head.append(s);
+    </script>
+</body>
+</html>

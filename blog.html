@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog & Câu chuyện - CAM SITE RETREATS</title>
+    <meta name="description" content="Khám phá câu chuyện, kinh nghiệm trekking và hành trình chữa lành từ cộng đồng CAM SITE RETREATS.">
+    <meta property="og:title" content="Blog & Câu chuyện - CAM SITE RETREATS">
+    <meta property="og:description" content="Những câu chuyện thật, cảm xúc thật từ mỗi chuyến đi.">
+    <script>window.onerror=function(m){console.error(m);return false;}</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="js/tour-manager.js?v=2"></script>
+    <script src="js/ui-components.js?v=2"></script>
+    <style>
+        :root { --primary: #E85D04; --secondary: #FFF8F0; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--secondary); }
+        .text-primary { color: var(--primary); }
+        .bg-primary { background: var(--primary); }
+        .border-primary { border-color: var(--primary); }
+
+        /* Hero */
+        .blog-hero {
+            background: linear-gradient(135deg, #1a0a00 0%, #3d1a00 50%, #E85D04 100%);
+            position: relative; overflow: hidden;
+        }
+        .blog-hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url('bg-texture.png') center/cover;
+            opacity: 0.08;
+        }
+
+        /* Card Hover Effects */
+        .blog-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(232, 93, 4, 0.15);
+        }
+        .blog-card:hover .card-img img {
+            transform: scale(1.08);
+        }
+        .card-img {
+            overflow: hidden; height: 220px; position: relative;
+        }
+        .card-img img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card-img .no-img {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #fff0e6, #ffe5cc);
+            display: flex; align-items: center; justify-content: center;
+            color: #E85D04; font-size: 48px; font-weight: 900;
+        }
+
+        /* Category badge */
+        .cat-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: #FFF0E6;
+            color: #E85D04;
+        }
+
+        /* Filter tabs */
+        .filter-tab {
+            padding: 8px 20px; border-radius: 999px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            border: 2px solid transparent;
+            background: white; color: #6b7280;
+        }
+        .filter-tab.active, .filter-tab:hover {
+            background: #E85D04; color: white;
+            border-color: #E85D04;
+        }
+
+        /* Skeleton loader */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 12px;
+        }
+
+        /* Pagination */
+        .page-btn {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            cursor: pointer; transition: all 0.2s;
+            border: 2px solid #e5e7eb; background: white; color: #374151;
+        }
+        .page-btn.active { background: #E85D04; color: white; border-color: #E85D04; }
+        .page-btn:hover:not(.active) { border-color: #E85D04; color: #E85D04; }
+
+        /* Featured post */
+        .featured-card {
+            border-radius: 32px; overflow: hidden;
+            background: white;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .featured-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(232,93,4,0.12); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div id="header-placeholder"></div>
+
+    <!-- Hero -->
+    <section class="blog-hero pt-32 pb-20 px-6 text-center">
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <span class="inline-block px-4 py-1 rounded-full bg-white/10 text-orange-200 text-xs font-bold uppercase tracking-widest mb-6">Câu chuyện từ CAM</span>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+                Nhật ký<br><span style="color:#ffb380">những chuyến đi</span>
+            </h1>
+            <p class="text-orange-100 text-lg max-w-xl mx-auto leading-relaxed">
+                Những câu chuyện thật, cảm xúc thật — từ rừng sâu đến đỉnh núi, từ lạ thành quen.
+            </p>
+        </div>
+    </section>
+
+    <!-- Filter Categories -->
+    <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-3 flex items-center gap-3 overflow-x-auto scrollbar-hide" id="category-filters">
+            <button class="filter-tab active" data-cat="">Tất cả</button>
+            <button class="filter-tab" data-cat="Kinh nghiệm">Kinh nghiệm</button>
+            <button class="filter-tab" data-cat="Review Tour">Review Tour</button>
+            <button class="filter-tab" data-cat="Câu chuyện">Câu chuyện</button>
+            <button class="filter-tab" data-cat="Tin tức">Tin tức</button>
+            <button class="filter-tab" data-cat="Cẩm nang">Cẩm nang</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-16">
+        <!-- Featured Post -->
+        <div id="featured-post" class="mb-16"></div>
+
+        <!-- Grid heading -->
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight">Bài viết mới nhất</h2>
+            <span id="post-count" class="text-sm text-gray-400 font-medium"></span>
+        </div>
+
+        <!-- Posts Grid -->
+        <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Skeleton loaders -->
+            ${[...Array(6)].map(() => `
+            <div class="blog-card">
+                <div class="card-img skeleton"></div>
+                <div class="p-5 space-y-3">
+                    <div class="skeleton h-4 w-1/3"></div>
+                    <div class="skeleton h-5 w-full"></div>
+                    <div class="skeleton h-4 w-5/6"></div>
+                </div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="flex justify-center gap-2 mt-8"></div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // ─── State ───────────────────────────────────────────────────
+        let currentPage = 1;
+        let currentCat = '';
+        const LIMIT = 6;
+
+        // ─── Format date ───────────────────────────────────────────
+        function fmtDate(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        // ─── Render skeleton ──────────────────────────────────────
+        function renderSkeletons() {
+            const grid = document.getElementById('posts-grid');
+            grid.innerHTML = Array(6).fill(0).map(() => `
+                <div class="blog-card">
+                    <div class="card-img skeleton"></div>
+                    <div class="p-5 space-y-3">
+                        <div class="skeleton h-3 w-1/3" style="height:12px"></div>
+                        <div class="skeleton h-5 w-full" style="height:20px"></div>
+                        <div class="skeleton h-4 w-5/6" style="height:16px"></div>
+                        <div class="skeleton h-4 w-2/3" style="height:16px"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ─── Render một card ──────────────────────────────────────
+        function renderCard(post) {
+            const img = post.thumbnail
+                ? `<img src="${post.thumbnail}" alt="${post.title}" loading="lazy">`
+                : `<div class="no-img">📖</div>`;
+            return `
+            <a href="post.html?slug=${post.slug}" class="blog-card block no-underline" id="post-${post.id}">
+                <div class="card-img">${img}</div>
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="cat-badge">${post.category || 'Kinh nghiệm'}</span>
+                        <span class="text-xs text-gray-400 font-medium">${fmtDate(post.published_at || post.created_at)}</span>
+                    </div>
+                    <h3 class="text-base font-bold text-gray-800 mb-2 leading-snug line-clamp-2">${post.title}</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed line-clamp-3">${post.excerpt || ''}</p>
+                    <div class="mt-4 flex items-center gap-1 text-primary text-sm font-bold">
+                        Đọc tiếp <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>`;
+        }
+
+        // ─── Render featured (bài đầu tiên to hơn) ───────────────
+        function renderFeatured(post) {
+            const featEl = document.getElementById('featured-post');
+            if (!post) { featEl.innerHTML = ''; return; }
+            const img = post.thumbnail
+                ? `<img src="${post.thumbnail}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">`
+                : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 text-7xl">📖</div>`;
+            featEl.innerHTML = `
+            <a href="post.html?slug=${post.slug}" class="featured-card group flex flex-col md:flex-row overflow-hidden no-underline">
+                <div class="relative md:w-1/2 h-64 md:h-auto overflow-hidden bg-gray-100">${img}</div>
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="cat-badge">${post.category}</span>
+                        <span class="text-xs text-gray-400">BÀI NỔI BẬT</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-4 leading-tight">${post.title}</h2>
+                    <p class="text-gray-500 leading-relaxed mb-6 line-clamp-3">${post.excerpt || ''}</p>
+                    <div class="flex items-center gap-2 text-primary font-bold">
+                        Đọc ngay <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </a>`;
+            lucide.createIcons();
+        }
+
+        // ─── Render pagination ────────────────────────────────────
+        function renderPagination(total) {
+            const pages = Math.ceil(total / LIMIT);
+            const el = document.getElementById('pagination');
+            if (pages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 1; i <= pages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        // ─── Load posts ───────────────────────────────────────────
+        async function loadPosts() {
+            renderSkeletons();
+            document.getElementById('featured-post').innerHTML = '';
+            try {
+                const params = new URLSearchParams({ page: currentPage, limit: LIMIT });
+                if (currentCat) params.set('category', currentCat);
+                const res = await fetch(`/api/blog?${params}`);
+                const data = await res.json();
+                const { posts = [], total = 0 } = data;
+
+                document.getElementById('post-count').textContent = `${total} bài viết`;
+
+                if (posts.length === 0) {
+                    document.getElementById('posts-grid').innerHTML = `
+                        <div class="col-span-3 py-20 text-center text-gray-400">
+                            <div class="text-5xl mb-4">📭</div>
+                            <p class="font-medium">Chưa có bài viết nào trong danh mục này.</p>
+                        </div>`;
+                    document.getElementById('pagination').innerHTML = '';
+                    return;
+                }
+
+                // Bài đầu tiên trang 1 → featured
+                if (currentPage === 1 && !currentCat) {
+                    renderFeatured(posts[0]);
+                    const remaining = posts.slice(1);
+                    document.getElementById('posts-grid').innerHTML = remaining.map(renderCard).join('');
+                } else {
+                    document.getElementById('featured-post').innerHTML = '';
+                    document.getElementById('posts-grid').innerHTML = posts.map(renderCard).join('');
+                }
+
+                renderPagination(total);
+                lucide.createIcons();
+            } catch (e) {
+                document.getElementById('posts-grid').innerHTML = `
+                    <div class="col-span-3 py-20 text-center text-gray-400">
+                        <p>Không thể tải bài viết. Vui lòng thử lại.</p>
+                    </div>`;
+            }
+        }
+
+        function goPage(p) {
+            currentPage = p;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            loadPosts();
+        }
+
+        // ─── Category filter ──────────────────────────────────────
+        document.getElementById('category-filters').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-cat]');
+            if (!btn) return;
+            document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCat = btn.dataset.cat;
+            currentPage = 1;
+            loadPosts();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadPosts);
+
+        // Scrollbar hide style
+        const s = document.createElement('style');
+        s.textContent = `.scrollbar-hide::-webkit-scrollbar{display:none}.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}`;
+        document.head.append(s);
+    </script>
+</body>
+</html>
