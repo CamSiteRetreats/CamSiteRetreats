@@ -95,7 +95,7 @@ export const afterRender = () => {
             const res  = await fetch('/api/schedules');
             const data = res.ok ? await res.json() : [];
             const sorted = data.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
-            filter.innerHTML = '<option value="">-- Chọn chuyến đi --</option>';
+            filter.innerHTML = '<option value="all">-- Tất cả chuyến đi --</option>';
             sorted.forEach(s => {
                 const d = new Date(s.start_date);
                 const label = `${s.tour_name} — ${d.toLocaleDateString('vi-VN')}`;
@@ -103,7 +103,7 @@ export const afterRender = () => {
             });
             
             if (sorted.length > 0) {
-                filter.value = sorted[0].id;
+                filter.value = 'all';
                 filter.dispatchEvent(new Event('change'));
             } else {
                 emptyState.classList.remove('hidden');
@@ -173,6 +173,7 @@ export const afterRender = () => {
                             <div>
                                 <div class="font-bold text-gray-900">${r.is_anonymous ? '<em class="text-gray-400 font-normal">Ẩn danh</em>' : (r.reviewer_name || '<em class="text-gray-400 font-normal">Không tên</em>')}</div>
                                 <div class="text-xs text-gray-400">${new Date(r.submitted_at).toLocaleString('vi-VN')}</div>
+                                ${r.tour_name ? `<div class="text-xs font-semibold text-csr-orange mt-0.5">📍 ${r.tour_name}</div>` : ''}
                             </div>
                         </div>
                         <div class="text-right">
@@ -233,7 +234,11 @@ export const afterRender = () => {
             copyBtn.classList.add('hidden');
             return;
         }
-        copyBtn.classList.remove('hidden');
+        if (sid === 'all') {
+            copyBtn.classList.add('hidden');
+        } else {
+            copyBtn.classList.remove('hidden');
+        }
         loadReviews(sid);
     });
 

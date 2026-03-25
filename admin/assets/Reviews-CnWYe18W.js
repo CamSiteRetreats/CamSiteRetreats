@@ -1,4 +1,4 @@
-import{S as f,H as w}from"./Header-CKJNmtLR.js";const _=()=>`
+import{S as f,H as w}from"./Header-CKJNmtLR.js";const L=()=>`
   <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
     ${f()}
     <div class="flex flex-col flex-1 w-full overflow-hidden">
@@ -74,16 +74,16 @@ import{S as f,H as w}from"./Header-CKJNmtLR.js";const _=()=>`
       </main>
     </div>
   </div>
-`,$=()=>{const i=document.getElementById("scheduleFilter"),n=document.getElementById("copyLinkBtn"),o=document.getElementById("statsRow"),c=document.getElementById("avgBars"),u=document.getElementById("reviewList"),r=document.getElementById("reviewListWrap"),v=document.getElementById("emptyState"),g=document.getElementById("noReviewsState"),h=async()=>{try{const s=await fetch("/api/schedules"),d=(s.ok?await s.json():[]).sort((a,t)=>new Date(t.start_date)-new Date(a.start_date));i.innerHTML='<option value="">-- Chọn chuyến đi --</option>',d.forEach(a=>{const t=new Date(a.start_date),m=`${a.tour_name} — ${t.toLocaleDateString("vi-VN")}`;i.insertAdjacentHTML("beforeend",`<option value="${a.id}">${m}</option>`)}),d.length>0?(i.value=d[0].id,i.dispatchEvent(new Event("change"))):v.classList.remove("hidden")}catch(s){console.error(s)}},y=async s=>{o.classList.add("hidden"),c.classList.add("hidden"),r.classList.add("hidden"),g.classList.add("hidden"),v.classList.add("hidden");try{const l=localStorage.getItem("csr_admin_token"),d=await fetch(`/api/reviews?admin=1&schedule_id=${s}`,{headers:{Authorization:`Bearer ${l}`}}),{reviews:a,stats:t}=await d.json();if(!a||a.length===0){g.classList.remove("hidden");return}document.getElementById("stat-total").textContent=t.total??a.length,document.getElementById("stat-overall").textContent=t.avg_overall?"⭐ "+t.avg_overall:"--",document.getElementById("stat-vehicle").textContent=t.avg_vehicle?"⭐ "+t.avg_vehicle:"--",document.getElementById("stat-guide").textContent=t.avg_guide?"⭐ "+t.avg_guide:"--",o.classList.remove("hidden");const m=[{label:"🚐 Xe cộ",val:t.avg_vehicle},{label:"🧭 Hướng dẫn viên",val:t.avg_guide},{label:"🍽️ Bữa ăn",val:t.avg_meals},{label:"⭐ Tổng thể",val:t.avg_overall}];document.getElementById("avgBarsContent").innerHTML=m.map(e=>{const p=e.val?(e.val/5*100).toFixed(0):0,b=p>=80?"bg-green-500":p>=60?"bg-yellow-400":"bg-red-400";return`
+`,$=()=>{const i=document.getElementById("scheduleFilter"),d=document.getElementById("copyLinkBtn"),o=document.getElementById("statsRow"),c=document.getElementById("avgBars"),p=document.getElementById("reviewList"),r=document.getElementById("reviewListWrap"),v=document.getElementById("emptyState"),g=document.getElementById("noReviewsState"),h=async()=>{try{const s=await fetch("/api/schedules"),l=(s.ok?await s.json():[]).sort((a,t)=>new Date(t.start_date)-new Date(a.start_date));i.innerHTML='<option value="all">-- Tất cả chuyến đi --</option>',l.forEach(a=>{const t=new Date(a.start_date),m=`${a.tour_name} — ${t.toLocaleDateString("vi-VN")}`;i.insertAdjacentHTML("beforeend",`<option value="${a.id}">${m}</option>`)}),l.length>0?(i.value="all",i.dispatchEvent(new Event("change"))):v.classList.remove("hidden")}catch(s){console.error(s)}},y=async s=>{o.classList.add("hidden"),c.classList.add("hidden"),r.classList.add("hidden"),g.classList.add("hidden"),v.classList.add("hidden");try{const n=localStorage.getItem("csr_admin_token"),l=await fetch(`/api/reviews?admin=1&schedule_id=${s}`,{headers:{Authorization:`Bearer ${n}`}}),{reviews:a,stats:t}=await l.json();if(!a||a.length===0){g.classList.remove("hidden");return}document.getElementById("stat-total").textContent=t.total??a.length,document.getElementById("stat-overall").textContent=t.avg_overall?"⭐ "+t.avg_overall:"--",document.getElementById("stat-vehicle").textContent=t.avg_vehicle?"⭐ "+t.avg_vehicle:"--",document.getElementById("stat-guide").textContent=t.avg_guide?"⭐ "+t.avg_guide:"--",o.classList.remove("hidden");const m=[{label:"🚐 Xe cộ",val:t.avg_vehicle},{label:"🧭 Hướng dẫn viên",val:t.avg_guide},{label:"🍽️ Bữa ăn",val:t.avg_meals},{label:"⭐ Tổng thể",val:t.avg_overall}];document.getElementById("avgBarsContent").innerHTML=m.map(e=>{const u=e.val?(e.val/5*100).toFixed(0):0,b=u>=80?"bg-green-500":u>=60?"bg-yellow-400":"bg-red-400";return`
                 <div>
                     <div class="flex justify-between mb-1">
                         <span class="text-sm font-medium text-gray-700">${e.label}</span>
                         <span class="text-sm font-bold text-csr-orange">${e.val??"--"} / 5</span>
                     </div>
                     <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                        <div class="${b} h-2.5 rounded-full transition-all duration-700" style="width:${p}%"></div>
+                        <div class="${b} h-2.5 rounded-full transition-all duration-700" style="width:${u}%"></div>
                     </div>
-                </div>`}).join(""),c.classList.remove("hidden");const x=e=>e?"⭐".repeat(e)+" "+e+"/5":'<span class="text-gray-300 text-xs">Không đánh giá</span>';u.innerHTML=a.map(e=>`
+                </div>`}).join(""),c.classList.remove("hidden");const x=e=>e?"⭐".repeat(e)+" "+e+"/5":'<span class="text-gray-300 text-xs">Không đánh giá</span>';p.innerHTML=a.map(e=>`
                 <div class="glass-panel p-5 border-l-4 ${e.is_anonymous?"border-gray-300":"border-csr-orange"}">
                     <div class="flex justify-between items-start flex-wrap gap-3 mb-4">
                         <div class="flex items-center gap-3">
@@ -93,6 +93,7 @@ import{S as f,H as w}from"./Header-CKJNmtLR.js";const _=()=>`
                             <div>
                                 <div class="font-bold text-gray-900">${e.is_anonymous?'<em class="text-gray-400 font-normal">Ẩn danh</em>':e.reviewer_name||'<em class="text-gray-400 font-normal">Không tên</em>'}</div>
                                 <div class="text-xs text-gray-400">${new Date(e.submitted_at).toLocaleString("vi-VN")}</div>
+                                ${e.tour_name?`<div class="text-xs font-semibold text-csr-orange mt-0.5">📍 ${e.tour_name}</div>`:""}
                             </div>
                         </div>
                         <div class="text-right">
@@ -131,4 +132,4 @@ import{S as f,H as w}from"./Header-CKJNmtLR.js";const _=()=>`
                             <p class="text-gray-700">${e.suggestion}</p>
                         </div>`:""}
                 </div>
-            `).join(""),document.getElementById("reviewListCount").textContent=`${a.length} phiếu`,r.classList.remove("hidden")}catch(l){console.error("Error loading reviews:",l)}};i.addEventListener("change",()=>{const s=i.value;if(!s){v.classList.remove("hidden"),o.classList.add("hidden"),c.classList.add("hidden"),r.classList.add("hidden"),g.classList.add("hidden"),n.classList.add("hidden");return}n.classList.remove("hidden"),y(s)}),n.addEventListener("click",()=>{const s=i.value;if(!s)return;const l=`${window.location.origin}/review?schedule_id=${s}`;navigator.clipboard.writeText(l).then(()=>{const d=n.innerHTML;n.innerHTML="✅ Đã copy!",setTimeout(()=>n.innerHTML=d,2e3)})}),h()};export{$ as afterRender,_ as render};
+            `).join(""),document.getElementById("reviewListCount").textContent=`${a.length} phiếu`,r.classList.remove("hidden")}catch(n){console.error("Error loading reviews:",n)}};i.addEventListener("change",()=>{const s=i.value;if(!s){v.classList.remove("hidden"),o.classList.add("hidden"),c.classList.add("hidden"),r.classList.add("hidden"),g.classList.add("hidden"),d.classList.add("hidden");return}s==="all"?d.classList.add("hidden"):d.classList.remove("hidden"),y(s)}),d.addEventListener("click",()=>{const s=i.value;if(!s)return;const n=`${window.location.origin}/review?schedule_id=${s}`;navigator.clipboard.writeText(n).then(()=>{const l=d.innerHTML;d.innerHTML="✅ Đã copy!",setTimeout(()=>d.innerHTML=l,2e3)})}),h()};export{$ as afterRender,L as render};

@@ -20,33 +20,58 @@ export async function onRequest(context) {
         const scheduleId = url.searchParams.get('schedule_id');
         const isAdmin    = url.searchParams.get('admin') === '1';
 
-        if (!scheduleId) {
-            return new Response(JSON.stringify({ error: 'Thiếu schedule_id' }), { status: 400, headers: corsHeaders });
-        }
-
-        // Admin: lấy tất cả đánh giá + thống kê
+        // Admin: lấy tất cả hoặc theo schedule_id
         if (isAdmin) {
             const token = request.headers.get('Authorization')?.replace('Bearer ', '');
             if (!token) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
 
-            const reviews = await sql`
-                SELECT * FROM tour_reviews
-                WHERE schedule_id = ${scheduleId}
-                ORDER BY submitted_at DESC
-            `;
+            let reviews, stats;
+            if (scheduleId && scheduleId !== 'all') {
+                reviews = await sql`
+                    SELECT r.*, s.tour_name 
+                    FROM tour_reviews r
+                    LEFT JOIN schedules s ON r.schedule_id = s.id
+                    WHERE r.schedule_id = ${scheduleId}
+                    ORDER BY r.submitted_at DESC
+                `;
 
-            const stats = await sql`
-                SELECT
-                    COUNT(*)::int                              AS total,
-                    ROUND(AVG(rating_vehicle)::numeric, 1)    AS avg_vehicle,
-                    ROUND(AVG(rating_guide)::numeric, 1)      AS avg_guide,
-                    ROUND(AVG(rating_meals)::numeric, 1)      AS avg_meals,
-                    ROUND(AVG(rating_overall)::numeric, 1)    AS avg_overall
-                FROM tour_reviews
-                WHERE schedule_id = ${scheduleId}
-            `;
+                const st = await sql`
+                    SELECT
+                        COUNT(*)::int                              AS total,
+                        ROUND(AVG(rating_vehicle)::numeric, 1)    AS avg_vehicle,
+                        ROUND(AVG(rating_guide)::numeric, 1)      AS avg_guide,
+                        ROUND(AVG(rating_meals)::numeric, 1)      AS avg_meals,
+                        ROUND(AVG(rating_overall)::numeric, 1)    AS avg_overall
+                    FROM tour_reviews
+                    WHERE schedule_id = ${scheduleId}
+                `;
+                stats = st[0];
+            } else {
+                reviews = await sql`
+                    SELECT r.*, s.tour_name 
+                    FROM tour_reviews r
+                    LEFT JOIN schedules s ON r.schedule_id = s.id
+                    ORDER BY r.submitted_at DESC
+                    LIMIT 200
+                `;
 
-            return new Response(JSON.stringify({ reviews, stats: stats[0] }), { headers: corsHeaders });
+                const st = await sql`
+                    SELECT
+                        COUNT(*)::int                              AS total,
+                        ROUND(AVG(rating_vehicle)::numeric, 1)    AS avg_vehicle,
+                        ROUND(AVG(rating_guide)::numeric, 1)      AS avg_guide,
+                        ROUND(AVG(rating_meals)::numeric, 1)      AS avg_meals,
+                        ROUND(AVG(rating_overall)::numeric, 1)    AS avg_overall
+                    FROM tour_reviews
+                `;
+                stats = st[0];
+            }
+
+            return new Response(JSON.stringify({ reviews, stats }), { headers: corsHeaders });
+        }
+
+        if (!scheduleId || scheduleId === 'all') {
+            return new Response(JSON.stringify({ error: 'Thiếu schedule_id' }), { status: 400, headers: corsHeaders });
         }
 
         // Public: lấy thông tin chuyến để hiển thị trên form
