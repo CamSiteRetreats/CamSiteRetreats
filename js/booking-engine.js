@@ -752,8 +752,12 @@ const BookingEngine = {
         }).catch(() => prompt('Copy nội dung này:', code));
     },
 
+    _submitting: false, // Guard chống double-submit
+
     async _submit() {
-        // Commitments đã được xác nhận ở bước 4, không cần kiểm tra lại
+        // Guard: tránh submit nhiều lần
+        if (this._submitting) return;
+        this._submitting = true;
 
         const btn = document.getElementById('be-submit-btn');
         if (btn) { btn.textContent = 'Đang gửi...'; btn.disabled = true; }
@@ -799,6 +803,16 @@ const BookingEngine = {
             if (!res.ok) throw new Error('Server error');
             const saved = await res.json();
 
+            // ── Cập nhật QR code và nội dung CK với CSR{id} để webhook match chính xác ──
+            if (saved.id) {
+                const depositAmt = this.getDepositAmount();
+                const newCode = `CSR${saved.id} ${this._generateTransferCode()}`;
+                const qrImg = document.getElementById('be-qr-img');
+                if (qrImg) qrImg.src = this._getQRUrl(depositAmt, newCode);
+                const codeEl = document.getElementById('be-transfer-code');
+                if (codeEl) codeEl.textContent = newCode;
+            }
+
             // Increment coupon usage
             if (this.coupon?.code) {
                 fetch(`/api/coupons?action=use`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ code: this.coupon.code }) }).catch(() => {});
@@ -817,6 +831,7 @@ const BookingEngine = {
             if (this.onSuccess) this.onSuccess(saved);
         } catch(e) {
             console.error('Submit error:', e);
+            this._submitting = false; // Reset để cho phép retry
             alert('Có lỗi xảy ra: ' + e.message);
             if (btn) { btn.textContent = 'Gửi đăng ký'; btn.disabled = false; }
         }

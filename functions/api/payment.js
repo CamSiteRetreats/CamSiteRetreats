@@ -140,31 +140,45 @@ async function handleSepayWebhook({ request, env }) {
     const existingTx = await sql`SELECT id FROM payment_transactions WHERE sepay_transaction_id = ${String(sepayTransactionId)}`;
     if (existingTx.length > 0) return Response.json({ success: true, message: 'Duplicate' });
 
-    // Robust matching logic
-    const bookings = await sql`SELECT * FROM bookings WHERE status IN ('Chờ cọc', 'Chờ xác nhận cọc', 'Đã cọc', 'Đã cọc (Chờ đi)') OR status IS NULL OR status = '' ORDER BY created_at DESC`;
+    // Fetch ALL bookings chưa hoàn tất để match
+    const bookings = await sql`
+        SELECT * FROM bookings 
+        WHERE status NOT IN ('Hoàn tất', 'Hoàn thành', 'Đã huỷ')
+        ORDER BY created_at DESC
+        LIMIT 500
+    `;
 
     let matchedBooking = null;
     let paymentType = 'deposit';
     const rawSearch = (transferContent || description || '').toLowerCase();
     const cleanSearch = normalizeVN(rawSearch);
 
-    // Strategy 1: Match by ID (CSR154, ID154, or just 154 if unique enough)
-    for (const booking of bookings) {
-        const idStr = String(booking.id);
-        const searchTerms = [
-            'csr' + idStr,
-            'id' + idStr,
-            'thanh toan ' + idStr,
-            'tt' + idStr
-        ];
+    // ── Strategy 0: Match trực tiếp theo Booking ID (CSR{id} ở đầu nội dung) ──
+    // Format mới: "CSR154 thacliengai 20250401 nguyenvan coc"
+    const csrMatch = cleanSearch.match(/csr(\d+)/);
+    if (csrMatch) {
+        const bookingId = parseInt(csrMatch[1]);
+        matchedBooking = bookings.find(b => b.id === bookingId) || null;
+    }
 
-        if (searchTerms.some(term => cleanSearch.includes(term))) {
-            matchedBooking = booking;
-            break;
+    // ── Strategy 1: Match by keyword ID pattern (id154, tt154, etc.) ──
+    if (!matchedBooking) {
+        for (const booking of bookings) {
+            const idStr = String(booking.id);
+            const searchTerms = [
+                'csr' + idStr,
+                'id' + idStr,
+                'thanh toan ' + idStr,
+                'tt' + idStr
+            ];
+            if (searchTerms.some(term => cleanSearch.includes(term))) {
+                matchedBooking = booking;
+                break;
+            }
         }
     }
 
-    // Strategy 2: Match by Customer Name + Tour Name (fallback)
+    // ── Strategy 2: Match by Customer Name + Tour Name (fallback) ──
     if (!matchedBooking) {
         for (const booking of bookings) {
             const bName = normalizeVN(booking.name);
@@ -191,7 +205,7 @@ async function handleSepayWebhook({ request, env }) {
 
         // Get or Generate Customer ID
         let customerId = matchedBooking.customer_id;
-        if (newStatus === 'Đã cọc' && (!customerId || customerId.trim() === '')) {
+        if (newStatus.includes('Đã cọc') && (!customerId || customerId.trim() === '')) {
             const check = await sql`SELECT csr_code FROM crm_customers WHERE phone = ${matchedBooking.phone}`;
             if (check.length > 0) {
                 customerId = check[0].csr_code;
