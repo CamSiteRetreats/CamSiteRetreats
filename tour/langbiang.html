@@ -1285,7 +1285,10 @@ filterSchedules();
                 const res = await fetch('/api/tours?t=' + Date.now());
                 if (!res.ok) return;
                 const tours = await res.json();
-                const matching = tours.filter(t => t.url && t.url.toLowerCase().includes('langbiang'));
+                const matching = tours.filter(t =>
+                (t.url && t.url.toLowerCase().includes('langbiang')) ||
+                (t.name && (t.name.toLowerCase().includes('lang biang') || t.name.toLowerCase().includes('langbiang')))
+            );
                 let found = matching.find(t => t.price && parseFloat(t.price) > 0);
                 if (!found && matching.length > 0) found = matching[0];
                 if (found) {
@@ -1303,7 +1306,10 @@ filterSchedules();
         function getCurrentTourData() {
             if (window._currentTourData) return window._currentTourData;
             const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
-            const matching = tours.filter(t => t.url && t.url.toLowerCase().includes('langbiang'));
+            const matching = tours.filter(t =>
+                (t.url && t.url.toLowerCase().includes('langbiang')) ||
+                (t.name && (t.name.toLowerCase().includes('lang biang') || t.name.toLowerCase().includes('langbiang')))
+            );
             let found = matching.find(t => t.price && parseFloat(t.price) > 0);
             if (!found && matching.length > 0) found = matching[0];
             return found || { name: 'Lang Biang', price: null };
