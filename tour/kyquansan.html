@@ -1246,16 +1246,7 @@
             }
         }
 
-        function selectDate(element, dateStr) {
-            // Remove selected class from all options
-            document.querySelectorAll('.date-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            // Add selected class to clicked element
-            element.classList.add('selected');
-            // Update hidden input
-            document.getElementById('selected-date-input').value = dateStr;
-        }
+        
 
         // Initialize Data & Recommendations
         document.addEventListener('DOMContentLoaded', () => {
@@ -1286,96 +1277,7 @@ filterSchedules();
 
         lucide.createIcons();
 
-        // ===== BOOKING MODAL INTEGRATION =====
-        window._currentTourData = null;
-
-        async function fetchTourDataFromAPI() {
-            try {
-                const res = await fetch('/api/tours?t=' + Date.now());
-                if (!res.ok) throw new Error('API Error ' + res.status);
-                const tours = await res.json();
-                const matchingTours = tours.filter(t =>
-                    (t.url && t.url.toLowerCase().includes('kyquansan')) ||
-                    (t.name && (t.name.toLowerCase().includes('ky.*quan|kyquansan')))
-                );
-                let found = matchingTours.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
-                if (!found && matchingTours.length > 0) found = matchingTours[0];
-                if (found) {
-                    window._currentTourData = found;
-                    const fp = TourManager.formatPrice(found.price);
-                    const pd = document.getElementById('tour-price-display');
-                    const mpd = document.getElementById('mobile-tour-price-display');
-                    if (pd) pd.textContent = fp;
-                    if (mpd) mpd.textContent = fp;
-                    filterSchedules();
-                }
-            } catch (err) {
-                console.warn('[kyquansan] Could not fetch tours API:', err);
-            }
-        }
-
-        function getCurrentTourData() {
-            if (window._currentTourData) return window._currentTourData;
-            const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
-            const matching = tours.filter(t =>
-                (t.url && t.url.toLowerCase().includes('kyquansan')) ||
-                (t.name && t.name.toLowerCase().includes('ky.*quan|kyquansan'))
-            );
-            let found = matching.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
-            if (!found && matching.length > 0) found = matching[0];
-            return found || { name: 'Ky Quan San', price: null };
-        }
-
-        function initiateBooking() {
-            const dateStr = document.getElementById('selected-date-input').value;
-            if (!dateStr) { alert('Vui long chon ngay khoi hanh'); return; }
-            const tour = getCurrentTourData();
-            const price = (tour.price && tour.price !== 'Update') ? parseFloat(tour.price) : null;
-            if (window.BookingFlow) {
-                window.BookingFlow.open(tour.name, price, dateStr, tour.id || null);
-            } else {
-                alert('Loi: Khong tim thay module BookingFlow. Vui long tai lai trang.');
-            }
-        }
-        window.openBookingModal = initiateBooking;
-
-        function selectDate(element, dateStr) {
-            document.querySelectorAll('.date-option').forEach(opt => opt.classList.remove('selected'));
-            element.classList.add('selected');
-            const input = document.getElementById('selected-date-input');
-            if (input) input.value = dateStr;
-            const btn = document.getElementById('btn-book-now');
-            if (btn) { btn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-        }
-
-        function filterSchedules() {
-            const dateSelector = document.getElementById('date-selector');
-            if (!dateSelector) return;
-            const tour = getCurrentTourData();
-            if (!tour || !tour.id) { dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chua co lich khoi hanh.</div>'; return; }
-            const fullTour = TourManager.getTourById(tour.id);
-            dateSelector.innerHTML = '';
-            if (fullTour && fullTour.schedules && fullTour.schedules.length > 0) {
-                fullTour.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-                fullTour.schedules.forEach(item => {
-                    const rem = item.remaining; const st = item.calculatedStatus;
-                    let sd = '', sc = '', oc = '', ck = true;
-                    if (st === 'Het cho') { sd = 'Het cho'; sc = 'text-gray-400'; oc = 'opacity-50 cursor-not-allowed bg-gray-100'; ck = false; }
-                    else if (rem <= 3) { sd = 'Chi con ' + rem + ' cho'; sc = 'text-orange-500'; }
-                    else { sd = 'Con ' + rem + ' cho'; sc = 'text-primary'; }
-                    let fd = item.date;
-                    if (!fd) { const s = new Date(item.startDate), e = new Date(item.endDate); fd = s.getDate()+'/'+(s.getMonth()+1)+' - '+e.getDate()+'/'+(e.getMonth()+1); }
-                    let ss = (item.startDate || '').includes('T') ? item.startDate.split('T')[0] : item.startDate;
-                    const ca = ck ? 'onclick="selectDate(this, \''+ss+'\')"' : '';
-                    dateSelector.insertAdjacentHTML('beforeend', '<div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 '+oc+'" '+ca+'><span class="text-[12px] font-bold leading-tight">'+fd+'</span><span class="text-[13px] date-status '+sc+' font-bold">'+sd+'</span></div>');
-                });
-            } else {
-                dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chua co lich khoi hanh.</div>';
-            }
-        }
-        // ===== END BOOKING MODAL INTEGRATION =====
-
-        // ===== BOOKING MODAL INTEGRATION =====
+                // ===== BOOKING MODAL INTEGRATION =====
         window._currentTourData = null;
 
         async function fetchTourDataFromAPI() {
@@ -1409,13 +1311,13 @@ filterSchedules();
 
         function initiateBooking() {
             const dateStr = document.getElementById('selected-date-input').value;
-            if (!dateStr) { alert('Vui long chon ngay khoi hanh'); return; }
+            if (!dateStr) { alert('Vui lòng chọn ngày khởi hành'); return; }
             const tour = getCurrentTourData();
             const price = (tour.price && tour.price !== 'Update') ? parseFloat(tour.price) : null;
             if (window.BookingFlow) {
                 window.BookingFlow.open(tour.name, price, dateStr, tour.id || null);
             } else {
-                alert('Loi: Khong tim thay module BookingFlow.');
+                alert('Lỗi: Không tìm thấy module BookingFlow.');
             }
         }
         window.openBookingModal = initiateBooking;
@@ -1433,7 +1335,7 @@ filterSchedules();
             const ds = document.getElementById('date-selector');
             if (!ds) return;
             const tour = getCurrentTourData();
-            if (!tour || !tour.id) { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chua co lich khoi hanh.</div>'; return; }
+            if (!tour || !tour.id) { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>'; return; }
             const full = TourManager.getTourById(tour.id);
             ds.innerHTML = '';
             if (full && full.schedules && full.schedules.length > 0) {
@@ -1441,16 +1343,16 @@ filterSchedules();
                 full.schedules.forEach(item => {
                     const rem = item.remaining; const st = item.calculatedStatus;
                     let sd='', sc='', oc='', ck=true;
-                    if (st === 'Het cho') { sd='Het cho'; sc='text-gray-400'; oc='opacity-50 cursor-not-allowed bg-gray-100'; ck=false; }
-                    else if (rem<=3) { sd='Chi con '+rem+' cho'; sc='text-orange-500'; }
-                    else { sd='Con '+rem+' cho'; sc='text-primary'; }
+                    if (st === 'Hết chỗ') { sd='Hết chỗ'; sc='text-gray-400'; oc='opacity-50 cursor-not-allowed bg-gray-100'; ck=false; }
+                    else if (rem<=3) { sd='Chỉ còn '+rem+' chỗ'; sc='text-orange-500'; }
+                    else { sd='Còn '+rem+' chỗ'; sc='text-primary'; }
                     let fd=item.date;
                     if (!fd) { const s=new Date(item.startDate),e=new Date(item.endDate); fd=s.getDate()+'/'+(s.getMonth()+1)+' - '+e.getDate()+'/'+(e.getMonth()+1); }
                     let ss=(item.startDate||'').includes('T')?item.startDate.split('T')[0]:item.startDate;
                     const ca=ck?'onclick="selectDate(this, \''+ss+'\')"':'';
                     ds.insertAdjacentHTML('beforeend','<div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 '+oc+'" '+ca+'><span class="text-[12px] font-bold leading-tight">'+fd+'</span><span class="text-[13px] date-status '+sc+' font-bold">'+sd+'</span></div>');
                 });
-            } else { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chua co lich khoi hanh.</div>'; }
+            } else { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>'; }
         }
         // ===== END BOOKING MODAL INTEGRATION =====
 
