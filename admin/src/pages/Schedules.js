@@ -98,6 +98,15 @@ export const render = () => {
                               </select>
                           </div>
                       </div>
+                       <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Link Nhóm Zalo <span class="text-gray-400 normal-case font-normal">(Sẽ hiện cho khách sau khi thanh toán)</span></label>
+                          <div class="relative">
+                              <span class="absolute left-3 top-3 text-blue-500">
+                                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.14 1c-6.15 0-11.14 4.58-11.14 10.21 0 3.2 1.6 6.05 4.12 7.91-.12.44-.43 1.6-.43 1.6s-.1.38.16.53c.26.15.54-.04.54-.04l1.88-1.29c.6.16 1.23.25 1.88.25 6.15 0 11.14-4.58 11.14-10.21S18.29 1 12.14 1z"/></svg>
+                              </span>
+                              <input type="url" id="sch-zalo-link" class="input-field bg-gray-50 pl-10" placeholder="https://zalo.me/g/xxxxxx">
+                          </div>
+                      </div>
                       <div>
                           <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Nhãn Nhóm <span class="text-gray-400 normal-case font-normal">(tùy chọn, dùng khi có 2+ nhóm cùng ngày)</span></label>
                           <input type="text" id="sch-group-label" class="input-field bg-blue-50/50 font-bold text-blue-700 border-blue-200" placeholder="VD: Nhóm 1, VIP, Budget...">
@@ -146,10 +155,12 @@ export const afterRender = () => {
             document.getElementById('sch-slots').value = editData.slots;
             document.getElementById('sch-status').value = editData.status || 'Đang mở';
             document.getElementById('sch-group-label').value = editData.group_label || '';
+            document.getElementById('sch-zalo-link').value = editData.zalo_link || '';
         } else {
             title.textContent = 'Thêm Lịch Khởi Hành';
             scheduleForm.reset();
             document.getElementById('sch-edit-id').value = '';
+            document.getElementById('sch-zalo-link').value = '';
         }
 
         scheduleModal.classList.remove('hidden');
@@ -302,6 +313,10 @@ export const afterRender = () => {
             const groupBadge = item.group_label
                 ? `<span class="ml-2 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border bg-blue-50 text-blue-600 border-blue-200">${item.group_label}</span>`
                 : '';
+            
+            const zaloBadge = item.zalo_link
+                ? `<span class="ml-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border bg-blue-600 text-white border-blue-700 flex items-center gap-1"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.14 1c-6.15 0-11.14 4.58-11.14 10.21 0 3.2 1.6 6.05 4.12 7.91-.12.44-.43 1.6-.43 1.6s-.1.38.16.53c.26.15.54-.04.54-.04l1.88-1.29c.6.16 1.23.25 1.88.25 6.15 0 11.14-4.58 11.14-10.21S18.29 1 12.14 1z"/></svg> ZALO</span>`
+                : '';
 
             // Auto-detect status
             let status = item.status || 'Đang mở';
@@ -326,7 +341,9 @@ export const afterRender = () => {
                                 <div class="text-lg md:text-xl font-black">${dayMonth}</div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-base md:text-lg font-bold text-gray-900 mb-0.5 md:mb-1 tracking-wide truncate">${item.tour_name}${groupBadge}</h3>
+                                <h3 class="text-base md:text-lg font-bold text-gray-900 mb-0.5 md:mb-1 tracking-wide truncate flex items-center gap-1">
+                                    ${item.tour_name}${groupBadge}${zaloBadge}
+                                </h3>
                                 <div class="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-gray-500 flex-wrap">
                                     <span class="flex items-center gap-1">
                                         <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -439,7 +456,8 @@ export const afterRender = () => {
             end_date: document.getElementById('sch-end-date').value,
             slots: parseInt(document.getElementById('sch-slots').value),
             status: document.getElementById('sch-status').value,
-            group_label: document.getElementById('sch-group-label').value.trim() || null
+            group_label: document.getElementById('sch-group-label').value.trim() || null,
+            zalo_link: document.getElementById('sch-zalo-link').value.trim() || null
         };
 
         try {

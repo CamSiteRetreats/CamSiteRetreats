@@ -51,7 +51,7 @@ export async function onRequest(context) {
 
         } else if (method === 'POST') {
             const body = await request.json();
-            const { id, tour_name, start_date, end_date, slots, status, group_label } = body;
+            const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link } = body;
 
             if (!tour_name || !start_date || !end_date) {
                 return Response.json({ error: 'Missing required configuration fields' }, { status: 400, headers: corsHeaders });
@@ -60,15 +60,15 @@ export async function onRequest(context) {
             if (id) {
                 // Update existing
                 await sql.query(
-                    `UPDATE schedules SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5, group_label=$6 WHERE id=$7`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, id]
+                    `UPDATE schedules SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5, group_label=$6, zalo_link=$7 WHERE id=$8`,
+                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, id]
                 );
                 response = Response.json({ success: true, message: 'Updated schedule' });
             } else {
                 // Insert new
                 await sql.query(
-                    `INSERT INTO schedules (tour_name, start_date, end_date, slots, status, group_label) VALUES ($1, $2, $3, $4, $5, $6)`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null]
+                    `INSERT INTO schedules (tour_name, start_date, end_date, slots, status, group_label, zalo_link) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null]
                 );
                 response = Response.json({ success: true, message: 'Created schedule' });
             }

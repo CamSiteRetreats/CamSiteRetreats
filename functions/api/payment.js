@@ -236,7 +236,14 @@ async function handlePaymentStatus({ request, env }) {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     const sql = getDb(env);
-    const rows = await sql`SELECT status, deposit, total_price FROM bookings WHERE id = ${id}`;
+    const rows = await sql`
+        SELECT 
+            b.status, b.deposit, b.total_price, b.deposit_required, b.schedule_id,
+            s.zalo_link
+        FROM bookings b
+        LEFT JOIN schedules s ON b.schedule_id = s.id
+        WHERE b.id = ${id}
+    `;
 
     if (rows.length === 0) return Response.json({ error: 'Not found' }, { status: 404 });
     const booking = rows[0];
@@ -264,6 +271,7 @@ async function handlePaymentStatus({ request, env }) {
         isPaid: !!isPaid,
         isFullyPaid: !!isFullyPaid,
         deposit: currentDeposit,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        zaloLink: booking.zalo_link || null
     });
 }

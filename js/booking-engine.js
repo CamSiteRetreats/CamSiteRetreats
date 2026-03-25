@@ -861,10 +861,53 @@ const BookingEngine = {
                 const data = await res.json();
                 if (data.isPaid) {
                     clearInterval(this._pollInterval);
-                    window.location.href = `/invoice.html?id=${bookingId}`;
+                    this._showSuccessModal(bookingId, data.zaloLink);
                 }
             } catch(e) { console.warn('Poll error:', e); }
         }, 5000);
+    },
+
+    _showSuccessModal(bookingId, zaloLink) {
+        // Xóa modal cũ nếu có
+        const existing = document.getElementById('be-success-modal');
+        if (existing) existing.remove();
+
+        const modalHtml = `
+            <div id="be-success-modal" style="position:fixed; inset:0; z-index:9999; background:rgba(17,24,39,0.7); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; transition:opacity 0.3s ease;">
+                <div style="background:white; border-radius:24px; width:100%; max-width:400px; padding:32px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); transform:scale(0.9); transition:transform 0.3s ease;" id="be-success-content">
+                    <div style="width:80px; height:80px; background:#f0fdf4; color:#22c55e; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px;">
+                        <svg style="width:40px; height:40px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h2 style="font-size:24px; font-weight:800; color:#111827; margin-bottom:8px;">Đăng ký thành công!</h2>
+                    <p style="font-size:15px; color:#6b7280; margin-bottom:32px; line-height:1.5;">Hệ thống đã xác nhận thanh toán của bạn.<br>Cảm ơn bạn đã đồng hành cùng CAM!</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        ${zaloLink ? `
+                        <a href="${zaloLink}" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#0068ff; color:white; font-weight:700; padding:14px; border-radius:14px; text-decoration:none; transition:opacity 0.2s;">
+                            <svg style="width:20px; height:20px" fill="currentColor" viewBox="0 0 24 24"><path d="M12.14 1c-6.15 0-11.14 4.58-11.14 10.21 0 3.2 1.6 6.05 4.12 7.91-.12.44-.43 1.6-.43 1.6s-.1.38.16.53c.26.15.54-.04.54-.04l1.88-1.29c.6.16 1.23.25 1.88.25 6.15 0 11.14-4.58 11.14-10.21S18.29 1 12.14 1z"/></svg>
+                            Tham gia nhóm Zalo
+                        </a>` : ''}
+                        
+                        <a href="/invoice.html?id=${bookingId}" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#f3f4f6; color:#374151; font-weight:700; padding:14px; border-radius:14px; text-decoration:none; transition:background 0.2s;">
+                            <svg style="width:18px; height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Nhận hóa đơn tour
+                        </a>
+
+                        <button onclick="window.location.reload()" style="margin-top:12px; font-size:13px; font-weight:600; color:#9ca3af; background:none; border:none; cursor:pointer;">Đóng và quay lại</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        const modal = document.getElementById('be-success-modal');
+        const content = document.getElementById('be-success-content');
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            content.style.transform = 'scale(1)';
+        }, 50);
     },
 };
 
