@@ -1350,16 +1350,18 @@
         });
 
         function startMarquee() {
-            function step() {
-                if (isReccAutoScrolling) {
-                    scrollPos += 0.8; // Change this for speed
+            // Using setInterval properly or leave empty if we use CSS instead. 
+            // Replacing with a highly optimized interval (only runs if tab is active)
+            const marqueeInterval = setInterval(() => {
+                if (isReccAutoScrolling && !document.hidden && reccMarquee) {
+                    scrollPos += 1;
                     if (scrollPos >= reccMarquee.scrollWidth / 2) {
                         scrollPos = 0;
                     }
                     reccMarquee.scrollLeft = scrollPos;
                 }
-                animationId = requestAnimationFrame(step);
-            }
+            }, 30); // 33fps
+        }
             animationId = requestAnimationFrame(step);
         }
 

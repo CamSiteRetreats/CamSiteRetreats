@@ -468,10 +468,17 @@ const TourManager = {
             ? '../' + tourUrl
             : tourUrl;
 
+        const resolvePath = (path) => {
+            if (isSubfolder && path && !path.startsWith('http') && !path.startsWith('/') && !path.startsWith('../')) {
+                return '../' + path;
+            }
+            return path;
+        };
+
         return `
             <div class="min-w-[280px] md:min-w-[340px] bg-white rounded-[24px] overflow-hidden shadow-lg shadow-gray-200/40 border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group flex-shrink-0">
                 <div class="h-56 overflow-hidden relative">
-                    ${this.createImageSlideshow(tour)}
+                    <img src="${resolvePath(tour.image)}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" alt="${tour.name}">
                     <div class="absolute top-4 left-4 flex gap-2 z-20">
                         <span class="bg-gray-900/80 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md">${tour.type}</span>
                     </div>
