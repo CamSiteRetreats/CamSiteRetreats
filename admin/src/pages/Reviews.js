@@ -101,7 +101,13 @@ export const afterRender = () => {
                 const label = `${s.tour_name} — ${d.toLocaleDateString('vi-VN')}`;
                 filter.insertAdjacentHTML('beforeend', `<option value="${s.id}">${label}</option>`);
             });
-            emptyState.classList.remove('hidden');
+            
+            if (sorted.length > 0) {
+                filter.value = sorted[0].id;
+                filter.dispatchEvent(new Event('change'));
+            } else {
+                emptyState.classList.remove('hidden');
+            }
         } catch (e) { console.error(e); }
     };
 
