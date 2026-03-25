@@ -730,9 +730,9 @@ export const afterRender = () => {
             if (filterSale && filterSale !== "null" && b.sale_name !== filterSale) return false;
             if (filterSale === "null" && b.sale_name && b.sale_name !== 'Website') return false;
 
-            // 5. Lọc Search (Tên, SĐT, CRM ID)
+            // 5. Lọc Search (Tên, SĐT, CRM ID, Booking ID)
             if (searchTerm) {
-                const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''}`.toLowerCase();
+                const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} ${b.id || ''} csr${b.id || ''} #csr${b.id || ''}`.toLowerCase();
                 if (!searchString.includes(searchTerm)) return false;
             }
 
@@ -1212,7 +1212,7 @@ export const afterRender = () => {
                 if (filterSale && filterSale !== "null" && b.sale_name !== filterSale) return false;
                 if (filterSale === "null" && b.sale_name && b.sale_name !== 'Website') return false;
                 if (searchTerm) {
-                    const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} `.toLowerCase();
+                    const searchString = `${b.name || ''} ${b.phone || ''} ${b.customer_id || ''} ${b.id || ''} csr${b.id || ''} #csr${b.id || ''}`.toLowerCase();
                     if (!searchString.includes(searchTerm)) return false;
                 }
                 return true;
