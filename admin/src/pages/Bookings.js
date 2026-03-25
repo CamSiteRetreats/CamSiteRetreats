@@ -1521,7 +1521,8 @@ export const afterRender = () => {
         document.getElementById('edit-total').value = fillTotal;
         document.getElementById('edit-discount').value = booking.discount || 0;
         document.getElementById('edit-deposit').value = booking.deposit || 0;
-        document.getElementById('edit-deposit-required').value = booking.deposit_required || 1000000;
+        const bDepReq = parseInt(booking.deposit_required);
+        document.getElementById('edit-deposit-required').value = !isNaN(bDepReq) ? bDepReq : 1000000;
 
         window.updateEditRemaining();
 
@@ -1953,7 +1954,8 @@ export const afterRender = () => {
 
                 const tourPrice = parseInt(document.getElementById('addTourPrice').value) || 0;
                 const discount = parseInt(document.getElementById('addDiscount').value) || 0;
-                const depositRequired = parseInt(document.getElementById('addDepositRequired').value) || 1000000;
+                const addDepReqVal = parseInt(document.getElementById('addDepositRequired').value);
+                const depositRequired = !isNaN(addDepReqVal) ? addDepReqVal : 1000000;
                 const csrCode = document.getElementById('addCsrCode').value || "";
 
                 // Lấy profile Sale hiện tại
@@ -2115,7 +2117,8 @@ export const afterRender = () => {
                 const basePrice = parseInt(document.getElementById('edit-total').value) || 0;
                 const discount = parseInt(document.getElementById('edit-discount').value) || 0;
                 const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
-                const deposit_required = parseInt(document.getElementById('edit-deposit-required').value) || 1000000;
+                const editDepReqVal = parseInt(document.getElementById('edit-deposit-required').value);
+                const deposit_required = !isNaN(editDepReqVal) ? editDepReqVal : 1000000;
 
                 const bookingPayload = {
                     id: bookingId,

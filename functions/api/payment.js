@@ -68,7 +68,8 @@ async function handlePaymentLink({ request, env }) {
     const totalPrice = parseInt(booking.total_price) || 0;
     const deposit = parseInt(booking.deposit) || 0;
     const remaining = totalPrice - deposit;
-    const depositRequired = parseInt(booking.deposit_required) || 1000000;
+    const parsedReq1 = parseInt(booking.deposit_required);
+    const depositRequired = !isNaN(parsedReq1) ? parsedReq1 : 1000000;
 
     const needsDeposit = deposit === 0 || booking.status === 'Chờ cọc' || booking.status === 'Chờ xác nhận cọc';
     const paymentType = needsDeposit ? 'deposit' : 'remaining';
@@ -202,7 +203,8 @@ async function handleSepayWebhook({ request, env }) {
         const currentDeposit = parseInt(matchedBooking.deposit) || 0;
         const newDeposit = currentDeposit + amount;
         const totalPrice = parseInt(matchedBooking.total_price) || 0;
-        const depositReq = parseInt(matchedBooking.deposit_required) || 1000000;
+        const parsedReq2 = parseInt(matchedBooking.deposit_required);
+        const depositReq = !isNaN(parsedReq2) ? parsedReq2 : 1000000;
 
         let newStatus = matchedBooking.status;
         if (totalPrice > 0 && newDeposit >= totalPrice) newStatus = 'Hoàn tất';
@@ -241,13 +243,16 @@ async function handlePaymentStatus({ request, env }) {
     const totalPrice = parseInt(booking.total_price) || 0;
     const currentDeposit = parseInt(booking.deposit) || 0;
 
+    const pReq3 = parseInt(booking.deposit_required);
+    const reqAmount3 = !isNaN(pReq3) ? pReq3 : 1000000;
+
     const isPaid = booking.status &&
         (
             booking.status.includes('Đã cọc') ||
             booking.status === 'Hoàn tất' ||
             booking.status === 'Hoàn thành' ||
             booking.status === 'Đã thanh toán' ||
-            (totalPrice > 0 && currentDeposit >= (parseInt(booking.deposit_required) || 1000000))
+            (totalPrice > 0 && currentDeposit >= reqAmount3)
         );
 
     const isFullyPaid = booking.status === 'Hoàn tất' ||
