@@ -347,11 +347,8 @@ export const afterRender = async () => {
 
             console.log('[Roster] Matched bookings:', allBookings.length);
 
-            // Sắp xếp: mặc định theo thời gian đăng ký tour, từ sớm nhất đến muộn nhất
-            // Sử dụng a.id và b.id vì ID tự động tăng theo thời gian đăng ký
-            allBookings.sort((a, b) => {
-                return (a.id || 0) - (b.id || 0);
-            });
+            // Sắp xếp: API trả về mới nhất -> cũ nhất (DESC). Đảo ngược mảng để thành Sớm nhất -> Muộn nhất (những người đăng ký đầu tiên hiện lên trên đầu)
+            allBookings.reverse();
 
             renderTable();
 
