@@ -347,11 +347,11 @@ export const afterRender = async () => {
 
             console.log('[Roster] Matched bookings:', allBookings.length);
 
-            // Sắp xếp: ưu tiên Đã Cọc / Hoàn tất lên đầu
+            // Sắp xếp: mặc định theo thời gian đăng ký tour, từ sớm nhất đến muộn nhất
             allBookings.sort((a, b) => {
-                const sA = (a.status || '').includes('cọc') || a.status === 'Hoàn tất' ? 1 : 0;
-                const sB = (b.status || '').includes('cọc') || b.status === 'Hoàn tất' ? 1 : 0;
-                return sB - sA;
+                const dateA = new Date(a.created_at || 0).getTime();
+                const dateB = new Date(b.created_at || 0).getTime();
+                return dateA - dateB;
             });
 
             renderTable();
