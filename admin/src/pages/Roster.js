@@ -348,10 +348,9 @@ export const afterRender = async () => {
             console.log('[Roster] Matched bookings:', allBookings.length);
 
             // Sắp xếp: mặc định theo thời gian đăng ký tour, từ sớm nhất đến muộn nhất
+            // Sử dụng a.id và b.id vì ID tự động tăng theo thời gian đăng ký
             allBookings.sort((a, b) => {
-                const dateA = new Date(a.created_at || 0).getTime();
-                const dateB = new Date(b.created_at || 0).getTime();
-                return dateA - dateB;
+                return (a.id || 0) - (b.id || 0);
             });
 
             renderTable();
