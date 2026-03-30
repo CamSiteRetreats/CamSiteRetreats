@@ -397,12 +397,6 @@ export const afterRender = async () => {
     const exportExcel = () => {
         const visibleColumnsArr = COLUMNS.filter(c => visibleCols.has(c.id));
 
-        let csvContent = "\\uFEFF"; // BOM for UTF-8 Excel support
-
-        // Header row
-        csvContent += visibleColumnsArr.map(c => `"${c.label}"`).join(",") + "\n";
-
-        // Data rows (using the currently filtered data)
         const sStatus = filterStatus.value.toLowerCase();
         const sGender = filterGender.value.toLowerCase();
         const activeData = allBookings.filter(b => {
@@ -414,36 +408,65 @@ export const afterRender = async () => {
             return statusMatch && genderMatch;
         });
 
+        // Tạo nội dung file Excel bằng định dạng HTML table (hỗ trợ stylesheet cho Excel)
+        let htmlTable = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8" />
+                <style>
+                    table { border-collapse: collapse; width: 100%; font-family: 'Calibri', sans-serif; font-size: 11pt; }
+                    th, td { border: 1px solid #000000; padding: 6px 8px; text-align: left; vertical-align: middle; }
+                    th { background-color: #f2f2f2; font-weight: bold; }
+                    /* Class ngăn Excel tự động format số điện thoại / cccd thành số khoa học / mất số 0 */
+                    .num { mso-number-format: "\\@"; }
+                </style>
+            </head>
+            <body>
+                <table>
+                    <thead>
+                        <tr>
+                            ${visibleColumnsArr.map(c => `<th>${c.label}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
         activeData.forEach((b, index) => {
-            const rowArr = visibleColumnsArr.map(c => {
-                // Determine pure text for export (strip HTML)
+            htmlTable += '<tr>';
+            visibleColumnsArr.forEach(c => {
                 let cellData = '';
                 if (c.id === 'col-stt') cellData = index + 1;
                 else if (c.id === 'col-name') cellData = b.name || '';
                 else if (c.id === 'col-address') cellData = b.address || '';
-                else if (c.id === 'col-phone') cellData = b.phone ? `'${b.phone}` : ''; // Appending ' prevents Excel scientific notation
+                else if (c.id === 'col-phone') cellData = b.phone ? String(b.phone) : '';
                 else if (c.id === 'col-diet') cellData = (b.diet === 'Chay' || b.diet === 'Có') ? 'Có' : 'Không';
                 else if (c.id === 'col-pole') cellData = (b.trekking_pole === 'Có') ? 'Có' : 'Không';
                 else {
-                    // Quick strip HTML
+                    // Loại bỏ mã HTML ra khỏi cell data
                     const rawStr = String(c.render(b, index));
                     const tmp = document.createElement("DIV");
                     tmp.innerHTML = rawStr;
                     cellData = tmp.textContent || tmp.innerText || "";
                 }
-
-                // Escape quotes
-                cellData = String(cellData).replace(/"/g, '""');
-                return `"${cellData}"`;
+                
+                // Ép kiểu text cho phone hoặc cccd để Excel không làm mất số
+                const isNumForce = (c.id === 'col-phone' || c.id === 'col-cccd');
+                htmlTable += `<td ${isNumForce ? 'class="num"' : ''}>${cellData}</td>`;
             });
-
-            csvContent += rowArr.join(",") + "\n";
+            htmlTable += '</tr>';
         });
 
-        // Download Blob
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        htmlTable += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        // Thêm ký tự BOM (Byte Order Mark) để đảm bảo các bản Excel cũ nhận chuẩn UTF-8
+        const blob = new Blob(['\ufeff', htmlTable], { type: 'application/vnd.ms-excel;charset=utf-8' });
         const url = URL.createObjectURL(blob);
-        const fileName = `DS_Doan_${targetTour || 'Tour'}_${targetDateFormated || 'Date'}.csv`.replace(/[/\\?%*:|"<>]/g, '-');
+        const fileName = `DS_Doan_${targetTour || 'Tour'}_${targetDateFormated || 'Date'}.xls`.replace(/[/\\?%*:|"<>]/g, '-');
 
         const link = document.createElement("a");
         link.setAttribute("href", url);

@@ -1223,36 +1223,68 @@ export const afterRender = () => {
                 return;
             }
 
-            // Headers
-            const headers = ['Mã KH (CRM)', 'Họ và Tên', 'Số điện thoại', 'Tên Tour', 'Lịch trình', 'Trạng thái', 'Nguồn / Sale', 'Đã cọc', 'Tổng tiền', 'Ghi chú'];
+            // Giao diện HTML xuất Excel
+            let htmlTable = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8" />
+                    <style>
+                        table { border-collapse: collapse; width: 100%; font-family: 'Calibri', sans-serif; font-size: 11pt; }
+                        th, td { border: 1px solid #000000; padding: 6px 8px; text-align: left; vertical-align: middle; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        .num { mso-number-format: "\\@"; }
+                    </style>
+                </head>
+                <body>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mã KH (CRM)</th>
+                                <th>Họ và Tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Tên Tour</th>
+                                <th>Lịch trình</th>
+                                <th>Trạng thái</th>
+                                <th>Nguồn / Sale</th>
+                                <th>Đã cọc</th>
+                                <th>Tổng tiền</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
 
-            // Build CSV rows
-            const rows = [headers];
             dataToExport.forEach(b => {
-                rows.push([
-                    `"#CSR${b.id}"`,
-                    `"${b.name || ''}"`,
-                    `= "${b.phone || ''}"`, // Force Excel treat as text string
-                    `"${b.tour || ''}"`,
-                    `"${b.date || ''}"`,
-                    `"${b.status || ''}"`,
-                    `"${b.sale_name || 'Website'}"`,
-                    b.deposit || 0,
-                    b.total_price || 0,
-                    `"${(b.special || '').replace(/"/g, '""')}"` // Escape quotes
-                ]);
+                htmlTable += `
+                    <tr>
+                        <td class="num">#CSR${b.id || ''}</td>
+                        <td>${(b.name || '').replace(/</g, '&lt;')}</td>
+                        <td class="num">${b.phone || ''}</td>
+                        <td>${(b.tour || '').replace(/</g, '&lt;')}</td>
+                        <td class="num">${b.date || ''}</td>
+                        <td>${(b.status || '').replace(/</g, '&lt;')}</td>
+                        <td>${(b.sale_name || 'Website').replace(/</g, '&lt;')}</td>
+                        <td>${b.deposit || 0}</td>
+                        <td>${b.total_price || 0}</td>
+                        <td>${(b.special || '').replace(/</g, '&lt;')}</td>
+                    </tr>
+                `;
             });
 
-            // Convert to CSV string format with BOM for UTF-8 compatibility
-            const csvContent = "\\uFEFF" + rows.map(e => e.join(",")).join("\n");
+            htmlTable += `
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
 
-            // Trigger download
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            // Trigger download với BOM và MIME Excel
+            const blob = new Blob(['\ufeff', htmlTable], { type: 'application/vnd.ms-excel;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
             let filenameStatus = activeTab === 'pending' ? 'ChoCoc' : (activeTab === 'upcoming' ? 'SapThamGia' : (activeTab === 'ready' ? 'ChoLenXe' : 'LichSu'));
-            link.setAttribute("download", `BaoCao_DonHang_${filenameStatus}_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.setAttribute("download", `BaoCao_DonHang_${filenameStatus}_${new Date().toISOString().slice(0, 10)}.xls`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
