@@ -71,11 +71,17 @@ export const render = () => {
                   <!-- Filters & Column Selection (Hidden on Print) -->
                   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 space-y-5 print:hidden">
                       <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between border-b border-gray-100 pb-5">
-                          <div class="flex items-center gap-4">
+                          <div class="flex flex-wrap items-center gap-4">
                               <h3 class="font-bold text-gray-800 flex items-center gap-2">
                                   <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                                  Lọc Nhanh
+                                  Bộ lọc & Tìm kiếm
                               </h3>
+                              <!-- Tìm kiếm text -->
+                              <div class="relative min-w-[200px]">
+                                  <input type="text" id="filterSearch" placeholder="Tìm tên, SĐT..." class="input-field pl-9 py-2 text-sm w-full">
+                                  <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                              </div>
+
                               <select id="filterStatus" class="input-field py-2 text-sm max-w-[180px]">
                                   <option value="">-- Tất cả Trạng thái --</option>
                                   <option value="Đã cọc">Đã cọc / Hoàn tất</option>
@@ -86,6 +92,12 @@ export const render = () => {
                                   <option value="">-- Giới tính --</option>
                                   <option value="Nam">Nam</option>
                                   <option value="Nữ">Nữ</option>
+                              </select>
+
+                              <!-- Sắp xếp -->
+                              <select id="filterSort" class="input-field py-2 text-sm max-w-[180px] font-bold text-csr-orange border-csr-orange/20">
+                                  <option value="newest">🆕 Mới nhất lên đầu</option>
+                                  <option value="oldest">⏳ Cũ nhất lên đầu</option>
                               </select>
                           </div>
                           
@@ -348,8 +360,15 @@ export const afterRender = async () => {
             console.log('[Roster] Matched bookings:', allBookings.length);
 
             // Sắp xếp: Luôn ưu tiên những người ĐĂNG KÝ ĐẦU TIÊN hiện lên TRÊN ĐẦU (Sắp xếp theo ID tăng dần)
-            allBookings.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-            console.log('[Roster] Sorted bookings (Oldest first):', allBookings.map(b => b.id));
+            // Apply sorting (Now respects the filterSort select)
+            const sortOrder = document.getElementById('filterSort')?.value || 'newest';
+            if (sortOrder === 'newest') {
+                allBookings.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+            } else {
+                allBookings.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            }
+
+            console.log(`[Roster] Sorted bookings (${sortOrder}):`, allBookings.map(b => b.id));
 
             renderTable();
 
@@ -362,17 +381,27 @@ export const afterRender = async () => {
     const renderTable = () => {
         const sStatus = filterStatus.value.toLowerCase();
         const sGender = filterGender.value.toLowerCase();
+        const sSearch = document.getElementById('filterSearch')?.value?.toLowerCase() || '';
 
         const filtered = allBookings.filter(b => {
+            // 1. Search term (Name, Phone, ID, Address, CRM ID)
+            if (sSearch) {
+                const searchStr = `${b.name} ${b.phone} ${b.address} ${b.medal_name} ${b.customer_id}`.toLowerCase();
+                if (!searchStr.includes(sSearch)) return false;
+            }
+
+            // 2. Status filter
             const bStatus = (b.status || '').toLowerCase();
             const statusMatch = sStatus === '' ||
                 (sStatus === 'chờ cọc' && (bStatus.includes('chờ cọc') || bStatus.includes('chờ xác nhận'))) ||
                 (sStatus === 'đã cọc' && (bStatus.includes('đã cọc') || bStatus.includes('hoàn tất') || bStatus.includes('hoàn thành'))) ||
                 (sStatus === 'đã hủy' && bStatus.includes('hủy'));
 
+            if (!statusMatch) return false;
+
+            // 3. Gender filter
             const bGender = (b.gender || '').toLowerCase();
-            const genderMatch = sGender === '' || bGender === sGender;
-            return statusMatch && genderMatch;
+            return sGender === '' || bGender === sGender;
         });
 
         document.getElementById('text-visible-count').textContent = filtered.length;
@@ -400,13 +429,27 @@ export const afterRender = async () => {
 
         const sStatus = filterStatus.value.toLowerCase();
         const sGender = filterGender.value.toLowerCase();
+        const sSearch = document.getElementById('filterSearch')?.value?.toLowerCase() || '';
+
         const activeData = allBookings.filter(b => {
+            // Multi-criteria filter (same logic as renderTable)
+            if (sSearch) {
+                const searchStr = `${b.name} ${b.phone} ${b.address} ${b.medal_name} ${b.customer_id}`.toLowerCase();
+                if (!searchStr.includes(sSearch)) return false;
+            }
+
+            const bStatus = (b.status || '').toLowerCase();
             const statusMatch = sStatus === '' ||
-                (sStatus === 'chờ cọc' && (b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc')) ||
-                (sStatus === 'đã cọc' && (b.status === 'Đã cọc' || b.status === 'Hoàn tất' || b.status === 'Hoàn thành')) ||
-                (sStatus === 'đã hủy' && b.status === 'Đã hủy');
-            const genderMatch = sGender === '' || (b.gender && b.gender.toLowerCase() === sGender);
-            return statusMatch && genderMatch;
+                (sStatus === 'chờ cọc' && (bStatus.includes('chờ cọc') || bStatus.includes('chờ xác nhận'))) ||
+                (sStatus === 'đã cọc' && (bStatus.includes('đã cọc') || bStatus.includes('hoàn tất') || bStatus.includes('hoàn thành'))) ||
+                (sStatus === 'đã hủy' && bStatus.includes('hủy'));
+
+            if (!statusMatch) return false;
+
+            const bGender = (b.gender || '').toLowerCase();
+            const genderMatch = sGender === '' || bGender === sGender;
+
+            return genderMatch;
         });
 
         // Tạo nội dung file Excel bằng định dạng HTML table (hỗ trợ stylesheet cho Excel)
@@ -480,6 +523,8 @@ export const afterRender = async () => {
     // Events
     filterStatus.addEventListener('change', renderTable);
     filterGender.addEventListener('change', renderTable);
+    document.getElementById('filterSearch')?.addEventListener('input', renderTable);
+    document.getElementById('filterSort')?.addEventListener('change', loadData);
 
     document.getElementById('btnExportPDF').addEventListener('click', () => {
         window.print();
