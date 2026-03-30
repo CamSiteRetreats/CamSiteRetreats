@@ -1140,6 +1140,8 @@ export const afterRender = () => {
         try {
             const res = await fetch('/api/bookings');
             currentBookings = await res.json();
+            // Sắp xếp: Luôn ưu tiên những người ĐĂNG KÝ ĐẦU TIÊN hiện lên TRÊN ĐẦU (Sắp xếp theo ID tăng dần)
+            currentBookings.sort((a, b) => parseInt(a.id) - parseInt(b.id));
             populateFilters(); // Generate Options cho thẻ Select
             renderTable(); // Gọi hàm Render HTML sau khi tải xong mảng
         } catch (err) {

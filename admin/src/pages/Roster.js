@@ -347,8 +347,9 @@ export const afterRender = async () => {
 
             console.log('[Roster] Matched bookings:', allBookings.length);
 
-            // Sắp xếp: API trả về mới nhất -> cũ nhất (DESC). Đảo ngược mảng để thành Sớm nhất -> Muộn nhất (những người đăng ký đầu tiên hiện lên trên đầu)
-            allBookings.reverse();
+            // Sắp xếp: Luôn ưu tiên những người ĐĂNG KÝ ĐẦU TIÊN hiện lên TRÊN ĐẦU (Sắp xếp theo ID tăng dần)
+            allBookings.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            console.log('[Roster] Sorted bookings (Oldest first):', allBookings.map(b => b.id));
 
             renderTable();
 
