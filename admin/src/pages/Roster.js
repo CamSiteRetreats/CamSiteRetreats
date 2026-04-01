@@ -182,11 +182,11 @@ export const afterRender = async () => {
         { id: 'col-medal', label: 'Tên Huy Chương', default: false, render: (b) => b.medal_name || b.name || '-' }
     ];
 
-    // Read URL params
     const params = new URLSearchParams(window.location.search);
     const targetTour = params.get('tour') || '';
     const targetDateStr = params.get('date') || ''; // Ex: 2025-03-01
     const targetScheduleId = params.get('scheduleId') || '';
+    const hasGroupLabel = !!params.get('groupLabel');
     let targetDateFormated = targetDateStr;
 
     // Convert to DD/MM/YYYY for title and robust comparison
@@ -339,12 +339,19 @@ export const afterRender = async () => {
 
             // Lọc theo Tour và Ngày (so sánh linh hoạt: range, no-year, chuẩn)
             allBookings = data.filter(b => {
-                // Priority: If we have a targetScheduleId, and the booking has a schedule_id, they must match
-                if (targetScheduleId && b.schedule_id) {
-                    return String(b.schedule_id) === String(targetScheduleId);
+                // Priority: Nếu đã request ID lịch trình (từ nút Xem Danh Sách Đoàn ở Lịch trình)
+                if (targetScheduleId) {
+                    // Ưu tiên 1: booking được gán trực tiếp
+                    if (String(b.schedule_id) === String(targetScheduleId)) return true;
+                    // Fallback: Nếu lịch trình NÀY KIỂU DOANH NGHIỆP CŨ (không có label ĐỘI A, ĐỘI B...)
+                    if (!hasGroupLabel && !b.schedule_id) {
+                        // Tiếp tục rơi xuống logic check Tên & Ngày
+                    } else {
+                        return false;
+                    }
                 }
 
-                // Fallback / legacy matching:
+                // Fallback / legacy matching for general URLs (without scheduleId or for older group-less schedules):
                 let mTour = true, mDate = true;
                 if (targetTour) {
                     const normB = normalizeText(b.tour);

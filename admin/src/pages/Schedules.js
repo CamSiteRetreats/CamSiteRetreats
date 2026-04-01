@@ -431,8 +431,9 @@ export const afterRender = () => {
             const tourName = detailsBtn.getAttribute('data-tour');
             const dateStr = detailsBtn.getAttribute('data-date');
             const safeDate = dateStr && dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+            const groupLabel = item.group_label || '';
             // Open schedule details using the new V2 router
-            const url = `/admin/roster?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(safeDate)}&scheduleId=${schId}`;
+            const url = `/admin/roster?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(safeDate)}&scheduleId=${schId}&groupLabel=${encodeURIComponent(groupLabel)}`;
 
             // Navigate cleanly using History API
             history.pushState(null, null, url);

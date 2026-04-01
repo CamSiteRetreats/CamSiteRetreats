@@ -1,0 +1,22 @@
+[
+  {
+    "id": 23,
+    "tour_name": "Tà Năng - Phan Dũng",
+    "start_date": "2026-04-24T17:00:00.000Z",
+    "slots": 17,
+    "status": "Đang mở",
+    "end_date": "2026-04-25T17:00:00.000Z",
+    "group_label": "Team Cam",
+    "zalo_link": null
+  },
+  {
+    "id": 32,
+    "tour_name": "Tà Năng - Phan Dũng",
+    "start_date": "2026-04-24T17:00:00.000Z",
+    "slots": 15,
+    "status": "Đang mở",
+    "end_date": "2026-04-25T17:00:00.000Z",
+    "group_label": "Team Quýt",
+    "zalo_link": "https://zalo.me/g/wdcj2lvc8gviiwavd9a8"
+  }
+]
