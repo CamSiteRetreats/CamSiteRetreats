@@ -185,18 +185,50 @@ export const afterRender = () => {
     };
 
     const renderServiceRow = (s, i) => `
-        <div class="ts-service-row flex gap-2 items-start" data-index="${i}">
-            <div class="flex-1 space-y-1">
-                <input type="text" class="ts-srv-label input-field bg-gray-50 text-sm w-full" value="${s.label || ''}" placeholder="Tên dịch vụ (VD: Thuê lều riêng)">
-                <input type="text" class="ts-srv-desc input-field bg-gray-50 text-xs w-full" value="${s.description || ''}" placeholder="Mô tả ngắn (tùy chọn)">
+        <div class="ts-service-row flex gap-3 items-start p-3 bg-gray-50 rounded-xl border border-gray-100" data-index="${i}">
+
+            <!-- Ô upload ảnh -->
+            <div class="ts-img-upload-area flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer relative group hover:border-csr-orange transition-colors"
+                 style="min-width:80px; min-height:80px;"
+                 onclick="document.getElementById('ts-img-input-${i}').click()"
+                 ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                 ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                 ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleServiceImgDrop(event, ${i});">
+                <!-- Preview ảnh nếu đã có -->
+                ${s.image
+                    ? `<img src="${s.image}" class="w-full h-full object-cover ts-img-preview" id="ts-img-preview-${i}">`
+                    : `<div id="ts-img-preview-${i}" class="w-full h-full flex flex-col items-center justify-center text-gray-300 text-center p-1">
+                            <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span style="font-size:9px; font-weight:700; text-transform:uppercase;">Thêm ảnh</span>
+                       </div>`
+                }
+                <!-- Overlay khi hover để đổi ảnh -->
+                ${s.image ? `<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span style="font-size:9px; color:white; font-weight:700;">ĐỔI ẢNH</span>
+                </div>` : ''}
+                <input type="file" id="ts-img-input-${i}" accept="image/*" class="hidden ts-img-file-input" data-row="${i}">
             </div>
-            <div style="width:130px;">
-                <input type="number" class="ts-srv-price input-field bg-gray-50 text-sm w-full" value="${s.price || 0}" placeholder="Giá (VNĐ)">
+            <!-- Hidden input lưu URL ảnh sau khi upload -->
+            <input type="hidden" class="ts-srv-image" value="${s.image || ''}">
+
+            <!-- Thông tin dịch vụ -->
+            <div class="flex-1 space-y-2">
+                <input type="text" class="ts-srv-label input-field bg-white text-sm w-full" value="${s.label || ''}" placeholder="Tên dịch vụ (VD: Áo khoác CSR)">
+                <input type="text" class="ts-srv-desc input-field bg-white text-xs w-full" value="${s.description || ''}" placeholder="Mô tả ngắn (tùy chọn)">
             </div>
-            <button class="ts-remove-service p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-1" data-index="${i}" title="Xóa">
+
+            <!-- Giá -->
+            <div style="width:120px;" class="flex-shrink-0">
+                <input type="number" class="ts-srv-price input-field bg-white text-sm w-full" value="${s.price || 0}" placeholder="Giá (VNĐ)">
+                <div class="text-[10px] text-gray-400 text-center mt-1">đồng</div>
+            </div>
+
+            <!-- Nút xóa -->
+            <button class="ts-remove-service p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-1 flex-shrink-0" data-index="${i}" title="Xóa dịch vụ">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>`;
+
 
     const bindConfigEvents = (tour) => {
         // Toggle pickup section visibility
@@ -226,15 +258,119 @@ export const afterRender = () => {
             const emptyP = list.parentElement.querySelector('p');
             if (emptyP) emptyP.remove();
             const row = document.createElement('div');
-            row.innerHTML = renderServiceRow({ label: '', description: '', price: 0, id: `srv_${Date.now()}` }, newIdx);
+            row.innerHTML = renderServiceRow({ label: '', description: '', price: 0, image: '', id: `srv_${Date.now()}` }, newIdx);
             list.appendChild(row.firstElementChild);
             bindRemoveButtons();
+            bindImageInputs();
         });
 
         bindRemoveButtons();
+        bindImageInputs();
 
         // Save
         document.getElementById('ts-save-btn')?.addEventListener('click', () => saveConfig(tour));
+    };
+
+    // ── Image upload helpers ───────────────────────────────────────────────────
+
+    /**
+     * Nén ảnh bằng Canvas (chạy hoàn toàn ở client): giảm kích thước tối đa 1000px, quality 85%
+     * Trả về data URL dạng JPEG.
+     */
+    const compressImage = (file) => new Promise((resolve, reject) => {
+        const MAX_PX = 1000;
+        const QUALITY = 0.85;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                // Scale down nếu lớn hơn MAX_PX
+                if (width > MAX_PX || height > MAX_PX) {
+                    if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX; }
+                    else                { width  = Math.round(width  * MAX_PX / height); height = MAX_PX; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', QUALITY));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+    /**
+     * Upload ảnh đã nén lên server, cập nhật preview + hidden input trong row.
+     */
+    const uploadServiceImage = async (file, rowIndex) => {
+        const previewEl = document.getElementById(`ts-img-preview-${rowIndex}`);
+        const row = document.querySelector(`.ts-service-row[data-index="${rowIndex}"]`);
+        const hiddenInput = row?.querySelector('.ts-srv-image');
+
+        if (!previewEl || !row) return;
+
+        // 1) Hiển thị trạng thái đang xử lý
+        previewEl.outerHTML = `<div id="ts-img-preview-${rowIndex}" class="w-full h-full flex items-center justify-center">
+            <svg class="animate-spin w-6 h-6 text-csr-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        </div>`;
+
+        try {
+            // 2) Nén client-side trước khi gửi lên server
+            const base64 = await compressImage(file);
+            const safeName = (file.name || 'service').replace(/\.[^.]+$/, '');
+
+            // 3) Upload lên server (server tiếp tục nén lần 2 bằng sharp)
+            const res  = await fetch('/api/upload', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, filename: safeName }),
+            });
+            const data = await res.json();
+
+            if (!data.success) throw new Error(data.error || 'Upload thất bại');
+
+            const newUrl = data.url;
+
+            // 4) Cập nhật preview thành ảnh thật
+            const previewNow = document.getElementById(`ts-img-preview-${rowIndex}`);
+            if (previewNow) {
+                previewNow.outerHTML = `<img src="${newUrl}" class="w-full h-full object-cover" id="ts-img-preview-${rowIndex}">`;
+            }
+
+            // 5) Lưu URL vào hidden input
+            if (hiddenInput) hiddenInput.value = newUrl;
+
+            console.log(`[upload] ✅ Row ${rowIndex}: ${data.stats?.inputKB}KB → ${data.stats?.outputKB}KB (${data.stats?.savePct}% nhẹ hơn)`);
+
+        } catch (err) {
+            console.error('[upload] ❌', err);
+            const previewNow = document.getElementById(`ts-img-preview-${rowIndex}`);
+            if (previewNow) previewNow.outerHTML = `<div id="ts-img-preview-${rowIndex}" class="w-full h-full flex items-center justify-center text-red-400 text-[9px] text-center p-1">Lỗi upload</div>`;
+            alert('Lỗi upload ảnh: ' + err.message);
+        }
+    };
+
+    /** Bind file-input change events cho tất cả service rows hiện có */
+    const bindImageInputs = () => {
+        document.querySelectorAll('.ts-img-file-input').forEach(input => {
+            // Chỉ bind 1 lần
+            if (input.dataset.bound) return;
+            input.dataset.bound = '1';
+            input.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                const rowIdx = parseInt(input.dataset.row);
+                if (file && !isNaN(rowIdx)) uploadServiceImage(file, rowIdx);
+            });
+        });
+    };
+
+    /** Handler cho drag-drop (cần expose ra window vì được gọi từ inline HTML) */
+    window.handleServiceImgDrop = (event, rowIndex) => {
+        const file = event.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith('image/')) uploadServiceImage(file, rowIndex);
     };
 
     const bindRemoveButtons = () => {
@@ -265,14 +401,15 @@ export const afterRender = () => {
             if (label) pickup_points.push({ label, time });
         });
 
-        // Collect services
+        // Collect services (bao gồm cả image URL nếu đã upload)
         const serviceRows = document.querySelectorAll('.ts-service-row');
         const services = [];
         serviceRows.forEach((row, i) => {
-            const label = row.querySelector('.ts-srv-label')?.value.trim();
-            const desc = row.querySelector('.ts-srv-desc')?.value.trim();
-            const price = parseInt(row.querySelector('.ts-srv-price')?.value || '0');
-            if (label) services.push({ id: `srv_${i}_${Date.now()}`, label, description: desc || '', price });
+            const label  = row.querySelector('.ts-srv-label')?.value.trim();
+            const desc   = row.querySelector('.ts-srv-desc')?.value.trim();
+            const price  = parseInt(row.querySelector('.ts-srv-price')?.value || '0');
+            const image  = row.querySelector('.ts-srv-image')?.value.trim() || '';
+            if (label) services.push({ id: `srv_${i}_${Date.now()}`, label, description: desc || '', price, image });
         });
 
         const step3 = { show_coupon: document.getElementById('ts-show-coupon')?.checked !== false };

@@ -105,13 +105,19 @@ const BookingEngine = {
             .be-toggle input:checked ~ .be-toggle-track { background: #E85D04; }
             .be-toggle-thumb { position: absolute; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,.2); transition: transform 0.2s; }
             .be-toggle input:checked ~ .be-toggle-track .be-toggle-thumb { transform: translateX(20px); }
-            .be-service-card { border: 2px solid #e5e7eb; border-radius: 16px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-            .be-service-card:hover { border-color: #E85D04; background: #fff8f0; }
-            .be-service-card.selected { border-color: #E85D04; background: #fff3e8; }
-            .be-service-card.selected .be-service-check { background: #E85D04; border-color: #E85D04; }
-            .be-service-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-            .be-service-check svg { opacity: 0; transition: opacity 0.2s; }
-            .be-service-card.selected .be-service-check svg { opacity: 1; }
+            .be-service-card { border: 2px solid #e5e7eb; border-radius: 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+            .be-service-card:hover { border-color: #E85D04; box-shadow: 0 4px 16px rgba(232,93,4,.12); transform: translateY(-2px); }
+            .be-service-card.selected { border-color: #E85D04; box-shadow: 0 4px 20px rgba(232,93,4,.2); }
+            .be-service-card .be-card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: linear-gradient(135deg,#fff3e8,#fde8d8); }
+            .be-service-card .be-card-img-placeholder { width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg,#fff3e8,#fde8d8); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+            .be-service-card .be-card-body { padding: 10px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+            .be-service-card .be-card-name { font-size: 13px; font-weight: 700; color: #1f2937; line-height: 1.3; }
+            .be-service-card .be-card-desc { font-size: 11px; color: #9ca3af; line-height: 1.4; }
+            .be-service-card .be-card-price { font-size: 14px; font-weight: 900; color: #E85D04; margin-top: auto; padding-top: 6px; }
+            .be-service-card .be-check-badge { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: white; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+            .be-service-card.selected .be-check-badge { background: #E85D04; border-color: #E85D04; }
+            .be-service-card .be-check-badge svg { opacity: 0; transition: opacity 0.2s; }
+            .be-service-card.selected .be-check-badge svg { opacity: 1; }
             .be-step-btn { width: 100%; padding: 16px; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 14px; border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
             .be-btn-primary { background: #E85D04; color: white; box-shadow: 0 4px 16px rgba(232,93,4,.25); }
             .be-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
@@ -346,22 +352,29 @@ const BookingEngine = {
             ${services.length > 0 ? `
             <div>
                 <label class="be-label" style="margin-bottom:12px;">Dịch vụ bổ sung (tùy chọn)</label>
-                <div style="display:flex; flex-direction:column; gap:8px;" id="be-services-list">
+                <div style="display:flex; flex-direction:column; gap:16px;" id="be-services-list">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:12px;">
                     ${services.map(sv => `
                     <div class="be-service-card ${this.selectedServices[sv.id] ? 'selected' : ''}"
                          onclick="BookingEngine._toggleService(${JSON.stringify(sv).replace(/"/g, '&quot;')}, this)"
                          data-service-id="${sv.id}">
-                        <div>
-                            <div style="font-size:14px; font-weight:700; color:#1f2937;">${sv.label}</div>
-                            ${sv.description ? `<div style="font-size:12px; color:#9ca3af; margin-top:2px;">${sv.description}</div>` : ''}
+                        <!-- Badge check -->
+                        <div class="be-check-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-weight:800; color:#E85D04; font-size:15px; white-space:nowrap;">+${this.formatVND(sv.price)}</span>
-                            <div class="be-service-check">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
+                        <!-- Ảnh sản phẩm -->
+                        ${sv.image
+                            ? `<img class="be-card-img" src="${sv.image}" alt="${sv.label}" loading="lazy">`
+                            : `<div class="be-card-img-placeholder">🎒</div>`
+                        }
+                        <!-- Thông tin -->
+                        <div class="be-card-body">
+                            <div class="be-card-name">${sv.label}</div>
+                            ${sv.description ? `<div class="be-card-desc">${sv.description}</div>` : ''}
+                            <div class="be-card-price">+${this.formatVND(sv.price)}</div>
                         </div>
                     </div>`).join('')}
+                    </div>
                 </div>
             </div>` : ''}
 
