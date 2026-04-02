@@ -123,6 +123,67 @@
 
             const container = document.getElementById('booking-container');
 
+            // ── Danh sách trạng thái đã "hoàn tất" — link sẽ tự đóng ──────────
+            const CLOSED_STATUSES = ['Đã cọc', 'Đã cọc (Chờ đi)', 'Hoàn thành'];
+
+            // ── Hiển thị màn hình "Link đã đóng" ──────────────────────────────
+            const showCompletedNotice = (bookingData) => {
+                const name = bookingData?.name || 'Quý khách';
+                const tour = bookingData?.tour || '';
+                const date = bookingData?.date || '';
+
+                container.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:40px 20px; text-align:center; animation: fadeIn .4s ease-out;">
+                        <!-- Icon check circle -->
+                        <div style="width:80px; height:80px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 24px rgba(16,185,129,.2);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+
+                        <!-- Title -->
+                        <div>
+                            <h2 style="font-size:22px; font-weight:900; color:#1f2937; margin:0 0 6px;">Đăng ký đã hoàn tất!</h2>
+                            <p style="font-size:14px; color:#6b7280; line-height:1.6; margin:0;">
+                                Thông tin của <strong style="color:#1f2937;">${name}</strong> đã được ghi nhận thành công.
+                                ${tour ? `<br>Tour: <strong style="color:#E85D04;">${tour}</strong>` : ''}
+                                ${date ? ` · Ngày: <strong>${date}</strong>` : ''}
+                            </p>
+                        </div>
+
+                        <!-- Info box -->
+                        <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:16px; padding:16px 20px; max-width:320px; width:100%; text-align:left;">
+                            <div style="font-size:12px; font-weight:700; color:#15803d; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">Ghi chú</div>
+                            <p style="font-size:13px; color:#166534; line-height:1.6; margin:0;">
+                                Link đăng ký này đã được đóng sau khi hoàn tất xác nhận cọc. Nếu bạn cần thay đổi thông tin, vui lòng liên hệ trực tiếp với CAM SITE RETREATS.
+                            </p>
+                        </div>
+
+                        <!-- CTA -->
+                        <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px;">
+                            <a href="tel:+84123456789" style="
+                                background: #E85D04; color: white; text-decoration:none;
+                                padding:14px 20px; border-radius:14px; font-weight:700;
+                                font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;
+                                box-shadow: 0 4px 16px rgba(232,93,4,.3); transition:opacity .2s;
+                            ">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17.92z"/></svg>
+                                Liên hệ hỗ trợ
+                            </a>
+                            <a href="/" style="
+                                background: #f3f4f6; color: #4b5563; text-decoration:none;
+                                padding:14px 20px; border-radius:14px; font-weight:600;
+                                font-size:14px; text-align:center; transition:background .2s;
+                            ">Về trang chủ</a>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+                    </style>
+                `;
+            };
+
             if (typeof BookingEngine === 'undefined') {
                 container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;font-weight:600;">Không thể tải form. Vui lòng tải lại trang.</div>';
                 return;
@@ -148,13 +209,20 @@
                 }
             });
 
-            // Nếu có bookingId → pre-fill sau khi mount
+            // Nếu có bookingId → kiểm tra trạng thái trước khi pre-fill
             if (bookingId) {
                 const doFill = () => {
                     fetch(`/api/bookings?id=${bookingId}`)
                         .then(r => r.json())
                         .then(async b => {
                             if (!b || !b.name) return;
+
+                            // ── KIỂM TRA: Link đã đóng nếu đã thanh toán/hoàn tất ──────
+                            if (b.status && CLOSED_STATUSES.some(s => b.status.includes(s))) {
+                                showCompletedNotice(b);
+                                return; // Dừng, không render form
+                            }
+                            // ────────────────────────────────────────────────────────────
 
                             // Lấy full tour config
                             let fullTour = null;
@@ -196,7 +264,7 @@
                                 vegetarian:     b.diet === 'Ăn chay',
                                 trekkingPole:   b.trekking_pole === 'Có',
                                 specialRequest: b.special       || '',
-                                depositRequired: parseInt(b.deposit_required), // Đồng bộ số tiền cọc
+                                depositRequired: parseInt(b.deposit_required),
                             };
 
                             // Re-mount với đủ tourData (để sinh đúng form step 2 & 3)

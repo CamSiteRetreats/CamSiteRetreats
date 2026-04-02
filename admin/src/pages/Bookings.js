@@ -1418,34 +1418,169 @@ export const afterRender = () => {
         const booking = currentBookings.find(b => b.id == bookingId);
         if (!booking) return;
 
-        const depositHtml = parseInt(booking.deposit) > 0 ? `<span class="text-green-600 font-bold">${parseInt(booking.deposit).toLocaleString('vi-VN')}đ</span>` : `<span class="text-yellow-600 font-bold">0đ (Chưa Cọc)</span>`;
-        const priceHtml = booking.total_price ? `${parseInt(booking.total_price).toLocaleString('vi-VN')}đ` : 'Chưa định giá';
+        // ── helpers ──────────────────────────────────────────────────────────
+        const fmtVND = (n) => parseInt(n || 0).toLocaleString('vi-VN') + 'đ';
+        const fmtDate = (d) => {
+            if (!d) return '—';
+            // Convert ISO YYYY-MM-DD to DD/MM/YYYY
+            if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
+                const [y, mo, day] = d.split('-');
+                return `${day}/${mo}/${y}`;
+            }
+            return d;
+        };
+
+        const totalPrice = parseInt(booking.total_price) || 0;
+        const depositAmt = parseInt(booking.deposit) || 0;
+        const discount   = parseInt(booking.discount) || 0;
+        const remaining  = totalPrice - depositAmt;
+
+        // Parse services_booked if present
+        let servicesList = [];
+        try {
+            if (booking.services_booked) {
+                const parsed = typeof booking.services_booked === 'string'
+                    ? JSON.parse(booking.services_booked) : booking.services_booked;
+                if (Array.isArray(parsed)) servicesList = parsed;
+            }
+        } catch(e) {}
+
+        const servicesTotal = servicesList.reduce((sum, s) => sum + (parseInt(s.price) || 0), 0);
+
+        // Status badge helper
+        const statusColor = {
+            'Chờ tư vấn': 'bg-purple-100 text-purple-700 border-purple-200',
+            'Chờ cọc': 'bg-yellow-100 text-yellow-700 border-yellow-200',
+            'Chờ xác nhận cọc': 'bg-orange-100 text-orange-700 border-orange-200',
+            'Đã cọc': 'bg-blue-100 text-blue-700 border-blue-200',
+            'Đã cọc (Chờ đi)': 'bg-blue-100 text-blue-700 border-blue-200',
+            'Hoàn thành': 'bg-green-100 text-green-700 border-green-200',
+        };
+        const statusClass = statusColor[booking.status] || 'bg-gray-100 text-gray-700 border-gray-200';
+
+        const rowFn = (label, value, cls = '') =>
+            `<div class="flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-none">
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide min-w-[110px] pt-0.5">${label}</span>
+                <span class="text-sm font-medium text-gray-800 flex-1 ${cls}">${value || '—'}</span>
+            </div>`;
+
+        const sectionHeader = (icon, title, colorClass = 'bg-blue-50 text-blue-600') =>
+            `<div class="flex items-center gap-2.5 mb-3">
+                <div class="w-7 h-7 rounded-lg ${colorClass} flex items-center justify-center flex-shrink-0 text-sm">${icon}</div>
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">${title}</h3>
+            </div>`;
 
         const content = `
-           <div class="grid grid-cols-2 gap-y-3 gap-x-6 border-b pb-4">
-               <p><strong class="text-gray-500 block">Họ và Tên:</strong> <span class="text-lg font-medium">${booking.name}</span></p>
-               <p><strong class="text-gray-500 block">SĐT:</strong> <span class="text-lg">${booking.phone}</span></p>
-               <p><strong class="text-gray-500 block">ID Đơn:</strong> <span class="text-csr-orange font-mono font-bold text-lg">#CSR${booking.id}</span></p>
-               <p><strong class="text-gray-500 block">Huy Chương:</strong> <span class="text-csr-orange font-bold text-lg">${booking.medal_name || 'Theo Tên Thật'}</span></p>
-           </div>
-            <div class="grid grid-cols-2 gap-y-3 gap-x-6 border-b py-4 bg-gray-50/50 rounded-lg p-3">
-                <p><strong class="text-gray-500 block">Ngày Sinh:</strong> <span>${booking.dob || 'Không có'}</span></p>
-                <p><strong class="text-gray-500 block">Giới Tính:</strong> <span>${booking.gender || 'Bình thường'}</span></p>
-                <p><strong class="text-gray-500 block">Dị Ứng / Y tế:</strong> <span class="text-red-500 font-medium">${booking.allergy || 'Không'}</span></p>
-                <p><strong class="text-gray-500 block">Chế Độ Ăn:</strong> <span>${booking.diet || 'Không'}</span></p>
-                <p><strong class="text-gray-500 block">Mượn Gậy:</strong> <span>${booking.trekking_pole || 'Không'}</span></p>
-                <p><strong class="text-gray-500 block">CCCD:</strong> <span>${booking.id_card || 'Không có'}</span></p>
-                <p class="col-span-2"><strong class="text-gray-500 block">Địa Chỉ:</strong> <span class="text-xs break-words">${booking.address || 'Không có'}</span></p>
+        <div class="space-y-4 pb-2">
+
+            <!-- ① Thông tin Tour -->
+            <div class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-4">
+                ${sectionHeader('🗺️', 'Thông tin Tour', 'bg-orange-100 text-orange-600')}
+                <div class="grid grid-cols-2 gap-x-4">
+                    ${rowFn('Mã Đơn', `<span class="font-mono font-black text-csr-orange text-base">#CSR${booking.id}</span>`)}
+                    ${rowFn('Tên Tour', `<span class="text-csr-orange font-bold">${booking.tour || '—'}</span>`)}
+                    ${rowFn('Ngày Khởi Hành', `<span class="font-bold text-gray-900">${fmtDate(booking.date)}</span>`)}
+                    ${rowFn('Ngày Đăng Ký', booking.created_at ? fmtDate(booking.created_at.split('T')[0]) : '—')}
+                    ${rowFn('Trạng Thái', `<span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold border ${statusClass}">${booking.status || 'Chưa rõ'}</span>`)}
+                    ${rowFn('Tên Huy Chương', `<span class="font-black text-orange-600 uppercase tracking-wide">${booking.medal_name || booking.name}</span>`)}
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-y-3 gap-x-6 pt-4">
-                <p><strong class="text-gray-500 block">Tour Tham Gia:</strong> <span class="text-blue-600 font-medium">${booking.tour}</span></p>
-                <p><strong class="text-gray-500 block">Ngày Khởi Hành:</strong> <span>${booking.date}</span></p>
-                <p><strong class="text-gray-500 block">Tiền Cọc:</strong> ${depositHtml}</p>
-                <p><strong class="text-gray-500 block">Tổng Tiền:</strong> <span class="font-bold">${priceHtml}</span></p>
-                <p><strong class="text-gray-500 block">Cam Kết:</strong> <span class="${booking.commitments ? 'text-green-600' : 'text-red-500'} font-bold">${booking.commitments ? 'Đã đồng ý' : 'Chưa xác nhận'}</span></p>
-                <p class="col-span-2"><strong class="text-gray-500 block">Nhân Viên Sale / Ghi Chú:</strong> <span class="italic text-gray-700 bg-yellow-50 p-2 block mt-1 rounded border border-yellow-100">${booking.sale_name || 'Website'} - ${booking.special || '(Không có nhánh ghi chú)'}</span></p>
+
+            <!-- ② Thông tin cá nhân -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                ${sectionHeader('👤', 'Thông tin Cá nhân', 'bg-blue-50 text-blue-600')}
+                ${rowFn('Họ và Tên', `<span class="font-bold text-gray-900 text-base">${booking.name}</span>`)}
+                ${rowFn('Số Điện Thoại', `<a href="tel:${booking.phone}" class="text-blue-600 font-bold hover:underline">${booking.phone || '—'}</a>`)}
+                ${rowFn('Ngày Sinh', fmtDate(booking.dob))}
+                ${rowFn('Giới Tính', booking.gender || '—')}
+                ${rowFn('CCCD / Passport', `<span class="font-mono">${booking.id_card || '—'}</span>`)}
+                ${rowFn('Địa Chỉ', booking.address || '—')}
+                ${rowFn('Cam Kết SK', booking.commitments
+                    ? '<span class="text-green-600 font-bold">✅ Đã đồng ý</span>'
+                    : '<span class="text-red-500">❌ Chưa xác nhận</span>')}
             </div>
-        `;
+
+            <!-- ③ Thông tin Hậu cần -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                ${sectionHeader('🎒', 'Thông tin Hậu cần', 'bg-purple-50 text-purple-600')}
+                ${rowFn('Điểm Đón', booking.pickup_point || '—')}
+                ${rowFn('Chế Độ Ăn', booking.diet || 'Không')}
+                ${rowFn('Mượn Gậy', booking.trekking_pole === 'Có'
+                    ? '<span class="text-orange-600 font-bold">✅ Có mượn gậy</span>'
+                    : '<span class="text-gray-500">Không</span>')}
+                ${rowFn('Dị Ứng / Y Tế', booking.allergy
+                    ? `<span class="text-red-600 font-semibold">${booking.allergy}</span>`
+                    : '<span class="text-gray-400 italic">Không có</span>')}
+                ${rowFn('Yêu Cầu Khác', booking.special
+                    ? `<span class="bg-yellow-50 border border-yellow-100 rounded px-2 py-1 italic text-gray-700">${booking.special}</span>`
+                    : '<span class="text-gray-400 italic">Không có</span>')}
+            </div>
+
+            <!-- ④ Dịch vụ đi kèm -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                ${sectionHeader('✨', 'Dịch Vụ Đi Kèm', 'bg-green-50 text-green-600')}
+                ${servicesList.length > 0
+                    ? servicesList.map(sv => `
+                        <div class="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-none">
+                            <span class="text-sm text-gray-700 font-medium">${sv.label || sv.name || '—'}</span>
+                            <span class="text-sm font-bold text-green-600">+${fmtVND(sv.price)}</span>
+                        </div>`).join('')
+                    : `<p class="text-sm text-gray-400 italic py-1">Không có dịch vụ đi kèm.</p>`
+                }
+            </div>
+
+            <!-- ⑤ Giá chi tiết -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-4 text-white">
+                ${sectionHeader('💰', 'Giá Chi Tiết', 'bg-white/20 text-white')}
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between items-center py-1.5 border-b border-white/10">
+                        <span class="text-gray-400">Giá Tour Gốc</span>
+                        <span class="font-bold">${fmtVND(totalPrice + discount)}</span>
+                    </div>
+                    ${discount > 0 ? `
+                    <div class="flex justify-between items-center py-1.5 border-b border-white/10">
+                        <span class="text-gray-400">Giảm Giá / Coupon</span>
+                        <span class="font-bold text-red-400">- ${fmtVND(discount)}</span>
+                    </div>` : ''}
+                    ${servicesTotal > 0 ? `
+                    <div class="flex justify-between items-center py-1.5 border-b border-white/10">
+                        <span class="text-gray-400">Dịch Vụ Bổ Sung</span>
+                        <span class="font-bold text-green-400">+ ${fmtVND(servicesTotal)}</span>
+                    </div>` : ''}
+                    <div class="flex justify-between items-center py-2 border-b border-white/20">
+                        <span class="text-white font-bold">Tổng Thanh Toán</span>
+                        <span class="font-black text-orange-400 text-lg">${fmtVND(totalPrice)}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-white/10">
+                        <div>
+                            <span class="text-gray-400">Đã Cọc</span>
+                            ${booking.deposit_date ? `<div class="text-[11px] text-gray-500 mt-0.5">Ngày: ${fmtDate(booking.deposit_date)}</div>` : ''}
+                        </div>
+                        <span class="font-bold text-green-400">${depositAmt > 0 ? fmtVND(depositAmt) : '0đ (Chưa cọc)'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 bg-white/5 rounded-xl px-3 mt-2">
+                        <span class="font-bold text-gray-300">Còn Lại Cần Thu</span>
+                        <span class="font-black text-xl ${remaining > 0 ? 'text-red-400' : 'text-green-400'}">
+                            ${remaining > 0 ? fmtVND(remaining) : '✅ Đã thu đủ'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sale phụ trách -->
+            ${(booking.sale_name && booking.sale_name !== 'Website') ? `
+            <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
+                    ${(booking.sale_name || 'W').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                    <div class="text-xs text-blue-500 uppercase font-semibold tracking-wide">Sale Phụ Trách</div>
+                    <div class="text-sm font-bold text-blue-800">${booking.sale_name}</div>
+                </div>
+            </div>` : ''}
+
+        </div>`;
+
         document.getElementById('detailContentBlock').innerHTML = content;
         document.getElementById('detailModal').classList.remove('hidden');
         setTimeout(() => {
