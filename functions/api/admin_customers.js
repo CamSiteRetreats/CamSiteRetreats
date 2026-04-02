@@ -9,7 +9,7 @@ export async function onRequest(context) {
     // Set CORS headers
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
     };
 
@@ -20,7 +20,7 @@ export async function onRequest(context) {
     try {
         // 0. LIỆT KÊ TOÀN BỘ KHÁCH HÀNG THÂN THIẾT (GET)
         if (request.method === 'GET') {
-            const rows = await sql`SELECT * FROM crm_customers ORDER BY created_at DESC`;
+            const rows = await sql`SELECT id, csr_code, full_name, phone, cccd, dob, gender, medical_notes, dietary, loyalty_tier, notes, created_at, updated_at FROM crm_customers ORDER BY created_at DESC`;
             return Response.json({ success: true, data: rows }, { headers: corsHeaders });
         }
 
@@ -144,6 +144,33 @@ export async function onRequest(context) {
             }
 
             return Response.json({ success: true, message: 'Đã lưu thông tin Khách hàng thành công!', csr_code: csrCode }, { headers: corsHeaders });
+        }
+
+        // 3. XÓA KHÁCH HÀNG (DELETE)
+        if (request.method === 'DELETE') {
+            const id = url.searchParams.get('id');
+            const deleteBookings = url.searchParams.get('delete_bookings') === 'true';
+            if (!id) return Response.json({ success: false, message: 'Thiếu ID khách hàng.' }, { status: 400, headers: corsHeaders });
+
+            const custCheck = await sql`SELECT phone FROM crm_customers WHERE id = ${id}`;
+            if (custCheck.length === 0) return Response.json({ success: false, message: 'Không tìm thấy khách hàng.' }, { status: 404, headers: corsHeaders });
+
+            const phone = custCheck[0].phone;
+            await sql`DELETE FROM crm_customers WHERE id = ${id}`;
+            if (deleteBookings) await sql`DELETE FROM bookings WHERE phone = ${phone}`;
+
+            return Response.json({ success: true, message: 'Đã xóa dữ liệu khách hàng thành công.' }, { headers: corsHeaders });
+        }
+
+        // 4. CẬP NHẬT GHI CHÚ NỘI BỘ (PATCH)
+        if (request.method === 'PATCH' && action === 'update_notes') {
+            const id = url.searchParams.get('id');
+            const body = await request.json();
+            const { notes } = body;
+            if (!id) return Response.json({ success: false, message: 'Thiếu ID khách hàng.' }, { status: 400, headers: corsHeaders });
+
+            await sql`UPDATE crm_customers SET notes=${notes || ''}, updated_at=CURRENT_TIMESTAMP WHERE id=${id}`;
+            return Response.json({ success: true, message: 'Đã lưu ghi chú.' }, { headers: corsHeaders });
         }
 
         return new Response('Endpoint action Not Found', { status: 404, headers: corsHeaders });

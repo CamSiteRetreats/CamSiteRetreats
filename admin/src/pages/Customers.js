@@ -20,7 +20,7 @@ export const render = () => {
                   </div>
 
                   <!-- Statistics -->
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                       <div class="glass-panel p-5 border-l-4 border-csr-orange">
                           <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Tổng Khách Hàng</div>
                           <div class="text-3xl font-bold text-gray-900 mt-1" id="stat-total">--</div>
@@ -32,6 +32,10 @@ export const render = () => {
                       <div class="glass-panel p-5 border-l-4 border-blue-500">
                           <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Đủ ĐK Giảm Giá</div>
                           <div class="text-3xl font-bold text-blue-600 mt-1" id="stat-discount">--</div>
+                      </div>
+                      <div class="glass-panel p-5 border-l-4 border-purple-500">
+                          <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Tổng Doanh Thu (LTV)</div>
+                          <div class="text-2xl font-bold text-purple-600 mt-1" id="stat-ltv">--</div>
                       </div>
                   </div>
 
@@ -52,6 +56,7 @@ export const render = () => {
                                       <th class="p-4 font-medium">Khách Hàng</th>
                                       <th class="p-4 font-medium">Tour Gần Nhất</th>
                                       <th class="p-4 font-medium text-center">Số Tour</th>
+                                      <th class="p-4 font-medium">Tổng Chi (LTV)</th>
                                       <th class="p-4 font-medium">Đề Xuất</th>
                                       <th class="p-4 font-medium text-center">Thao Tác</th>
                                   </tr>
@@ -117,6 +122,10 @@ export const afterRender = () => {
         c._tourCount = customerBookings.length;
         c._latestTour = customerBookings.length > 0 ? customerBookings[0].tour : null;
         c._latestDate = customerBookings.length > 0 ? customerBookings[0].date : null;
+        // Tổng chi tiêu (LTV): cộng tất cả đơn đã cọc hoặc hoàn thành
+        c._ltv = customerBookings
+            .filter(b => b.status?.includes('cọc') || b.status?.includes('Cọc') || b.status?.includes('Hoàn'))
+            .reduce((sum, b) => sum + (parseInt(b.total_price) || 0), 0);
 
         // Đề xuất giảm giá
         if (c._tourCount >= 5) {
@@ -164,6 +173,9 @@ export const afterRender = () => {
             const tourCountBadge = c._tourCount > 0
                 ? `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${c._tourCount >= 5 ? 'bg-purple-100 text-purple-600' : c._tourCount >= 2 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}">${c._tourCount}</span>`
                 : '<span class="text-gray-300">0</span>';
+            const ltvDisplay = c._ltv > 0
+                ? `<span class="text-sm font-bold text-purple-700">${(c._ltv / 1_000_000).toFixed(1)}Mđ</span>`
+                : '<span class="text-gray-300 text-xs">—</span>';
 
             return `
                 <tr class="hover:bg-gray-50 transition-colors block md:table-row p-4 md:p-0 mb-4 md:mb-0 glass-panel md:glass-none border-l-4 border-csr-orange md:border-none relative">
@@ -196,8 +208,14 @@ export const afterRender = () => {
                     </td>
                     <td class="py-2 md:p-4 block md:table-cell">
                         <div class="flex justify-between items-center md:block">
+                            <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Tổng chi (LTV)</span>
+                            <div class="text-right md:text-left">${ltvDisplay}</div>
+                        </div>
+                    </td>
+                    <td class="py-2 md:p-4 block md:table-cell">
+                        <div class="flex justify-between items-center md:block">
                             <span class="md:hidden text-[10px] text-gray-400 uppercase font-medium">Hạng mức</span>
-                            <div class="text-right">${discountHtml ? discountBadge : '—'}</div>
+                            <div class="text-right">${discountBadge}</div>
                         </div>
                     </td>
                     <td class="py-4 md:p-4 block md:table-cell border-t md:border-none border-gray-50 mt-2">
@@ -222,6 +240,9 @@ export const afterRender = () => {
         document.getElementById('stat-total').textContent = data.length;
         document.getElementById('stat-returning').textContent = data.filter(c => c._tourCount >= 2).length;
         document.getElementById('stat-discount').textContent = data.filter(c => c._discount).length;
+        const totalLtv = data.reduce((sum, c) => sum + (c._ltv || 0), 0);
+        const ltvEl = document.getElementById('stat-ltv');
+        if (ltvEl) ltvEl.textContent = totalLtv > 0 ? (totalLtv / 1_000_000).toFixed(1) + 'Mđ' : '0đ';
     };
 
     // --- SEARCH ---
@@ -318,6 +339,16 @@ export const afterRender = () => {
                 </div>
             </div>
 
+            <!-- Tổng chi tiêu LTV -->
+            ${c._ltv > 0 ? `
+            <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold text-purple-500 uppercase tracking-wide">Tổng Chi Tiêu (LTV)</div>
+                    <div class="text-2xl font-black text-purple-700 mt-0.5">${c._ltv.toLocaleString('vi-VN')}đ</div>
+                </div>
+                <div class="text-4xl">💰</div>
+            </div>` : ''}
+
             <!-- Đề xuất giảm giá -->
             <div class="mb-6">${discountHtml}</div>
 
@@ -331,6 +362,23 @@ export const afterRender = () => {
                             <span class="text-sm font-medium ${r.color || 'text-gray-900'}">${r.value || '-'}</span>
                         </div>
                     `).join('')}
+                </div>
+            </div>
+
+            <!-- Ghi chú chăm sóc nội bộ -->
+            <div class="mb-6">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">📝 Ghi Chú Chăm Sóc Nội Bộ</h4>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                    <textarea id="crm-notes-input"
+                        placeholder="VD: Khách hay đi một mình, thích giường tầng trên, dị ứng nhẹ với pe-ni-xi-lin, có sinh nhật tháng 3..."
+                        class="w-full bg-transparent border-none outline-none text-sm text-gray-700 resize-none placeholder-yellow-400 min-h-[80px]"
+                        rows="4">${c.notes || ''}</textarea>
+                    <div class="flex justify-end mt-2">
+                        <button id="crm-notes-save" data-id="${c.id}"
+                            class="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold rounded-lg transition-colors">
+                            Lưu Ghi Chú
+                        </button>
+                    </div>
                 </div>
             </div>
 

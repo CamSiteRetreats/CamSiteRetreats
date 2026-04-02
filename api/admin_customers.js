@@ -181,6 +181,19 @@ module.exports = async (req, res) => {
             return res.status(200).json({ success: true, message: 'Đã xóa dữ liệu khách hàng thành công.' });
         }
 
+        // 4. CẬP NHẬT GHI CHÚ NỘI BỘ (PATCH)
+        if (req.method === 'PATCH' && action === 'update_notes') {
+            const { id } = req.query;
+            const { notes } = req.body;
+            if (!id) return res.status(400).json({ success: false, message: 'Thiếu ID khách hàng.' });
+
+            await db.query(
+                'UPDATE crm_customers SET notes=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$2',
+                [notes || '', id]
+            );
+            return res.status(200).json({ success: true, message: 'Đã lưu ghi chú.' });
+        }
+
         // Tạm thời chỉ dev tính năng Search và Create. CRUD sẽ bổ sung sau.
         return res.status(404).json({ error: 'Endpoint action Not Found' });
 
