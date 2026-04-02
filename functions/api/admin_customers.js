@@ -20,7 +20,7 @@ export async function onRequest(context) {
     try {
         // 0. LIỆT KÊ TOÀN BỘ KHÁCH HÀNG THÂN THIẾT (GET)
         if (request.method === 'GET') {
-            const rows = await sql`SELECT id, csr_code, full_name, phone, cccd, dob, gender, medical_notes, dietary, loyalty_tier, notes, created_at, updated_at FROM crm_customers ORDER BY created_at DESC`;
+            const rows = await sql`SELECT * FROM crm_customers ORDER BY created_at DESC`;
             return Response.json({ success: true, data: rows }, { headers: corsHeaders });
         }
 
@@ -169,8 +169,13 @@ export async function onRequest(context) {
             const { notes } = body;
             if (!id) return Response.json({ success: false, message: 'Thiếu ID khách hàng.' }, { status: 400, headers: corsHeaders });
 
-            await sql`UPDATE crm_customers SET notes=${notes || ''}, updated_at=CURRENT_TIMESTAMP WHERE id=${id}`;
-            return Response.json({ success: true, message: 'Đã lưu ghi chú.' }, { headers: corsHeaders });
+            try {
+                await sql`UPDATE crm_customers SET notes=${notes || ''}, updated_at=CURRENT_TIMESTAMP WHERE id=${id}`;
+                return Response.json({ success: true, message: 'Đã lưu ghi chú.' }, { headers: corsHeaders });
+            } catch (noteErr) {
+                // Cột notes chưa tồn tại trong DB → trả về lỗi thân thiện
+                return Response.json({ success: false, message: 'Cột notes chưa được tạo trong DB. Chạy: ALTER TABLE crm_customers ADD COLUMN IF NOT EXISTS notes TEXT;' }, { status: 400, headers: corsHeaders });
+            }
         }
 
         return new Response('Endpoint action Not Found', { status: 404, headers: corsHeaders });
