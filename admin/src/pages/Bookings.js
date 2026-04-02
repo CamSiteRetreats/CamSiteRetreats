@@ -1530,38 +1530,38 @@ export const afterRender = () => {
             </div>
 
             <!-- ⑤ Giá chi tiết -->
-            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-4 text-white">
+            <div class="bg-gradient-to-br from-csr-orange to-orange-600 rounded-2xl p-4 text-white shadow-lg shadow-orange-500/20">
                 ${sectionHeader('💰', 'Giá Chi Tiết', 'bg-white/20 text-white')}
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between items-center py-1.5 border-b border-white/10">
-                        <span class="text-gray-400">Giá Tour Gốc</span>
+                        <span class="text-orange-50 font-medium">Giá Tour Gốc</span>
                         <span class="font-bold">${fmtVND(totalPrice + discount)}</span>
                     </div>
                     ${discount > 0 ? `
                     <div class="flex justify-between items-center py-1.5 border-b border-white/10">
-                        <span class="text-gray-400">Giảm Giá / Coupon</span>
-                        <span class="font-bold text-red-400">- ${fmtVND(discount)}</span>
+                        <span class="text-orange-50 font-medium">Giảm Giá / Coupon</span>
+                        <span class="font-bold text-yellow-200">- ${fmtVND(discount)}</span>
                     </div>` : ''}
                     ${servicesTotal > 0 ? `
                     <div class="flex justify-between items-center py-1.5 border-b border-white/10">
-                        <span class="text-gray-400">Dịch Vụ Bổ Sung</span>
-                        <span class="font-bold text-green-400">+ ${fmtVND(servicesTotal)}</span>
+                        <span class="text-orange-50 font-medium">Dịch Vụ Bổ Sung</span>
+                        <span class="font-bold text-green-100">+ ${fmtVND(servicesTotal)}</span>
                     </div>` : ''}
-                    <div class="flex justify-between items-center py-2 border-b border-white/20">
-                        <span class="text-white font-bold">Tổng Thanh Toán</span>
-                        <span class="font-black text-orange-400 text-lg">${fmtVND(totalPrice)}</span>
+                    <div class="flex justify-between items-center py-2.5 border-b border-white/20">
+                        <span class="text-white font-black uppercase tracking-wider">Tổng Thanh Toán</span>
+                        <span class="font-black text-white text-xl drop-shadow-sm">${fmtVND(totalPrice)}</span>
                     </div>
                     <div class="flex justify-between items-center py-1.5 border-b border-white/10">
                         <div>
-                            <span class="text-gray-400">Đã Cọc</span>
-                            ${booking.deposit_date ? `<div class="text-[11px] text-gray-500 mt-0.5">Ngày: ${fmtDate(booking.deposit_date)}</div>` : ''}
+                            <span class="text-orange-50 font-medium">Đã Cọc</span>
+                            ${booking.deposit_date ? `<div class="text-[11px] text-orange-200 mt-0.5">Ngày: ${fmtDate(booking.deposit_date)}</div>` : ''}
                         </div>
-                        <span class="font-bold text-green-400">${depositAmt > 0 ? fmtVND(depositAmt) : '0đ (Chưa cọc)'}</span>
+                        <span class="font-bold text-green-100">${depositAmt > 0 ? fmtVND(depositAmt) : '0đ (Chưa cọc)'}</span>
                     </div>
-                    <div class="flex justify-between items-center py-2 bg-white/5 rounded-xl px-3 mt-2">
-                        <span class="font-bold text-gray-300">Còn Lại Cần Thu</span>
-                        <span class="font-black text-xl ${remaining > 0 ? 'text-red-400' : 'text-green-400'}">
-                            ${remaining > 0 ? fmtVND(remaining) : '✅ Đã thu đủ'}
+                    <div class="flex justify-between items-center py-3 bg-white text-gray-900 rounded-xl px-4 mt-3 shadow-inner">
+                        <span class="font-black text-xs uppercase tracking-widest text-gray-500">Còn Lại Cần Thu</span>
+                        <span class="font-black text-2xl ${remaining > 0 ? 'text-red-600' : 'text-green-600'}">
+                            ${remaining > 0 ? fmtVND(remaining) : '✅ ĐÃ THU ĐỦ'}
                         </span>
                     </div>
                 </div>
