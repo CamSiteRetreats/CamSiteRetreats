@@ -1,9 +1,9 @@
-import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
+import{S as T,H as M}from"./Header-CamAZjvb.js";const $=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
-        ${h()}
+        ${T()}
         
         <div class="flex flex-col flex-1 w-full overflow-hidden">
-          ${y()}
+          ${M()}
           
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-7xl mx-auto space-y-6">
@@ -65,24 +65,50 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
                           <textarea id="tour-short-desc" class="input-field bg-gray-50 h-20 resize-none text-base" placeholder="Mô tả ngắn hiển thị trên card tour..."></textarea>
                       </div>
 
-                      <!-- Ảnh -->
+                      <!-- Ảnh chính -->
                       <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính (URL) *</label>
-                          <input type="text" id="tour-image" class="input-field bg-gray-50 text-base" placeholder="tour/Tanang/thumb1.png" required>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính *</label>
+                          <div id="tour-img-zone-main"
+                               class="relative w-full h-36 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                               ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                               ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                               ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'main');"
+                               onclick="document.getElementById('tour-img-input-main').click()">
+                              <div id="tour-img-preview-main" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                  <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                  <span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span>
+                                  <span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>
+                              </div>
+                              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-main">
+                                  <span class="text-white font-bold text-sm">ĐỔI ẢNH</span>
+                              </div>
+                          </div>
+                          <input type="file" id="tour-img-input-main" accept="image/*" class="hidden" data-slot="main">
+                          <input type="hidden" id="tour-image" value="">
                       </div>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                      <!-- Ảnh phụ 1,2,3 -->
+                      <div class="grid grid-cols-3 gap-3">
+                          ${["2","3","4"].map(s=>`
                           <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 1</label>
-                              <input type="text" id="tour-image2" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 2</label>
-                              <input type="text" id="tour-image3" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 3</label>
-                              <input type="text" id="tour-image4" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
+                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ ${parseInt(s)-1}</label>
+                              <div id="tour-img-zone-${s}"
+                                   class="relative h-24 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                                   ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                                   ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                                   ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'${s}');"
+                                   onclick="document.getElementById('tour-img-input-${s}').click()">
+                                  <div id="tour-img-preview-${s}" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                                      <span class="text-[9px] font-bold uppercase">Thêm ảnh</span>
+                                  </div>
+                                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-${s}">
+                                      <span class="text-white font-bold text-[10px]">ĐỔI ẢNH</span>
+                                  </div>
+                              </div>
+                              <input type="file" id="tour-img-input-${s}" accept="image/*" class="hidden" data-slot="${s}">
+                              <input type="hidden" id="tour-image${s}" value="">
+                          </div>`).join("")}
                       </div>
 
                       <!-- Thông số -->
@@ -155,7 +181,7 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
               </div>
           </div>
       </div>
-    `,I=()=>{const r=document.getElementById("toursTableBody"),n=document.getElementById("tourModal"),s=document.getElementById("tourModalContent"),m=document.getElementById("tourForm");let i=[];const c="/api/admin_tours",p=(e=null)=>{const t=document.getElementById("tourModalTitle");e?(t.textContent="Chỉnh Sửa Tour",document.getElementById("tour-edit-id").value=e.id,document.getElementById("tour-name").value=e.name||"",document.getElementById("tour-short-desc").value=e.short_desc||e.shortDesc||"",document.getElementById("tour-image").value=e.image||"",document.getElementById("tour-image2").value=e.image2||"",document.getElementById("tour-image3").value=e.image3||"",document.getElementById("tour-image4").value=e.image4||"",document.getElementById("tour-duration").value=e.duration||"",document.getElementById("tour-price").value=e.price||"",document.getElementById("tour-level").value=e.level||"Trung Bình",document.getElementById("tour-region").value=e.region||"Miền Nam",document.getElementById("tour-type").value=e.type||"TREKKING",document.getElementById("tour-altitude").value=e.altitude||"",document.getElementById("tour-sort-order").value=e.sort_order||0,document.getElementById("tour-custom-domain").value=e.custom_domain||"",document.getElementById("tour-is-visible").checked=e.is_visible!==!1):(t.textContent="Thêm Tour Mới",m.reset(),document.getElementById("tour-edit-id").value="",document.getElementById("tour-is-visible").checked=!0,document.getElementById("tour-custom-domain").value="https://camsiteretreats.com/tour/"),n.classList.remove("hidden"),setTimeout(()=>{n.classList.add("opacity-100"),s.classList.remove("scale-95"),s.classList.add("scale-100")},10)},u=()=>{n.classList.remove("opacity-100"),s.classList.remove("scale-100"),s.classList.add("scale-95"),setTimeout(()=>{n.classList.add("hidden")},200)};document.getElementById("addTourBtn").addEventListener("click",()=>p()),document.getElementById("closeTourModalBtn").addEventListener("click",u),document.getElementById("cancelTourBtn").addEventListener("click",u),n.addEventListener("click",e=>{e.target===n&&u()});const g=async()=>{r.innerHTML='<tr><td colspan="7" class="text-center py-8 text-gray-400">Đang tải danh sách tour...</td></tr>';try{const e=await fetch(c);if(!e.ok)throw new Error("Failed to load tours");const t=await e.json();i=Array.isArray(t)?t:t.data||[],v()}catch(e){console.error("Error loading tours:",e),r.innerHTML='<tr><td colspan="7" class="text-center py-4 text-red-500">Lỗi kết nối server.</td></tr>'}},v=()=>{if(i.length===0){r.innerHTML='<tr><td colspan="7" class="text-center py-8 text-gray-400">Chưa có tour nào.</td></tr>';return}r.innerHTML=i.map(e=>{const t=!e.price||e.price==="Update"||e.price==="0"||parseInt(e.price)===0?'<span class="text-gray-400 italic">Update...</span>':`<span class="font-bold text-csr-orange">${parseInt(e.price).toLocaleString("vi-VN")}đ</span>`,l=e.level==="Dễ"?"bg-green-100 text-green-700":e.level==="Khó"?"bg-red-100 text-red-600":"bg-orange-100 text-orange-700",o=e.is_visible!==!1?'<span class="bg-green-100 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold">Hiển thị</span>':'<span class="bg-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold">Đã ẩn</span>';return`
+    `,j=()=>{const s=document.getElementById("toursTableBody"),c=document.getElementById("tourModal"),m=document.getElementById("tourModalContent"),b=document.getElementById("tourForm");let g=[];const p="/api/admin_tours",y=(e=null)=>{const t=document.getElementById("tourModalTitle");e?(t.textContent="Chỉnh Sửa Tour",document.getElementById("tour-edit-id").value=e.id,document.getElementById("tour-name").value=e.name||"",document.getElementById("tour-short-desc").value=e.short_desc||e.shortDesc||"",u("main",e.image||""),u("2",e.image2||""),u("3",e.image3||""),u("4",e.image4||""),document.getElementById("tour-duration").value=e.duration||"",document.getElementById("tour-price").value=e.price||"",document.getElementById("tour-level").value=e.level||"Trung Bình",document.getElementById("tour-region").value=e.region||"Miền Nam",document.getElementById("tour-type").value=e.type||"TREKKING",document.getElementById("tour-altitude").value=e.altitude||"",document.getElementById("tour-sort-order").value=e.sort_order||0,document.getElementById("tour-custom-domain").value=e.custom_domain||"",document.getElementById("tour-is-visible").checked=e.is_visible!==!1):(t.textContent="Thêm Tour Mới",b.reset(),document.getElementById("tour-edit-id").value="",document.getElementById("tour-is-visible").checked=!0,document.getElementById("tour-custom-domain").value="https://camsiteretreats.com/tour/",["main","2","3","4"].forEach(o=>u(o,""))),c.classList.remove("hidden"),setTimeout(()=>{c.classList.add("opacity-100"),m.classList.remove("scale-95"),m.classList.add("scale-100")},10),I()},h=()=>{c.classList.remove("opacity-100"),m.classList.remove("scale-100"),m.classList.add("scale-95"),setTimeout(()=>{c.classList.add("hidden")},200)};document.getElementById("addTourBtn").addEventListener("click",()=>y()),document.getElementById("closeTourModalBtn").addEventListener("click",h),document.getElementById("cancelTourBtn").addEventListener("click",h),c.addEventListener("click",e=>{e.target===c&&h()});const w=["main","2","3","4"],k=(e,t)=>{const o=document.getElementById(`tour-img-preview-${e}`),n=document.getElementById(`tour-img-overlay-${e}`);document.getElementById(`tour-img-zone-${e}`),o&&(o.innerHTML=`<img src="${t}" class="w-full h-full object-cover" alt="preview">`,o.className="w-full h-full",n&&n.classList.remove("hidden"))},u=(e,t)=>{const o=document.getElementById(`tour-img-preview-${e}`),n=document.getElementById(`tour-img-overlay-${e}`),r=document.getElementById(e==="main"?"tour-image":`tour-image${e}`);if(o){if(t)o.innerHTML=`<img src="${t}" class="w-full h-full object-cover" alt="preview">`,o.className="w-full h-full",n&&n.classList.remove("hidden");else{const l=e==="main";o.innerHTML=l?'<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span><span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>':'<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg><span class="text-[9px] font-bold uppercase">Thêm ảnh</span>',o.className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1",n&&n.classList.add("hidden")}r&&(r.value=t||"")}},B=e=>new Promise((t,o)=>{const r=new FileReader;r.onload=l=>{const d=new Image;d.onload=()=>{let{width:a,height:i}=d;(a>1200||i>1200)&&(a>i?(i=Math.round(i*1200/a),a=1200):(a=Math.round(a*1200/i),i=1200));const v=document.createElement("canvas");v.width=a,v.height=i,v.getContext("2d").drawImage(d,0,0,a,i),t(v.toDataURL("image/jpeg",.85))},d.onerror=o,d.src=l.target.result},r.onerror=o,r.readAsDataURL(e)}),f=async(e,t)=>{const o=document.getElementById(`tour-img-preview-${t}`),n=document.getElementById(t==="main"?"tour-image":`tour-image${t}`);if(o){o.innerHTML='<svg class="animate-spin w-7 h-7 text-csr-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>',o.className="w-full h-full flex items-center justify-center";try{const r=await B(e),l=(e.name||`tour-${t}`).replace(/\.[^.]+$/,""),a=await(await fetch("/api/upload",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:r,filename:`tour-${l}`})})).json();if(!a.success)throw new Error(a.error||"Upload thất bại");k(t,a.url),n&&(n.value=a.url),console.log(`[tour-upload] ✅ slot=${t} ${a.stats?.inputKB}KB → ${a.stats?.outputKB}KB`)}catch(r){o.innerHTML=`<span class="text-red-400 text-xs text-center p-2">❌ Lỗi: ${r.message}</span>`,o.className="w-full h-full flex items-center justify-center",alert("Lỗi upload ảnh: "+r.message)}}},I=()=>{w.forEach(e=>{const t=document.getElementById(`tour-img-input-${e}`);!t||t.dataset.bound||(t.dataset.bound="1",t.addEventListener("change",o=>{const n=o.target.files?.[0];n&&f(n,e)}))})};window.handleTourImgDrop=(e,t)=>{const o=e.dataTransfer?.files?.[0];o&&o.type.startsWith("image/")&&f(o,t)};const x=async()=>{s.innerHTML='<tr><td colspan="7" class="text-center py-8 text-gray-400">Đang tải danh sách tour...</td></tr>';try{const e=await fetch(p);if(!e.ok)throw new Error("Failed to load tours");const t=await e.json();g=Array.isArray(t)?t:t.data||[],E()}catch(e){console.error("Error loading tours:",e),s.innerHTML='<tr><td colspan="7" class="text-center py-4 text-red-500">Lỗi kết nối server.</td></tr>'}},E=()=>{if(g.length===0){s.innerHTML='<tr><td colspan="7" class="text-center py-8 text-gray-400">Chưa có tour nào.</td></tr>';return}s.innerHTML=g.map(e=>{const t=!e.price||e.price==="Update"||e.price==="0"||parseInt(e.price)===0?'<span class="text-gray-400 italic">Update...</span>':`<span class="font-bold text-csr-orange">${parseInt(e.price).toLocaleString("vi-VN")}đ</span>`,o=e.level==="Dễ"?"bg-green-100 text-green-700":e.level==="Khó"?"bg-red-100 text-red-600":"bg-orange-100 text-orange-700",n=e.is_visible!==!1?'<span class="bg-green-100 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold">Hiển thị</span>':'<span class="bg-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold">Đã ẩn</span>';return`
                 <tr class="hover:bg-gray-50 transition-colors group block md:table-row border-b md:border-none p-4 md:p-0" data-tour-id="${e.id}">
                     <td class="p-0 md:p-4 block md:table-cell mb-4 md:mb-0">
                         <div class="flex items-center gap-3">
@@ -166,8 +192,8 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
                                 <div class="font-bold text-base md:text-sm text-gray-900 group-hover:text-csr-orange transition-colors truncate">${e.name}</div>
                                 <div class="text-[10px] text-gray-400 truncate max-w-[200px]">${e.short_desc||e.shortDesc||""}</div>
                                 <div class="flex items-center gap-2 mt-1 md:hidden">
-                                     <span class="px-2 py-0.5 ${l} rounded text-[10px] font-bold uppercase">${e.level||"-"}</span>
-                                     ${o}
+                                     <span class="px-2 py-0.5 ${o} rounded text-[10px] font-bold uppercase">${e.level||"-"}</span>
+                                     ${n}
                                 </div>
                             </div>
                         </div>
@@ -178,7 +204,7 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
                     </td>
                     <td class="hidden md:table-cell p-4 text-sm text-gray-600">${e.duration||"-"}</td>
                     <td class="hidden md:table-cell p-4">
-                        <span class="px-2 py-0.5 ${l} rounded text-[10px] font-bold uppercase">${e.level||"-"}</span>
+                        <span class="px-2 py-0.5 ${o} rounded text-[10px] font-bold uppercase">${e.level||"-"}</span>
                     </td>
                     <td class="p-0 md:p-4 block md:table-cell mb-4 md:mb-0">
                         <div class="flex justify-between items-center md:block">
@@ -186,7 +212,7 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
                             <div class="text-sm md:text-base">${t}</div>
                         </div>
                     </td>
-                    <td class="hidden md:table-cell p-4 text-center">${o}</td>
+                    <td class="hidden md:table-cell p-4 text-center">${n}</td>
                     <td class="p-0 md:p-4 block md:table-cell">
                         <div class="flex items-center justify-end md:justify-end gap-2 md:gap-1">
                             <button class="tour-edit-btn p-3 md:p-2 text-gray-500 md:text-gray-400 hover:text-blue-500 hover:bg-blue-50 bg-gray-100 md:bg-transparent rounded-xl md:rounded-lg transition-colors flex-1 md:flex-none justify-center flex items-center gap-2 md:block" data-id="${e.id}" title="Sửa">
@@ -204,4 +230,4 @@ import{S as h,H as y}from"./Header-CamAZjvb.js";const B=()=>`
                         </div>
                     </td>
                 </tr>
-            `}).join("")};r.addEventListener("click",async e=>{const t=e.target.closest(".tour-edit-btn"),l=e.target.closest(".tour-delete-btn");if(t){const o=parseInt(t.getAttribute("data-id")),a=i.find(d=>d.id===o);a&&p(a)}if(l){const o=l.getAttribute("data-id");if(confirm("Dữ liệu lịch trình liên quan có thể bị ảnh hưởng. Bạn vẫn muốn xóa tour này?"))try{if((await fetch(`${c}?id=${o}`,{method:"DELETE"})).ok)g();else throw new Error("Delete failed")}catch(a){alert("Lỗi khi xóa: "+a.message)}}}),m.addEventListener("submit",async e=>{e.preventDefault();const t=m.querySelector('button[type="submit"]'),l=t.textContent;t.textContent="Đang lưu...",t.disabled=!0;const o=document.getElementById("tour-edit-id").value,a={id:o?parseInt(o):null,name:document.getElementById("tour-name").value,image:document.getElementById("tour-image").value,image2:document.getElementById("tour-image2").value||null,image3:document.getElementById("tour-image3").value||null,image4:document.getElementById("tour-image4").value||null,shortDesc:document.getElementById("tour-short-desc").value,altitude:document.getElementById("tour-altitude").value||null,level:document.getElementById("tour-level").value,region:document.getElementById("tour-region").value,type:document.getElementById("tour-type").value,duration:document.getElementById("tour-duration").value,price:document.getElementById("tour-price").value,sort_order:parseInt(document.getElementById("tour-sort-order").value)||0,custom_domain:document.getElementById("tour-custom-domain").value.trim()||null,is_visible:document.getElementById("tour-is-visible").checked};try{const d=o?`${c}?id=${o}`:c,b=await fetch(d,{method:o?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(a)});if(!b.ok){const x=await b.json();throw new Error(x.message||x.error||"Save failed")}u(),g(),alert(o?"✅ Cập nhật tour thành công!":"✅ Thêm tour mới thành công! Website sẽ tự đồng bộ trong vài giây.")}catch(d){alert("❌ Lỗi: "+d.message)}finally{t.textContent=l,t.disabled=!1}}),g()};export{I as afterRender,B as render};
+            `}).join("")};s.addEventListener("click",async e=>{const t=e.target.closest(".tour-edit-btn"),o=e.target.closest(".tour-delete-btn");if(t){const n=parseInt(t.getAttribute("data-id")),r=g.find(l=>l.id===n);r&&y(r)}if(o){const n=o.getAttribute("data-id");if(confirm("Dữ liệu lịch trình liên quan có thể bị ảnh hưởng. Bạn vẫn muốn xóa tour này?"))try{if((await fetch(`${p}?id=${n}`,{method:"DELETE"})).ok)x();else throw new Error("Delete failed")}catch(r){alert("Lỗi khi xóa: "+r.message)}}}),b.addEventListener("submit",async e=>{e.preventDefault();const t=b.querySelector('button[type="submit"]'),o=t.textContent;t.textContent="Đang lưu...",t.disabled=!0;const n=document.getElementById("tour-edit-id").value,r={id:n?parseInt(n):null,name:document.getElementById("tour-name").value,image:document.getElementById("tour-image").value,image2:document.getElementById("tour-image2").value||null,image3:document.getElementById("tour-image3").value||null,image4:document.getElementById("tour-image4").value||null,shortDesc:document.getElementById("tour-short-desc").value,altitude:document.getElementById("tour-altitude").value||null,level:document.getElementById("tour-level").value,region:document.getElementById("tour-region").value,type:document.getElementById("tour-type").value,duration:document.getElementById("tour-duration").value,price:document.getElementById("tour-price").value,sort_order:parseInt(document.getElementById("tour-sort-order").value)||0,custom_domain:document.getElementById("tour-custom-domain").value.trim()||null,is_visible:document.getElementById("tour-is-visible").checked};try{const l=n?`${p}?id=${n}`:p,a=await fetch(l,{method:n?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});if(!a.ok){const i=await a.json();throw new Error(i.message||i.error||"Save failed")}h(),x(),alert(n?"✅ Cập nhật tour thành công!":"✅ Thêm tour mới thành công! Website sẽ tự đồng bộ trong vài giây.")}catch(l){alert("❌ Lỗi: "+l.message)}finally{t.textContent=o,t.disabled=!1}}),x()};export{j as afterRender,$ as render};

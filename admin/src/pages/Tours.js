@@ -69,24 +69,50 @@ export const render = () => {
                           <textarea id="tour-short-desc" class="input-field bg-gray-50 h-20 resize-none text-base" placeholder="Mô tả ngắn hiển thị trên card tour..."></textarea>
                       </div>
 
-                      <!-- Ảnh -->
+                      <!-- Ảnh chính -->
                       <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính (URL) *</label>
-                          <input type="text" id="tour-image" class="input-field bg-gray-50 text-base" placeholder="tour/Tanang/thumb1.png" required>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính *</label>
+                          <div id="tour-img-zone-main"
+                               class="relative w-full h-36 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                               ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                               ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                               ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'main');"
+                               onclick="document.getElementById('tour-img-input-main').click()">
+                              <div id="tour-img-preview-main" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                  <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                  <span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span>
+                                  <span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>
+                              </div>
+                              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-main">
+                                  <span class="text-white font-bold text-sm">ĐỔI ẢNH</span>
+                              </div>
+                          </div>
+                          <input type="file" id="tour-img-input-main" accept="image/*" class="hidden" data-slot="main">
+                          <input type="hidden" id="tour-image" value="">
                       </div>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                      <!-- Ảnh phụ 1,2,3 -->
+                      <div class="grid grid-cols-3 gap-3">
+                          ${['2','3','4'].map(n => `
                           <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 1</label>
-                              <input type="text" id="tour-image2" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 2</label>
-                              <input type="text" id="tour-image3" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ 3</label>
-                              <input type="text" id="tour-image4" class="input-field bg-gray-50 text-sm" placeholder="URL...">
-                          </div>
+                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ ${parseInt(n)-1}</label>
+                              <div id="tour-img-zone-${n}"
+                                   class="relative h-24 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                                   ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                                   ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                                   ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'${n}');"
+                                   onclick="document.getElementById('tour-img-input-${n}').click()">
+                                  <div id="tour-img-preview-${n}" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                                      <span class="text-[9px] font-bold uppercase">Thêm ảnh</span>
+                                  </div>
+                                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-${n}">
+                                      <span class="text-white font-bold text-[10px]">ĐỔI ẢNH</span>
+                                  </div>
+                              </div>
+                              <input type="file" id="tour-img-input-${n}" accept="image/*" class="hidden" data-slot="${n}">
+                              <input type="hidden" id="tour-image${n}" value="">
+                          </div>`).join('')}
                       </div>
 
                       <!-- Thông số -->
@@ -179,10 +205,11 @@ export const afterRender = () => {
             document.getElementById('tour-edit-id').value = editData.id;
             document.getElementById('tour-name').value = editData.name || '';
             document.getElementById('tour-short-desc').value = editData.short_desc || editData.shortDesc || '';
-            document.getElementById('tour-image').value = editData.image || '';
-            document.getElementById('tour-image2').value = editData.image2 || '';
-            document.getElementById('tour-image3').value = editData.image3 || '';
-            document.getElementById('tour-image4').value = editData.image4 || '';
+            // Hiển thị ảnh hiện có vào preview zones
+            resetSlotPreview('main', editData.image || '');
+            resetSlotPreview('2', editData.image2 || '');
+            resetSlotPreview('3', editData.image3 || '');
+            resetSlotPreview('4', editData.image4 || '');
             document.getElementById('tour-duration').value = editData.duration || '';
             document.getElementById('tour-price').value = editData.price || '';
             document.getElementById('tour-level').value = editData.level || 'Trung Bình';
@@ -198,6 +225,8 @@ export const afterRender = () => {
             document.getElementById('tour-edit-id').value = '';
             document.getElementById('tour-is-visible').checked = true;
             document.getElementById('tour-custom-domain').value = 'https://camsiteretreats.com/tour/';
+            // Reset tất cả preview về trạng thái trống
+            ['main','2','3','4'].forEach(slot => resetSlotPreview(slot, ''));
         }
 
         modal.classList.remove('hidden');
@@ -206,6 +235,9 @@ export const afterRender = () => {
             modalContent.classList.remove('scale-95');
             modalContent.classList.add('scale-100');
         }, 10);
+
+        // Bind image upload inputs after modal is open
+        bindTourImageInputs();
     };
 
     const closeModal = () => {
@@ -219,6 +251,116 @@ export const afterRender = () => {
     document.getElementById('closeTourModalBtn').addEventListener('click', closeModal);
     document.getElementById('cancelTourBtn').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // ── IMAGE UPLOAD HELPERS ────────────────────────────────────────────────
+    const SLOTS = ['main', '2', '3', '4'];
+
+    /** Cập nhật preview zone sau khi upload thành công */
+    const setSlotPreview = (slot, url) => {
+        const previewEl = document.getElementById(`tour-img-preview-${slot}`);
+        const overlayEl = document.getElementById(`tour-img-overlay-${slot}`);
+        const zone = document.getElementById(`tour-img-zone-${slot}`);
+        if (!previewEl) return;
+        // Thay nội dung preview bằng ảnh thật
+        previewEl.innerHTML = `<img src="${url}" class="w-full h-full object-cover" alt="preview">`;
+        previewEl.className = 'w-full h-full';
+        if (overlayEl) overlayEl.classList.remove('hidden');
+    };
+
+    /** Reset preview về trạng thái ban đầu (khi mở modal thêm mới) */
+    const resetSlotPreview = (slot, url) => {
+        const previewEl = document.getElementById(`tour-img-preview-${slot}`);
+        const overlayEl = document.getElementById(`tour-img-overlay-${slot}`);
+        const hiddenInput = document.getElementById(slot === 'main' ? 'tour-image' : `tour-image${slot}`);
+        if (!previewEl) return;
+        if (url) {
+            previewEl.innerHTML = `<img src="${url}" class="w-full h-full object-cover" alt="preview">`;
+            previewEl.className = 'w-full h-full';
+            if (overlayEl) overlayEl.classList.remove('hidden');
+        } else {
+            const isMain = slot === 'main';
+            previewEl.innerHTML = isMain
+                ? `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span><span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>`
+                : `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg><span class="text-[9px] font-bold uppercase">Thêm ảnh</span>`;
+            previewEl.className = 'w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1';
+            if (overlayEl) overlayEl.classList.add('hidden');
+        }
+        if (hiddenInput) hiddenInput.value = url || '';
+    };
+
+    /** Nén ảnh bằng Canvas (client-side): max 1200px, quality 85% */
+    const compressTourImage = (file) => new Promise((resolve, reject) => {
+        const MAX_PX = 1200;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > MAX_PX || height > MAX_PX) {
+                    if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX; }
+                    else               { width  = Math.round(width * MAX_PX / height);  height = MAX_PX; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.85));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+    /** Upload 1 file ảnh → server → cập nhật zone + hidden input */
+    const uploadTourImage = async (file, slot) => {
+        const previewEl = document.getElementById(`tour-img-preview-${slot}`);
+        const hiddenInput = document.getElementById(slot === 'main' ? 'tour-image' : `tour-image${slot}`);
+        if (!previewEl) return;
+
+        // Hiển thị spinner
+        previewEl.innerHTML = `<svg class="animate-spin w-7 h-7 text-csr-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>`;
+        previewEl.className = 'w-full h-full flex items-center justify-center';
+
+        try {
+            const base64 = await compressTourImage(file);
+            const safeName = (file.name || `tour-${slot}`).replace(/\.[^.]+$/, '');
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, filename: `tour-${safeName}` }),
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Upload thất bại');
+
+            setSlotPreview(slot, data.url);
+            if (hiddenInput) hiddenInput.value = data.url;
+            console.log(`[tour-upload] ✅ slot=${slot} ${data.stats?.inputKB}KB → ${data.stats?.outputKB}KB`);
+        } catch (err) {
+            previewEl.innerHTML = `<span class="text-red-400 text-xs text-center p-2">❌ Lỗi: ${err.message}</span>`;
+            previewEl.className = 'w-full h-full flex items-center justify-center';
+            alert('Lỗi upload ảnh: ' + err.message);
+        }
+    };
+
+    /** Bind file-input change cho 4 slot ảnh */
+    const bindTourImageInputs = () => {
+        SLOTS.forEach(slot => {
+            const input = document.getElementById(`tour-img-input-${slot}`);
+            if (!input || input.dataset.bound) return;
+            input.dataset.bound = '1';
+            input.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadTourImage(file, slot);
+            });
+        });
+    };
+
+    /** Handler drag-drop (inline HTML gọi qua window) */
+    window.handleTourImgDrop = (event, slot) => {
+        const file = event.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith('image/')) uploadTourImage(file, slot);
+    };
 
     // --- LOAD TOURS ---
     const loadTours = async () => {
