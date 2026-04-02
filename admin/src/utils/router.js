@@ -47,19 +47,27 @@ export const initRouter = () => {
         }
 
         try {
-            const { render } = await matchedRoute();
+            // Import module 1 lần duy nhất — tránh bug double-import tạo 2 instance khác nhau
+            const module = await matchedRoute();
+            const { render, afterRender } = module;
+
             document.getElementById('app').innerHTML = render();
 
             // Init sidebar toggle (must run after DOM is updated)
             initSidebar();
 
             // Call after render hook if it exists
-            const { afterRender } = await matchedRoute();
             if (afterRender) afterRender();
 
         } catch (e) {
             console.error('Error loading page:', e);
-            document.getElementById('app').innerHTML = '<h1>404 Not Found</h1>';
+            document.getElementById('app').innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;font-family:sans-serif;">
+                    <div style="font-size:48px;">⚠️</div>
+                    <div style="font-size:18px;font-weight:700;color:#1f2937;">Lỗi tải trang</div>
+                    <div style="font-size:13px;color:#6b7280;max-width:400px;text-align:center;">${e.message}</div>
+                    <button onclick="location.reload()" style="padding:10px 24px;background:#E85D04;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Tải lại trang</button>
+                </div>`;
         }
     };
 
