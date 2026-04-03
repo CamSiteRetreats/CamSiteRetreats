@@ -175,10 +175,10 @@ export const afterRender = async () => {
         { id: 'col-gender', label: 'Giới tính', default: true, render: (b) => b.gender || '-' },
         { id: 'col-cccd', label: 'CCCD / Passport', default: true, render: (b) => b.id_card || b.cccd || '-' },
         { id: 'col-address', label: 'Địa chỉ', default: true, render: (b) => `<div class="max-w-[200px] truncate print:max-w-none print:whitespace-normal" title="${b.address || ''}">${b.address || '-'}</div>` },
-        { id: 'col-diet', label: 'Ăn chay', default: false, render: (b) => (b.diet === 'Chay' || b.diet === 'Có') ? '<span class="text-green-600 font-bold">Có</span>' : 'Không' },
+        { id: 'col-diet', label: 'Ăn chay', default: false, render: (b) => (b.diet === 'Ăn chay' || b.diet === 'Chay' || b.diet === 'Có') ? '<span class="text-green-600 font-bold">Có</span>' : 'Không' },
         { id: 'col-pole', label: 'Gậy Trekking', default: false, render: (b) => (b.trekking_pole === 'Có') ? '<span class="text-orange-600 font-bold">Có</span>' : 'Không' },
-        { id: 'col-allergy', label: 'Dị ứng', default: false, render: (b) => b.medical_notes || b.allergy || '-' },
-        { id: 'col-special', label: 'Yêu cầu ĐB', default: false, render: (b) => b.special_notes || b.special || '-' },
+        { id: 'col-allergy', label: 'Dị ứng / Yêu cầu', default: false, render: (b) => b.special || b.medical_notes || b.allergy || '-' },
+        { id: 'col-special', label: 'Yêu cầu ĐB', default: false, render: (b) => b.special || b.special_notes || '-' },
         { id: 'col-medal', label: 'Tên Huy Chương', default: false, render: (b) => b.medal_name || b.name || '-' }
     ];
 
@@ -490,7 +490,7 @@ export const afterRender = async () => {
                 else if (c.id === 'col-name') cellData = b.name || '';
                 else if (c.id === 'col-address') cellData = b.address || '';
                 else if (c.id === 'col-phone') cellData = b.phone ? String(b.phone) : '';
-                else if (c.id === 'col-diet') cellData = (b.diet === 'Chay' || b.diet === 'Có') ? 'Có' : 'Không';
+                else if (c.id === 'col-diet') cellData = (b.diet === 'Ăn chay' || b.diet === 'Chay' || b.diet === 'Có') ? 'Có' : 'Không';
                 else if (c.id === 'col-pole') cellData = (b.trekking_pole === 'Có') ? 'Có' : 'Không';
                 else {
                     // Loại bỏ mã HTML ra khỏi cell data

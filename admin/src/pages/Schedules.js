@@ -371,7 +371,7 @@ export const afterRender = () => {
                             <button class="sch-review-btn bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border border-yellow-200 rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" title="Copy Link Đánh Giá">
                                 ⭐ Link ĐG
                             </button>
-                            <button class="sch-details-btn bg-csr-orange hover:opacity-90 text-white rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 flex-[2] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" data-date="${item.start_date}" title="Xem Danh Sách Đoàn">
+                            <button class="sch-details-btn bg-csr-orange hover:opacity-90 text-white rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 flex-[2] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" data-date="${item.start_date}" data-group-label="${item.group_label || ''}" title="Xem Danh Sách Đoàn">
                                 <svg class="w-4 h-4 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 📋 DS Đoàn
                             </button>
@@ -380,9 +380,6 @@ export const afterRender = () => {
                 </div>
             `;
         }).join('');
-
-        // Attach card button events via delegation
-        scheduleList.addEventListener('click', handleCardAction);
     };
 
     // --- CARD ACTION HANDLER ---
@@ -431,7 +428,7 @@ export const afterRender = () => {
             const tourName = detailsBtn.getAttribute('data-tour');
             const dateStr = detailsBtn.getAttribute('data-date');
             const safeDate = dateStr && dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
-            const groupLabel = item.group_label || '';
+            const groupLabel = detailsBtn.getAttribute('data-group-label') || '';
             // Open schedule details using the new V2 router
             const url = `/admin/roster?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(safeDate)}&scheduleId=${schId}&groupLabel=${encodeURIComponent(groupLabel)}`;
 
@@ -482,6 +479,7 @@ export const afterRender = () => {
     });
 
     // --- INIT ---
+    scheduleList.addEventListener('click', handleCardAction); // gắn 1 lần duy nhất
     loadTourOptions();
     loadSchedules();
 };
