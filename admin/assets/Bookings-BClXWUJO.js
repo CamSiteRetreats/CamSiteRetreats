@@ -23,6 +23,7 @@ import{S as xe,H as ye}from"./Header-CamAZjvb.js";console.log("Bookings V3 - Cac
                               Thêm Khách Thủ Công
                           </button>
                       </div>
+                  </div>
 
                   <!-- Tab Navigation -->
                   <div class="border-b border-gray-200 -mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto custom-scrollbar no-scrollbar">

@@ -28,6 +28,7 @@ export const render = () => {
                               Thêm Khách Thủ Công
                           </button>
                       </div>
+                  </div>
 
                   <!-- Tab Navigation -->
                   <div class="border-b border-gray-200 -mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto custom-scrollbar no-scrollbar">
