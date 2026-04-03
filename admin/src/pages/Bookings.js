@@ -16,7 +16,7 @@ export const render = () => {
                   <div class="flex justify-between items-end">
                       <div>
                           <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Khách Đăng Ký & Tham Gia Tour</h1>
-                          <p class="text-gray-500 text-sm">Quản lý trạng thái đơn hàng và thông tin chi tiết đoàn.</p>
+                          <p class="text-gray-500 text-sm">Quản lý đăng ký chờ lịch, đơn hàng và thông tin chi tiết đoàn.</p>
                       </div>
                       <button id="addBookingBtn" class="btn-primary flex items-center gap-2 shadow-lg shadow-csr-orange/20">
                           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -28,7 +28,7 @@ export const render = () => {
                   <div class="border-b border-gray-200 -mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto custom-scrollbar no-scrollbar">
                       <nav class="-mb-px flex space-x-6 min-w-max pb-1" aria-label="Tabs" id="bookingTabsNav">
                           <button data-tab="consult" class="tab-btn border-csr-orange text-csr-orange whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm">
-                              Khách Hàng Tư Vấn
+                              ⏳ Đăng Ký Chờ Lịch
                           </button>
                           <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Chờ Cọc
@@ -94,7 +94,7 @@ export const render = () => {
                          </select>
                          <select id="filterStatus" class="input-field h-10 text-sm max-w-[170px]">
                              <option value="">Tất cả Trạng Thái</option>
-                             <option value="Chờ tư vấn">Chờ tư vấn</option>
+                             <option value="Chờ tư vấn">Chờ lịch</option>
                              <option value="Chờ cọc">Chờ cọc</option>
                              <option value="Chờ xác nhận cọc">Chờ xác nhận cọc</option>
                              <option value="Đã cọc">Đã cọc</option>
@@ -753,9 +753,9 @@ export const afterRender = () => {
         let totalCustomersCount = filteredData.length;
 
         if (activeTab === 'consult') {
-            if (statTitle1) statTitle1.textContent = 'Tổng Leads Tư Vấn';
-            if (statTitle2) statTitle2.textContent = 'Chưa Có Sale Nhận';
-            if (statTitle3) statTitle3.textContent = 'Đã Có Sale Nhận';
+            if (statTitle1) statTitle1.textContent = 'Tổng Đăng Ký Chờ Lịch';
+            if (statTitle2) statTitle2.textContent = 'Chưa Được Liên Hệ';
+            if (statTitle3) statTitle3.textContent = 'Đã Có Sale Phụ Trách';
 
             let noSaleCount = 0;
             let hasSaleCount = 0;
@@ -769,8 +769,8 @@ export const afterRender = () => {
             });
 
             if (statTotalCustomers) statTotalCustomers.textContent = totalCustomersCount;
-            if (statTotalRevenue) statTotalRevenue.textContent = noSaleCount + ' Đơn';
-            if (statTotalCollected) statTotalCollected.textContent = hasSaleCount + ' Đơn';
+            if (statTotalRevenue) statTotalRevenue.textContent = noSaleCount + ' Người';
+            if (statTotalCollected) statTotalCollected.textContent = hasSaleCount + ' Người';
         } else if (activeTab === 'pending') {
             if (statTitle1) statTitle1.textContent = 'Tổng Khách (Chờ Cọc)';
             if (statTitle2) statTitle2.textContent = 'Khách Chưa Tư Vấn (Mới)';
@@ -1448,6 +1448,8 @@ export const afterRender = () => {
         const servicesTotal = servicesList.reduce((sum, s) => sum + (parseInt(s.price) || 0), 0);
 
         // Status badge helper
+        const statusLabelMap = { 'Chờ tư vấn': 'Chờ lịch' };
+        const displayStatus = statusLabelMap[booking.status] || booking.status;
         const statusColor = {
             'Chờ tư vấn': 'bg-purple-100 text-purple-700 border-purple-200',
             'Chờ cọc': 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -1481,7 +1483,7 @@ export const afterRender = () => {
                     ${rowFn('Tên Tour', `<span class="text-csr-orange font-bold">${booking.tour || '—'}</span>`)}
                     ${rowFn('Ngày Khởi Hành', `<span class="font-bold text-gray-900">${fmtDate(booking.date)}</span>`)}
                     ${rowFn('Ngày Đăng Ký', booking.created_at ? fmtDate(booking.created_at.split('T')[0]) : '—')}
-                    ${rowFn('Trạng Thái', `<span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold border ${statusClass}">${booking.status || 'Chưa rõ'}</span>`)}
+                    ${rowFn('Trạng Thái', `<span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold border ${statusClass}">${displayStatus || 'Chưa rõ'}</span>`)}
                     ${rowFn('Tên Huy Chương', `<span class="font-black text-orange-600 uppercase tracking-wide">${booking.medal_name || booking.name}</span>`)}
                 </div>
             </div>

@@ -1,9 +1,9 @@
-import{S as Y,H as A}from"./Header-CamAZjvb.js";const z=()=>`
+import{S as K,H as Y}from"./Header-CamAZjvb.js";const z=()=>`
     <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
-      ${Y()}
+      ${K()}
       
       <div class="flex flex-col flex-1 w-full overflow-hidden">
-        ${A()}
+        ${Y()}
         
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
              <div class="max-w-7xl mx-auto space-y-6">
@@ -39,17 +39,17 @@ import{S as Y,H as A}from"./Header-CamAZjvb.js";const z=()=>`
                         </div>
                         <div class="text-[10px] text-blue-500 mt-2 font-medium">Đã cọc, chưa thanh toán đủ</div>
                     </div>
-                    <div class="glass-panel p-5 border-l-4 border-orange-500 hover:-translate-y-0.5 transition-transform cursor-pointer" onclick="window.location.href='/admin_v2/leads'">
+                    <div class="glass-panel p-5 border-l-4 border-purple-500 hover:-translate-y-0.5 transition-transform cursor-pointer" onclick="window.location.href='/admin_v2/bookings'">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Leads Chờ Tư Vấn</div>
-                                <div class="text-3xl font-bold text-csr-orange mt-1" id="stat-pending-leads">--</div>
+                                <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Khách Đang Chờ Lịch</div>
+                                <div class="text-3xl font-bold text-purple-600 mt-1" id="stat-pending-leads">--</div>
                             </div>
-                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                         </div>
-                        <div class="text-[10px] text-orange-500 mt-2 font-medium">Chưa có Sale nhận đơn</div>
+                        <div class="text-[10px] text-purple-500 mt-2 font-medium">Đăng ký nhưng chưa có slot</div>
                     </div>
                 </div>
 
@@ -107,11 +107,11 @@ import{S as Y,H as A}from"./Header-CamAZjvb.js";const z=()=>`
         </main>
       </div>
     </div>
-  `,G=()=>{(async()=>{try{const[c,f,y,b,w]=await Promise.all([fetch("/api/bookings"),fetch("/api/admin_customers"),fetch("/api/schedules"),fetch("/api/leads"),fetch("/api/tours")]),g=c.ok?await c.json():[],K=f.ok?await f.json():{data:[]},p=y.ok?await y.json():[],N=b.ok?await b.json():[],L=w.ok?await w.json():[],h=(t,n)=>t&&t.includes(n),k=g.filter(t=>h(t.status,"Chờ xác nhận cọc")||!t.status).length;document.getElementById("stat-pending-deposit").textContent=k;const $=g.filter(t=>{if(!h(t.status,"Đã cọc"))return!1;const n=parseFloat(t.total_price)||0,s=parseFloat(t.deposit)||0;return n===0?!0:s<n}).length;document.getElementById("stat-pending-payment").textContent=$;const C=N.filter(t=>h(t.status,"Chờ tư vấn")||!t.status).length;document.getElementById("stat-pending-leads").textContent=C;const i=[],d=new Date,E=d.getMonth(),M=d.getFullYear(),x=E+1,D=x>11?M+1:M,v=x>11?0:x;L.filter(t=>t.is_visible!==!1).forEach(t=>{if(!p.some(s=>{const e=new Date(s.start_date);return s.tour_name===t.name&&e.getMonth()===v&&e.getFullYear()===D})){const s=["1","2","3","4","5","6","7","8","9","10","11","12"];i.push({type:"schedule",icon:"📅",color:"text-purple-600 bg-purple-50 border-purple-200",title:`Tour "${t.name}" chưa có lịch tháng ${s[v]}`,desc:`Hãy tạo lịch trình tháng ${s[v]}/${D} cho tour này.`,action:"/admin_v2/schedules"})}});const m=new Date(d);m.setDate(d.getDate()+7),p.forEach(t=>{const n=new Date(t.start_date);if(n>=d&&n<=m){const s=parseInt(t.booked_count)||0,e=(t.slots||0)-s,a=Math.ceil((n-d)/(1e3*60*60*24)),r=a===0?"HÔM NAY":a===1?"NGÀY MAI":`${a} ngày nữa`;i.push({type:"departure",icon:"🚐",color:a<=2?"text-red-600 bg-red-50 border-red-200":"text-green-600 bg-green-50 border-green-200",title:`${t.tour_name} khởi hành ${r}`,desc:`Ngày ${u(n)} • ${s} khách đã đăng ký • ${e>=0?e:0} chỗ trống`,action:"/admin_v2/schedules"})}}),p.forEach(t=>{const n=new Date(t.start_date);n>=d&&n<=m&&g.filter(e=>{if(!e.dob||!e.date||!(e.tour&&(e.tour===t.tour_name||t.tour_name.includes(e.tour)||e.tour.includes(t.tour_name))))return!1;const r=e.date,o=u(n);return r.includes(o.split("/")[0]+"/"+o.split("/")[1])}).forEach(e=>{if(!e.dob)return;let a,r;if(e.dob.includes("-")){const o=e.dob.split("-");a=parseInt(o[1]),r=parseInt(o[2])}else if(e.dob.includes("/")){const o=e.dob.split("/");r=parseInt(o[0]),a=parseInt(o[1])}else return;a===d.getMonth()+1&&i.push({type:"birthday",icon:"🎂",color:"text-pink-600 bg-pink-50 border-pink-200",title:`${e.name} có sinh nhật tháng ${a}!`,desc:`Sinh ngày ${r}/${a} • Tour ${t.tour_name} ngày ${u(n)}`,action:"/admin_v2/bookings"})})});const j={departure:0,birthday:1,schedule:2};i.sort((t,n)=>{const s=j[t.type]??99,e=j[n.type]??99;return s-e});const T=document.getElementById("alertsContainer"),R=document.getElementById("alertCount");R.textContent=`${i.length} thông báo`,i.length===0?T.innerHTML=`
+  `,G=()=>{(async()=>{try{const[p,m,f,y,b]=await Promise.all([fetch("/api/bookings"),fetch("/api/admin_customers"),fetch("/api/schedules"),fetch("/api/leads"),fetch("/api/tours")]),l=p.ok?await p.json():[],A=m.ok?await m.json():{data:[]},g=f.ok?await f.json():[],V=y.ok?await y.json():[],N=b.ok?await b.json():[],w=(t,n)=>t&&t.includes(n),k=l.filter(t=>w(t.status,"Chờ xác nhận cọc")||!t.status).length;document.getElementById("stat-pending-deposit").textContent=k;const $=l.filter(t=>{if(!w(t.status,"Đã cọc"))return!1;const n=parseFloat(t.total_price)||0,s=parseFloat(t.deposit)||0;return n===0?!0:s<n}).length;document.getElementById("stat-pending-payment").textContent=$;const C=l.filter(t=>t.status==="Chờ tư vấn").length;document.getElementById("stat-pending-leads").textContent=C;const d=[],i=new Date,E=i.getMonth(),M=i.getFullYear(),h=E+1,D=h>11?M+1:M,x=h>11?0:h;N.filter(t=>t.is_visible!==!1).forEach(t=>{if(!g.some(s=>{const e=new Date(s.start_date);return s.tour_name===t.name&&e.getMonth()===x&&e.getFullYear()===D})){const s=["1","2","3","4","5","6","7","8","9","10","11","12"];d.push({type:"schedule",icon:"📅",color:"text-purple-600 bg-purple-50 border-purple-200",title:`Tour "${t.name}" chưa có lịch tháng ${s[x]}`,desc:`Hãy tạo lịch trình tháng ${s[x]}/${D} cho tour này.`,action:"/admin_v2/schedules"})}});const v=new Date(i);v.setDate(i.getDate()+7),g.forEach(t=>{const n=new Date(t.start_date);if(n>=i&&n<=v){const s=parseInt(t.booked_count)||0,e=(t.slots||0)-s,o=Math.ceil((n-i)/(1e3*60*60*24)),r=o===0?"HÔM NAY":o===1?"NGÀY MAI":`${o} ngày nữa`;d.push({type:"departure",icon:"🚐",color:o<=2?"text-red-600 bg-red-50 border-red-200":"text-green-600 bg-green-50 border-green-200",title:`${t.tour_name} khởi hành ${r}`,desc:`Ngày ${u(n)} • ${s} khách đã đăng ký • ${e>=0?e:0} chỗ trống`,action:"/admin_v2/schedules"})}}),g.forEach(t=>{const n=new Date(t.start_date);n>=i&&n<=v&&l.filter(e=>{if(!e.dob||!e.date||!(e.tour&&(e.tour===t.tour_name||t.tour_name.includes(e.tour)||e.tour.includes(t.tour_name))))return!1;const r=e.date,a=u(n);return r.includes(a.split("/")[0]+"/"+a.split("/")[1])}).forEach(e=>{if(!e.dob)return;let o,r;if(e.dob.includes("-")){const a=e.dob.split("-");o=parseInt(a[1]),r=parseInt(a[2])}else if(e.dob.includes("/")){const a=e.dob.split("/");r=parseInt(a[0]),o=parseInt(a[1])}else return;o===i.getMonth()+1&&d.push({type:"birthday",icon:"🎂",color:"text-pink-600 bg-pink-50 border-pink-200",title:`${e.name} có sinh nhật tháng ${o}!`,desc:`Sinh ngày ${r}/${o} • Tour ${t.tour_name} ngày ${u(n)}`,action:"/admin_v2/bookings"})})});const j={departure:0,birthday:1,schedule:2};d.sort((t,n)=>{const s=j[t.type]??99,e=j[n.type]??99;return s-e});const _=document.getElementById("alertsContainer"),L=document.getElementById("alertCount");L.textContent=`${d.length} thông báo`,d.length===0?_.innerHTML=`
                     <div class="p-6 text-center">
                         <div class="text-3xl mb-2">✅</div>
                         <div class="text-gray-500 text-sm font-medium">Tuyệt vời! Không có công việc cần xử lý.</div>
-                    </div>`:T.innerHTML=i.map(t=>`
+                    </div>`:_.innerHTML=d.map(t=>`
                     <div class="flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='${t.action}'">
                         <div class="w-10 h-10 rounded-xl ${t.color} border flex items-center justify-center text-lg shrink-0">${t.icon}</div>
                         <div class="min-w-0 flex-1">
@@ -120,11 +120,11 @@ import{S as Y,H as A}from"./Header-CamAZjvb.js";const z=()=>`
                         </div>
                         <svg class="w-4 h-4 text-gray-300 shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
-                `).join("");const _=k+$+C;document.getElementById("dashboardSubtitle").textContent=_>0?`Có ${_} công việc cần xử lý và ${i.length} nhắc nhở.`:"Không có công việc nào cần xử lý. 🎉";const B=document.getElementById("recentBookingsBody"),H=g.slice(0,5);H.length===0?B.innerHTML='<tr><td colspan="4" class="text-center py-6 text-gray-400 text-sm">Chưa có đơn hàng nào.</td></tr>':B.innerHTML=H.map(t=>{const s=(o=>o?o.includes("Đã cọc")?"bg-green-100 text-green-600":o.includes("Chờ xác nhận")?"bg-yellow-100 text-yellow-600":o.includes("Hoàn")?"bg-blue-100 text-blue-600":o.includes("hủy")||o.includes("Hủy")?"bg-red-100 text-red-500":"bg-gray-100 text-gray-500":"bg-gray-100 text-gray-500")(t.status),e=(t.name||"?")[0].toUpperCase(),a=["bg-orange-500","bg-blue-500","bg-green-500","bg-purple-500","bg-pink-500"];return`
+                `).join("");const T=k+$+C;document.getElementById("dashboardSubtitle").textContent=T>0?`Có ${T} công việc cần xử lý và ${d.length} nhắc nhở.`:"Không có công việc nào cần xử lý. 🎉";const B=document.getElementById("recentBookingsBody"),H=l.slice(0,5);H.length===0?B.innerHTML='<tr><td colspan="4" class="text-center py-6 text-gray-400 text-sm">Chưa có đơn hàng nào.</td></tr>':B.innerHTML=H.map(t=>{const s=(a=>a?a.includes("Đã cọc")?"bg-green-100 text-green-600":a.includes("Chờ xác nhận")?"bg-yellow-100 text-yellow-600":a.includes("Hoàn")?"bg-blue-100 text-blue-600":a.includes("hủy")||a.includes("Hủy")?"bg-red-100 text-red-500":"bg-gray-100 text-gray-500":"bg-gray-100 text-gray-500")(t.status),e=(t.name||"?")[0].toUpperCase(),o=["bg-orange-500","bg-blue-500","bg-green-500","bg-purple-500","bg-pink-500"];return`
                         <tr class="hover:bg-gray-50 transition-colors block md:table-row p-3 md:p-0">
                             <td class="px-0 md:px-4 py-1 md:py-3 block md:table-cell">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 md:w-7 md:h-7 rounded-full ${a[Math.abs(e.charCodeAt(0))%a.length]} flex items-center justify-center text-white text-xs md:text-[10px] font-bold shrink-0">${e}</div>
+                                    <div class="w-10 h-10 md:w-7 md:h-7 rounded-full ${o[Math.abs(e.charCodeAt(0))%o.length]} flex items-center justify-center text-white text-xs md:text-[10px] font-bold shrink-0">${e}</div>
                                     <div class="min-w-0 flex-1">
                                         <div class="text-sm font-bold md:font-medium text-gray-900 truncate">${t.name||"-"}</div>
                                         <div class="text-[11px] text-gray-400 md:hidden">${t.phone||""}</div>
@@ -150,17 +150,17 @@ import{S as Y,H as A}from"./Header-CamAZjvb.js";const z=()=>`
                                 <span class="${s} text-[10px] px-2 py-0.5 rounded-full font-bold">${t.status||"Mới"}</span>
                             </td>
                         </tr>
-                    `}).join("");const S=document.getElementById("schedulesContainer"),I=p.filter(t=>new Date(t.start_date)>=d).sort((t,n)=>new Date(t.start_date)-new Date(n.start_date)).slice(0,5);I.length===0?S.innerHTML='<div class="text-center py-4 text-gray-400 text-sm">Không có lịch trình sắp tới.</div>':S.innerHTML=I.map(t=>{const n=parseInt(t.booked_count)||0,s=(t.slots||0)-n,e=t.slots?Math.round(n/t.slots*100):0,a=e>=80?"bg-red-500":e>=50?"bg-yellow-500":"bg-green-500",r=new Date(t.start_date),V=Math.ceil((r-d)/(1e3*60*60*24))<=3?'<span class="text-[9px] bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full font-bold ml-2">SẮP ĐI</span>':"";return`
+                    `}).join("");const I=document.getElementById("schedulesContainer"),S=g.filter(t=>new Date(t.start_date)>=i).sort((t,n)=>new Date(t.start_date)-new Date(n.start_date)).slice(0,5);S.length===0?I.innerHTML='<div class="text-center py-4 text-gray-400 text-sm">Không có lịch trình sắp tới.</div>':I.innerHTML=S.map(t=>{const n=parseInt(t.booked_count)||0,s=(t.slots||0)-n,e=t.slots?Math.round(n/t.slots*100):0,o=e>=80?"bg-red-500":e>=50?"bg-yellow-500":"bg-green-500",r=new Date(t.start_date),R=Math.ceil((r-i)/(1e3*60*60*24))<=3?'<span class="text-[9px] bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full font-bold ml-2">SẮP ĐI</span>':"";return`
                         <div class="p-2 rounded-lg hover:bg-gray-50 transition-colors">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-sm font-medium text-gray-800 truncate">${t.tour_name||"-"}${V}</span>
+                                <span class="text-sm font-medium text-gray-800 truncate">${t.tour_name||"-"}${R}</span>
                                 <span class="text-[10px] text-gray-400 shrink-0 ml-2">${u(r)}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full ${a} rounded-full" style="width: ${e}%"></div>
+                                    <div class="h-full ${o} rounded-full" style="width: ${e}%"></div>
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-500 shrink-0">${n}/${t.slots||"?"}</span>
                             </div>
                         </div>
-                    `}).join("")}catch(c){console.error("Dashboard load error:",c)}})()};function u(l){return`${l.getDate().toString().padStart(2,"0")}/${(l.getMonth()+1).toString().padStart(2,"0")}/${l.getFullYear()}`}export{G as afterRender,z as render};
+                    `}).join("")}catch(p){console.error("Dashboard load error:",p)}})()};function u(c){return`${c.getDate().toString().padStart(2,"0")}/${(c.getMonth()+1).toString().padStart(2,"0")}/${c.getFullYear()}`}export{G as afterRender,z as render};
