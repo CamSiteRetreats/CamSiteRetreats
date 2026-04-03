@@ -18,11 +18,16 @@ export const render = () => {
                           <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Khách Đăng Ký & Tham Gia Tour</h1>
                           <p class="text-gray-500 text-sm">Quản lý đăng ký chờ lịch, đơn hàng và thông tin chi tiết đoàn.</p>
                       </div>
-                      <button id="addBookingBtn" class="btn-primary flex items-center gap-2 shadow-lg shadow-csr-orange/20">
-                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                          Thêm Khách Thủ Công
-                      </button>
-                  </div>
+                      <div class="flex items-center gap-2">
+                          <button id="addWaitingBtn" class="btn-primary flex items-center gap-2 shadow-lg shadow-purple-500/20 bg-purple-600 hover:bg-purple-700 hidden">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                              Thêm Khách Chờ Lịch
+                          </button>
+                          <button id="addBookingBtn" class="btn-primary flex items-center gap-2 shadow-lg shadow-csr-orange/20">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                              Thêm Khách Thủ Công
+                          </button>
+                      </div>
 
                   <!-- Tab Navigation -->
                   <div class="border-b border-gray-200 -mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto custom-scrollbar no-scrollbar">
@@ -129,6 +134,53 @@ export const render = () => {
                </div>
           </main>
         </div>
+      </div>
+
+      <!-- Add Waiting List Customer Modal -->
+      <div id="waitingModal" class="fixed inset-0 z-[60] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 md:p-4 opacity-0 transition-opacity duration-300">
+          <div class="bg-white border border-gray-200 rounded-xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 transform" id="waitingModalContent">
+               <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-purple-50 rounded-t-xl">
+                   <h2 class="text-lg font-bold text-purple-900">Thêm Khách Đăng Ký Chờ Lịch</h2>
+                   <button type="button" class="text-gray-500 hover:text-gray-900" onclick="window.closeWaitingModal()">
+                       <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                   </button>
+               </div>
+               <div class="p-6">
+                   <form id="waitingForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Họ và Tên *</label>
+                            <input type="text" id="wl-name" class="input-field bg-gray-50 font-medium" required placeholder="Nhập họ và tên">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Số Điện Thoại *</label>
+                                <input type="tel" id="wl-phone" class="input-field bg-gray-50 font-medium" required placeholder="09xx xxx xxx">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên Zalo / Ghi Chú</label>
+                                <input type="text" id="wl-zalo" class="input-field bg-gray-50" placeholder="Nick Zalo">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tuyến Tour Mong Muốn *</label>
+                            <select id="wl-tour" class="input-field bg-gray-50" required>
+                                <option value="">-- Chọn Tour --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Lịch Khởi Hành (Tùy chọn)</label>
+                            <select id="wl-date" class="input-field bg-gray-50">
+                                <option value="">-- Chọn Lịch (Hoặc để trống) --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex gap-3 pt-4 mt-2">
+                            <button type="button" onclick="window.closeWaitingModal()" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">Hủy</button>
+                            <button type="submit" id="wl-submit" class="flex-[2] px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-md">Lưu Vào Danh Sách</button>
+                        </div>
+                   </form>
+               </div>
+          </div>
       </div>
 
       <!-- ROW ACTION MODAL (Hiển thị khi click vào Dòng Khách Hàng) -->
@@ -503,9 +555,9 @@ export const afterRender = () => {
             allSchedules = schedulesRes.ok ? await schedulesRes.json() : [];
             allUsers = usersRes.ok ? await usersRes.json() : [];
 
-            // Populate tour dropdowns (cả modal tạo đơn + modal edit)
             populateTourDropdown('addTourName');
             populateTourDropdown('edit-tour');
+            populateTourDropdown('wl-tour');
             populateSaleDropdown('edit-sale');
         } catch (err) {
             console.error('Lỗi tải tours/schedules:', err);
@@ -636,6 +688,14 @@ export const afterRender = () => {
         });
     }
 
+    const wlTourSelect = document.getElementById('wl-tour');
+    if (wlTourSelect) {
+        wlTourSelect.addEventListener('change', (e) => {
+            const tourName = e.target.value;
+            populateDateDropdown('wl-date', tourName);
+        });
+    }
+
     // Fetch data ngay lập tức
     loadToursAndSchedules();
 
@@ -753,6 +813,11 @@ export const afterRender = () => {
         let totalCustomersCount = filteredData.length;
 
         if (activeTab === 'consult') {
+            const addWaitingBtn = document.getElementById('addWaitingBtn');
+            const addBookingBtn = document.getElementById('addBookingBtn');
+            if(addWaitingBtn) addWaitingBtn.classList.remove('hidden');
+            if(addBookingBtn) addBookingBtn.classList.add('hidden');
+
             if (statTitle1) statTitle1.textContent = 'Tổng Đăng Ký Chờ Lịch';
             if (statTitle2) statTitle2.textContent = 'Chưa Được Liên Hệ';
             if (statTitle3) statTitle3.textContent = 'Đã Có Sale Phụ Trách';
@@ -772,6 +837,11 @@ export const afterRender = () => {
             if (statTotalRevenue) statTotalRevenue.textContent = noSaleCount + ' Người';
             if (statTotalCollected) statTotalCollected.textContent = hasSaleCount + ' Người';
         } else if (activeTab === 'pending') {
+            const addWaitingBtn = document.getElementById('addWaitingBtn');
+            const addBookingBtn = document.getElementById('addBookingBtn');
+            if(addWaitingBtn) addWaitingBtn.classList.add('hidden');
+            if(addBookingBtn) addBookingBtn.classList.remove('hidden');
+
             if (statTitle1) statTitle1.textContent = 'Tổng Khách (Chờ Cọc)';
             if (statTitle2) statTitle2.textContent = 'Khách Chưa Tư Vấn (Mới)';
             if (statTitle3) statTitle3.textContent = 'Đã Có Sale Giữ Chỗ';
@@ -2425,4 +2495,99 @@ export const afterRender = () => {
             }
         });
     }
+
+    // ============================================
+    // WAITING LIST MODAL LOGIC
+    // ============================================
+    window.openWaitingModal = () => {
+        document.getElementById('waitingModal').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('waitingModal').classList.add('opacity-100');
+            const mc = document.getElementById('waitingModalContent');
+            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+        }, 10);
+    };
+
+    window.closeWaitingModal = () => {
+        document.getElementById('waitingModal').classList.remove('opacity-100');
+        const mc = document.getElementById('waitingModalContent');
+        if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+        setTimeout(() => {
+            document.getElementById('waitingModal').classList.add('hidden');
+        }, 300);
+    };
+
+    const wBtn = document.getElementById('addWaitingBtn');
+    if(wBtn) wBtn.addEventListener('click', () => window.openWaitingModal());
+
+    const wForm = document.getElementById('waitingForm');
+    if(wForm) {
+        wForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('wl-submit');
+            btn.innerHTML = 'Đang lưu...';
+            btn.disabled = true;
+
+            const specialText = document.getElementById('wl-zalo').value ? `Tên Zalo / Ghi Chú: ${document.getElementById('wl-zalo').value}` : '';
+            
+            // Lấy Sale (Admin đang thao tác hoặc mặc định Website)
+            let saleObj = { id: 'null', name: 'Website' };
+            try {
+                const userStr = localStorage.getItem('csr_user');
+                if (userStr) {
+                    const u = JSON.parse(userStr);
+                    saleObj = { id: u.id, name: u.full_name || u.fullName };
+                }
+            } catch(ex) {}
+
+            const payload = {
+                name: document.getElementById('wl-name').value,
+                phone: document.getElementById('wl-phone').value,
+                tour: document.getElementById('wl-tour').value,
+                date: 'Mở (Chưa có ngày)',
+                status: 'Chờ tư vấn', 
+                special: specialText,
+                sale_id: saleObj.id,
+                sale_name: saleObj.name
+            };
+
+            // Trích xuất schedule_id nếu có
+            const wlDateSelect = document.getElementById('wl-date');
+            if (wlDateSelect && wlDateSelect.value) {
+                const parts = wlDateSelect.value.split("::");
+                if (parts.length === 2 && parts[0] && parts[0] !== 'undefined') {
+                    payload.schedule_id = parts[0];
+                    payload.date = parts[1];
+                }
+            }
+
+            try {
+                const res = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(data.success) {
+                    window.closeWaitingModal();
+                    wForm.reset();
+                    if (typeof loadBookings === 'function') {
+                        loadBookings();
+                    } else {
+                        alert('✅ Đã thêm vào danh sách chờ!');
+                        window.location.reload();
+                    }
+                } else {
+                    alert('Lỗi lưu danh sách: ' + data.message);
+                }
+            } catch(error) {
+                console.error(error);
+                alert('Có lỗi xảy ra, vui lòng thử lại.');
+            } finally {
+                btn.innerHTML = 'Lưu Vào Danh Sách';
+                btn.disabled = false;
+            }
+        });
+    }
+
 };
