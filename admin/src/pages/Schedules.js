@@ -124,8 +124,32 @@ export const render = () => {
               </div>
           </div>
       </div>
+
+      <!-- Guide Picker Modal -->
+      <div id="guidePickerModal" class="fixed inset-0 z-[70] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
+              <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                  <div>
+                      <h2 class="text-lg font-black text-gray-800">👥 Phân Công Nhân Sự</h2>
+                      <p class="text-xs text-gray-400 mt-0.5" id="guidePickerSubtitle">Chọn nhân sự cho lịch tour</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                      <a href="/admin/guides" data-link class="text-xs text-indigo-600 hover:underline font-medium">Thêm nhân sự mới →</a>
+                      <button id="closeGuidePickerBtn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                          <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                  </div>
+              </div>
+              <div class="p-5 overflow-y-auto flex-1">
+                  <div id="guidePickerList" class="space-y-2">
+                      <div class="text-center py-8 text-gray-400">Đang tải...</div>
+                  </div>
+              </div>
+          </div>
+      </div>
     `;
 };
+
 
 export const afterRender = () => {
     let currentSchedules = [];
@@ -368,6 +392,9 @@ export const afterRender = () => {
                             <button class="sch-delete-btn bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 rounded-lg p-2 md:p-2.5 transition-colors flex-1 md:flex-none flex justify-center" data-id="${item.id}" title="Xóa">
                                 <svg class="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
+                            <button class="sch-guides-btn bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg px-2.5 py-2 md:py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" title="Phân công Nhân Sự">
+                                👥 Nhân Sự
+                            </button>
                             <button class="sch-review-btn bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border border-yellow-200 rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" title="Copy Link Đánh Giá">
                                 ⭐ Link ĐG
                             </button>
@@ -382,17 +409,106 @@ export const afterRender = () => {
         }).join('');
     };
 
+    // --- GUIDE PICKER LOGIC ---
+    const guidePickerModal = document.getElementById('guidePickerModal');
+    const guidePickerList = document.getElementById('guidePickerList');
+    let pickerScheduleId = null;
+
+    const openGuidePicker = async (scheduleId, tourName) => {
+        pickerScheduleId = scheduleId;
+        document.getElementById('guidePickerSubtitle').textContent = `Tour: ${tourName}`;
+        guidePickerModal.classList.remove('hidden');
+        guidePickerList.innerHTML = '<div class="text-center py-8 text-gray-400">Đang tải...</div>';
+
+        try {
+            const [allRes, assignedRes] = await Promise.all([
+                fetch('/api/guides'),
+                fetch(`/api/guides?schedule_id=${scheduleId}`)
+            ]);
+            const allGuides = await allRes.json();
+            const assignedGuides = await assignedRes.json();
+            const assignedIds = new Set(assignedGuides.map(g => g.id));
+
+            const ROLE_COLORS = {
+                'Hướng Dẫn Viên': 'bg-blue-100 text-blue-700',
+                'Leader': 'bg-purple-100 text-purple-700',
+                'Photo': 'bg-pink-100 text-pink-700',
+                'Guider': 'bg-cyan-100 text-cyan-700',
+                'Hậu Cần': 'bg-amber-100 text-amber-700',
+                'Học Việc': 'bg-gray-100 text-gray-600',
+            };
+
+            if (allGuides.length === 0) {
+                guidePickerList.innerHTML = '<div class="text-center py-8 text-gray-400"><div class="text-3xl mb-2">👥</div><p>Chưa có nhân sự nào.</p><a href="/admin/guides" data-link class="text-indigo-600 text-sm font-medium hover:underline">+ Thêm nhân sự mới</a></div>';
+                return;
+            }
+
+            guidePickerList.innerHTML = allGuides.map(g => {
+                const isAssigned = assignedIds.has(g.id);
+                const badgeColor = ROLE_COLORS[g.role] || 'bg-gray-100 text-gray-600';
+                const initials = (g.full_name || 'X').split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
+                return `
+                <div class="flex items-center gap-3 p-3 rounded-xl border transition-all ${ isAssigned ? 'border-indigo-200 bg-indigo-50' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50'}">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-csr-orange/20 to-orange-100 flex items-center justify-center text-csr-orange font-black text-xs shrink-0">${initials}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-sm text-gray-900 truncate">${g.full_name}</div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeColor}">${g.role}</span>
+                    </div>
+                    <button class="guide-toggle-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${ isAssigned ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-indigo-600 text-white hover:bg-indigo-700'}"
+                        data-guide-id="${g.id}" data-assigned="${isAssigned}">
+                        ${ isAssigned ? '✕ Bỏ' : '+ Thêm'}
+                    </button>
+                </div>`;
+            }).join('');
+
+            // Attach toggle events
+            guidePickerList.querySelectorAll('.guide-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const guideId = parseInt(btn.getAttribute('data-guide-id'));
+                    const isAssigned = btn.getAttribute('data-assigned') === 'true';
+                    btn.disabled = true;
+                    btn.textContent = '...';
+
+                    await fetch('/api/guides', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: isAssigned ? 'unassign' : 'assign',
+                            schedule_id: pickerScheduleId,
+                            guide_id: guideId
+                        })
+                    });
+                    // Refresh picker
+                    openGuidePicker(pickerScheduleId, document.getElementById('guidePickerSubtitle').textContent.replace('Tour: ', ''));
+                });
+            });
+
+        } catch (e) {
+            guidePickerList.innerHTML = `<div class="text-center py-8 text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
+        }
+    };
+
+    document.getElementById('closeGuidePickerBtn').addEventListener('click', () => guidePickerModal.classList.add('hidden'));
+    guidePickerModal.addEventListener('click', (e) => { if (e.target === guidePickerModal) guidePickerModal.classList.add('hidden'); });
+
     // --- CARD ACTION HANDLER ---
     const handleCardAction = async (e) => {
         const editBtn = e.target.closest('.sch-edit-btn');
         const deleteBtn = e.target.closest('.sch-delete-btn');
         const reviewBtn = e.target.closest('.sch-review-btn');
         const detailsBtn = e.target.closest('.sch-details-btn');
+        const guidesBtn = e.target.closest('.sch-guides-btn');
 
         if (editBtn) {
             const id = editBtn.getAttribute('data-id');
             const item = currentSchedules.find(s => s.id == id);
             if (item) openModal(item);
+        }
+
+        if (guidesBtn) {
+            const id = guidesBtn.getAttribute('data-id');
+            const tourName = guidesBtn.getAttribute('data-tour');
+            openGuidePicker(parseInt(id), tourName);
         }
 
         if (deleteBtn) {

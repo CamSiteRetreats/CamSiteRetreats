@@ -1,4 +1,4 @@
-import{S as g,H as b}from"./Header-CamAZjvb.js";const x=()=>{let d={role:"sale",fullName:"Guest"};try{const s=localStorage.getItem("csr_user");s&&(d=JSON.parse(s))}catch{}return d.role!=="admin"?`
+import{S as g,H as b}from"./Header-Dmidaim7.js";const x=()=>{let d={role:"sale",fullName:"Guest"};try{const s=localStorage.getItem("csr_user");s&&(d=JSON.parse(s))}catch{}return d.role!=="admin"?`
             <div class="flex h-screen items-center justify-center bg-gray-50 text-gray-800">
                 <div class="text-center">
                     <h1 class="text-4xl font-bold text-gray-900 mb-4">403</h1>

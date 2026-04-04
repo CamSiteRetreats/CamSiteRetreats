@@ -1,4 +1,4 @@
-import{S as O,H as U}from"./Header-CamAZjvb.js";const X=()=>`
+import{S as O,H as U}from"./Header-Dmidaim7.js";const X=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800 font-sans">
         <!-- Sidebar is hidden when printing -->
         <div class="print:hidden">

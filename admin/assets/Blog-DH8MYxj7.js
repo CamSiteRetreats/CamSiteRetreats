@@ -1,4 +1,4 @@
-import{S as B,H as I}from"./Header-CamAZjvb.js";const i="/api/blog",h="https://cdn.quilljs.com/1.3.6",T=()=>`
+import{S as B,H as I}from"./Header-Dmidaim7.js";const i="/api/blog",h="https://cdn.quilljs.com/1.3.6",T=()=>`
   <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
     ${B()}
     <div class="flex flex-col flex-1 w-full overflow-hidden">

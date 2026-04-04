@@ -8,6 +8,7 @@ export const initRouter = () => {
         '/admin/tours': () => import('../pages/Tours.js'),
         '/admin/tour-settings': () => import('../pages/TourSettings.js'),
         '/admin/schedules': () => import('../pages/Schedules.js'),
+        '/admin/guides': () => import('../pages/Guides.js'),
         '/admin/reports': () => import('../pages/Reports.js'),
         '/admin/users': () => import('../pages/Users.js'),
         '/admin/roster': () => import('../pages/Roster.js'),

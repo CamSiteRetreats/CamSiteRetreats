@@ -1,4 +1,4 @@
-import{S as xe,H as ye}from"./Header-CamAZjvb.js";console.log("Bookings V3 - Cache Busted!");const ke=()=>`
+import{S as xe,H as ye}from"./Header-Dmidaim7.js";console.log("Bookings V3 - Cache Busted!");const ke=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${xe()}
         
