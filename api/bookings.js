@@ -15,7 +15,12 @@ module.exports = async (req, res) => {
 
     try {
         if (method === 'GET') {
-            const { rows } = await db.query('SELECT * FROM bookings ORDER BY created_at DESC');
+            const { rows } = await db.query(`
+                SELECT b.*, COALESCE(t.commission_rate, 5) AS commission_rate
+                FROM bookings b
+                LEFT JOIN tours t ON LOWER(TRIM(b.tour)) = LOWER(TRIM(t.name))
+                ORDER BY b.created_at DESC
+            `);
             return res.status(200).json(rows);
         }
 
@@ -34,7 +39,8 @@ module.exports = async (req, res) => {
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit', 'discount',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
                     'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required',
-                    'services_booked', 'coupon_code', 'pickup_point', 'schedule_id'
+                    'services_booked', 'coupon_code', 'pickup_point', 'schedule_id',
+                    'commission_paid', 'commission_paid_at', 'commission_payment_id'
                 ];
 
                 for (const field of possibleFields) {

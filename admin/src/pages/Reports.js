@@ -11,214 +11,192 @@ export const render = () => {
     const isAdmin = user.role === 'admin';
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Ngày cuối tháng
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     const toDateStr = lastDay.toISOString().split('T')[0];
     const fromDateStr = firstDay.toISOString().split('T')[0];
 
     return `
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${Sidebar()}
-        
         <div class="flex flex-col flex-1 w-full overflow-hidden">
           ${Header()}
-          
-          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-               <div class="max-w-7xl mx-auto space-y-8">
-                  
-                  <div class="flex justify-between items-end flex-wrap gap-4">
+          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+            <div class="max-w-7xl mx-auto space-y-6">
+
+              <!-- Header & Date Filter -->
+              <div class="flex justify-between items-end flex-wrap gap-4">
+                  <div>
+                      <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-1">
+                        ${isAdmin ? '💰 Hoa Hồng & Báo Cáo' : '📊 Báo Cáo Của Tôi'}
+                      </h1>
+                      <p class="text-gray-500 text-sm">${isAdmin ? 'Quản lý và thanh toán hoa hồng cho đội ngũ Sales.' : 'Theo dõi đơn hàng và hoa hồng của bạn.'}</p>
+                  </div>
+                  <div class="flex items-center gap-3 flex-wrap">
+                      <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
+                          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                          <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Từ ngày</label>
+                          <input type="date" id="reportDateFrom" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${fromDateStr}">
+                      </div>
+                      <span class="text-gray-400 font-bold">→</span>
+                      <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
+                          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                          <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Đến ngày</label>
+                          <input type="date" id="reportDateTo" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${toDateStr}">
+                      </div>
+                      <button id="reportApplyBtn" class="bg-gray-900 hover:bg-csr-orange text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">Lọc</button>
+                  </div>
+              </div>
+
+              ${isAdmin ? `
+              <!-- ADMIN: Cài đặt % hoa hồng theo Tour -->
+              <div class="glass-panel overflow-hidden">
+                  <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-100/50 cursor-pointer" id="commissionSetupToggle">
                       <div>
-                          <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Báo Cáo &amp; Hiệu Suất</h1>
-                          <p class="text-gray-500 text-sm">
-                            ${isAdmin ? 'Quản lý hoa hồng, doanh thu tổng và xếp hạng Sales.' : 'Bảng xếp hạng doanh số và theo dõi hoa hồng của bạn.'}
-                          </p>
+                          <h2 class="text-base font-bold text-gray-900">⚙️ Cài đặt % Hoa Hồng Theo Tour</h2>
+                          <p class="text-xs text-gray-400 mt-0.5">Click để mở/đóng</p>
                       </div>
-                      <div class="flex items-center gap-3 flex-wrap">
-                          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
-                              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                              <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Từ ngày</label>
-                              <input type="date" id="reportDateFrom" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${fromDateStr}">
-                          </div>
-                          <span class="text-gray-400 font-bold">→</span>
-                          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
-                              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                              <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Đến ngày</label>
-                              <input type="date" id="reportDateTo" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${toDateStr}">
-                          </div>
-                          <button id="reportApplyBtn" class="bg-gray-900 hover:bg-csr-orange text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">Lọc</button>
-                      </div>
+                      <svg id="commissionSetupChevron" class="w-5 h-5 text-gray-400 transition-transform duration-200 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </div>
+                  <div class="p-4 hidden" id="commissionSetupContainer">
+                      <div class="text-center text-gray-400 py-4 text-sm">Đang tải danh sách Tour...</div>
+                  </div>
+              </div>
 
-                  ${isAdmin ? `
-                  <!-- PHẦN 1: QUẢN LÝ HOA HỒNG TOUR (ADMIN ONLY) -->
-                  <div class="glass-panel overflow-hidden">
-                      <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
-                          <div>
-                              <h2 class="text-lg font-bold text-gray-900">1. Cài Đặt Mức Hoa Hồng Tour</h2>
-                              <p class="text-xs text-gray-500 mt-1">Mức hoa hồng này được tính cho các đơn hàng của tour tương ứng.</p>
-                          </div>
-                      </div>
-                      <div class="p-4" id="commissionSetupContainer">
-                          <div class="text-center text-gray-400 py-4 text-sm">Đang tải danh sách Tour...</div>
-                      </div>
+              <!-- ADMIN: Danh sách Sales -->
+              <div class="glass-panel overflow-hidden">
+                  <div class="p-4 border-b border-gray-200 bg-gray-100/50">
+                      <h2 class="text-base font-bold text-gray-900">👥 Danh Sách Nhân Viên Sale</h2>
+                      <p class="text-xs text-gray-400 mt-0.5">Bấm "Xem" để mở lịch sử đơn và thanh toán hoa hồng.</p>
                   </div>
+                  <div class="overflow-x-auto">
+                      <table class="w-full text-left border-collapse text-sm">
+                          <thead>
+                              <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-400 font-bold">
+                                  <th class="p-4">#</th>
+                                  <th class="p-4">Nhân Viên Sale</th>
+                                  <th class="p-4 text-center">Đơn Đã Cọc</th>
+                                  <th class="p-4 text-center">Đơn Hoàn Thành</th>
+                                  <th class="p-4 text-right text-csr-orange">HH Chưa Thanh Toán</th>
+                                  <th class="p-4 text-center">Thao Tác</th>
+                              </tr>
+                          </thead>
+                          <tbody id="salesTableBody" class="divide-y divide-gray-100">
+                              <tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Đang tải dữ liệu...</td></tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+              ` : `
+              <!-- SALE: 4 Stat Cards -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div class="glass-panel p-5 border-l-4 border-gray-400">
+                      <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide leading-tight">Tổng Đơn Tiếp Nhận</h3>
+                      <p class="text-3xl font-black text-gray-900 mt-2" id="sale-stat-total-pax">...</p>
+                  </div>
+                  <div class="glass-panel p-5 border-l-4 border-blue-500">
+                      <h3 class="text-xs font-bold text-blue-500 uppercase tracking-wide leading-tight">Đã Hoàn Thành</h3>
+                      <p class="text-3xl font-black text-blue-600 mt-2" id="sale-stat-success-pax">...</p>
+                  </div>
+                  <div class="glass-panel p-5 border-l-4 border-csr-orange">
+                      <h3 class="text-xs font-bold text-csr-orange uppercase tracking-wide leading-tight">Tổng Doanh Số</h3>
+                      <p class="text-2xl font-black text-csr-orange mt-2" id="sale-stat-revenue">...</p>
+                  </div>
+                  <div class="glass-panel p-5 border-l-4 border-green-500">
+                      <h3 class="text-xs font-bold text-green-600 uppercase tracking-wide leading-tight">HH Thực Nhận</h3>
+                      <p class="text-2xl font-black text-green-600 mt-2" id="sale-stat-real-comm">...</p>
+                  </div>
+              </div>
 
-                  <!-- PHẦN 2: DOANH THU TỔNG (ADMIN ONLY) -->
-                  <div>
-                      <h2 class="text-lg font-bold text-gray-900 mb-4">2. Thống Kê Doanh Thu Tổng (Kỳ Chọn)</h2>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div class="glass-panel p-6 border-l-4 border-csr-orange">
-                              <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Số Khởi Hành (Chuyến)</h3>
-                              <p class="text-4xl font-black text-gray-900 mt-2" id="stat-departures">...</p>
-                          </div>
-                          <div class="glass-panel p-6 border-l-4 border-blue-500">
-                              <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Số Khách Tham Gia</h3>
-                              <p class="text-4xl font-black text-gray-900 mt-2" id="stat-pax">...</p>
-                          </div>
-                          <div class="glass-panel p-6 border-l-4 border-green-500">
-                              <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Tổng Doanh Thu</h3>
-                              <p class="text-4xl font-black text-green-600 mt-2" id="stat-revenue">...</p>
-                          </div>
-                      </div>
+              <!-- SALE: Lịch sử đơn của mình -->
+              <div class="glass-panel overflow-hidden">
+                  <div class="p-4 border-b border-gray-200 bg-gray-100/50">
+                      <h2 class="text-base font-bold text-gray-900">📋 Lịch Sử Đơn Của Tôi</h2>
                   </div>
+                  <div id="saleOrdersContainer">
+                      <div class="p-8 text-center text-gray-400 text-sm">Đang tải...</div>
+                  </div>
+              </div>
 
-                  <!-- PHẦN 3: BẢNG XẾP HẠNG SALES (ADMIN ONLY) -->
-                  <div class="glass-panel overflow-hidden mt-8">
-                      <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
-                          <div>
-                              <h2 class="text-lg font-bold text-gray-900">3. Bảng Xếp Hạng Đội Ngũ Sales</h2>
-                              <p class="text-xs text-gray-500 mt-1">Tính theo đơn "Đã cọc" hoặc "Hoàn tất". Gộp theo ID người dùng (tránh lỗi đổi tên).</p>
-                          </div>
-                      </div>
-                      <div class="overflow-x-auto">
-                          <table class="w-full text-left border-collapse">
-                              <thead>
-                                  <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-400 font-bold">
-                                      <th class="p-4 text-center w-16">TOP</th>
-                                      <th class="p-4">Nhân Viên Sale</th>
-                                      <th class="p-4 text-center">Đơn Chốt</th>
-                                      <th class="p-4 text-right">Doanh Số Kéo Về</th>
-                                      <th class="p-4 text-right text-csr-orange">Hoa Hồng Kênh</th>
-                                      <th class="p-4 text-center">Thao Tác</th>
-                                  </tr>
-                              </thead>
-                              <tbody id="salesTableBody" class="divide-y divide-gray-100">
-                                  <tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Đang tải dữ liệu...</td></tr>
-                              </tbody>
-                          </table>
-                      </div>
+              <!-- SALE: Lịch sử thanh toán HH từ Admin -->
+              <div class="glass-panel overflow-hidden">
+                  <div class="p-4 border-b border-gray-200 bg-gray-100/50">
+                      <h2 class="text-base font-bold text-gray-900">💸 Lịch Sử Admin Thanh Toán Hoa Hồng</h2>
                   </div>
-                  ` : `
-                  <!-- MÀN HÌNH RIÊNG DÀNH CHO ROLE SALE -->
-                  
-                  <!-- PHẦN 1: THỐNG KÊ CÁ NHÂN (SALE ONLY) — 4 CARDS -->
-                  <div>
-                      <h2 class="text-lg font-bold text-gray-900 mb-4">1. Thống Kê Của Tôi</h2>
-                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                          <div class="glass-panel p-6 border-l-4 border-gray-400">
-                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide leading-tight">Số Khách Tiếp Nhận</h3>
-                              <p class="text-4xl font-black text-gray-900 mt-2" id="sale-stat-total-pax">...</p>
-                              <p class="text-[10px] text-gray-400 mt-1">Tổng đơn trong kỳ (mọi trạng thái)</p>
-                          </div>
-                          <div class="glass-panel p-6 border-l-4 border-blue-500">
-                              <h3 class="text-xs font-bold text-blue-500 uppercase tracking-wide leading-tight">Số Khách Hoàn Thành</h3>
-                              <p class="text-4xl font-black text-blue-600 mt-2" id="sale-stat-success-pax">...</p>
-                              <p class="text-[10px] text-gray-400 mt-1">Đã đủ chi phí &amp; đã khởi hành</p>
-                          </div>
-                          <div class="glass-panel p-6 border-l-4 border-csr-orange">
-                              <h3 class="text-xs font-bold text-csr-orange uppercase tracking-wide leading-tight">Tổng Doanh Thu</h3>
-                              <p class="text-3xl font-black text-csr-orange mt-2" id="sale-stat-revenue">...</p>
-                              <p class="text-[10px] text-gray-400 mt-1">Đơn Đã cọc + Hoàn tất trong kỳ</p>
-                          </div>
-                          <div class="glass-panel p-6 border-l-4 border-green-500">
-                              <h3 class="text-xs font-bold text-green-600 uppercase tracking-wide leading-tight">Hoa Hồng Thực Nhận</h3>
-                              <p class="text-3xl font-black text-green-600 mt-2" id="sale-stat-real-comm">...</p>
-                              <p class="text-[10px] text-gray-400 mt-1">Từ các khách đã hoàn thành</p>
-                          </div>
-                      </div>
+                  <div id="salePaymentHistoryContainer">
+                      <div class="p-8 text-center text-gray-400 text-sm">Đang tải...</div>
                   </div>
+              </div>
+              `}
 
-                  <!-- PHẦN 2: BẢNG BÁO CÁO CÁ NHÂN THEO TOUR (SALE ONLY) -->
-                  <div class="glass-panel overflow-hidden mt-8">
-                      <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-100/50">
-                          <div>
-                              <h2 class="text-lg font-bold text-gray-900">2. Báo Cáo Doanh Thu Theo Tuyến Tour</h2>
-                              <p class="text-xs text-gray-500 mt-1">Gom nhóm dựa trên tour đã chốt thành công trong kỳ.</p>
-                          </div>
-                      </div>
-                      <div class="overflow-x-auto">
-                          <table class="w-full text-left border-collapse">
-                              <thead>
-                                  <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-400 font-bold">
-                                      <th class="p-4 text-center w-16">STT</th>
-                                      <th class="p-4">Tên Tour</th>
-                                      <th class="p-4 text-center">Đơn Chốt</th>
-                                      <th class="p-4 text-right">Doanh Số Kéo Về</th>
-                                      <th class="p-4 text-right text-csr-orange">Hoa Hồng Kênh</th>
-                                      <th class="p-4 text-center">Thao Tác</th>
-                                  </tr>
-                              </thead>
-                              <tbody id="saleTourTableBody" class="divide-y divide-gray-100">
-                                  <tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Đang tải dữ liệu...</td></tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-                  `}
-
-               </div>
+            </div>
           </main>
         </div>
       </div>
 
-      <!-- SALE / ADMIN DETAIL MODAL -->
-      <div id="saleDetailModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
-          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 flex flex-col" id="saleDetailContent">
-              <div class="sticky top-0 bg-white/95 backdrop-blur z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <!-- ADMIN SALE DETAIL PANEL (SLIDE-IN) -->
+      <div id="saleDetailPanel" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200 flex items-stretch justify-end">
+          <div class="bg-white w-full max-w-4xl h-full flex flex-col shadow-2xl translate-x-full transition-transform duration-300" id="saleDetailPanelInner">
+
+              <!-- Panel Header -->
+              <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-white shrink-0">
                   <div>
-                      <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2" id="modalSaleName">Chi Tiết</h2>
-                      <p class="text-xs text-gray-500 mt-0.5" id="modalMonthText"></p>
+                      <h2 class="text-lg font-bold text-gray-900" id="panelSaleName">Chi Tiết Sale</h2>
+                      <p class="text-xs text-gray-400 mt-0.5" id="panelSaleStats"></p>
                   </div>
-                  <button type="button" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors" onclick="window.closeSaleDetailModal()">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  <button onclick="window.closeSalePanel()" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                   </button>
               </div>
-              
-              <div class="p-6 flex-1 bg-gray-50/50">
-                ${isAdmin ? `
-                <!-- Admin Modal Stats -->
-                <div class="grid grid-cols-3 gap-4 mb-6" id="adminModalStats">
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div class="text-xs text-gray-500 font-bold uppercase mb-1">Tổng Đơn</div>
-                        <div class="text-xl font-black text-gray-900" id="modalTotalBookings">0</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <div class="text-xs text-gray-500 font-bold uppercase mb-1">Doanh Số</div>
-                        <div class="text-xl font-black text-gray-900" id="modalTotalRevenue">0đ</div>
-                    </div>
-                    <div class="bg-orange-50 p-4 rounded-xl border border-orange-200 shadow-sm">
-                        <div class="text-xs text-csr-orange font-bold uppercase mb-1">Tiền Hoa Hồng</div>
-                        <div class="text-xl font-black text-csr-orange" id="modalTotalCommission">0đ</div>
-                    </div>
-                </div>
-                ` : ''}
 
-                <!-- Bookings Table -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-100 border-b border-gray-200 text-xs text-gray-600 uppercase font-bold">
-                            <tr>
-                                <th class="p-4 w-1/2 border-r border-gray-200">
-                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Thông Tin Khách Hàng</div>
-                                </th>
-                                <th class="p-4 w-1/2">
-                                    <div class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> Chi Tiết Đơn Hàng &amp; Hoa Hồng</div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalBookingsBody" class="divide-y divide-gray-100">
-                        </tbody>
-                    </table>
-                </div>
+              <!-- Payment Toolbar -->
+              <div class="px-6 py-3 border-b border-gray-100 bg-orange-50/50 flex items-center justify-between gap-4 shrink-0" id="payToolbar">
+                  <div class="text-sm text-gray-600" id="paySelectionInfo">Chọn đơn để thanh toán hoa hồng</div>
+                  <button id="payCommissionBtn" onclick="window.openPayConfirmModal()"
+                      class="bg-csr-orange text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#d65503] transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                      💰 Thanh Toán Hoa Hồng
+                  </button>
+              </div>
+
+              <!-- Tabs: Lịch sử đơn / Lịch sử thanh toán -->
+              <div class="flex border-b border-gray-200 px-6 bg-white shrink-0">
+                  <button id="tabOrders" onclick="window.switchPanelTab('orders')" class="py-3 px-1 mr-6 text-sm font-bold border-b-2 border-csr-orange text-csr-orange transition-colors">Lịch Sử Đơn</button>
+                  <button id="tabPayHistory" onclick="window.switchPanelTab('pay-history')" class="py-3 px-1 mr-6 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors">Lịch Sử Thanh Toán</button>
+              </div>
+
+              <!-- Tab Content -->
+              <div class="flex-1 overflow-y-auto">
+                  <!-- Orders Tab -->
+                  <div id="tabContentOrders" class="p-4">
+                      <div class="text-center text-gray-400 py-8 text-sm">Đang tải...</div>
+                  </div>
+                  <!-- Payment History Tab -->
+                  <div id="tabContentPayHistory" class="p-4 hidden">
+                      <div class="text-center text-gray-400 py-8 text-sm">Đang tải lịch sử...</div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- CONFIRM PAYMENT MODAL -->
+      <div id="payConfirmModal" class="fixed inset-0 z-[60] bg-gray-900/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 scale-95 transition-transform duration-300" id="payConfirmModalInner">
+              <h3 class="text-lg font-bold text-gray-900 mb-1">Xác Nhận Thanh Toán Hoa Hồng</h3>
+              <p class="text-sm text-gray-500 mb-5">Vui lòng kiểm tra lại trước khi xác nhận.</p>
+
+              <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 space-y-2 mb-5">
+                  <div class="flex justify-between text-sm"><span class="text-gray-500">Nhân viên:</span> <span class="font-bold text-gray-900" id="confirmSaleName">—</span></div>
+                  <div class="flex justify-between text-sm"><span class="text-gray-500">Số đơn:</span> <span class="font-bold text-gray-900" id="confirmOrderCount">—</span></div>
+                  <div class="flex justify-between text-sm border-t border-orange-100 pt-2 mt-2"><span class="text-gray-500 font-bold">Tổng hoa hồng:</span> <span class="font-black text-csr-orange text-lg" id="confirmTotalComm">—</span></div>
+              </div>
+
+              <div class="mb-5">
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú (tuỳ chọn)</label>
+                  <input type="text" id="payNote" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-csr-orange focus:outline-none" placeholder="VD: Thanh toán tháng 4/2026...">
+              </div>
+
+              <div class="flex gap-3">
+                  <button onclick="window.closePayConfirmModal()" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors text-sm">Hủy</button>
+                  <button onclick="window.confirmPayCommission()" id="confirmPayBtn" class="flex-1 px-4 py-3 bg-csr-orange text-white rounded-xl font-bold hover:bg-[#d65503] transition-colors shadow-lg shadow-csr-orange/30 text-sm">✅ Xác Nhận Thanh Toán</button>
               </div>
           </div>
       </div>
@@ -235,61 +213,86 @@ export const afterRender = () => {
 
     let allTours = [];
     let allBookings = [];
-    let allUsers = [];   // [{id, full_name, fullName, role, ...}]
-    let filteredBookings = [];
+    let allUsers = [];
+
+    // State cho panel Admin
+    let currentPanelSale = null; // { key, name, bookings[], filteredBookings[] }
+    let currentPanelTab = 'orders';
+    let selectedBookingIds = new Set();
+    let panelPayHistory = []; // lịch sử thanh toán của sale đang mở
 
     const dateFromInput = document.getElementById('reportDateFrom');
     const dateToInput = document.getElementById('reportDateTo');
     const applyBtn = document.getElementById('reportApplyBtn');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
-    const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
+    const formatVND = (num) => new Intl.NumberFormat('vi-VN').format(Math.round(num || 0)) + 'đ';
 
-    // ----- Date Helpers -----
-    // Parse "dd/mm/yyyy hh:mm" or "dd/mm/yyyy" or "yyyy-mm-dd" → Date
+    // ── Helper: Tính tổng tiền dịch vụ (robust) ──────────────────────────────
+    const calcServicesTotal = (services_booked) => {
+        if (!services_booked) return 0;
+        try {
+            const svs = Array.isArray(services_booked)
+                ? services_booked
+                : JSON.parse(services_booked);
+            if (Array.isArray(svs)) {
+                return svs.reduce((sum, s) => sum + (parseInt(s.price) || 0), 0);
+            }
+        } catch (e) {
+            const matches = String(services_booked).match(/price:\s*(\d+)/g) || [];
+            return matches.reduce((sum, m) => sum + Number(m.replace(/price:\s*/, '')), 0);
+        }
+        return 0;
+    };
+
+    // ── Helper: Tính hoa hồng 1 booking ──────────────────────────────────────
+    const calcCommission = (b, tours) => {
+        const tourConf = tours.find(t => t.name &&  b.tour && t.name.toLowerCase().trim() === b.tour.toLowerCase().trim());
+        const rate = parseFloat(b.commission_rate ?? tourConf?.commission_rate ?? 5);
+        const servicesTotal = calcServicesTotal(b.services_booked);
+        const basePrice = Math.max(0, (parseInt(b.total_price) || 0) - (parseInt(b.discount) || 0) - servicesTotal);
+        const commission = basePrice * (rate / 100);
+        return { rate, servicesTotal, basePrice, commission };
+    };
+
+    // ── Helper: Parse ngày booking ────────────────────────────────────────────
     const parseBookingDate = (dateStr) => {
         if (!dateStr) return null;
-        // Could be "15/03/2026 - 16/03/2026", "15/03/2026", "2026-03-15"
-        const cleaned = dateStr.split('-')[0].trim(); // Take first part if range
+        const cleaned = dateStr.split('-')[0].trim();
         if (cleaned.includes('/')) {
             const parts = cleaned.split('/');
-            if (parts.length === 3) {
-                // dd/mm/yyyy
-                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-            }
-        } else if (cleaned.includes('-')) {
-            return new Date(cleaned);
+            if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            if (parts.length === 2) return new Date(new Date().getFullYear(), parseInt(parts[1]) - 1, parseInt(parts[0]));
         }
+        if (cleaned.match(/^\d{4}-/)) return new Date(cleaned);
         return null;
     };
 
-    const getDateRange = () => {
-        const from = dateFromInput.value ? new Date(dateFromInput.value) : null;
-        const to = dateToInput.value ? new Date(dateToInput.value) : null;
-        if (from) from.setHours(0, 0, 0, 0);
-        if (to) to.setHours(23, 59, 59, 999);
-        return { from, to };
-    };
+    const today = new Date(); today.setHours(0, 0, 0, 0);
 
-    const isInDateRange = (booking, from, to) => {
-        const d = parseBookingDate(booking.date);
+    const isInDateRange = (b, from, to) => {
+        const d = parseBookingDate(b.date);
         if (!d) return false;
         if (from && d < from) return false;
         if (to && d > to) return false;
         return true;
     };
 
-    // ----- User Map: id → currentName -----
-    const buildUserMap = () => {
-        const map = {};
-        allUsers.forEach(u => {
-            map[String(u.id)] = u.full_name || u.fullName || u.username || `User #${u.id}`;
-        });
-        return map;
+    const getDateRange = () => {
+        const from = dateFromInput?.value ? new Date(dateFromInput.value) : null;
+        const to = dateToInput?.value ? new Date(dateToInput.value) : null;
+        if (from) from.setHours(0, 0, 0, 0);
+        if (to) to.setHours(23, 59, 59, 999);
+        return { from, to };
     };
 
-    // ----- Load Data -----
+    const isSuccessStatus = (b) => b.status && (b.status.includes('Đã cọc') || b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
+    const isCompletedTrip = (b) => {
+        const isFullyPaid = b.status && (b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
+        if (!isFullyPaid) return false;
+        const d = parseBookingDate(b.date); return d && d < today;
+    };
+
+    // ── Load Data ─────────────────────────────────────────────────────────────
     const loadData = async () => {
         try {
             const [toursRes, bookingsRes, usersRes] = await Promise.all([
@@ -302,20 +305,23 @@ export const afterRender = () => {
             allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
             allUsers = usersRes.ok ? await usersRes.json() : [];
 
-            if (isAdmin) renderCommissionSetup();
-            processReports();
+            if (isAdmin) {
+                renderCommissionSetup();
+                renderAdminSalesList();
+            } else {
+                renderSaleView();
+            }
         } catch (err) {
-            console.error('Lỗi tải data báo cáo:', err);
-            alert('Có lỗi xảy ra khi lấy dữ liệu báo cáo!');
+            console.error('Lỗi tải dữ liệu báo cáo:', err);
         }
     };
 
-    // ----- Commission Setup (Admin) -----
+    // ── Commission Setup (Admin) ──────────────────────────────────────────────
     const renderCommissionSetup = () => {
         const container = document.getElementById('commissionSetupContainer');
         if (!container) return;
         if (allTours.length === 0) {
-            container.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">Không có Tour nào trong hệ thống.</div>';
+            container.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">Không có Tour nào.</div>';
             return;
         }
         const gridHtml = allTours.map(t => {
@@ -325,161 +331,83 @@ export const afterRender = () => {
                     <div class="font-medium text-sm text-gray-900 flex-1 truncate pr-4">${t.name}</div>
                     <div class="flex items-center gap-2">
                         <div class="relative w-24">
-                            <input type="number" min="0" max="100" step="0.5" class="w-full bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-sm font-bold focus:border-csr-orange focus:outline-none" value="${rate}" id="comm_input_${t.id}">
+                            <input type="number" min="0" max="100" step="0.5"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-sm font-bold focus:border-csr-orange focus:outline-none"
+                                value="${rate}" id="comm_input_${t.id}">
                             <span class="absolute right-3 top-1.5 text-gray-400 font-bold">%</span>
                         </div>
-                        <button class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-csr-orange transition-colors" onclick="window.saveCommission(${t.id})">Lưu</button>
+                        <button class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-csr-orange transition-colors"
+                            onclick="window.saveCommission(${t.id})">Lưu</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
         container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${gridHtml}</div>`;
+
+        // Toggle
+        document.getElementById('commissionSetupToggle')?.addEventListener('click', () => {
+            container.classList.toggle('hidden');
+            document.getElementById('commissionSetupChevron')?.classList.toggle('rotate-180');
+        });
     };
 
     window.saveCommission = async (tourId) => {
         const input = document.getElementById(`comm_input_${tourId}`);
         if (!input) return;
         const rate = parseFloat(input.value);
-        if (isNaN(rate) || rate < 0 || rate > 100) { alert('Tỉ lệ hoa hồng không hợp lệ (0-100)'); return; }
+        if (isNaN(rate) || rate < 0 || rate > 100) { alert('Tỉ lệ hoa hồng không hợp lệ (0–100)'); return; }
         const btn = input.nextElementSibling;
-        const oldText = btn.textContent;
         btn.textContent = '...'; btn.disabled = true;
         try {
             const res = await fetch(`/api/admin_tours?id=${tourId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ commission_rate: rate })
             });
             if (res.ok) {
                 const t = allTours.find(x => x.id === tourId);
                 if (t) t.commission_rate = rate;
-                btn.classList.add('bg-green-500');
-                btn.textContent = 'Đã lưu!';
-                setTimeout(() => { btn.classList.remove('bg-green-500'); btn.textContent = oldText; btn.disabled = false; }, 1500);
-                processReports();
-            } else { throw new Error('Lỗi cập nhật'); }
-        } catch (err) {
-            alert('Lỗi khi lưu tỉ lệ hoa hồng!');
-            btn.textContent = oldText; btn.disabled = false;
-        }
+                btn.classList.add('bg-green-500'); btn.textContent = '✓ Đã lưu!';
+                setTimeout(() => { btn.classList.remove('bg-green-500'); btn.textContent = 'Lưu'; btn.disabled = false; }, 1500);
+                renderAdminSalesList();
+            } else throw new Error();
+        } catch { alert('Lỗi khi lưu!'); btn.textContent = 'Lưu'; btn.disabled = false; }
     };
 
-    // ----- Process / Filter Data -----
-    const processReports = () => {
+    // ── Admin: Render bảng danh sách Sales ───────────────────────────────────
+    const renderAdminSalesList = () => {
         const { from, to } = getDateRange();
-        const userMap = buildUserMap(); // id → currentName
-
-        // Filter by date range AND valid status
-        let myRawBookingsInRange = []; // Tất cả đơn của sale trong kỳ (mọi status)
-
-        filteredBookings = allBookings.filter(b => {
-            if (!isInDateRange(b, from, to)) return false;
-
-            // Nếu là Sale: thu thập mọi đơn của mình để đếm "Tiếp nhận"
-            if (!isAdmin) {
-                const bSaleId = String(b.sale_id || '');
-                const myId = String(user.id || user.userId || '');
-                const nameMatch = b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase();
-                const idMatch = myId && bSaleId === myId;
-                if (idMatch || (!myId && nameMatch)) {
-                    myRawBookingsInRange.push(b);
-                }
-            }
-
-            // Chỉ lấy đơn đã thành công để tính DT
-            if (!b.status || (!b.status.includes('Đã cọc') && !b.status.includes('Hoàn tất') && !b.status.includes('Hoàn thành'))) return false;
-            return true;
-        });
-
-        // Map commission rate + resolve canonical sale identity
-        // Build a reverse map: full_name (lowercase) → userId for fallback matching
-        const nameToUserId = {};
-        allUsers.forEach(u => {
-            const name = (u.full_name || u.fullName || '').trim().toLowerCase();
-            if (name) nameToUserId[name] = String(u.id);
-        });
-
-        filteredBookings.forEach(b => {
-            const tourConf = allTours.find(t => t.name === b.tour);
-            b._rate = tourConf?.commission_rate ?? 5;
-            b._commission = (b.total_price || 0) * (b._rate / 100);
-
-            const saleIdStr = String(b.sale_id || '').trim();
-
-            if (saleIdStr && userMap[saleIdStr]) {
-                // Best case: sale_id exists and matches a user
-                b._displaySaleName = userMap[saleIdStr];
-                b._saleIdStr = saleIdStr;
-            } else {
-                // Fallback: try to find user by sale_name (handles old bookings with no sale_id
-                // or bookings made when the user had their current name)
-                const saleNameLower = (b.sale_name || '').trim().toLowerCase();
-                const foundUserId = saleNameLower ? nameToUserId[saleNameLower] : null;
-
-                if (foundUserId && userMap[foundUserId]) {
-                    // Matched by name → use canonical userId so it groups with ID-based bookings
-                    b._displaySaleName = userMap[foundUserId];
-                    b._saleIdStr = foundUserId;
-                } else {
-                    // No match at all
-                    b._displaySaleName = b.sale_name || 'Admin / Tự Đặt';
-                    b._saleIdStr = saleIdStr || b.sale_name || 'no-id';
-                }
-            }
-        });
-
-        const rangeLabel = dateFromInput.value && dateToInput.value
-            ? `${dateFromInput.value.split('-').reverse().join('/')} → ${dateToInput.value.split('-').reverse().join('/')}`
-            : '';
-
-        if (isAdmin) {
-            renderAdminStats();
-            renderAdminLeaderboard(rangeLabel);
-        } else {
-            renderSaleView(myRawBookingsInRange);
-        }
-    };
-
-    // ----- Admin Stats -----
-    const renderAdminStats = () => {
-        const statDepartures = document.getElementById('stat-departures');
-        const statPax = document.getElementById('stat-pax');
-        const statRevenue = document.getElementById('stat-revenue');
-        if (!statDepartures) return;
-        const trips = new Set();
-        filteredBookings.forEach(b => trips.add(b.tour + '|' + b.date));
-        statDepartures.textContent = trips.size;
-        statPax.textContent = filteredBookings.length;
-        statRevenue.textContent = formatVND(filteredBookings.reduce((s, b) => s + (Number(b.total_price) || 0), 0));
-    };
-
-    // ----- Admin Leaderboard — Group by sale_id -----
-    const renderAdminLeaderboard = (rangeLabel) => {
         const tbody = document.getElementById('salesTableBody');
         if (!tbody) return;
 
-        // Group by _saleIdStr (which is the sale_id or fallback to sale_name)
-        const salesMap = {};
-        filteredBookings.forEach(b => {
-            const key = b._saleIdStr;
-            if (!salesMap[key]) {
-                salesMap[key] = {
-                    key,
-                    name: b._displaySaleName,
-                    bookings: [],
-                    totalRev: 0,
-                    totalComm: 0
-                };
-            }
-            salesMap[key].bookings.push(b);
-            salesMap[key].totalRev += (Number(b.total_price) || 0);
-            salesMap[key].totalComm += b._commission;
+        // Lọc booking hợp lệ trong range + đã thành công
+        const validBookings = allBookings.filter(b => isInDateRange(b, from, to) && isSuccessStatus(b));
+
+        // Build user map: id → currentName
+        const userMap = {};
+        const nameToId = {};
+        allUsers.forEach(u => {
+            const uid = String(u.id);
+            const name = u.full_name || u.fullName || u.username || `User #${u.id}`;
+            userMap[uid] = name;
+            nameToId[name.trim().toLowerCase()] = uid;
         });
 
-        let salesArr = Object.values(salesMap).sort((a, b) => b.totalRev - a.totalRev);
-        window._currentDetailMode = 'admin';
-        window._currentDetailList = salesArr;
-        window._reportRangeLabel = rangeLabel;
+        // Group by sale id
+        const salesMap = {};
+        validBookings.forEach(b => {
+            const saleIdStr = String(b.sale_id || '').trim();
+            let key = saleIdStr;
+            let displayName = b.sale_name || 'Admin / Tự Đặt';
+            if (saleIdStr && userMap[saleIdStr]) { displayName = userMap[saleIdStr]; }
+            else {
+                const byName = nameToId[(b.sale_name || '').trim().toLowerCase()];
+                if (byName) { key = byName; displayName = userMap[byName]; }
+                else key = b.sale_name || 'no-id';
+            }
+            if (!salesMap[key]) salesMap[key] = { key, saleId: saleIdStr || key, name: displayName, bookings: [] };
+            salesMap[key].bookings.push(b);
+        });
+
+        const salesArr = Object.values(salesMap).sort((a, b) => a.name.localeCompare(b.name));
 
         if (salesArr.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Chưa có dữ liệu nào trong kỳ này.</td></tr>';
@@ -487,166 +415,473 @@ export const afterRender = () => {
         }
 
         tbody.innerHTML = salesArr.map((s, idx) => {
-            const rank = idx + 1;
-            let rankHtml = `<div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold mx-auto text-xs">${rank}</div>`;
-            if (rank === 1) rankHtml = `<div class="w-8 h-8 rounded-full bg-yellow-100 border border-yellow-300 flex items-center justify-center text-yellow-600 font-bold mx-auto text-xs">🥇1</div>`;
-            else if (rank === 2) rankHtml = `<div class="w-8 h-8 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-gray-600 font-bold mx-auto text-xs">🥈2</div>`;
-            else if (rank === 3) rankHtml = `<div class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-orange-600 font-bold mx-auto text-xs">🥉3</div>`;
+            const deposited = s.bookings.filter(b => !isCompletedTrip(b) && !b.commission_paid).length;
+            const completed = s.bookings.filter(b => isCompletedTrip(b) && !b.commission_paid).length;
+            const unpaidComm = s.bookings
+                .filter(b => !b.commission_paid)
+                .reduce((sum, b) => sum + calcCommission(b, allTours).commission, 0);
             return `
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="p-4 border-b border-gray-100">${rankHtml}</td>
-                    <td class="p-4 border-b border-gray-100 font-bold text-gray-900">${s.name}</td>
-                    <td class="p-4 border-b border-gray-100 text-center font-medium">${s.bookings.length}</td>
-                    <td class="p-4 border-b border-gray-100 text-right font-black text-gray-900">${formatVND(s.totalRev)}</td>
-                    <td class="p-4 border-b border-gray-100 text-right font-black text-csr-orange">${formatVND(s.totalComm)}</td>
-                    <td class="p-4 border-b border-gray-100 text-center">
-                        <button class="text-xs bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-md hover:border-csr-orange hover:text-csr-orange transition-colors font-medium" onclick="window.openSaleDetail(${idx})">Xem Lịch Sử Đơn</button>
+                    <td class="p-4 border-b border-gray-100 text-gray-400 text-sm font-medium">${idx + 1}</td>
+                    <td class="p-4 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-csr-orange/10 text-csr-orange flex items-center justify-center font-bold text-sm shrink-0">${(s.name || 'S').charAt(0).toUpperCase()}</div>
+                            <div class="font-bold text-gray-900">${s.name}</div>
+                        </div>
                     </td>
-                </tr>
-            `;
+                    <td class="p-4 border-b border-gray-100 text-center">
+                        <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">${deposited} đơn</span>
+                    </td>
+                    <td class="p-4 border-b border-gray-100 text-center">
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">${completed} đơn</span>
+                    </td>
+                    <td class="p-4 border-b border-gray-100 text-right font-black text-csr-orange text-base">${formatVND(unpaidComm)}</td>
+                    <td class="p-4 border-b border-gray-100 text-center">
+                        <button class="text-xs bg-csr-orange text-white px-4 py-1.5 rounded-lg hover:bg-[#d65503] transition-colors font-bold shadow-sm"
+                            onclick="window.openSalePanel('${s.key}')">Xem &rsaquo;</button>
+                    </td>
+                </tr>`;
         }).join('');
+
+        // Store for openSalePanel
+        window._salesMap = salesMap;
+        window._allToursRef = allTours;
     };
 
-    // ----- Sale View -----
-    const renderSaleView = (myRawBookingsInRange) => {
-        // Tổng tiếp nhận = mọi đơn của mình trong kỳ
-        const totalPaxReceived = myRawBookingsInRange.length;
+    // ── Admin: Mở panel chi tiết 1 sale ──────────────────────────────────────
+    window.openSalePanel = async (key) => {
+        const s = window._salesMap?.[key];
+        if (!s) return;
 
-        // Đơn hợp lệ (Đã cọc / Hoàn tất) của mình
-        const myId = String(user.id || user.userId || '');
-        const myValidBookings = filteredBookings.filter(b => {
-            const bSaleId = String(b.sale_id || '');
-            const nameMatch = b.sale_name && b.sale_name.toLowerCase() === user.fullName.toLowerCase();
-            return myId ? bSaleId === myId : nameMatch;
+        currentPanelSale = s;
+        selectedBookingIds.clear();
+        currentPanelTab = 'orders';
+
+        document.getElementById('panelSaleName').textContent = s.name;
+        updatePayToolbar();
+        renderPanelOrders();
+
+        // Load payment history
+        try {
+            const res = await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(s.saleId)}`);
+            panelPayHistory = res.ok ? await res.json() : [];
+        } catch { panelPayHistory = []; }
+        renderPanelPayHistory();
+
+        // Show panel
+        const panel = document.getElementById('saleDetailPanel');
+        const panelInner = document.getElementById('saleDetailPanelInner');
+        panel.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            panel.classList.remove('opacity-0');
+            panelInner.classList.remove('translate-x-full');
         });
+        switchPanelTab('orders');
+    };
 
-        // Khách hoàn thành = status "Hoàn tất" / "Hoàn thành" + ngày khởi hành < hôm nay
-        const myCompletedBookings = myValidBookings.filter(b => {
-            const isFullyPaid = b.status && (b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
-            if (!isFullyPaid) return false;
-            const departDate = parseBookingDate(b.date);
-            return departDate && departDate < today;
-        });
+    window.closeSalePanel = () => {
+        const panel = document.getElementById('saleDetailPanel');
+        const panelInner = document.getElementById('saleDetailPanelInner');
+        panel.classList.add('opacity-0');
+        panelInner.classList.add('translate-x-full');
+        setTimeout(() => panel.classList.add('hidden'), 300);
+    };
 
-        const totalPaxSuccess = myCompletedBookings.length;
-        const totalRev = myValidBookings.reduce((s, b) => s + (Number(b.total_price) || 0), 0);
-        const totalRealComm = myCompletedBookings.reduce((s, b) => s + b._commission, 0);
+    window.switchPanelTab = (tab) => {
+        currentPanelTab = tab;
+        const ordersContent = document.getElementById('tabContentOrders');
+        const payHistContent = document.getElementById('tabContentPayHistory');
+        const tabOrders = document.getElementById('tabOrders');
+        const tabPay = document.getElementById('tabPayHistory');
+        const toolbar = document.getElementById('payToolbar');
 
-        document.getElementById('sale-stat-total-pax').textContent = totalPaxReceived;
-        document.getElementById('sale-stat-success-pax').textContent = totalPaxSuccess;
-        document.getElementById('sale-stat-revenue').textContent = formatVND(totalRev);
-        document.getElementById('sale-stat-real-comm').textContent = formatVND(totalRealComm);
+        if (tab === 'orders') {
+            ordersContent?.classList.remove('hidden');
+            payHistContent?.classList.add('hidden');
+            tabOrders?.classList.add('border-csr-orange', 'text-csr-orange');
+            tabOrders?.classList.remove('border-transparent', 'text-gray-500');
+            tabPay?.classList.remove('border-csr-orange', 'text-csr-orange');
+            tabPay?.classList.add('border-transparent', 'text-gray-500');
+            toolbar?.classList.remove('hidden');
+        } else {
+            payHistContent?.classList.remove('hidden');
+            ordersContent?.classList.add('hidden');
+            tabPay?.classList.add('border-csr-orange', 'text-csr-orange');
+            tabPay?.classList.remove('border-transparent', 'text-gray-500');
+            tabOrders?.classList.remove('border-csr-orange', 'text-csr-orange');
+            tabOrders?.classList.add('border-transparent', 'text-gray-500');
+            toolbar?.classList.add('hidden');
+        }
+    };
 
-        // Bảng gom theo Tour
-        const tbody = document.getElementById('saleTourTableBody');
-        if (!tbody) return;
+    const renderPanelOrders = () => {
+        const container = document.getElementById('tabContentOrders');
+        if (!container || !currentPanelSale) return;
 
-        const tourMap = {};
-        myValidBookings.forEach(b => {
-            const tName = b.tour || 'Khác';
-            if (!tourMap[tName]) tourMap[tName] = { tourName: tName, bookings: [], totalRev: 0, totalComm: 0 };
-            tourMap[tName].bookings.push(b);
-            tourMap[tName].totalRev += (Number(b.total_price) || 0);
-            tourMap[tName].totalComm += b._commission;
-        });
+        const bs = currentPanelSale.bookings;
 
-        let tourArr = Object.values(tourMap).sort((a, b) => b.totalRev - a.totalRev);
-        window._currentDetailMode = 'sale';
-        window._currentDetailList = tourArr;
+        // Sắp xếp: Hoàn thành → Đã cọc → Đã TT HH
+        const completed = bs.filter(b => isCompletedTrip(b) && !b.commission_paid);
+        const deposited = bs.filter(b => !isCompletedTrip(b) && !b.commission_paid);
+        const paidComm  = bs.filter(b => b.commission_paid);
+        const sorted = [...completed, ...deposited, ...paidComm];
 
-        if (tourArr.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Bạn chưa có đơn hàng nào chốt thành công trong kỳ này.</td></tr>';
+        if (sorted.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">Không có đơn nào trong kỳ này.</div>';
             return;
         }
 
-        tbody.innerHTML = tourArr.map((t, idx) => `
-            <tr class="hover:bg-gray-50 transition-colors bg-white">
-                <td class="p-4 border-b border-gray-100 text-center text-gray-500 font-bold text-sm">${idx + 1}</td>
-                <td class="p-4 border-b border-gray-100 font-bold text-gray-900">${t.tourName}</td>
-                <td class="p-4 border-b border-gray-100 text-center font-medium">${t.bookings.length}</td>
-                <td class="p-4 border-b border-gray-100 text-right font-black text-gray-900">${formatVND(t.totalRev)}</td>
-                <td class="p-4 border-b border-gray-100 text-right font-black text-csr-orange">${formatVND(t.totalComm)}</td>
-                <td class="p-4 border-b border-gray-100 text-center">
-                    <button class="text-xs bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-md hover:border-csr-orange hover:text-csr-orange transition-colors font-medium shadow-sm" onclick="window.openSaleDetail(${idx})">Xem Chi Tiết Khách</button>
-                </td>
-            </tr>
-        `).join('');
+        const buildSection = (title, color, items) => {
+            if (items.length === 0) return '';
+            return `
+                <div class="mb-1">
+                    <div class="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-${color}-600 bg-${color}-50 border-b border-${color}-100">── ${title} (${items.length}) ──</div>
+                    ${items.map((b, idx) => buildOrderRow(b, idx)).join('')}
+                </div>`;
+        };
+
+        const sttBase = { completedIdx: 0, depositedIdx: completed.length, paidIdx: completed.length + deposited.length };
+
+        const buildOrderRow = (b, idx) => {
+            const { rate, servicesTotal, basePrice, commission } = calcCommission(b, allTours);
+            const isPaid = b.commission_paid;
+            const canSelect = !isPaid;
+            const isChecked = selectedBookingIds.has(b.id);
+            return `
+                <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${isPaid ? 'opacity-60' : ''}">
+                    <input type="checkbox" class="order-checkbox w-4 h-4 accent-csr-orange shrink-0 ${canSelect ? '' : 'cursor-not-allowed'}"
+                        data-id="${b.id}" data-commission="${commission}" ${isChecked ? 'checked' : ''} ${!canSelect ? 'disabled' : ''}
+                        onchange="window.onOrderCheck(this)">
+                    <div class="text-xs text-gray-400 font-mono w-12 shrink-0 text-center">#${b.id}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-bold text-gray-900 text-sm truncate">${b.name}</span>
+                            <span class="text-xs text-gray-400 shrink-0">${b.phone || ''}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 truncate mt-0.5">${b.tour} · ${b.date}</div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-sm font-bold text-gray-900">${formatVND(b.total_price)}</div>
+                        ${servicesTotal > 0 ? `<div class="text-[10px] text-gray-400">DV: -${formatVND(servicesTotal)}</div>` : ''}
+                        <div class="text-sm font-black text-csr-orange">HH: ${formatVND(commission)} <span class="text-gray-400 font-normal text-[10px]">(${rate}%)</span></div>
+                    </div>
+                    <div class="shrink-0 w-24 text-right">
+                        ${isPaid
+                            ? `<span class="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">✅ Đã TT HH</span>`
+                            : isCompletedTrip(b)
+                                ? `<span class="inline-block bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded border border-green-200">Hoàn thành</span>`
+                                : `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded border border-blue-200">Đã cọc</span>`
+                        }
+                    </div>
+                </div>`;
+        };
+
+        container.innerHTML = `
+            <div class="flex items-center gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-200 text-[10px] font-bold uppercase text-gray-400 tracking-wider">
+                <div class="w-4 shrink-0">
+                    <input type="checkbox" id="selectAllOrders" class="w-4 h-4 accent-csr-orange" onchange="window.toggleSelectAll(this)">
+                </div>
+                <div class="w-12 text-center shrink-0">Mã ĐH</div>
+                <div class="flex-1">Thông Tin Khách · Tour</div>
+                <div class="w-40 text-right">Giá Đơn · Hoa Hồng</div>
+                <div class="w-24 text-right">Trạng Thái</div>
+            </div>
+            ${buildSection('ĐÃ HOÀN THÀNH', 'green', completed)}
+            ${buildSection('ĐÃ CỌC', 'blue', deposited)}
+            ${buildSection('ĐÃ THANH TOÁN HOA HỒNG', 'gray', paidComm)}
+        `;
     };
 
-    // ----- Modal -----
-    const modal = document.getElementById('saleDetailModal');
-    const modalContent = document.getElementById('saleDetailContent');
+    const renderPanelPayHistory = () => {
+        const container = document.getElementById('tabContentPayHistory');
+        if (!container) return;
 
-    window.closeSaleDetailModal = () => {
-        modal.classList.add('opacity-0');
-        modalContent.classList.add('scale-95');
-        setTimeout(() => modal.classList.add('hidden'), 200);
-    };
-
-    window.openSaleDetail = (idx) => {
-        const item = window._currentDetailList[idx];
-        if (!item) return;
-
-        const rangeLabel = window._reportRangeLabel || '';
-
-        if (window._currentDetailMode === 'admin') {
-            document.getElementById('modalSaleName').innerHTML = `Lịch sử đơn của: <span class="text-csr-orange">${item.name}</span>`;
-            document.getElementById('modalMonthText').textContent = `Kỳ: ${rangeLabel}`;
-            document.getElementById('modalTotalBookings').textContent = item.bookings.length;
-            document.getElementById('modalTotalRevenue').textContent = formatVND(item.totalRev);
-            document.getElementById('modalTotalCommission').textContent = formatVND(item.totalComm);
-        } else {
-            document.getElementById('modalSaleName').innerHTML = `Đơn chốt - Tuyến Tour: <span class="text-csr-orange">${item.tourName}</span>`;
-            document.getElementById('modalMonthText').textContent = `Kỳ Báo Cáo: ${rangeLabel}`;
+        if (panelPayHistory.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào cho nhân viên này.</div>';
+            return;
         }
 
-        const tbody = document.getElementById('modalBookingsBody');
-        tbody.innerHTML = item.bookings.map(b => `
-            <tr class="hover:bg-blue-50/20 transition-colors">
-                <td class="p-4 border-r border-gray-100 border-b align-top">
-                    <div class="font-bold text-gray-900 text-base mb-1">${b.name}</div>
-                    <div class="text-xs text-gray-500 flex items-center gap-1">
-                        SĐT: <span class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-mono tracking-wider">${b.phone || 'N/A'}</span>
-                    </div>
-                    ${window._currentDetailMode === 'admin' ? `<div class="text-[10px] text-gray-400 mt-1">Sale: ${b._displaySaleName}</div>` : ''}
-                </td>
-                <td class="p-4 border-b border-gray-100 align-top">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">${b.tour}</span>
-                        <span class="text-xs text-gray-400">Khởi hành: ${b.date}</span>
-                    </div>
-                    <div class="text-xs mb-1">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${b.status && b.status.includes('Hoàn tất') ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">${b.status || '-'}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm mt-3 border-t border-gray-100 border-dashed pt-3">
-                        <div class="text-gray-500">Giá trị đơn: <span class="font-bold text-gray-900">${formatVND(b.total_price)}</span></div>
-                        <div class="flex gap-4">
-                            <div class="text-gray-500">Tỉ lệ HH: <span class="font-bold text-gray-900">${b._rate}%</span></div>
-                            <div class="text-csr-orange bg-orange-50 px-2 py-0.5 rounded font-black border border-orange-100">+ ${formatVND(b._commission)}</div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        container.innerHTML = `
+            <table class="w-full text-sm text-left border-collapse">
+                <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
+                    <th class="p-3">Mã Batch</th>
+                    <th class="p-3">Ngày TT</th>
+                    <th class="p-3 text-center">Số Đơn</th>
+                    <th class="p-3 text-right text-csr-orange">Tổng HH</th>
+                    <th class="p-3">Admin TT</th>
+                    <th class="p-3">Ghi Chú</th>
+                </tr></thead>
+                <tbody class="divide-y divide-gray-100">
+                    ${panelPayHistory.map(p => {
+                        const d = new Date(p.created_at);
+                        const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+                        return `<tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-3 font-mono text-gray-500 text-xs">#BATCH${p.id}</td>
+                            <td class="p-3 text-gray-700 font-medium">${dateStr}</td>
+                            <td class="p-3 text-center"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-bold">${p.total_orders} đơn</span></td>
+                            <td class="p-3 text-right font-black text-csr-orange">${formatVND(p.total_amount)}</td>
+                            <td class="p-3 text-gray-600">${p.paid_by || '—'}</td>
+                            <td class="p-3 text-gray-400 text-xs">${p.note || '—'}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>`;
+    };
 
+    // ── Checkbox logic ────────────────────────────────────────────────────────
+    window.onOrderCheck = (checkbox) => {
+        const id = parseInt(checkbox.dataset.id);
+        if (checkbox.checked) selectedBookingIds.add(id);
+        else selectedBookingIds.delete(id);
+        updatePayToolbar();
+    };
+
+    window.toggleSelectAll = (masterCheckbox) => {
+        const checkboxes = document.querySelectorAll('.order-checkbox:not(:disabled)');
+        checkboxes.forEach(cb => {
+            cb.checked = masterCheckbox.checked;
+            const id = parseInt(cb.dataset.id);
+            if (masterCheckbox.checked) selectedBookingIds.add(id);
+            else selectedBookingIds.delete(id);
+        });
+        updatePayToolbar();
+    };
+
+    const updatePayToolbar = () => {
+        const count = selectedBookingIds.size;
+        const totalComm = currentPanelSale?.bookings
+            .filter(b => selectedBookingIds.has(b.id))
+            .reduce((sum, b) => sum + calcCommission(b, allTours).commission, 0) || 0;
+
+        const info = document.getElementById('paySelectionInfo');
+        const btn = document.getElementById('payCommissionBtn');
+        if (info) info.textContent = count > 0 ? `Đã chọn ${count} đơn · Tổng HH: ${formatVND(totalComm)}` : 'Chọn đơn để thanh toán hoa hồng';
+        if (btn) btn.disabled = count === 0;
+    };
+
+    // ── Confirm Payment Modal ─────────────────────────────────────────────────
+    window.openPayConfirmModal = () => {
+        const count = selectedBookingIds.size;
+        if (count === 0) return;
+        const totalComm = currentPanelSale?.bookings
+            .filter(b => selectedBookingIds.has(b.id))
+            .reduce((sum, b) => sum + calcCommission(b, allTours).commission, 0) || 0;
+
+        document.getElementById('confirmSaleName').textContent = currentPanelSale?.name || '—';
+        document.getElementById('confirmOrderCount').textContent = `${count} đơn`;
+        document.getElementById('confirmTotalComm').textContent = formatVND(totalComm);
+        document.getElementById('payNote').value = '';
+
+        const modal = document.getElementById('payConfirmModal');
+        const inner = document.getElementById('payConfirmModalInner');
         modal.classList.remove('hidden');
         requestAnimationFrame(() => {
             modal.classList.remove('opacity-0');
-            modalContent.classList.remove('scale-95');
+            inner.classList.remove('scale-95');
         });
     };
 
-    // Events
-    applyBtn.addEventListener('click', processReports);
-    // Also allow pressing Enter in date inputs
-    dateFromInput.addEventListener('keydown', e => { if (e.key === 'Enter') processReports(); });
-    dateToInput.addEventListener('keydown', e => { if (e.key === 'Enter') processReports(); });
+    window.closePayConfirmModal = () => {
+        const modal = document.getElementById('payConfirmModal');
+        const inner = document.getElementById('payConfirmModalInner');
+        modal.classList.add('opacity-0');
+        inner.classList.add('scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 200);
+    };
 
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) window.closeSaleDetailModal();
+    window.confirmPayCommission = async () => {
+        const btn = document.getElementById('confirmPayBtn');
+        btn.textContent = 'Đang xử lý...'; btn.disabled = true;
+
+        const note = document.getElementById('payNote').value.trim();
+        const adminName = user.fullName || user.full_name || 'Admin';
+
+        try {
+            const res = await fetch('/api/commission_payments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sale_id: currentPanelSale.saleId,
+                    sale_name: currentPanelSale.name,
+                    booking_ids: [...selectedBookingIds],
+                    paid_by: adminName,
+                    note,
+                })
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+
+            window.closePayConfirmModal();
+            selectedBookingIds.clear();
+
+            // Refresh data
+            await loadData();
+
+            // Reload panel nếu vẫn đang mở
+            if (currentPanelSale && window._salesMap) {
+                const updatedSale = window._salesMap[currentPanelSale.key];
+                if (updatedSale) {
+                    currentPanelSale = updatedSale;
+                    // Reload payment history
+                    try {
+                        const histRes = await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(currentPanelSale.saleId)}`);
+                        panelPayHistory = histRes.ok ? await histRes.json() : [];
+                    } catch { panelPayHistory = []; }
+                    renderPanelOrders();
+                    renderPanelPayHistory();
+                    updatePayToolbar();
+                    document.getElementById('panelSaleName').textContent = currentPanelSale.name;
+                }
+            }
+
+            alert('✅ Đã thanh toán hoa hồng thành công!');
+
+        } catch (err) {
+            console.error('Lỗi thanh toán hoa hồng:', err);
+            alert('❌ Lỗi: ' + err.message);
+        } finally {
+            btn.textContent = '✅ Xác Nhận Thanh Toán'; btn.disabled = false;
+        }
+    };
+
+    // ── Sale View ─────────────────────────────────────────────────────────────
+    const renderSaleView = async () => {
+        const { from, to } = getDateRange();
+        const myId = String(user.id || user.userId || '');
+        const myName = (user.fullName || user.full_name || '').toLowerCase();
+
+        // Lọc đơn của sale hiện tại
+        const myBookings = allBookings.filter(b => {
+            const bSaleId = String(b.sale_id || '').trim();
+            const nameMatch = (b.sale_name || '').toLowerCase() === myName;
+            const idMatch = myId && bSaleId === myId;
+            if (!idMatch && !nameMatch) return false;
+            return isInDateRange(b, from, to) && isSuccessStatus(b);
         });
-    }
+
+        const myCompleted = myBookings.filter(b => isCompletedTrip(b));
+        const totalRev = myBookings.reduce((s, b) => s + (parseInt(b.total_price) || 0), 0);
+        const totalComm = myCompleted.reduce((s, b) => s + calcCommission(b, allTours).commission, 0);
+
+        // All bookings (mọi status, trong kỳ)
+        const myAllInRange = allBookings.filter(b => {
+            const bSaleId = String(b.sale_id || '').trim();
+            const nameMatch = (b.sale_name || '').toLowerCase() === myName;
+            const idMatch = myId && bSaleId === myId;
+            return (idMatch || nameMatch) && isInDateRange(b, from, to);
+        });
+
+        const totalPax = myAllInRange.length;
+
+        // Update stat cards
+        const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+        el('sale-stat-total-pax', totalPax);
+        el('sale-stat-success-pax', myCompleted.length);
+        el('sale-stat-revenue', formatVND(totalRev));
+        el('sale-stat-real-comm', formatVND(totalComm));
+
+        // Render lịch sử đơn
+        const ordersContainer = document.getElementById('saleOrdersContainer');
+        if (ordersContainer) {
+            if (myBookings.length === 0) {
+                ordersContainer.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">Chưa có đơn nào trong kỳ này.</div>';
+            } else {
+                const completedList = myBookings.filter(b => isCompletedTrip(b) && !b.commission_paid);
+                const depositedList = myBookings.filter(b => !isCompletedTrip(b) && !b.commission_paid);
+                const paidList      = myBookings.filter(b => b.commission_paid);
+                const sorted        = [...completedList, ...depositedList, ...paidList];
+
+                ordersContainer.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
+                                <th class="p-3 text-center w-12">STT</th>
+                                <th class="p-3 w-20">Mã ĐH</th>
+                                <th class="p-3">Tên KH</th>
+                                <th class="p-3">Tour · Ngày</th>
+                                <th class="p-3 text-right">Giá Đơn</th>
+                                <th class="p-3 text-right text-csr-orange">Hoa Hồng</th>
+                                <th class="p-3 text-center">Trạng Thái HH</th>
+                            </tr></thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${sorted.map((b, idx) => {
+                                    const { rate, servicesTotal, commission } = calcCommission(b, allTours);
+                                    return `<tr class="hover:bg-gray-50 transition-colors ${b.commission_paid ? 'opacity-70' : ''}">
+                                        <td class="p-3 text-center text-gray-400 font-medium">${idx + 1}</td>
+                                        <td class="p-3 font-mono text-gray-600 text-xs">#CSR${b.id}</td>
+                                        <td class="p-3">
+                                            <div class="font-bold text-gray-900">${b.name}</div>
+                                            <div class="text-[11px] text-gray-400">${b.phone || ''}</div>
+                                        </td>
+                                        <td class="p-3">
+                                            <div class="font-medium text-gray-700">${b.tour}</div>
+                                            <div class="text-[11px] text-gray-400">${b.date}</div>
+                                        </td>
+                                        <td class="p-3 text-right font-bold text-gray-900">${formatVND(b.total_price)}</td>
+                                        <td class="p-3 text-right font-black text-csr-orange">${formatVND(commission)}</td>
+                                        <td class="p-3 text-center">
+                                            ${b.commission_paid
+                                                ? `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">✅ Đã nhận</span>`
+                                                : isCompletedTrip(b)
+                                                    ? `<span class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-full">⏳ Chờ TT</span>`
+                                                    : `<span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-full">Đang cọc</span>`
+                                            }
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>`;
+            }
+        }
+
+        // Render lịch sử thanh toán từ Admin
+        const payHistContainer = document.getElementById('salePaymentHistoryContainer');
+        if (payHistContainer && myId) {
+            try {
+                const res = await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(myId)}`);
+                const history = res.ok ? await res.json() : [];
+                if (history.length === 0) {
+                    payHistContainer.innerHTML = '<div class="p-6 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào.</div>';
+                } else {
+                    payHistContainer.innerHTML = `
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
+                                <th class="p-3">Batch</th>
+                                <th class="p-3">Ngày Nhận</th>
+                                <th class="p-3 text-center">Số Đơn</th>
+                                <th class="p-3 text-right text-green-600">Số Tiền Nhận</th>
+                                <th class="p-3">Ghi Chú</th>
+                            </tr></thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${history.map(p => {
+                                    const d = new Date(p.created_at);
+                                    const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+                                    return `<tr class="hover:bg-gray-50">
+                                        <td class="p-3 font-mono text-gray-400 text-xs">#BATCH${p.id}</td>
+                                        <td class="p-3 font-medium text-gray-700">${dateStr}</td>
+                                        <td class="p-3 text-center"><span class="bg-gray-100 text-xs font-bold px-2 py-0.5 rounded">${p.total_orders} đơn</span></td>
+                                        <td class="p-3 text-right font-black text-green-600">${formatVND(p.total_amount)}</td>
+                                        <td class="p-3 text-gray-400 text-xs">${p.note || '—'}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>`;
+                }
+            } catch { payHistContainer.innerHTML = '<div class="p-6 text-center text-gray-400 text-sm">Lỗi tải lịch sử.</div>'; }
+        }
+    };
+
+    // ── Events ────────────────────────────────────────────────────────────────
+    applyBtn?.addEventListener('click', () => {
+        if (isAdmin) renderAdminSalesList();
+        else renderSaleView();
+    });
+
+    // Close panel on overlay click
+    document.getElementById('saleDetailPanel')?.addEventListener('click', (e) => {
+        if (e.target.id === 'saleDetailPanel') window.closeSalePanel();
+    });
 
     // Init
     loadData();
