@@ -2049,16 +2049,17 @@ export const afterRender = () => {
                     alert('Lỗi khi Copy Clipboard. Link là: ' + url);
                 });
             }
-            // NÚT THANH TOÁN → COPY LINK (không mở trang)
+            // NÚT THANH TOÁN → COPY LINK KÈM NỘI DUNG NHẮN TIN
             else if (btn.classList.contains('payment-btn')) {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 const baseUrl = isLocal
                     ? 'http://localhost:8888'
                     : window.location.origin;
 
-                const url = baseUrl + `/pay?id=${bookingId}`;
-                navigator.clipboard.writeText(url).then(() => {
-                    // Feedback trực quan trên button
+                const payUrl = baseUrl + `/pay?id=${bookingId}`;
+                const message = `Dạ sắp đến ngày khởi hành rồi, cảm ơn anh chị đã tin tưởng và lựa chọn CAM SITE RETREATS trong hành trình lần này, em xin phép nhận nốt thanh toán phần tiền còn lại để chuẩn bị thật tốt cho chuyến đi nhennn!!!\nDạ mình thanh toán ở link này giúp em nhé: ${payUrl}`;
+
+                navigator.clipboard.writeText(message).then(() => {
                     const originalText = btn.textContent;
                     btn.textContent = '✅ Đã copy!';
                     btn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
@@ -2069,7 +2070,7 @@ export const afterRender = () => {
                         btn.classList.remove('bg-green-500');
                     }, 2000);
                 }).catch(() => {
-                    alert('🔗 Link thanh toán:\n' + url);
+                    alert('🔗 Nội dung đã chuẩn bị (copy thủ công):\n\n' + message);
                 });
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
