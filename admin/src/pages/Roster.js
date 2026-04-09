@@ -184,42 +184,53 @@ export const afterRender = async () => {
     const renderExtraServices = (b) => {
         let items = [];
 
-        const rawJson = b.services_booked;
-        if (rawJson && rawJson.trim() !== '' && rawJson !== '[]' && rawJson !== 'null') {
-            // Thử JSON.parse trước (cho data mới)
-            try {
-                const parsed = JSON.parse(rawJson);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    items = parsed.map(sv => {
-                        const label = sv.label || sv.name || sv.title || '';
-                        const price = sv.price && Number(sv.price) > 0
-                            ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
-                        return (label + price).trim();
-                    }).filter(Boolean);
-                }
-            } catch(e) {
-                // Data cũ lưu dạng JS object literal, không phải JSON hợp lệ
-                // Dùng regex để extract label và price
-                const labelMatches = rawJson.match(/label:\s*'([^']+)'/g) || rawJson.match(/label:\s*"([^"]+)"/g) || [];
-                const priceMatches = rawJson.match(/price:\s*(\d+)/g) || [];
+        const raw = b.services_booked;
 
-                if (labelMatches.length > 0) {
-                    items = labelMatches.map((labelStr, i) => {
-                        const label = labelStr.replace(/label:\s*['"]/, '').replace(/['"]$/, '').trim();
-                        const priceStr = priceMatches[i] || '';
-                        const price = priceStr ? Number(priceStr.replace('price:', '').trim()) : 0;
-                        const priceDisplay = price > 0 ? ` (+${price.toLocaleString('vi-VN')}đ)` : '';
-                        return (label + priceDisplay).trim();
-                    }).filter(Boolean);
+        if (raw && raw !== '[]' && raw !== 'null' && raw !== '') {
+
+            // Case 1: DB (Cloudflare JSONB) trả về array trực tiếp, không cần parse
+            if (Array.isArray(raw)) {
+                items = raw.map(sv => {
+                    const label = sv.label || sv.name || sv.title || '';
+                    const price = sv.price && Number(sv.price) > 0
+                        ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
+                    return (label + price).trim();
+                }).filter(Boolean);
+            }
+            // Case 2 & 3: Dạng string (JSON hoặc JS literal)
+            else if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+                try {
+                    // Case 2: Valid JSON string
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        items = parsed.map(sv => {
+                            const label = sv.label || sv.name || sv.title || '';
+                            const price = sv.price && Number(sv.price) > 0
+                                ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
+                            return (label + price).trim();
+                        }).filter(Boolean);
+                    }
+                } catch(e) {
+                    // Case 3: JS object literal → dùng regex extract
+                    const labelMatches = raw.match(/label:\s*['"]([^'"]+)['"]/g) || [];
+                    const priceMatches = raw.match(/price:\s*(\d+)/g) || [];
+                    if (labelMatches.length > 0) {
+                        items = labelMatches.map((m, i) => {
+                            const label = m.replace(/label:\s*['"]/, '').replace(/['"]$/, '').trim();
+                            const priceStr = priceMatches[i] || '';
+                            const price = priceStr ? Number(priceStr.replace(/price:\s*/, '')) : 0;
+                            return (label + (price > 0 ? ` (+${price.toLocaleString('vi-VN')}đ)` : '')).trim();
+                        }).filter(Boolean);
+                    }
                 }
             }
         }
 
         // Fallback: các field cũ (plain text)
         if (items.length === 0) {
-            const raw = b.extra_services || b.extraServices || b.extra || b.notes_extra || '';
-            if (raw && raw !== '-' && raw.trim() !== '') {
-                items = raw.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+            const oldRaw = b.extra_services || b.extraServices || b.extra || b.notes_extra || '';
+            if (oldRaw && oldRaw !== '-' && oldRaw.trim() !== '') {
+                items = oldRaw.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
             }
         }
 
@@ -600,30 +611,29 @@ export const afterRender = async () => {
                 else if (c.id === 'col-pole') cellData = (b.trekking_pole === 'Có') ? 'Có' : 'Không';
                 else if (c.id === 'col-status') cellData = b.status || '';
                 else if (c.id === 'col-extra') {
-                    const rawJson = b.services_booked;
-                    if (rawJson && rawJson.trim() !== '' && rawJson !== '[]' && rawJson !== 'null') {
-                        try {
-                            const parsed = JSON.parse(rawJson);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                cellData = parsed.map(sv => {
-                                    const label = sv.label || sv.name || sv.title || '';
-                                    const price = sv.price && Number(sv.price) > 0
-                                        ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
-                                    return (label + price).trim();
-                                }).filter(Boolean).join(', ');
-                            }
-                        } catch(e) {
-                            // JS literal format → dùng regex
-                            const labelMatches = rawJson.match(/label:\s*'([^']+)'/g) || rawJson.match(/label:\s*"([^"]+)"/g) || [];
-                            const priceMatches = rawJson.match(/price:\s*(\d+)/g) || [];
-                            if (labelMatches.length > 0) {
-                                cellData = labelMatches.map((labelStr, i) => {
-                                    const label = labelStr.replace(/label:\s*['"]/, '').replace(/['"]$/, '').trim();
-                                    const priceStr = priceMatches[i] || '';
-                                    const price = priceStr ? Number(priceStr.replace('price:', '').trim()) : 0;
-                                    const priceDisplay = price > 0 ? ` (+${price.toLocaleString('vi-VN')}đ)` : '';
-                                    return (label + priceDisplay).trim();
-                                }).filter(Boolean).join(', ');
+                    const raw = b.services_booked;
+                    if (raw && raw !== '[]' && raw !== 'null' && raw !== '') {
+                        const extractItems = (arr) => arr.map(sv => {
+                            const label = sv.label || sv.name || sv.title || '';
+                            const price = sv.price && Number(sv.price) > 0 ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
+                            return (label + price).trim();
+                        }).filter(Boolean).join(', ');
+
+                        if (Array.isArray(raw)) {
+                            cellData = extractItems(raw);
+                        } else if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+                            try {
+                                cellData = extractItems(JSON.parse(raw));
+                            } catch(e) {
+                                const labelMatches = raw.match(/label:\s*['"]([^'"]+)['"]/g) || [];
+                                const priceMatches = raw.match(/price:\s*(\d+)/g) || [];
+                                if (labelMatches.length > 0) {
+                                    cellData = labelMatches.map((m, i) => {
+                                        const label = m.replace(/label:\s*['"]/, '').replace(/['"]$/, '').trim();
+                                        const price = priceMatches[i] ? Number(priceMatches[i].replace(/price:\s*/, '')) : 0;
+                                        return (label + (price > 0 ? ` (+${price.toLocaleString('vi-VN')}đ)` : '')).trim();
+                                    }).filter(Boolean).join(', ');
+                                }
                             }
                         }
                     }
