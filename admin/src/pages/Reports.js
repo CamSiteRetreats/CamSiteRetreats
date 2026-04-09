@@ -9,11 +9,6 @@ export const render = () => {
     } catch (e) { }
 
     const isAdmin = user.role === 'admin';
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const toDateStr = lastDay.toISOString().split('T')[0];
-    const fromDateStr = firstDay.toISOString().split('T')[0];
 
     return `
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
@@ -23,28 +18,12 @@ export const render = () => {
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
             <div class="max-w-7xl mx-auto space-y-6">
 
-              <!-- Header & Date Filter -->
-              <div class="flex justify-between items-end flex-wrap gap-4">
-                  <div>
-                      <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-1">
-                        ${isAdmin ? '💰 Hoa Hồng & Báo Cáo' : '📊 Báo Cáo Của Tôi'}
-                      </h1>
-                      <p class="text-gray-500 text-sm">${isAdmin ? 'Quản lý và thanh toán hoa hồng cho đội ngũ Sales.' : 'Theo dõi đơn hàng và hoa hồng của bạn.'}</p>
-                  </div>
-                  <div class="flex items-center gap-3 flex-wrap">
-                      <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
-                          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                          <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Từ ngày</label>
-                          <input type="date" id="reportDateFrom" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${fromDateStr}">
-                      </div>
-                      <span class="text-gray-400 font-bold">→</span>
-                      <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
-                          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                          <label class="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Đến ngày</label>
-                          <input type="date" id="reportDateTo" class="text-sm font-bold text-gray-800 border-none outline-none bg-transparent" value="${toDateStr}">
-                      </div>
-                      <button id="reportApplyBtn" class="bg-gray-900 hover:bg-csr-orange text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">Lọc</button>
-                  </div>
+              <!-- Header -->
+              <div>
+                  <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-1">
+                    ${isAdmin ? '💰 Hoa Hồng & Báo Cáo' : '📊 Báo Cáo Của Tôi'}
+                  </h1>
+                  <p class="text-gray-500 text-sm">${isAdmin ? 'Quản lý và thanh toán hoa hồng cho đội ngũ Sales.' : 'Theo dõi đơn hàng và hoa hồng của bạn.'}</p>
               </div>
 
               ${isAdmin ? `
@@ -221,10 +200,6 @@ export const afterRender = () => {
     let selectedBookingIds = new Set();
     let panelPayHistory = []; // lịch sử thanh toán của sale đang mở
 
-    const dateFromInput = document.getElementById('reportDateFrom');
-    const dateToInput = document.getElementById('reportDateTo');
-    const applyBtn = document.getElementById('reportApplyBtn');
-
     const formatVND = (num) => new Intl.NumberFormat('vi-VN').format(Math.round(num || 0)) + 'đ';
 
     // ── Helper: Tính tổng tiền dịch vụ (robust) ──────────────────────────────
@@ -268,22 +243,6 @@ export const afterRender = () => {
     };
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
-
-    const isInDateRange = (b, from, to) => {
-        const d = parseBookingDate(b.date);
-        if (!d) return false;
-        if (from && d < from) return false;
-        if (to && d > to) return false;
-        return true;
-    };
-
-    const getDateRange = () => {
-        const from = dateFromInput?.value ? new Date(dateFromInput.value) : null;
-        const to = dateToInput?.value ? new Date(dateToInput.value) : null;
-        if (from) from.setHours(0, 0, 0, 0);
-        if (to) to.setHours(23, 59, 59, 999);
-        return { from, to };
-    };
 
     const isSuccessStatus = (b) => b.status && (b.status.includes('Đã cọc') || b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
     const isCompletedTrip = (b) => {
@@ -374,12 +333,11 @@ export const afterRender = () => {
 
     // ── Admin: Render bảng danh sách Sales ───────────────────────────────────
     const renderAdminSalesList = () => {
-        const { from, to } = getDateRange();
         const tbody = document.getElementById('salesTableBody');
         if (!tbody) return;
 
-        // Lọc booking hợp lệ trong range + đã thành công
-        const validBookings = allBookings.filter(b => isInDateRange(b, from, to) && isSuccessStatus(b));
+        // Lọc tất cả booking hợp lệ (đã thành công)
+        const validBookings = allBookings.filter(b => isSuccessStatus(b));
 
         // Build user map: id → currentName
         const userMap = {};
@@ -746,29 +704,28 @@ export const afterRender = () => {
 
     // ── Sale View ─────────────────────────────────────────────────────────────
     const renderSaleView = async () => {
-        const { from, to } = getDateRange();
         const myId = String(user.id || user.userId || '');
         const myName = (user.fullName || user.full_name || '').toLowerCase();
 
-        // Lọc đơn của sale hiện tại
+        // Lọc tất cả đơn của sale hiện tại
         const myBookings = allBookings.filter(b => {
             const bSaleId = String(b.sale_id || '').trim();
             const nameMatch = (b.sale_name || '').toLowerCase() === myName;
             const idMatch = myId && bSaleId === myId;
             if (!idMatch && !nameMatch) return false;
-            return isInDateRange(b, from, to) && isSuccessStatus(b);
+            return isSuccessStatus(b);
         });
 
         const myCompleted = myBookings.filter(b => isCompletedTrip(b));
         const totalRev = myBookings.reduce((s, b) => s + (parseInt(b.total_price) || 0), 0);
         const totalComm = myCompleted.reduce((s, b) => s + calcCommission(b, allTours).commission, 0);
 
-        // All bookings (mọi status, trong kỳ)
+        // All bookings (mọi status)
         const myAllInRange = allBookings.filter(b => {
             const bSaleId = String(b.sale_id || '').trim();
             const nameMatch = (b.sale_name || '').toLowerCase() === myName;
             const idMatch = myId && bSaleId === myId;
-            return (idMatch || nameMatch) && isInDateRange(b, from, to);
+            return (idMatch || nameMatch);
         });
 
         const totalPax = myAllInRange.length;
@@ -873,11 +830,6 @@ export const afterRender = () => {
     };
 
     // ── Events ────────────────────────────────────────────────────────────────
-    applyBtn?.addEventListener('click', () => {
-        if (isAdmin) renderAdminSalesList();
-        else renderSaleView();
-    });
-
     // Close panel on overlay click
     document.getElementById('saleDetailPanel')?.addEventListener('click', (e) => {
         if (e.target.id === 'saleDetailPanel') window.closeSalePanel();
