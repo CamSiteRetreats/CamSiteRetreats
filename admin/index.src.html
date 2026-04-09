@@ -3,14 +3,45 @@
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/admin/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="CSR Admin" />
+    <meta name="description" content="Ứng dụng quản lý nhân viên CAM SITE RETREATS" />
+    <meta name="theme-color" content="#E85D04" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CSR Admin" />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/admin/manifest.json" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/admin/icon-512.png" />
+    <link rel="apple-touch-icon" href="/admin/icon-512.png" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <title>CAM SITE RETREATS | Admin Panel V2</title>
+
+    <title>CAM SITE RETREATS | Quản Trị</title>
     <script type="module" src="/src/main.js"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' })
+                    .then(reg => console.log('[PWA] SW registered:', reg.scope))
+                    .catch(err => console.warn('[PWA] SW registration failed:', err));
+            });
+        }
+    </script>
 </head>
 
 <body>

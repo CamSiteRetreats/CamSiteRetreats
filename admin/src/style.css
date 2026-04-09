@@ -31,3 +31,56 @@ body {
     @apply bg-white/90 backdrop-blur-md border border-csr-border rounded-xl shadow-sm text-gray-800;
   }
 }
+
+/* ===================================================
+   PWA MOBILE STYLES
+   =================================================== */
+
+/* Thêm padding bottom cho main content trên mobile (tránh bị che bởi BottomNav) */
+@media (max-width: 767px) {
+  main {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Loại bỏ tap highlight màu xanh trên mobile (cảm giác native hơn) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth touch scrolling */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* BottomNav active state indicator */
+.bottom-nav-item {
+  position: relative;
+  min-height: 56px;
+}
+
+.bottom-nav-item.bottom-nav-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 2px;
+  background-color: var(--color-csr-orange);
+  border-radius: 0 0 4px 4px;
+}
+
+/* More menu grid items hover */
+.more-menu-item:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
+/* PWA standalone mode: ẩn header mobile menu button vì đã có bottom nav */
+@media (display-mode: standalone) {
+  /* Ẩn bớt các element không cần thiết khi chạy như app */
+  body {
+    user-select: none;
+  }
+}

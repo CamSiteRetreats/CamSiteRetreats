@@ -1,3 +1,5 @@
+import { BottomNav, initBottomNav } from '../components/BottomNav.js';
+
 export const initRouter = () => {
     const routes = {
         '/admin/': () => import('../pages/Dashboard.js'),
@@ -56,6 +58,15 @@ export const initRouter = () => {
 
             // Init sidebar toggle (must run after DOM is updated)
             initSidebar();
+
+            // Inject Bottom Nav for mobile (PWA)
+            const appEl = document.getElementById('app');
+            if (appEl && !appEl.querySelector('#bottomNavBar')) {
+                const bnDiv = document.createElement('div');
+                bnDiv.innerHTML = BottomNav();
+                appEl.appendChild(bnDiv);
+            }
+            initBottomNav();
 
             // Call after render hook if it exists
             if (afterRender) afterRender();
