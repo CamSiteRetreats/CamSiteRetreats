@@ -88,12 +88,15 @@ export const afterRender = () => {
                     localStorage.setItem('csr_admin_token', data.token);
                     localStorage.setItem('csr_user', JSON.stringify({
                         id: data.user.id,
+                        username: data.user.username,
                         role: data.user.role,
                         fullName: data.user.fullName,
                         avatar: data.user.avatar || `https://ui-avatars.com/api/?name=${data.user.fullName.replace(' ', '+')}&background=E85D04&color=fff`,
                         phone: data.user.phone,
                         email: data.user.email,
-                        bank_info: data.user.bank_info
+                        bank_info: data.user.bank_info,
+                        payment_info: data.user.payment_info,
+                        status: data.user.status || 'active'
                     }));
 
                     // Handle Remember Me
