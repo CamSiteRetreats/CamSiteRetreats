@@ -244,7 +244,7 @@ export const afterRender = () => {
         const tourConf = tours.find(t => t.name &&  b.tour && t.name.toLowerCase().trim() === b.tour.toLowerCase().trim());
         const rate = parseFloat(b.commission_rate ?? tourConf?.commission_rate ?? 5);
         const servicesTotal = calcServicesTotal(b.services_booked);
-        const basePrice = Math.max(0, (parseInt(b.total_price) || 0) - (parseInt(b.discount) || 0) - servicesTotal);
+        const basePrice = Math.max(0, (parseInt(b.total_price) || 0) - servicesTotal);
         const commission = basePrice * (rate / 100);
         return { rate, servicesTotal, basePrice, commission };
     };
