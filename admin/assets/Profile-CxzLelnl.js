@@ -1,21 +1,9 @@
-import { Sidebar } from '../components/Sidebar.js';
-import { Header } from '../components/Header.js';
-
-export const render = () => {
-    let user = { id: '', username: '', fullName: '', role: '', avatar: '', phone: '', email: '', payment_info: null };
-    try {
-        const stored = localStorage.getItem('csr_user');
-        if (stored) user = JSON.parse(stored);
-    } catch (e) { }
-
-    const pInfo = user.payment_info || {};
-
-    return `
+import{S as y,H as x}from"./Header-Dmidaim7.js";const k=()=>{let e={id:"",username:"",fullName:"",role:"",avatar:"",phone:"",email:"",payment_info:null};try{const r=localStorage.getItem("csr_user");r&&(e=JSON.parse(r))}catch{}const o=e.payment_info||{};return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
-        ${Sidebar()}
+        ${y()}
         
         <div class="flex flex-col flex-1 w-full overflow-hidden">
-          ${Header()}
+          ${x()}
           
           <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
                <div class="max-w-4xl mx-auto space-y-6">
@@ -32,7 +20,7 @@ export const render = () => {
                             <!-- Avatar Section -->
                             <div class="flex items-center space-x-6">
                                 <div class="relative group cursor-pointer">
-                                    <img id="avatarPreview" src="${user.avatar || 'https://ui-avatars.com/api/?name=Guest&background=2A2A2A&color=fff'}" class="w-24 h-24 rounded-full object-cover border-4 border-csr-card shadow-lg">
+                                    <img id="avatarPreview" src="${e.avatar||"https://ui-avatars.com/api/?name=Guest&background=2A2A2A&color=fff"}" class="w-24 h-24 rounded-full object-cover border-4 border-csr-card shadow-lg">
                                     <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                         <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                     </div>
@@ -51,19 +39,19 @@ export const render = () => {
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Họ và Tên</label>
-                                    <input type="text" id="fullName" value="${user.fullName || ''}" class="input-field w-full font-bold text-gray-900" required>
+                                    <input type="text" id="fullName" value="${e.fullName||""}" class="input-field w-full font-bold text-gray-900" required>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Vai Trò</label>
-                                    <input type="text" value="${user.role === 'admin' ? 'Quản Trị Viên (Admin)' : 'Nhân Viên Sale'}" class="input-field w-full bg-gray-100 text-gray-500 cursor-not-allowed border-dashed" disabled>
+                                    <input type="text" value="${e.role==="admin"?"Quản Trị Viên (Admin)":"Nhân Viên Sale"}" class="input-field w-full bg-gray-100 text-gray-500 cursor-not-allowed border-dashed" disabled>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Số Điện Thoại</label>
-                                    <input type="tel" id="phone" value="${user.phone || ''}" class="input-field w-full">
+                                    <input type="tel" id="phone" value="${e.phone||""}" class="input-field w-full">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Email</label>
-                                    <input type="email" id="email" value="${user.email || ''}" class="input-field w-full">
+                                    <input type="email" id="email" value="${e.email||""}" class="input-field w-full">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Đổi Mật Khẩu</label>
@@ -82,15 +70,15 @@ export const render = () => {
                                     <div class="space-y-4">
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên Ngân Hàng</label>
-                                            <input type="text" id="bankName" value="${pInfo.bank_name || ''}" class="input-field w-full" placeholder="VD: Vietcombank, MB Bank...">
+                                            <input type="text" id="bankName" value="${o.bank_name||""}" class="input-field w-full" placeholder="VD: Vietcombank, MB Bank...">
                                         </div>
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Số Tài Khoản</label>
-                                            <input type="text" id="bankAccount" value="${pInfo.account_number || ''}" class="input-field w-full font-mono text-lg font-bold" placeholder="VD: 123456789">
+                                            <input type="text" id="bankAccount" value="${o.account_number||""}" class="input-field w-full font-mono text-lg font-bold" placeholder="VD: 123456789">
                                         </div>
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tên Chủ Tài Khoản</label>
-                                            <input type="text" id="bankOwner" value="${pInfo.account_name || ''}" class="input-field w-full font-black uppercase text-gray-900" placeholder="VD: NGUYEN VAN A">
+                                            <input type="text" id="bankOwner" value="${o.account_name||""}" class="input-field w-full font-black uppercase text-gray-900" placeholder="VD: NGUYEN VAN A">
                                         </div>
                                     </div>
 
@@ -98,7 +86,7 @@ export const render = () => {
                                     <div>
                                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mã QR Thanh Toán</label>
                                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-2xl hover:border-csr-orange transition-colors bg-gray-50 group relative cursor-pointer" onclick="document.getElementById('qrUpload').click()">
-                                            <div class="space-y-1 text-center" id="qrUploadPrompt" style="${pInfo.qr_code ? 'display: none;' : ''}">
+                                            <div class="space-y-1 text-center" id="qrUploadPrompt" style="${o.qr_code?"display: none;":""}">
                                                 <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-csr-orange transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                                                 <div class="flex text-sm text-gray-600 justify-center">
                                                     <span class="relative cursor-pointer bg-transparent rounded-md font-medium text-csr-orange hover:text-csr-light focus-within:outline-none">Tải ảnh QR lên</span>
@@ -106,8 +94,8 @@ export const render = () => {
                                                 <p class="text-xs text-gray-500">Tự động hỗ trợ cắt vuông (Crop)</p>
                                             </div>
                                             <!-- Preview Image -->
-                                            <div id="qrPreviewContainer" class="w-full relative" style="${pInfo.qr_code ? '' : 'display: none;'}">
-                                                <img id="qrPreview" src="${pInfo.qr_code || ''}" class="mx-auto max-h-48 object-contain rounded-xl shadow-sm border border-gray-200">
+                                            <div id="qrPreviewContainer" class="w-full relative" style="${o.qr_code?"":"display: none;"}">
+                                                <img id="qrPreview" src="${o.qr_code||""}" class="mx-auto max-h-48 object-contain rounded-xl shadow-sm border border-gray-200">
                                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                                                     <span class="text-white font-bold text-sm">Đổi Ảnh Khác</span>
                                                 </div>
@@ -150,160 +138,4 @@ export const render = () => {
               </div>
           </div>
       </div>
-    `;
-};
-
-export const afterRender = () => {
-    let user = { id: '', username: '', role: '', status: 'active' };
-    try {
-        const stored = localStorage.getItem('csr_user');
-        if (stored) user = JSON.parse(stored);
-    } catch (e) { }
-
-    // --- Avatar Logic ---
-    const avatarUpload = document.getElementById('avatarUpload');
-    const avatarPreview = document.getElementById('avatarPreview');
-
-    if (avatarUpload) {
-        avatarUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => avatarPreview.src = ev.target.result;
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    // --- QR Cropper Logic ---
-    let cropper = null;
-    const qrUpload = document.getElementById('qrUpload');
-    const cropModal = document.getElementById('cropModal');
-    const cropModalContent = document.getElementById('cropModalContent');
-    const cropImage = document.getElementById('cropImage');
-    
-    const qrPreviewContainer = document.getElementById('qrPreviewContainer');
-    const qrUploadPrompt = document.getElementById('qrUploadPrompt');
-    const qrPreview = document.getElementById('qrPreview');
-
-    window.closeCropModal = () => {
-        cropModal.classList.add('opacity-0');
-        cropModalContent.classList.add('scale-95');
-        setTimeout(() => {
-            cropModal.classList.add('hidden');
-            if (cropper) { cropper.destroy(); cropper = null; }
-            qrUpload.value = ''; // reset file input
-        }, 200);
-    };
-
-    if (qrUpload) {
-        qrUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    cropImage.src = ev.target.result;
-                    cropModal.classList.remove('hidden');
-                    // Wait for image load then init cropper
-                    cropImage.onload = () => {
-                        if (cropper) cropper.destroy();
-                        cropper = new Cropper(cropImage, {
-                            aspectRatio: 1, // Square crop for QR
-                            viewMode: 1,
-                            dragMode: 'move',
-                            autoCropArea: 0.8,
-                            restore: false,
-                            guides: true,
-                            center: true,
-                            highlight: false,
-                            cropBoxMovable: true,
-                            cropBoxResizable: true,
-                            toggleDragModeOnDblclick: false,
-                        });
-                        cropImage.classList.remove('opacity-0');
-                        requestAnimationFrame(() => {
-                            cropModal.classList.remove('opacity-0');
-                            cropModalContent.classList.remove('scale-95');
-                        });
-                    };
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    window.confirmCrop = () => {
-        if (!cropper) return;
-        const canvas = cropper.getCroppedCanvas({
-            width: 400,
-            height: 400,
-            fillColor: '#fff',
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high',
-        });
-        const base64Data = canvas.toDataURL('image/png', 0.9);
-        
-        // Update UI
-        qrPreview.src = base64Data;
-        qrPreviewContainer.style.display = 'block';
-        qrUploadPrompt.style.display = 'none';
-
-        window.closeCropModal();
-    };
-
-    // --- Save Logic via Real API ---
-    const form = document.getElementById('profileForm');
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSaveProfile');
-            const oldHtml = btn.innerHTML;
-            btn.innerHTML = 'Đang lưu...';
-            btn.disabled = true;
-
-            const payment_info = {
-                bank_name: document.getElementById('bankName').value.trim(),
-                account_number: document.getElementById('bankAccount').value.trim(),
-                account_name: document.getElementById('bankOwner').value.trim(),
-                qr_code: qrPreview.src.startsWith('data:') || qrPreview.src.startsWith('http') ? qrPreview.src : null
-            };
-
-            const bodyObj = {
-                id: user.id || undefined,
-                username: user.username,
-                role: user.role,
-                status: user.status,
-                fullName: document.getElementById('fullName').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                password: document.getElementById('newPassword').value || undefined, // only send if not empty
-                avatar: avatarPreview.src, // might be huge if not compressed, but ok for now
-                payment_info: payment_info
-            };
-
-            try {
-                const res = await fetch('/api/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bodyObj)
-                });
-
-                if (res.ok) {
-                    const savedUser = await res.json();
-                    localStorage.setItem('csr_user', JSON.stringify(savedUser));
-                    alert("Đã lưu thông tin hồ sơ thành công!");
-                    window.location.reload();
-                } else {
-                    const err = await res.json();
-                    alert(err.error || 'Lỗi khi lưu trên máy chủ!');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Lỗi kết nối máy chủ!');
-            } finally {
-                btn.innerHTML = oldHtml;
-                btn.disabled = false;
-            }
-        });
-    }
-};
+    `},B=()=>{let e={id:"",username:"",role:"",status:"active"};try{const a=localStorage.getItem("csr_user");a&&(e=JSON.parse(a))}catch{}const o=document.getElementById("avatarUpload"),r=document.getElementById("avatarPreview");o&&o.addEventListener("change",a=>{const t=a.target.files[0];if(t){const l=new FileReader;l.onload=s=>r.src=s.target.result,l.readAsDataURL(t)}});let n=null;const m=document.getElementById("qrUpload"),d=document.getElementById("cropModal"),g=document.getElementById("cropModalContent"),c=document.getElementById("cropImage"),h=document.getElementById("qrPreviewContainer"),f=document.getElementById("qrUploadPrompt"),u=document.getElementById("qrPreview");window.closeCropModal=()=>{d.classList.add("opacity-0"),g.classList.add("scale-95"),setTimeout(()=>{d.classList.add("hidden"),n&&(n.destroy(),n=null),m.value=""},200)},m&&m.addEventListener("change",a=>{const t=a.target.files[0];if(t){const l=new FileReader;l.onload=s=>{c.src=s.target.result,d.classList.remove("hidden"),c.onload=()=>{n&&n.destroy(),n=new Cropper(c,{aspectRatio:1,viewMode:1,dragMode:"move",autoCropArea:.8,restore:!1,guides:!0,center:!0,highlight:!1,cropBoxMovable:!0,cropBoxResizable:!0,toggleDragModeOnDblclick:!1}),c.classList.remove("opacity-0"),requestAnimationFrame(()=>{d.classList.remove("opacity-0"),g.classList.remove("scale-95")})}},l.readAsDataURL(t)}}),window.confirmCrop=()=>{if(!n)return;const t=n.getCroppedCanvas({width:400,height:400,fillColor:"#fff",imageSmoothingEnabled:!0,imageSmoothingQuality:"high"}).toDataURL("image/png",.9);u.src=t,h.style.display="block",f.style.display="none",window.closeCropModal()};const v=document.getElementById("profileForm");v&&v.addEventListener("submit",async a=>{a.preventDefault();const t=document.getElementById("btnSaveProfile"),l=t.innerHTML;t.innerHTML="Đang lưu...",t.disabled=!0;const s={bank_name:document.getElementById("bankName").value.trim(),account_number:document.getElementById("bankAccount").value.trim(),account_name:document.getElementById("bankOwner").value.trim(),qr_code:u.src.startsWith("data:")||u.src.startsWith("http")?u.src:null},b={id:e.id||void 0,username:e.username,role:e.role,status:e.status,fullName:document.getElementById("fullName").value.trim(),phone:document.getElementById("phone").value.trim(),email:document.getElementById("email").value.trim(),password:document.getElementById("newPassword").value||void 0,avatar:r.src,payment_info:s};try{const i=await fetch("/api/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});if(i.ok){const p=await i.json();localStorage.setItem("csr_user",JSON.stringify(p)),alert("Đã lưu thông tin hồ sơ thành công!"),window.location.reload()}else{const p=await i.json();alert(p.error||"Lỗi khi lưu trên máy chủ!")}}catch(i){console.error(i),alert("Lỗi kết nối máy chủ!")}finally{t.innerHTML=l,t.disabled=!1}})};export{B as afterRender,k as render};

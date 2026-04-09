@@ -20,13 +20,13 @@ export async function onRequest(context) {
         let response;
 
         if (method === 'GET') {
-            const rows = await sql`SELECT id, username, full_name, role, phone, email, avatar, bank_info, status, created_at FROM admins ORDER BY id ASC`;
+            const rows = await sql`SELECT id, username, full_name, role, phone, email, avatar, bank_info, payment_info, status, created_at FROM admins ORDER BY id ASC`;
             const users = rows.map(u => ({ ...u, fullName: u.full_name }));
             response = Response.json(users);
 
         } else if (method === 'POST') {
             const body = await request.json();
-            const { id, username, password, fullName, role, phone, email, avatar, bank_info, status } = body;
+            const { id, username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status } = body;
 
             if (!username) return Response.json({ error: 'Missing username' }, { status: 400, headers: corsHeaders });
             if (!fullName) return Response.json({ error: 'Missing full name' }, { status: 400, headers: corsHeaders });
@@ -37,13 +37,13 @@ export async function onRequest(context) {
                 let rows;
                 if (password && password.trim() !== '') {
                     rows = await sql.query(
-                        `UPDATE admins SET username=$1, password=$2, full_name=$3, role=$4, phone=$5, email=$6, avatar=$7, bank_info=$8, status=$9 WHERE id=$10 RETURNING *`,
-                        [username, password, fullName, role, phone, email, avatar, bank_info, status, id]
+                        `UPDATE admins SET username=$1, password=$2, full_name=$3, role=$4, phone=$5, email=$6, avatar=$7, bank_info=$8, payment_info=$9, status=$10 WHERE id=$11 RETURNING *`,
+                        [username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status, id]
                     );
                 } else {
                     rows = await sql.query(
-                        `UPDATE admins SET username=$1, full_name=$2, role=$3, phone=$4, email=$5, avatar=$6, bank_info=$7, status=$8 WHERE id=$9 RETURNING *`,
-                        [username, fullName, role, phone, email, avatar, bank_info, status, id]
+                        `UPDATE admins SET username=$1, full_name=$2, role=$3, phone=$4, email=$5, avatar=$6, bank_info=$7, payment_info=$8, status=$9 WHERE id=$10 RETURNING *`,
+                        [username, fullName, role, phone, email, avatar, bank_info, payment_info, status, id]
                     );
                 }
                 const user = rows[0];
@@ -58,8 +58,8 @@ export async function onRequest(context) {
                 if (existing.length > 0) return Response.json({ error: 'Tên đăng nhập đã tồn tại' }, { status: 400, headers: corsHeaders });
 
                 const rows = await sql.query(
-                    `INSERT INTO admins (username, password, full_name, role, phone, email, avatar, bank_info, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-                    [username, password, fullName, role, phone, email, avatar, bank_info, status || 'active']
+                    `INSERT INTO admins (username, password, full_name, role, phone, email, avatar, bank_info, payment_info, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+                    [username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status || 'active']
                 );
                 const user = rows[0];
                 delete user.password;

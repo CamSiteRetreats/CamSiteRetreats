@@ -128,10 +128,7 @@ export const render = () => {
                       </div>
                   </div>
 
-                  <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Thông Tin NH (Bank Info)</label>
-                      <input type="text" id="userBank" name="bank_info" class="input-field w-full" placeholder="VD: VCB - 123456789 - NGUYEN VAN A">
-                  </div>
+
 
                   <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
                       <button type="button" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors" onclick="window.closeUserModal()">Hủy</button>
@@ -201,7 +198,6 @@ export const afterRender = () => {
                     <td class="p-4 border-b border-gray-100">${roleBadge}</td>
                     <td class="p-4 border-b border-gray-100 text-xs text-gray-500">
                         ${u.phone ? `<div>📞 ${u.phone}</div>` : ''}
-                        ${u.bank_info ? `<div class="mt-1 text-csr-orange font-medium">💳 ${u.bank_info}</div>` : ''}
                     </td>
                     <td class="p-4 border-b border-gray-100 text-center">${statusBadge}</td>
                     <td class="p-4 border-b border-gray-100 text-center">
@@ -250,7 +246,6 @@ export const afterRender = () => {
             document.getElementById('userRole').value = userData.role;
             document.getElementById('userPhone').value = userData.phone || '';
             document.getElementById('userEmail').value = userData.email || '';
-            document.getElementById('userBank').value = userData.bank_info || '';
             document.getElementById('userStatus').value = userData.status || 'active';
 
             document.getElementById('userName').disabled = (userData.username === 'admin');
@@ -311,7 +306,6 @@ export const afterRender = () => {
             password: document.getElementById('userPass').value,
             phone: document.getElementById('userPhone').value,
             email: document.getElementById('userEmail').value,
-            bank_info: document.getElementById('userBank').value,
             status: document.getElementById('userStatus').value
         };
 

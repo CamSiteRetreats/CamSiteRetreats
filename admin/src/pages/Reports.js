@@ -168,6 +168,26 @@ export const render = () => {
                   <div class="flex justify-between text-sm border-t border-orange-100 pt-2 mt-2"><span class="text-gray-500 font-bold">Tổng hoa hồng:</span> <span class="font-black text-csr-orange text-lg" id="confirmTotalComm">—</span></div>
               </div>
 
+              <!-- Payment Info Display -->
+              <div id="paymentInfoBox" class="mb-5 p-4 border border-gray-200 rounded-xl bg-gray-50/50 hidden">
+                  <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <svg class="w-4 h-4 text-csr-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                      Thông tin chuyển khoản
+                  </h4>
+                  <div class="space-y-1 text-sm bg-white p-3 rounded border border-gray-100 shadow-sm">
+                      <div class="flex justify-between"><span class="text-gray-500">Ngân hàng:</span> <span class="font-medium text-gray-900" id="payBankName">—</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Số tài khoản:</span> <span class="font-bold font-mono text-gray-900" id="payBankAccount">—</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Chủ tài khoản:</span> <span class="font-bold text-csr-orange uppercase" id="payBankOwner">—</span></div>
+                  </div>
+                  <div id="payQrBox" class="mt-4 flex flex-col items-center">
+                     <!-- QR inject here -->
+                  </div>
+              </div>
+              <div id="noPaymentInfoBox" class="mb-5 p-4 bg-red-50 border border-red-100 rounded-xl text-center hidden">
+                  <p class="text-xs text-red-600 font-bold uppercase mb-1">Thiếu thông tin thanh toán</p>
+                  <p class="text-xs text-red-500">Nhân viên này chưa cài đặt Thông tin Ngân hàng trên Hồ Sơ Cá Nhân.</p>
+              </div>
+
               <div class="mb-5">
                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú (tuỳ chọn)</label>
                   <input type="text" id="payNote" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-csr-orange focus:outline-none" placeholder="VD: Thanh toán tháng 4/2026...">
@@ -629,6 +649,38 @@ export const afterRender = () => {
         document.getElementById('confirmOrderCount').textContent = `${count} đơn`;
         document.getElementById('confirmTotalComm').textContent = formatVND(totalComm);
         document.getElementById('payNote').value = '';
+
+        // Hiển thị thông tin thanh toán của Sale
+        const pInfoBox = document.getElementById('paymentInfoBox');
+        const noPInfoBox = document.getElementById('noPaymentInfoBox');
+        
+        let foundSale = allUsers.find(u => String(u.id) === String(currentPanelSale.saleId));
+        if (!foundSale && currentPanelSale.saleId === 'unassigned') {
+            foundSale = null;
+        }
+
+        const pInfo = foundSale?.payment_info;
+        if (pInfo && (pInfo.bank_name || pInfo.account_number || pInfo.qr_code)) {
+            document.getElementById('payBankName').textContent = pInfo.bank_name || '—';
+            document.getElementById('payBankAccount').textContent = pInfo.account_number || '—';
+            document.getElementById('payBankOwner').textContent = pInfo.account_name || '—';
+            
+            const qrBox = document.getElementById('payQrBox');
+            if (pInfo.qr_code) {
+                qrBox.innerHTML = `<p class="text-xs text-gray-500 mb-2 font-medium">Mã QR Quét Nhanh:</p><img src="${pInfo.qr_code}" class="w-32 h-32 object-contain rounded-xl border-2 border-gray-200 p-1 shadow-sm mix-blend-multiply">`;
+                qrBox.classList.remove('hidden');
+            } else {
+                qrBox.innerHTML = '';
+                qrBox.classList.add('hidden');
+            }
+
+            pInfoBox.classList.remove('hidden');
+            noPInfoBox.classList.add('hidden');
+        } else {
+            pInfoBox.classList.add('hidden');
+            noPInfoBox.classList.remove('hidden');
+            if (currentPanelSale.saleId === 'unassigned') noPInfoBox.classList.add('hidden'); // Ẩn luôn nếu ko có sale phụ trách
+        }
 
         const modal = document.getElementById('payConfirmModal');
         const inner = document.getElementById('payConfirmModalInner');

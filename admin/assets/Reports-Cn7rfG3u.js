@@ -1,4 +1,4 @@
-import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const x=localStorage.getItem("csr_user");x&&(f=JSON.parse(x))}catch{}const k=f.role==="admin";return`
+import{S as R,H as F}from"./Header-Dmidaim7.js";const q=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const y=localStorage.getItem("csr_user");y&&(f=JSON.parse(y))}catch{}const T=f.role==="admin";return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${R()}
         <div class="flex flex-col flex-1 w-full overflow-hidden">
@@ -9,12 +9,12 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
               <!-- Header -->
               <div>
                   <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-1">
-                    ${k?"💰 Hoa Hồng & Báo Cáo":"📊 Báo Cáo Của Tôi"}
+                    ${T?"💰 Hoa Hồng & Báo Cáo":"📊 Báo Cáo Của Tôi"}
                   </h1>
-                  <p class="text-gray-500 text-sm">${k?"Quản lý và thanh toán hoa hồng cho đội ngũ Sales.":"Theo dõi đơn hàng và hoa hồng của bạn."}</p>
+                  <p class="text-gray-500 text-sm">${T?"Quản lý và thanh toán hoa hồng cho đội ngũ Sales.":"Theo dõi đơn hàng và hoa hồng của bạn."}</p>
               </div>
 
-              ${k?`
+              ${T?`
               <!-- ADMIN: Cài đặt % hoa hồng theo Tour -->
               <div class="glass-panel overflow-hidden">
                   <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-100/50 cursor-pointer" id="commissionSetupToggle">
@@ -156,6 +156,26 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                   <div class="flex justify-between text-sm border-t border-orange-100 pt-2 mt-2"><span class="text-gray-500 font-bold">Tổng hoa hồng:</span> <span class="font-black text-csr-orange text-lg" id="confirmTotalComm">—</span></div>
               </div>
 
+              <!-- Payment Info Display -->
+              <div id="paymentInfoBox" class="mb-5 p-4 border border-gray-200 rounded-xl bg-gray-50/50 hidden">
+                  <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <svg class="w-4 h-4 text-csr-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                      Thông tin chuyển khoản
+                  </h4>
+                  <div class="space-y-1 text-sm bg-white p-3 rounded border border-gray-100 shadow-sm">
+                      <div class="flex justify-between"><span class="text-gray-500">Ngân hàng:</span> <span class="font-medium text-gray-900" id="payBankName">—</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Số tài khoản:</span> <span class="font-bold font-mono text-gray-900" id="payBankAccount">—</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Chủ tài khoản:</span> <span class="font-bold text-csr-orange uppercase" id="payBankOwner">—</span></div>
+                  </div>
+                  <div id="payQrBox" class="mt-4 flex flex-col items-center">
+                     <!-- QR inject here -->
+                  </div>
+              </div>
+              <div id="noPaymentInfoBox" class="mb-5 p-4 bg-red-50 border border-red-100 rounded-xl text-center hidden">
+                  <p class="text-xs text-red-600 font-bold uppercase mb-1">Thiếu thông tin thanh toán</p>
+                  <p class="text-xs text-red-500">Nhân viên này chưa cài đặt Thông tin Ngân hàng trên Hồ Sơ Cá Nhân.</p>
+              </div>
+
               <div class="mb-5">
                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú (tuỳ chọn)</label>
                   <input type="text" id="payNote" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-csr-orange focus:outline-none" placeholder="VD: Thanh toán tháng 4/2026...">
@@ -167,47 +187,47 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
               </div>
           </div>
       </div>
-    `},U=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const t=localStorage.getItem("csr_user");t&&(f=JSON.parse(t))}catch{}const k=f.role==="admin";let x=[],S=[],H=[],y=null,u=new Set,T=[];const b=t=>new Intl.NumberFormat("vi-VN").format(Math.round(t||0))+"đ",M=t=>{if(!t)return 0;try{const s=Array.isArray(t)?t:JSON.parse(t);if(Array.isArray(s))return s.reduce((e,n)=>e+(parseInt(n.price)||0),0)}catch{return(String(t).match(/price:\s*(\d+)/g)||[]).reduce((n,o)=>n+Number(o.replace(/price:\s*/,"")),0)}return 0},C=(t,s)=>{const e=s.find(g=>g.name&&t.tour&&g.name.toLowerCase().trim()===t.tour.toLowerCase().trim()),n=parseFloat(t.commission_rate??e?.commission_rate??5),o=M(t.services_booked),d=Math.max(0,(parseInt(t.total_price)||0)-(parseInt(t.discount)||0)-o),i=d*(n/100);return{rate:n,servicesTotal:o,basePrice:d,commission:i}},E=t=>{if(!t)return null;const s=t.split("-")[0].trim();if(s.includes("/")){const e=s.split("/");if(e.length===3)return new Date(parseInt(e[2]),parseInt(e[1])-1,parseInt(e[0]));if(e.length===2)return new Date(new Date().getFullYear(),parseInt(e[1])-1,parseInt(e[0]))}return s.match(/^\d{4}-/)?new Date(s):null},I=new Date;I.setHours(0,0,0,0);const L=t=>t.status&&(t.status.includes("Đã cọc")||t.status.includes("Hoàn tất")||t.status.includes("Hoàn thành")),w=t=>{if(!(t.status&&(t.status.includes("Hoàn tất")||t.status.includes("Hoàn thành"))))return!1;const e=E(t.date);return e&&e<I},_=async()=>{try{const[t,s,e]=await Promise.all([fetch("/api/admin_tours"),fetch("/api/bookings"),fetch("/api/users")]),n=t.ok?await t.json():{};x=Array.isArray(n)?n:n.data||[],S=s.ok?await s.json():[],H=e.ok?await e.json():[],k?(A(),B()):D()}catch(t){console.error("Lỗi tải dữ liệu báo cáo:",t)}},A=()=>{const t=document.getElementById("commissionSetupContainer");if(!t)return;if(x.length===0){t.innerHTML='<div class="text-sm text-gray-500 text-center py-4">Không có Tour nào.</div>';return}const s=x.map(e=>{const n=e.commission_rate??5;return`
+    `},G=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const t=localStorage.getItem("csr_user");t&&(f=JSON.parse(t))}catch{}const T=f.role==="admin";let y=[],I=[],L=[],p=null,u=new Set,k=[];const b=t=>new Intl.NumberFormat("vi-VN").format(Math.round(t||0))+"đ",P=t=>{if(!t)return 0;try{const n=Array.isArray(t)?t:JSON.parse(t);if(Array.isArray(n))return n.reduce((e,s)=>e+(parseInt(s.price)||0),0)}catch{return(String(t).match(/price:\s*(\d+)/g)||[]).reduce((s,o)=>s+Number(o.replace(/price:\s*/,"")),0)}return 0},C=(t,n)=>{const e=n.find(c=>c.name&&t.tour&&c.name.toLowerCase().trim()===t.tour.toLowerCase().trim()),s=parseFloat(t.commission_rate??e?.commission_rate??5),o=P(t.services_booked),d=Math.max(0,(parseInt(t.total_price)||0)-(parseInt(t.discount)||0)-o),r=d*(s/100);return{rate:s,servicesTotal:o,basePrice:d,commission:r}},E=t=>{if(!t)return null;const n=t.split("-")[0].trim();if(n.includes("/")){const e=n.split("/");if(e.length===3)return new Date(parseInt(e[2]),parseInt(e[1])-1,parseInt(e[0]));if(e.length===2)return new Date(new Date().getFullYear(),parseInt(e[1])-1,parseInt(e[0]))}return n.match(/^\d{4}-/)?new Date(n):null},H=new Date;H.setHours(0,0,0,0);const $=t=>t.status&&(t.status.includes("Đã cọc")||t.status.includes("Hoàn tất")||t.status.includes("Hoàn thành")),w=t=>{if(!(t.status&&(t.status.includes("Hoàn tất")||t.status.includes("Hoàn thành"))))return!1;const e=E(t.date);return e&&e<H},B=async()=>{try{const[t,n,e]=await Promise.all([fetch("/api/admin_tours"),fetch("/api/bookings"),fetch("/api/users")]),s=t.ok?await t.json():{};y=Array.isArray(s)?s:s.data||[],I=n.ok?await n.json():[],L=e.ok?await e.json():[],T?(A(),_()):j()}catch(t){console.error("Lỗi tải dữ liệu báo cáo:",t)}},A=()=>{const t=document.getElementById("commissionSetupContainer");if(!t)return;if(y.length===0){t.innerHTML='<div class="text-sm text-gray-500 text-center py-4">Không có Tour nào.</div>';return}const n=y.map(e=>{const s=e.commission_rate??5;return`
                 <div class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:border-csr-orange/30 transition-colors">
                     <div class="font-medium text-sm text-gray-900 flex-1 truncate pr-4">${e.name}</div>
                     <div class="flex items-center gap-2">
                         <div class="relative w-24">
                             <input type="number" min="0" max="100" step="0.5"
                                 class="w-full bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-sm font-bold focus:border-csr-orange focus:outline-none"
-                                value="${n}" id="comm_input_${e.id}">
+                                value="${s}" id="comm_input_${e.id}">
                             <span class="absolute right-3 top-1.5 text-gray-400 font-bold">%</span>
                         </div>
                         <button class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-csr-orange transition-colors"
                             onclick="window.saveCommission(${e.id})">Lưu</button>
                     </div>
-                </div>`}).join("");t.innerHTML=`<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${s}</div>`,document.getElementById("commissionSetupToggle")?.addEventListener("click",()=>{t.classList.toggle("hidden"),document.getElementById("commissionSetupChevron")?.classList.toggle("rotate-180")})};window.saveCommission=async t=>{const s=document.getElementById(`comm_input_${t}`);if(!s)return;const e=parseFloat(s.value);if(isNaN(e)||e<0||e>100){alert("Tỉ lệ hoa hồng không hợp lệ (0–100)");return}const n=s.nextElementSibling;n.textContent="...",n.disabled=!0;try{if((await fetch(`/api/admin_tours?id=${t}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({commission_rate:e})})).ok){const d=x.find(i=>i.id===t);d&&(d.commission_rate=e),n.classList.add("bg-green-500"),n.textContent="✓ Đã lưu!",setTimeout(()=>{n.classList.remove("bg-green-500"),n.textContent="Lưu",n.disabled=!1},1500),B()}else throw new Error}catch{alert("Lỗi khi lưu!"),n.textContent="Lưu",n.disabled=!1}};const B=()=>{const t=document.getElementById("salesTableBody");if(!t)return;const s=S.filter(i=>L(i)),e={},n={};H.forEach(i=>{const g=String(i.id),a=i.full_name||i.fullName||i.username||`User #${i.id}`;e[g]=a,n[a.trim().toLowerCase()]=g});const o={};s.forEach(i=>{const g=String(i.sale_id||"").trim();let a=g,h=i.sale_name||"Admin / Tự Đặt";if(g&&e[g])h=e[g];else{const p=n[(i.sale_name||"").trim().toLowerCase()];p?(a=p,h=e[p]):a=i.sale_name||"no-id"}o[a]||(o[a]={key:a,saleId:g||a,name:h,bookings:[]}),o[a].bookings.push(i)});const d=Object.values(o).sort((i,g)=>i.name.localeCompare(g.name));if(d.length===0){t.innerHTML='<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Chưa có dữ liệu nào trong kỳ này.</td></tr>';return}t.innerHTML=d.map((i,g)=>{const a=i.bookings.filter(r=>!w(r)&&!r.commission_paid).length,h=i.bookings.filter(r=>w(r)&&!r.commission_paid).length,p=i.bookings.filter(r=>!r.commission_paid).reduce((r,c)=>r+C(c,x).commission,0);return`
+                </div>`}).join("");t.innerHTML=`<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${n}</div>`,document.getElementById("commissionSetupToggle")?.addEventListener("click",()=>{t.classList.toggle("hidden"),document.getElementById("commissionSetupChevron")?.classList.toggle("rotate-180")})};window.saveCommission=async t=>{const n=document.getElementById(`comm_input_${t}`);if(!n)return;const e=parseFloat(n.value);if(isNaN(e)||e<0||e>100){alert("Tỉ lệ hoa hồng không hợp lệ (0–100)");return}const s=n.nextElementSibling;s.textContent="...",s.disabled=!0;try{if((await fetch(`/api/admin_tours?id=${t}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({commission_rate:e})})).ok){const d=y.find(r=>r.id===t);d&&(d.commission_rate=e),s.classList.add("bg-green-500"),s.textContent="✓ Đã lưu!",setTimeout(()=>{s.classList.remove("bg-green-500"),s.textContent="Lưu",s.disabled=!1},1500),_()}else throw new Error}catch{alert("Lỗi khi lưu!"),s.textContent="Lưu",s.disabled=!1}};const _=()=>{const t=document.getElementById("salesTableBody");if(!t)return;const n=I.filter(r=>$(r)),e={},s={};L.forEach(r=>{const c=String(r.id),a=r.full_name||r.fullName||r.username||`User #${r.id}`;e[c]=a,s[a.trim().toLowerCase()]=c});const o={};n.forEach(r=>{const c=String(r.sale_id||"").trim();let a=c,x=r.sale_name||"Admin / Tự Đặt";if(c&&e[c])x=e[c];else{const h=s[(r.sale_name||"").trim().toLowerCase()];h?(a=h,x=e[h]):a=r.sale_name||"no-id"}o[a]||(o[a]={key:a,saleId:c||a,name:x,bookings:[]}),o[a].bookings.push(r)});const d=Object.values(o).sort((r,c)=>r.name.localeCompare(c.name));if(d.length===0){t.innerHTML='<tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm">Chưa có dữ liệu nào trong kỳ này.</td></tr>';return}t.innerHTML=d.map((r,c)=>{const a=r.bookings.filter(i=>!w(i)&&!i.commission_paid).length,x=r.bookings.filter(i=>w(i)&&!i.commission_paid).length,h=r.bookings.filter(i=>!i.commission_paid).reduce((i,g)=>i+C(g,y).commission,0);return`
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="p-4 border-b border-gray-100 text-gray-400 text-sm font-medium">${g+1}</td>
+                    <td class="p-4 border-b border-gray-100 text-gray-400 text-sm font-medium">${c+1}</td>
                     <td class="p-4 border-b border-gray-100">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-csr-orange/10 text-csr-orange flex items-center justify-center font-bold text-sm shrink-0">${(i.name||"S").charAt(0).toUpperCase()}</div>
-                            <div class="font-bold text-gray-900">${i.name}</div>
+                            <div class="w-9 h-9 rounded-full bg-csr-orange/10 text-csr-orange flex items-center justify-center font-bold text-sm shrink-0">${(r.name||"S").charAt(0).toUpperCase()}</div>
+                            <div class="font-bold text-gray-900">${r.name}</div>
                         </div>
                     </td>
                     <td class="p-4 border-b border-gray-100 text-center">
                         <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">${a} đơn</span>
                     </td>
                     <td class="p-4 border-b border-gray-100 text-center">
-                        <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">${h} đơn</span>
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">${x} đơn</span>
                     </td>
-                    <td class="p-4 border-b border-gray-100 text-right font-black text-csr-orange text-base">${b(p)}</td>
+                    <td class="p-4 border-b border-gray-100 text-right font-black text-csr-orange text-base">${b(h)}</td>
                     <td class="p-4 border-b border-gray-100 text-center">
                         <button class="text-xs bg-csr-orange text-white px-4 py-1.5 rounded-lg hover:bg-[#d65503] transition-colors font-bold shadow-sm"
-                            onclick="window.openSalePanel('${i.key}')">Xem &rsaquo;</button>
+                            onclick="window.openSalePanel('${r.key}')">Xem &rsaquo;</button>
                     </td>
-                </tr>`}).join(""),window._salesMap=o,window._allToursRef=x};window.openSalePanel=async t=>{const s=window._salesMap?.[t];if(!s)return;y=s,u.clear(),document.getElementById("panelSaleName").textContent=s.name,$(),N();try{const o=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(s.saleId)}`);T=o.ok?await o.json():[]}catch{T=[]}P();const e=document.getElementById("saleDetailPanel"),n=document.getElementById("saleDetailPanelInner");e.classList.remove("hidden"),requestAnimationFrame(()=>{e.classList.remove("opacity-0"),n.classList.remove("translate-x-full")}),switchPanelTab("orders")},window.closeSalePanel=()=>{const t=document.getElementById("saleDetailPanel"),s=document.getElementById("saleDetailPanelInner");t.classList.add("opacity-0"),s.classList.add("translate-x-full"),setTimeout(()=>t.classList.add("hidden"),300)},window.switchPanelTab=t=>{const s=document.getElementById("tabContentOrders"),e=document.getElementById("tabContentPayHistory"),n=document.getElementById("tabOrders"),o=document.getElementById("tabPayHistory"),d=document.getElementById("payToolbar");t==="orders"?(s?.classList.remove("hidden"),e?.classList.add("hidden"),n?.classList.add("border-csr-orange","text-csr-orange"),n?.classList.remove("border-transparent","text-gray-500"),o?.classList.remove("border-csr-orange","text-csr-orange"),o?.classList.add("border-transparent","text-gray-500"),d?.classList.remove("hidden")):(e?.classList.remove("hidden"),s?.classList.add("hidden"),o?.classList.add("border-csr-orange","text-csr-orange"),o?.classList.remove("border-transparent","text-gray-500"),n?.classList.remove("border-csr-orange","text-csr-orange"),n?.classList.add("border-transparent","text-gray-500"),d?.classList.add("hidden"))};const N=()=>{const t=document.getElementById("tabContentOrders");if(!t||!y)return;const s=y.bookings,e=s.filter(a=>w(a)&&!a.commission_paid),n=s.filter(a=>!w(a)&&!a.commission_paid),o=s.filter(a=>a.commission_paid);if([...e,...n,...o].length===0){t.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Không có đơn nào trong kỳ này.</div>';return}const i=(a,h,p)=>p.length===0?"":`
+                </tr>`}).join(""),window._salesMap=o,window._allToursRef=y};window.openSalePanel=async t=>{const n=window._salesMap?.[t];if(!n)return;p=n,u.clear(),document.getElementById("panelSaleName").textContent=n.name,S(),N();try{const o=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(n.saleId)}`);k=o.ok?await o.json():[]}catch{k=[]}M();const e=document.getElementById("saleDetailPanel"),s=document.getElementById("saleDetailPanelInner");e.classList.remove("hidden"),requestAnimationFrame(()=>{e.classList.remove("opacity-0"),s.classList.remove("translate-x-full")}),switchPanelTab("orders")},window.closeSalePanel=()=>{const t=document.getElementById("saleDetailPanel"),n=document.getElementById("saleDetailPanelInner");t.classList.add("opacity-0"),n.classList.add("translate-x-full"),setTimeout(()=>t.classList.add("hidden"),300)},window.switchPanelTab=t=>{const n=document.getElementById("tabContentOrders"),e=document.getElementById("tabContentPayHistory"),s=document.getElementById("tabOrders"),o=document.getElementById("tabPayHistory"),d=document.getElementById("payToolbar");t==="orders"?(n?.classList.remove("hidden"),e?.classList.add("hidden"),s?.classList.add("border-csr-orange","text-csr-orange"),s?.classList.remove("border-transparent","text-gray-500"),o?.classList.remove("border-csr-orange","text-csr-orange"),o?.classList.add("border-transparent","text-gray-500"),d?.classList.remove("hidden")):(e?.classList.remove("hidden"),n?.classList.add("hidden"),o?.classList.add("border-csr-orange","text-csr-orange"),o?.classList.remove("border-transparent","text-gray-500"),s?.classList.remove("border-csr-orange","text-csr-orange"),s?.classList.add("border-transparent","text-gray-500"),d?.classList.add("hidden"))};const N=()=>{const t=document.getElementById("tabContentOrders");if(!t||!p)return;const n=p.bookings,e=n.filter(a=>w(a)&&!a.commission_paid),s=n.filter(a=>!w(a)&&!a.commission_paid),o=n.filter(a=>a.commission_paid);if([...e,...s,...o].length===0){t.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Không có đơn nào trong kỳ này.</div>';return}const r=(a,x,h)=>h.length===0?"":`
                 <div class="mb-1">
-                    <div class="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-${h}-600 bg-${h}-50 border-b border-${h}-100">── ${a} (${p.length}) ──</div>
-                    ${p.map((r,c)=>g(r)).join("")}
-                </div>`;e.length,e.length+n.length;const g=(a,h)=>{const{rate:p,servicesTotal:r,commission:c}=C(a,x),m=a.commission_paid,v=!m,l=u.has(a.id);return`
+                    <div class="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-${x}-600 bg-${x}-50 border-b border-${x}-100">── ${a} (${h.length}) ──</div>
+                    ${h.map((i,g)=>c(i)).join("")}
+                </div>`;e.length,e.length+s.length;const c=(a,x)=>{const{rate:h,servicesTotal:i,commission:g}=C(a,y),m=a.commission_paid,v=!m,l=u.has(a.id);return`
                 <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${m?"opacity-60":""}">
                     <input type="checkbox" class="order-checkbox w-4 h-4 accent-csr-orange shrink-0 ${v?"":"cursor-not-allowed"}"
-                        data-id="${a.id}" data-commission="${c}" ${l?"checked":""} ${v?"":"disabled"}
+                        data-id="${a.id}" data-commission="${g}" ${l?"checked":""} ${v?"":"disabled"}
                         onchange="window.onOrderCheck(this)">
                     <div class="text-xs text-gray-400 font-mono w-12 shrink-0 text-center">#${a.id}</div>
                     <div class="flex-1 min-w-0">
@@ -219,8 +239,8 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                     </div>
                     <div class="text-right shrink-0">
                         <div class="text-sm font-bold text-gray-900">${b(a.total_price)}</div>
-                        ${r>0?`<div class="text-[10px] text-gray-400">DV: -${b(r)}</div>`:""}
-                        <div class="text-sm font-black text-csr-orange">HH: ${b(c)} <span class="text-gray-400 font-normal text-[10px]">(${p}%)</span></div>
+                        ${i>0?`<div class="text-[10px] text-gray-400">DV: -${b(i)}</div>`:""}
+                        <div class="text-sm font-black text-csr-orange">HH: ${b(g)} <span class="text-gray-400 font-normal text-[10px]">(${h}%)</span></div>
                     </div>
                     <div class="shrink-0 w-24 text-right">
                         ${m?'<span class="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">✅ Đã TT HH</span>':w(a)?'<span class="inline-block bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded border border-green-200">Hoàn thành</span>':'<span class="inline-block bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded border border-blue-200">Đã cọc</span>'}
@@ -235,10 +255,10 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                 <div class="w-40 text-right">Giá Đơn · Hoa Hồng</div>
                 <div class="w-24 text-right">Trạng Thái</div>
             </div>
-            ${i("ĐÃ HOÀN THÀNH","green",e)}
-            ${i("ĐÃ CỌC","blue",n)}
-            ${i("ĐÃ THANH TOÁN HOA HỒNG","gray",o)}
-        `},P=()=>{const t=document.getElementById("tabContentPayHistory");if(t){if(T.length===0){t.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào cho nhân viên này.</div>';return}t.innerHTML=`
+            ${r("ĐÃ HOÀN THÀNH","green",e)}
+            ${r("ĐÃ CỌC","blue",s)}
+            ${r("ĐÃ THANH TOÁN HOA HỒNG","gray",o)}
+        `},M=()=>{const t=document.getElementById("tabContentPayHistory");if(t){if(k.length===0){t.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào cho nhân viên này.</div>';return}t.innerHTML=`
             <table class="w-full text-sm text-left border-collapse">
                 <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
                     <th class="p-3">Mã Batch</th>
@@ -249,16 +269,16 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                     <th class="p-3">Ghi Chú</th>
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100">
-                    ${T.map(s=>{const e=new Date(s.created_at),n=`${e.getDate().toString().padStart(2,"0")}/${(e.getMonth()+1).toString().padStart(2,"0")}/${e.getFullYear()}`;return`<tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-3 font-mono text-gray-500 text-xs">#BATCH${s.id}</td>
-                            <td class="p-3 text-gray-700 font-medium">${n}</td>
-                            <td class="p-3 text-center"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-bold">${s.total_orders} đơn</span></td>
-                            <td class="p-3 text-right font-black text-csr-orange">${b(s.total_amount)}</td>
-                            <td class="p-3 text-gray-600">${s.paid_by||"—"}</td>
-                            <td class="p-3 text-gray-400 text-xs">${s.note||"—"}</td>
+                    ${k.map(n=>{const e=new Date(n.created_at),s=`${e.getDate().toString().padStart(2,"0")}/${(e.getMonth()+1).toString().padStart(2,"0")}/${e.getFullYear()}`;return`<tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-3 font-mono text-gray-500 text-xs">#BATCH${n.id}</td>
+                            <td class="p-3 text-gray-700 font-medium">${s}</td>
+                            <td class="p-3 text-center"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-bold">${n.total_orders} đơn</span></td>
+                            <td class="p-3 text-right font-black text-csr-orange">${b(n.total_amount)}</td>
+                            <td class="p-3 text-gray-600">${n.paid_by||"—"}</td>
+                            <td class="p-3 text-gray-400 text-xs">${n.note||"—"}</td>
                         </tr>`}).join("")}
                 </tbody>
-            </table>`}};window.onOrderCheck=t=>{const s=parseInt(t.dataset.id);t.checked?u.add(s):u.delete(s),$()},window.toggleSelectAll=t=>{document.querySelectorAll(".order-checkbox:not(:disabled)").forEach(e=>{e.checked=t.checked;const n=parseInt(e.dataset.id);t.checked?u.add(n):u.delete(n)}),$()};const $=()=>{const t=u.size,s=y?.bookings.filter(o=>u.has(o.id)).reduce((o,d)=>o+C(d,x).commission,0)||0,e=document.getElementById("paySelectionInfo"),n=document.getElementById("payCommissionBtn");e&&(e.textContent=t>0?`Đã chọn ${t} đơn · Tổng HH: ${b(s)}`:"Chọn đơn để thanh toán hoa hồng"),n&&(n.disabled=t===0)};window.openPayConfirmModal=()=>{const t=u.size;if(t===0)return;const s=y?.bookings.filter(o=>u.has(o.id)).reduce((o,d)=>o+C(d,x).commission,0)||0;document.getElementById("confirmSaleName").textContent=y?.name||"—",document.getElementById("confirmOrderCount").textContent=`${t} đơn`,document.getElementById("confirmTotalComm").textContent=b(s),document.getElementById("payNote").value="";const e=document.getElementById("payConfirmModal"),n=document.getElementById("payConfirmModalInner");e.classList.remove("hidden"),requestAnimationFrame(()=>{e.classList.remove("opacity-0"),n.classList.remove("scale-95")})},window.closePayConfirmModal=()=>{const t=document.getElementById("payConfirmModal"),s=document.getElementById("payConfirmModalInner");t.classList.add("opacity-0"),s.classList.add("scale-95"),setTimeout(()=>t.classList.add("hidden"),200)},window.confirmPayCommission=async()=>{const t=document.getElementById("confirmPayBtn");t.textContent="Đang xử lý...",t.disabled=!0;const s=document.getElementById("payNote").value.trim(),e=f.fullName||f.full_name||"Admin";try{const n=await fetch("/api/commission_payments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sale_id:y.saleId,sale_name:y.name,booking_ids:[...u],paid_by:e,note:s})});if(!n.ok)throw new Error(await n.text());if(window.closePayConfirmModal(),u.clear(),await _(),y&&window._salesMap){const o=window._salesMap[y.key];if(o){y=o;try{const d=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(y.saleId)}`);T=d.ok?await d.json():[]}catch{T=[]}N(),P(),$(),document.getElementById("panelSaleName").textContent=y.name}}alert("✅ Đã thanh toán hoa hồng thành công!")}catch(n){console.error("Lỗi thanh toán hoa hồng:",n),alert("❌ Lỗi: "+n.message)}finally{t.textContent="✅ Xác Nhận Thanh Toán",t.disabled=!1}};const D=async()=>{const t=String(f.id||f.userId||""),s=(f.fullName||f.full_name||"").toLowerCase(),e=S.filter(r=>{const c=String(r.sale_id||"").trim(),m=(r.sale_name||"").toLowerCase()===s;return!(t&&c===t)&&!m?!1:L(r)}),n=e.filter(r=>w(r)),o=e.reduce((r,c)=>r+(parseInt(c.total_price)||0),0),d=n.reduce((r,c)=>r+C(c,x).commission,0),g=S.filter(r=>{const c=String(r.sale_id||"").trim(),m=(r.sale_name||"").toLowerCase()===s;return t&&c===t||m}).length,a=(r,c)=>{const m=document.getElementById(r);m&&(m.textContent=c)};a("sale-stat-total-pax",g),a("sale-stat-success-pax",n.length),a("sale-stat-revenue",b(o)),a("sale-stat-real-comm",b(d));const h=document.getElementById("saleOrdersContainer");if(h)if(e.length===0)h.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Chưa có đơn nào trong kỳ này.</div>';else{const r=e.filter(l=>w(l)&&!l.commission_paid),c=e.filter(l=>!w(l)&&!l.commission_paid),m=e.filter(l=>l.commission_paid),v=[...r,...c,...m];h.innerHTML=`
+            </table>`}};window.onOrderCheck=t=>{const n=parseInt(t.dataset.id);t.checked?u.add(n):u.delete(n),S()},window.toggleSelectAll=t=>{document.querySelectorAll(".order-checkbox:not(:disabled)").forEach(e=>{e.checked=t.checked;const s=parseInt(e.dataset.id);t.checked?u.add(s):u.delete(s)}),S()};const S=()=>{const t=u.size,n=p?.bookings.filter(o=>u.has(o.id)).reduce((o,d)=>o+C(d,y).commission,0)||0,e=document.getElementById("paySelectionInfo"),s=document.getElementById("payCommissionBtn");e&&(e.textContent=t>0?`Đã chọn ${t} đơn · Tổng HH: ${b(n)}`:"Chọn đơn để thanh toán hoa hồng"),s&&(s.disabled=t===0)};window.openPayConfirmModal=()=>{const t=u.size;if(t===0)return;const n=p?.bookings.filter(a=>u.has(a.id)).reduce((a,x)=>a+C(x,y).commission,0)||0;document.getElementById("confirmSaleName").textContent=p?.name||"—",document.getElementById("confirmOrderCount").textContent=`${t} đơn`,document.getElementById("confirmTotalComm").textContent=b(n),document.getElementById("payNote").value="";const e=document.getElementById("paymentInfoBox"),s=document.getElementById("noPaymentInfoBox");let o=L.find(a=>String(a.id)===String(p.saleId));!o&&p.saleId==="unassigned"&&(o=null);const d=o?.payment_info;if(d&&(d.bank_name||d.account_number||d.qr_code)){document.getElementById("payBankName").textContent=d.bank_name||"—",document.getElementById("payBankAccount").textContent=d.account_number||"—",document.getElementById("payBankOwner").textContent=d.account_name||"—";const a=document.getElementById("payQrBox");d.qr_code?(a.innerHTML=`<p class="text-xs text-gray-500 mb-2 font-medium">Mã QR Quét Nhanh:</p><img src="${d.qr_code}" class="w-32 h-32 object-contain rounded-xl border-2 border-gray-200 p-1 shadow-sm mix-blend-multiply">`,a.classList.remove("hidden")):(a.innerHTML="",a.classList.add("hidden")),e.classList.remove("hidden"),s.classList.add("hidden")}else e.classList.add("hidden"),s.classList.remove("hidden"),p.saleId==="unassigned"&&s.classList.add("hidden");const r=document.getElementById("payConfirmModal"),c=document.getElementById("payConfirmModalInner");r.classList.remove("hidden"),requestAnimationFrame(()=>{r.classList.remove("opacity-0"),c.classList.remove("scale-95")})},window.closePayConfirmModal=()=>{const t=document.getElementById("payConfirmModal"),n=document.getElementById("payConfirmModalInner");t.classList.add("opacity-0"),n.classList.add("scale-95"),setTimeout(()=>t.classList.add("hidden"),200)},window.confirmPayCommission=async()=>{const t=document.getElementById("confirmPayBtn");t.textContent="Đang xử lý...",t.disabled=!0;const n=document.getElementById("payNote").value.trim(),e=f.fullName||f.full_name||"Admin";try{const s=await fetch("/api/commission_payments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sale_id:p.saleId,sale_name:p.name,booking_ids:[...u],paid_by:e,note:n})});if(!s.ok)throw new Error(await s.text());if(window.closePayConfirmModal(),u.clear(),await B(),p&&window._salesMap){const o=window._salesMap[p.key];if(o){p=o;try{const d=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(p.saleId)}`);k=d.ok?await d.json():[]}catch{k=[]}N(),M(),S(),document.getElementById("panelSaleName").textContent=p.name}}alert("✅ Đã thanh toán hoa hồng thành công!")}catch(s){console.error("Lỗi thanh toán hoa hồng:",s),alert("❌ Lỗi: "+s.message)}finally{t.textContent="✅ Xác Nhận Thanh Toán",t.disabled=!1}};const j=async()=>{const t=String(f.id||f.userId||""),n=(f.fullName||f.full_name||"").toLowerCase(),e=I.filter(i=>{const g=String(i.sale_id||"").trim(),m=(i.sale_name||"").toLowerCase()===n;return!(t&&g===t)&&!m?!1:$(i)}),s=e.filter(i=>w(i)),o=e.reduce((i,g)=>i+(parseInt(g.total_price)||0),0),d=s.reduce((i,g)=>i+C(g,y).commission,0),c=I.filter(i=>{const g=String(i.sale_id||"").trim(),m=(i.sale_name||"").toLowerCase()===n;return t&&g===t||m}).length,a=(i,g)=>{const m=document.getElementById(i);m&&(m.textContent=g)};a("sale-stat-total-pax",c),a("sale-stat-success-pax",s.length),a("sale-stat-revenue",b(o)),a("sale-stat-real-comm",b(d));const x=document.getElementById("saleOrdersContainer");if(x)if(e.length===0)x.innerHTML='<div class="p-8 text-center text-gray-400 text-sm">Chưa có đơn nào trong kỳ này.</div>';else{const i=e.filter(l=>w(l)&&!l.commission_paid),g=e.filter(l=>!w(l)&&!l.commission_paid),m=e.filter(l=>l.commission_paid),v=[...i,...g,...m];x.innerHTML=`
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left border-collapse">
                             <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
@@ -271,8 +291,8 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                                 <th class="p-3 text-center">Trạng Thái HH</th>
                             </tr></thead>
                             <tbody class="divide-y divide-gray-100">
-                                ${v.map((l,O)=>{const{commission:j}=C(l,x);return`<tr class="hover:bg-gray-50 transition-colors ${l.commission_paid?"opacity-70":""}">
-                                        <td class="p-3 text-center text-gray-400 font-medium">${O+1}</td>
+                                ${v.map((l,D)=>{const{commission:O}=C(l,y);return`<tr class="hover:bg-gray-50 transition-colors ${l.commission_paid?"opacity-70":""}">
+                                        <td class="p-3 text-center text-gray-400 font-medium">${D+1}</td>
                                         <td class="p-3 font-mono text-gray-600 text-xs">#CSR${l.id}</td>
                                         <td class="p-3">
                                             <div class="font-bold text-gray-900">${l.name}</div>
@@ -283,14 +303,14 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                                             <div class="text-[11px] text-gray-400">${l.date}</div>
                                         </td>
                                         <td class="p-3 text-right font-bold text-gray-900">${b(l.total_price)}</td>
-                                        <td class="p-3 text-right font-black text-csr-orange">${b(j)}</td>
+                                        <td class="p-3 text-right font-black text-csr-orange">${b(O)}</td>
                                         <td class="p-3 text-center">
                                             ${l.commission_paid?'<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">✅ Đã nhận</span>':w(l)?'<span class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-full">⏳ Chờ TT</span>':'<span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-full">Đang cọc</span>'}
                                         </td>
                                     </tr>`}).join("")}
                             </tbody>
                         </table>
-                    </div>`}const p=document.getElementById("salePaymentHistoryContainer");if(p&&t)try{const r=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(t)}`),c=r.ok?await r.json():[];c.length===0?p.innerHTML='<div class="p-6 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào.</div>':p.innerHTML=`
+                    </div>`}const h=document.getElementById("salePaymentHistoryContainer");if(h&&t)try{const i=await fetch(`/api/commission_payments?sale_id=${encodeURIComponent(t)}`),g=i.ok?await i.json():[];g.length===0?h.innerHTML='<div class="p-6 text-center text-gray-400 text-sm">Chưa có lần thanh toán nào.</div>':h.innerHTML=`
                         <table class="w-full text-sm text-left border-collapse">
                             <thead><tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-400 font-bold">
                                 <th class="p-3">Batch</th>
@@ -300,7 +320,7 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                                 <th class="p-3">Ghi Chú</th>
                             </tr></thead>
                             <tbody class="divide-y divide-gray-100">
-                                ${c.map(m=>{const v=new Date(m.created_at),l=`${v.getDate().toString().padStart(2,"0")}/${(v.getMonth()+1).toString().padStart(2,"0")}/${v.getFullYear()}`;return`<tr class="hover:bg-gray-50">
+                                ${g.map(m=>{const v=new Date(m.created_at),l=`${v.getDate().toString().padStart(2,"0")}/${(v.getMonth()+1).toString().padStart(2,"0")}/${v.getFullYear()}`;return`<tr class="hover:bg-gray-50">
                                         <td class="p-3 font-mono text-gray-400 text-xs">#BATCH${m.id}</td>
                                         <td class="p-3 font-medium text-gray-700">${l}</td>
                                         <td class="p-3 text-center"><span class="bg-gray-100 text-xs font-bold px-2 py-0.5 rounded">${m.total_orders} đơn</span></td>
@@ -308,4 +328,4 @@ import{S as R,H as F}from"./Header-Dmidaim7.js";const V=()=>{let f={role:"sale",
                                         <td class="p-3 text-gray-400 text-xs">${m.note||"—"}</td>
                                     </tr>`}).join("")}
                             </tbody>
-                        </table>`}catch{p.innerHTML='<div class="p-6 text-center text-gray-400 text-sm">Lỗi tải lịch sử.</div>'}};document.getElementById("saleDetailPanel")?.addEventListener("click",t=>{t.target.id==="saleDetailPanel"&&window.closeSalePanel()}),_()};export{U as afterRender,V as render};
+                        </table>`}catch{h.innerHTML='<div class="p-6 text-center text-gray-400 text-sm">Lỗi tải lịch sử.</div>'}};document.getElementById("saleDetailPanel")?.addEventListener("click",t=>{t.target.id==="saleDetailPanel"&&window.closeSalePanel()}),B()};export{G as afterRender,q as render};
