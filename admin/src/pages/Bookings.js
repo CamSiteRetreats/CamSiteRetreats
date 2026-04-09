@@ -2049,7 +2049,7 @@ export const afterRender = () => {
                     alert('Lỗi khi Copy Clipboard. Link là: ' + url);
                 });
             }
-            // NÚT THANH TOÁN (SHORT URL)
+            // NÚT THANH TOÁN → COPY LINK (không mở trang)
             else if (btn.classList.contains('payment-btn')) {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 const baseUrl = isLocal
@@ -2057,7 +2057,20 @@ export const afterRender = () => {
                     : window.location.origin;
 
                 const url = baseUrl + `/pay?id=${bookingId}`;
-                window.open(url, '_blank');
+                navigator.clipboard.writeText(url).then(() => {
+                    // Feedback trực quan trên button
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Đã copy!';
+                    btn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                    btn.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        btn.classList.remove('bg-green-500');
+                    }, 2000);
+                }).catch(() => {
+                    alert('🔗 Link thanh toán:\n' + url);
+                });
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
             else if (btn.classList.contains('view-btn')) {
