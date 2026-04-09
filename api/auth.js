@@ -47,6 +47,7 @@ module.exports = async (req, res) => {
                     email: user.email,
                     avatar: user.avatar,
                     bank_info: user.bank_info,
+                    payment_info: user.payment_info,
                     status: user.status
                 };
                 return res.status(200).json({ success: true, token: token, user: frontendUser });

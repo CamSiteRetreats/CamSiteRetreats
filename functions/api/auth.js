@@ -55,6 +55,7 @@ export async function onRequest(context) {
                 email: user.email,
                 avatar: user.avatar,
                 bank_info: user.bank_info,
+                payment_info: user.payment_info,
                 status: user.status
             };
 

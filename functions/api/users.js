@@ -26,7 +26,15 @@ export async function onRequest(context) {
 
         } else if (method === 'POST') {
             const body = await request.json();
-            const { id, username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status } = body;
+            let { id, username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status } = body;
+            
+            // Fix undefined and JSON stringify
+            bank_info = bank_info || null;
+            if (payment_info && typeof payment_info === 'object') {
+                payment_info = JSON.stringify(payment_info);
+            } else if (!payment_info) {
+                payment_info = null;
+            }
 
             if (!username) return Response.json({ error: 'Missing username' }, { status: 400, headers: corsHeaders });
             if (!fullName) return Response.json({ error: 'Missing full name' }, { status: 400, headers: corsHeaders });

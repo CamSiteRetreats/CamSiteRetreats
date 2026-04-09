@@ -21,7 +21,15 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST') {
-            const { id, username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status } = req.body;
+            let { id, username, password, fullName, role, phone, email, avatar, bank_info, payment_info, status } = req.body;
+            
+            // Fix undefined and JSON stringify
+            bank_info = bank_info || null;
+            if (payment_info && typeof payment_info === 'object') {
+                payment_info = JSON.stringify(payment_info);
+            } else if (!payment_info) {
+                payment_info = null;
+            }
 
             if (!username) return res.status(400).json({ error: 'Missing username' });
             if (!fullName) return res.status(400).json({ error: 'Missing full name' });
