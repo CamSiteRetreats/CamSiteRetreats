@@ -182,13 +182,37 @@ export const afterRender = async () => {
     };
 
     const renderExtraServices = (b) => {
-        const raw = b.extra_services || b.extraServices || b.extra || b.notes_extra || '';
-        if (!raw || raw === '-' || raw.trim() === '') {
+        let items = [];
+
+        // Priority 1: services_booked là JSON array từ booking engine
+        const rawJson = b.services_booked;
+        if (rawJson && rawJson !== '[]' && rawJson !== 'null') {
+            try {
+                const parsed = JSON.parse(rawJson);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    items = parsed.map(sv => {
+                        const label = sv.label || sv.name || String(sv);
+                        const price = sv.price ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
+                        return label + price;
+                    });
+                }
+            } catch(e) {
+                // Nếu không parse được JSON → treat as plain text
+                items = [rawJson];
+            }
+        }
+
+        // Fallback: các field cũ (plain text)
+        if (items.length === 0) {
+            const raw = b.extra_services || b.extraServices || b.extra || b.notes_extra || '';
+            if (raw && raw !== '-' && raw.trim() !== '') {
+                items = raw.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+            }
+        }
+
+        if (items.length === 0) {
             return `<span class="text-gray-300 text-xs italic">Không có</span>`;
         }
-        // Split by newline or comma or semicolon
-        const items = raw.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
-        if (items.length === 0) return `<span class="text-gray-300 text-xs italic">Không có</span>`;
 
         const palette = [
             'bg-violet-100 text-violet-700 border-violet-200',
@@ -562,7 +586,23 @@ export const afterRender = async () => {
                 else if (c.id === 'col-diet') cellData = (b.diet === 'Ăn chay' || b.diet === 'Chay' || b.diet === 'Có') ? 'Có' : 'Không';
                 else if (c.id === 'col-pole') cellData = (b.trekking_pole === 'Có') ? 'Có' : 'Không';
                 else if (c.id === 'col-status') cellData = b.status || '';
-                else if (c.id === 'col-extra') cellData = b.extra_services || b.extraServices || b.extra || b.notes_extra || '';
+                else if (c.id === 'col-extra') {
+                    // Parse services_booked JSON array
+                    const rawJson = b.services_booked;
+                    if (rawJson && rawJson !== '[]' && rawJson !== 'null') {
+                        try {
+                            const parsed = JSON.parse(rawJson);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                cellData = parsed.map(sv => {
+                                    const label = sv.label || sv.name || String(sv);
+                                    const price = sv.price ? ` (+${Number(sv.price).toLocaleString('vi-VN')}đ)` : '';
+                                    return label + price;
+                                }).join(', ');
+                            }
+                        } catch(e) { cellData = rawJson; }
+                    }
+                    if (!cellData) cellData = b.extra_services || '';
+                }
                 else {
                     // Loại bỏ mã HTML ra khỏi cell data
                     const rawStr = String(c.render(b, index));
