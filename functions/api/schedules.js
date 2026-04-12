@@ -16,8 +16,13 @@ export async function onRequest(context) {
         return new Response(null, { headers: corsHeaders });
     }
 
+    const addCors = (res) => {
+        const final = new Response(res.body, res);
+        Object.entries(corsHeaders).forEach(([k, v]) => final.headers.set(k, v));
+        return final;
+    };
+
     try {
-        let response;
         const idParam = url.searchParams.get('id');
 
         if (method === 'GET') {
@@ -25,7 +30,7 @@ export async function onRequest(context) {
                 const schedule = await sql`
                     SELECT * FROM schedules WHERE id = ${idParam}
                 `;
-                response = Response.json(schedule[0] || { error: 'Not found' });
+                return addCors(Response.json(schedule[0] || { error: 'Not found' }));
             } else {
                 const schedules = await sql`
                     SELECT 
@@ -46,12 +51,12 @@ export async function onRequest(context) {
                                   (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
                               )
                              )
-                         )
+                          )
                         ) as booked_count
                     FROM schedules s
                     ORDER BY s.start_date ASC
                 `;
-                response = Response.json(schedules);
+                return addCors(Response.json(schedules));
             }
 
         } else if (method === 'POST') {
@@ -59,40 +64,52 @@ export async function onRequest(context) {
             const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin } = body;
 
             if (!tour_name || !start_date || !end_date) {
-                return Response.json({ error: 'Missing required configuration fields' }, { status: 400, headers: corsHeaders });
+                return addCors(Response.json({ error: 'Missing required fields' }, { status: 400 }));
             }
 
+            const slotsVal = parseInt(slots) || 0;
+            const statusVal = status || 'Đang mở';
+            const groupVal = group_label || null;
+            const zaloVal = zalo_link || null;
+            const pinVal = photo_pin || null;
+            // Must cast to JSONB explicitly for Neon serverless
+            const photoLinksJson = JSON.stringify(photo_links || []);
+
             if (id) {
-                // Update existing
-                await sql.query(
-                    `UPDATE schedules SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5, group_label=$6, zalo_link=$7, photo_links=$8, photo_pin=$9 WHERE id=$10`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, photo_links || null, photo_pin || null, id]
-                );
-                response = Response.json({ success: true, message: 'Updated schedule' });
+                await sql`
+                    UPDATE schedules
+                    SET tour_name   = ${tour_name},
+                        start_date  = ${start_date},
+                        end_date    = ${end_date},
+                        slots       = ${slotsVal},
+                        status      = ${statusVal},
+                        group_label = ${groupVal},
+                        zalo_link   = ${zaloVal},
+                        photo_links = ${photoLinksJson}::jsonb,
+                        photo_pin   = ${pinVal}
+                    WHERE id = ${id}
+                `;
+                return addCors(Response.json({ success: true, message: 'Updated schedule' }));
             } else {
-                // Insert new
-                await sql.query(
-                    `INSERT INTO schedules (tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, photo_links || null, photo_pin || null]
-                );
-                response = Response.json({ success: true, message: 'Created schedule' });
+                await sql`
+                    INSERT INTO schedules
+                        (tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin)
+                    VALUES
+                        (${tour_name}, ${start_date}, ${end_date}, ${slotsVal}, ${statusVal}, ${groupVal}, ${zaloVal}, ${photoLinksJson}::jsonb, ${pinVal})
+                `;
+                return addCors(Response.json({ success: true, message: 'Created schedule' }));
             }
 
         } else if (method === 'DELETE') {
             if (!idParam) {
-                return Response.json({ error: 'Missing ID' }, { status: 400, headers: corsHeaders });
+                return addCors(Response.json({ error: 'Missing ID' }, { status: 400 }));
             }
-
-            await sql.query(`DELETE FROM schedules WHERE id = $1`, [idParam]);
-            response = Response.json({ success: true, message: 'Deleted schedule' });
+            await sql`DELETE FROM schedules WHERE id = ${idParam}`;
+            return addCors(Response.json({ success: true, message: 'Deleted schedule' }));
 
         } else {
-            return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+            return addCors(new Response('Method Not Allowed', { status: 405 }));
         }
-
-        const final = new Response(response.body, response);
-        Object.entries(corsHeaders).forEach(([k, v]) => final.headers.set(k, v));
-        return final;
 
     } catch (error) {
         console.error('API Schedules Error:', error);
