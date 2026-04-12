@@ -162,18 +162,6 @@ export const render = () => {
               </div>
 
               <div class="p-5 overflow-y-auto flex-1">
-                  <!-- PIN Config -->
-                  <div class="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                      <label class="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                          Mã PIN Truy Cập (4 số cuối SĐT)
-                      </label>
-                      <input type="tel" id="photoPin" maxlength="4" inputmode="numeric" pattern="[0-9]{4}"
-                          class="w-full border border-amber-300 bg-white rounded-lg px-3 py-2 text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400 tracking-widest text-center text-lg"
-                          placeholder="_ _ _ _">
-                      <p class="text-[11px] text-amber-600 mt-1.5 font-medium">Khách cần nhập đúng PIN này mới xem được. Để trống = ai cũng xem được.</p>
-                  </div>
-
                   <!-- Links list -->
                   <div id="photoLinksList" class="space-y-3 mb-4">
                       <!-- Dynamic rows -->
@@ -589,7 +577,6 @@ export const afterRender = () => {
         photoModalScheduleId = scheduleId;
         photoModalScheduleData = scheduleData;
         document.getElementById('photoModalSubtitle').textContent = `Tour: ${tourName}`;
-        document.getElementById('photoPin').value = scheduleData.photo_pin || '';
         renderPhotoLinkRows(scheduleData.photo_links || []);
         photoLinksModal.classList.remove('hidden');
     };
@@ -626,13 +613,7 @@ export const afterRender = () => {
     document.getElementById('savePhotoLinksBtn').addEventListener('click', async () => {
         const btn = document.getElementById('savePhotoLinksBtn');
         const links = getPhotoLinksFromDOM();
-        const pin = document.getElementById('photoPin').value.trim();
         const s = photoModalScheduleData;
-
-        if (pin && (pin.length !== 4 || !/^\d{4}$/.test(pin))) {
-            alert('PIN phải là 4 chữ số!');
-            return;
-        }
 
         btn.textContent = 'Đang lưu...';
         btn.disabled = true;
@@ -646,8 +627,7 @@ export const afterRender = () => {
             status: s.status,
             group_label: s.group_label || null,
             zalo_link: s.zalo_link || null,
-            photo_links: links,
-            photo_pin: pin || null
+            photo_links: links
         };
 
         try {
