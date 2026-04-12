@@ -18,40 +18,45 @@ export async function onRequest(context) {
 
     try {
         let response;
+        const idParam = url.searchParams.get('id');
 
         if (method === 'GET') {
-            const schedules = await sql`
-                SELECT 
-                    s.*, 
-                    (SELECT COUNT(*) FROM bookings b 
-                     WHERE b.status NOT IN ('Đã hủy', 'Cancelled')
-                     AND (
-                         -- Priority 1: Booking được gắn trực tiếp vào lịch này
-                         (b.schedule_id = s.id)
-                         OR 
-                         -- Fallback: chỉ dùng khi đây là lịch DUY NHẤT trong ngày (không có group_label)
-                         -- Nếu có group_label → chỉ đếm bằng schedule_id, không fallback
-                         (b.schedule_id IS NULL AND s.group_label IS NULL AND
-                          (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour) AND 
-                          (
-                              (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
-                              (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR
-                              (b.date LIKE '%' || TO_CHAR(s.start_date, 'FMDD/FMMM') || '%') OR
-                              (b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || ' - %') OR
-                              (b.date LIKE '% - ' || TO_CHAR(s.start_date, 'FMDD/FMMM')) OR
-                              (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
-                          )
+            if (idParam) {
+                const schedule = await sql`
+                    SELECT * FROM schedules WHERE id = ${idParam}
+                `;
+                response = Response.json(schedule[0] || { error: 'Not found' });
+            } else {
+                const schedules = await sql`
+                    SELECT 
+                        s.*, 
+                        (SELECT COUNT(*) FROM bookings b 
+                         WHERE b.status NOT IN ('Đã hủy', 'Cancelled')
+                         AND (
+                             (b.schedule_id = s.id)
+                             OR 
+                             (b.schedule_id IS NULL AND s.group_label IS NULL AND
+                              (b.tour ILIKE s.tour_name OR s.tour_name ILIKE b.tour) AND 
+                              (
+                                  (b.date = TO_CHAR(s.start_date, 'YYYY-MM-DD')) OR
+                                  (b.date LIKE '%' || TO_CHAR(s.start_date, 'DD/MM') || '%') OR
+                                  (b.date LIKE '%' || TO_CHAR(s.start_date, 'FMDD/FMMM') || '%') OR
+                                  (b.date LIKE TO_CHAR(s.start_date, 'FMDD/FMMM') || ' - %') OR
+                                  (b.date LIKE '% - ' || TO_CHAR(s.start_date, 'FMDD/FMMM')) OR
+                                  (b.date LIKE TO_CHAR(s.start_date, 'DD/MM/YYYY') || '%')
+                              )
+                             )
                          )
-                     )
-                    ) as booked_count
-                FROM schedules s
-                ORDER BY s.start_date ASC
-            `;
-            response = Response.json(schedules);
+                        ) as booked_count
+                    FROM schedules s
+                    ORDER BY s.start_date ASC
+                `;
+                response = Response.json(schedules);
+            }
 
         } else if (method === 'POST') {
             const body = await request.json();
-            const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link } = body;
+            const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin } = body;
 
             if (!tour_name || !start_date || !end_date) {
                 return Response.json({ error: 'Missing required configuration fields' }, { status: 400, headers: corsHeaders });
@@ -60,26 +65,25 @@ export async function onRequest(context) {
             if (id) {
                 // Update existing
                 await sql.query(
-                    `UPDATE schedules SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5, group_label=$6, zalo_link=$7 WHERE id=$8`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, id]
+                    `UPDATE schedules SET tour_name=$1, start_date=$2, end_date=$3, slots=$4, status=$5, group_label=$6, zalo_link=$7, photo_links=$8, photo_pin=$9 WHERE id=$10`,
+                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, photo_links || null, photo_pin || null, id]
                 );
                 response = Response.json({ success: true, message: 'Updated schedule' });
             } else {
                 // Insert new
                 await sql.query(
-                    `INSERT INTO schedules (tour_name, start_date, end_date, slots, status, group_label, zalo_link) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null]
+                    `INSERT INTO schedules (tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                    [tour_name, start_date, end_date, slots || 0, status || 'Đang mở', group_label || null, zalo_link || null, photo_links || null, photo_pin || null]
                 );
                 response = Response.json({ success: true, message: 'Created schedule' });
             }
 
         } else if (method === 'DELETE') {
-            const id = url.searchParams.get('id');
-            if (!id) {
+            if (!idParam) {
                 return Response.json({ error: 'Missing ID' }, { status: 400, headers: corsHeaders });
             }
 
-            await sql.query(`DELETE FROM schedules WHERE id = $1`, [id]);
+            await sql.query(`DELETE FROM schedules WHERE id = $1`, [idParam]);
             response = Response.json({ success: true, message: 'Deleted schedule' });
 
         } else {

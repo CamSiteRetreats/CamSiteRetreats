@@ -147,6 +147,56 @@ export const render = () => {
               </div>
           </div>
       </div>
+
+      <!-- Photo Links Modal -->
+      <div id="photoLinksModal" class="fixed inset-0 z-[80] bg-gray-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
+              <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
+                  <div>
+                      <h2 class="text-lg font-black text-gray-800">📸 Quản Lý Link Ảnh</h2>
+                      <p class="text-xs text-gray-400 mt-0.5" id="photoModalSubtitle">Thêm link ảnh cho chuyến đi</p>
+                  </div>
+                  <button id="closePhotoModalBtn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+              </div>
+
+              <div class="p-5 overflow-y-auto flex-1">
+                  <!-- PIN Config -->
+                  <div class="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <label class="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-1.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+                          Mã PIN Truy Cập (4 số cuối SĐT)
+                      </label>
+                      <input type="tel" id="photoPin" maxlength="4" inputmode="numeric" pattern="[0-9]{4}"
+                          class="w-full border border-amber-300 bg-white rounded-lg px-3 py-2 text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400 tracking-widest text-center text-lg"
+                          placeholder="_ _ _ _">
+                      <p class="text-[11px] text-amber-600 mt-1.5 font-medium">Khách cần nhập đúng PIN này mới xem được. Để trống = ai cũng xem được.</p>
+                  </div>
+
+                  <!-- Links list -->
+                  <div id="photoLinksList" class="space-y-3 mb-4">
+                      <!-- Dynamic rows -->
+                  </div>
+
+                  <button id="addPhotoLinkBtn" class="w-full py-2.5 border-2 border-dashed border-gray-200 text-gray-400 hover:border-csr-orange hover:text-csr-orange rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                      Thêm Link Ảnh Mới
+                  </button>
+              </div>
+
+              <div class="p-5 border-t border-gray-100 shrink-0 space-y-2">
+                  <button id="copyPhotoShareLinkBtn" class="w-full py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                      Sao Chép Link Chia Sẻ Cho Khách
+                  </button>
+                  <button id="savePhotoLinksBtn" class="w-full py-3 bg-csr-orange text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      Lưu Thay Đổi
+                  </button>
+              </div>
+          </div>
+      </div>
     `;
 };
 
@@ -395,6 +445,9 @@ export const afterRender = () => {
                             <button class="sch-guides-btn bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg px-2.5 py-2 md:py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" title="Phân công Nhân Sự">
                                 👥 Nhân Sự
                             </button>
+                            <button class="sch-photo-btn bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg px-2.5 py-2 md:py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" title="Quản lý Link Ảnh">
+                                📸 Link Ảnh${(item.photo_links && item.photo_links.length > 0) ? `<span class="bg-purple-600 text-white text-[9px] rounded-full px-1.5 py-0.5 font-black">${item.photo_links.length}</span>` : ''}
+                            </button>
                             <button class="sch-review-btn bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border border-yellow-200 rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" title="Copy Link Đánh Giá">
                                 ⭐ Link ĐG
                             </button>
@@ -491,6 +544,130 @@ export const afterRender = () => {
     document.getElementById('closeGuidePickerBtn').addEventListener('click', () => guidePickerModal.classList.add('hidden'));
     guidePickerModal.addEventListener('click', (e) => { if (e.target === guidePickerModal) guidePickerModal.classList.add('hidden'); });
 
+    // --- PHOTO LINKS MODAL ---
+    const photoLinksModal = document.getElementById('photoLinksModal');
+    let photoModalScheduleId = null;
+    let photoModalScheduleData = null;
+
+    const renderPhotoLinkRows = (links) => {
+        const list = document.getElementById('photoLinksList');
+        if (!links || links.length === 0) {
+            list.innerHTML = `<p class="text-center text-gray-400 text-sm py-2 italic">Chưa có link nào. Nhấn nút bên dưới để thêm.</p>`;
+            return;
+        }
+        list.innerHTML = links.map((link, idx) => `
+            <div class="flex gap-2 items-start" data-link-idx="${idx}">
+                <div class="flex-1 space-y-2">
+                    <input type="text" class="photo-link-title-input w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-50 focus:bg-white" placeholder="Tiêu đề (VD: Album Full HD, Flycam...)" value="${link.title || ''}">
+                    <input type="url" class="photo-link-url-input w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-50 focus:bg-white" placeholder="https://drive.google.com/..." value="${link.url || ''}">
+                </div>
+                <button class="remove-photo-link-btn p-2 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors shrink-0 mt-1" data-idx="${idx}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `).join('');
+
+        list.querySelectorAll('.remove-photo-link-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                const currentLinks = getPhotoLinksFromDOM();
+                currentLinks.splice(idx, 1);
+                renderPhotoLinkRows(currentLinks);
+            });
+        });
+    };
+
+    const getPhotoLinksFromDOM = () => {
+        const rows = document.querySelectorAll('#photoLinksList [data-link-idx]');
+        return Array.from(rows).map(row => ({
+            title: row.querySelector('.photo-link-title-input').value.trim(),
+            url: row.querySelector('.photo-link-url-input').value.trim()
+        })).filter(l => l.title || l.url);
+    };
+
+    const openPhotoModal = (scheduleId, tourName, scheduleData) => {
+        photoModalScheduleId = scheduleId;
+        photoModalScheduleData = scheduleData;
+        document.getElementById('photoModalSubtitle').textContent = `Tour: ${tourName}`;
+        document.getElementById('photoPin').value = scheduleData.photo_pin || '';
+        renderPhotoLinkRows(scheduleData.photo_links || []);
+        photoLinksModal.classList.remove('hidden');
+    };
+
+    document.getElementById('closePhotoModalBtn').addEventListener('click', () => photoLinksModal.classList.add('hidden'));
+    photoLinksModal.addEventListener('click', (e) => { if (e.target === photoLinksModal) photoLinksModal.classList.add('hidden'); });
+
+    document.getElementById('addPhotoLinkBtn').addEventListener('click', () => {
+        const currentLinks = getPhotoLinksFromDOM();
+        currentLinks.push({ title: '', url: '' });
+        renderPhotoLinkRows(currentLinks);
+        // Focus on the new row
+        const rows = document.querySelectorAll('#photoLinksList [data-link-idx]');
+        const last = rows[rows.length - 1];
+        if (last) last.querySelector('.photo-link-title-input').focus();
+    });
+
+    document.getElementById('copyPhotoShareLinkBtn').addEventListener('click', () => {
+        const link = `${window.location.origin}/photos?id=${photoModalScheduleId}`;
+        navigator.clipboard.writeText(link).then(() => {
+            const btn = document.getElementById('copyPhotoShareLinkBtn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✅ Đã copy link!';
+            btn.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+            btn.classList.remove('bg-purple-50', 'text-purple-700', 'border-purple-200');
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');
+                btn.classList.add('bg-purple-50', 'text-purple-700', 'border-purple-200');
+            }, 2500);
+        }).catch(() => alert('Link chia sẻ:\n' + `${window.location.origin}/photos?id=${photoModalScheduleId}`));
+    });
+
+    document.getElementById('savePhotoLinksBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('savePhotoLinksBtn');
+        const links = getPhotoLinksFromDOM();
+        const pin = document.getElementById('photoPin').value.trim();
+        const s = photoModalScheduleData;
+
+        if (pin && (pin.length !== 4 || !/^\d{4}$/.test(pin))) {
+            alert('PIN phải là 4 chữ số!');
+            return;
+        }
+
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+
+        const payload = {
+            id: photoModalScheduleId,
+            tour_name: s.tour_name,
+            start_date: s.start_date && s.start_date.includes('T') ? s.start_date.split('T')[0] : s.start_date,
+            end_date: s.end_date && s.end_date.includes('T') ? s.end_date.split('T')[0] : s.end_date,
+            slots: s.slots,
+            status: s.status,
+            group_label: s.group_label || null,
+            zalo_link: s.zalo_link || null,
+            photo_links: links,
+            photo_pin: pin || null
+        };
+
+        try {
+            const res = await fetch(API_SCHEDULES, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Save failed');
+            photoLinksModal.classList.add('hidden');
+            await loadSchedules();
+            alert(`✅ Đã lưu ${links.length} link ảnh!`);
+        } catch (err) {
+            alert('❌ Lỗi: ' + err.message);
+        } finally {
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Lưu Thay Đổi';
+            btn.disabled = false;
+        }
+    });
+
     // --- CARD ACTION HANDLER ---
     const handleCardAction = async (e) => {
         const editBtn = e.target.closest('.sch-edit-btn');
@@ -498,6 +675,7 @@ export const afterRender = () => {
         const reviewBtn = e.target.closest('.sch-review-btn');
         const detailsBtn = e.target.closest('.sch-details-btn');
         const guidesBtn = e.target.closest('.sch-guides-btn');
+        const photoBtn = e.target.closest('.sch-photo-btn');
 
         if (editBtn) {
             const id = editBtn.getAttribute('data-id');
@@ -509,6 +687,13 @@ export const afterRender = () => {
             const id = guidesBtn.getAttribute('data-id');
             const tourName = guidesBtn.getAttribute('data-tour');
             openGuidePicker(parseInt(id), tourName);
+        }
+
+        if (photoBtn) {
+            const id = parseInt(photoBtn.getAttribute('data-id'));
+            const tourName = photoBtn.getAttribute('data-tour');
+            const scheduleData = currentSchedules.find(s => s.id == id);
+            if (scheduleData) openPhotoModal(id, tourName, scheduleData);
         }
 
         if (deleteBtn) {
