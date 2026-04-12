@@ -118,6 +118,17 @@ export const render = () => {
                       </div>
                   </div>
 
+                  <!-- Assigned Guides Section -->
+                  <div id="rosterGuidesSection" class="bg-indigo-50/50 rounded-2xl border border-indigo-100 p-5 hidden print:block print:border-none print:p-0 print:mb-6">
+                      <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm uppercase tracking-wider print:text-black print:mb-2">
+                          <svg class="w-4 h-4 text-indigo-500 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                          Nhân Sự Phụ Trách
+                      </h3>
+                      <div id="rosterGuidesList" class="flex flex-wrap gap-2">
+                          <!-- Guides will be loaded here -->
+                      </div>
+                  </div>
+
                   <!-- Data Table -->
                   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden print:border-none print:shadow-none print:rounded-none">
                       <div class="overflow-x-auto print:overflow-visible">
@@ -441,6 +452,41 @@ export const afterRender = async () => {
 
     const loadData = async () => {
         try {
+            // Load Guides if scheduleId is present
+            if (targetScheduleId) {
+                try {
+                    const guidesRes = await fetch(`/api/guides?schedule_id=${targetScheduleId}`);
+                    const guides = await guidesRes.json();
+                    if (guides && guides.length > 0) {
+                        const guidesSection = document.getElementById('rosterGuidesSection');
+                        const guidesList = document.getElementById('rosterGuidesList');
+                        
+                        const ROLE_COLORS = {
+                            'Hướng Dẫn Viên': 'bg-blue-100 text-blue-700 border-blue-200',
+                            'Leader': 'bg-purple-100 text-purple-700 border-purple-200',
+                            'Photo': 'bg-pink-100 text-pink-700 border-pink-200',
+                            'Guider': 'bg-cyan-100 text-cyan-700 border-cyan-200',
+                            'Hậu Cần': 'bg-amber-100 text-amber-700 border-amber-200',
+                            'Học Việc': 'bg-gray-100 text-gray-600 border-gray-200',
+                        };
+
+                        guidesSection.classList.remove('hidden');
+                        guidesList.innerHTML = guides.map(g => {
+                            const badgeColor = ROLE_COLORS[g.role] || 'bg-gray-100 text-gray-600 border-gray-200';
+                            return `
+                                <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-gray-200 shadow-sm print:shadow-none print:border-gray-400">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor} uppercase tracking-wide print:border-black print:text-black">${g.role}</span>
+                                    <span class="font-bold text-gray-900 text-sm print:text-black">${g.full_name}</span>
+                                    ${g.phone ? `<a href="tel:${g.phone}" class="text-xs text-gray-500 hover:text-indigo-600 font-medium ml-1 print:text-black print:no-underline">(${g.phone})</a>` : ''}
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } catch (err) {
+                    console.error('Error loading guides:', err);
+                }
+            }
+
             const res = await fetch('/api/bookings');
             const data = await res.json();
 
