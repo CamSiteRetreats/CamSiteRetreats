@@ -510,11 +510,11 @@ export const afterRender = () => {
                     btn.disabled = true;
                     btn.textContent = '...';
 
-                    await fetch('/api/guides', {
+                    const action = isAssigned ? 'unassign' : 'assign';
+                    await fetch(`/api/guides?action=${action}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            action: isAssigned ? 'unassign' : 'assign',
                             schedule_id: pickerScheduleId,
                             guide_id: guideId
                         })
