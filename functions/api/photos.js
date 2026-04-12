@@ -34,28 +34,24 @@ export async function onRequest(context) {
         }
 
         if (method === 'GET') {
-            // Return public info only
+            // Return public info only (no links yet, no PIN)
             const rows = await sql`
-                SELECT id, tour_name, start_date, end_date, group_label
+                SELECT id, tour_name, start_date, end_date, group_label,
+                       CASE WHEN length(photo_pin) > 0 THEN true ELSE false END as has_pin
                 FROM schedules WHERE id = ${id}
             `;
             if (!rows || rows.length === 0) {
                 return addCors(Response.json({ error: 'Không tìm thấy chuyến đi.' }, { status: 404 }));
             }
-            // Always return has_pin: true so the client shows the PIN screen
-            return addCors(Response.json({ ...rows[0], has_pin: true }));
+            return addCors(Response.json(rows[0]));
 
         } else if (method === 'POST') {
             // Validate PIN and return photo links
             const body = await request.json();
             const { pin } = body;
 
-            if (!pin || pin.length !== 4) {
-                return addCors(Response.json({ error: 'Mã PIN phải là 4 số cuối số điện thoại của bạn.' }, { status: 400 }));
-            }
-
             const rows = await sql`
-                SELECT id, tour_name, start_date, end_date, group_label, photo_links
+                SELECT id, tour_name, start_date, end_date, group_label, photo_links, photo_pin
                 FROM schedules WHERE id = ${id}
             `;
             if (!rows || rows.length === 0) {
@@ -68,35 +64,21 @@ export async function onRequest(context) {
                 return addCors(Response.json({ error: 'Chưa có ảnh nào cho chuyến đi này.' }, { status: 404 }));
             }
 
-            // Validate PIN dynamically against bookings
-            const activeBookings = await sql`
-                SELECT phone FROM bookings 
-                WHERE status NOT IN ('Đã hủy', 'Cancelled')
-                AND (
-                    (schedule_id = ${id})
-                    OR 
-                    (schedule_id IS NULL AND ${schedule.group_label} IS NULL AND
-                     (tour ILIKE ${schedule.tour_name} OR ${schedule.tour_name} ILIKE tour) AND 
-                     (
-                         (date = TO_CHAR(${schedule.start_date}::timestamp, 'YYYY-MM-DD')) OR
-                         (date LIKE '%' || TO_CHAR(${schedule.start_date}::timestamp, 'DD/MM') || '%') OR
-                         (date LIKE '%' || TO_CHAR(${schedule.start_date}::timestamp, 'FMDD/FMMM') || '%') OR
-                         (date LIKE TO_CHAR(${schedule.start_date}::timestamp, 'FMDD/FMMM') || ' - %') OR
-                         (date LIKE '% - ' || TO_CHAR(${schedule.start_date}::timestamp, 'FMDD/FMMM')) OR
-                         (date LIKE TO_CHAR(${schedule.start_date}::timestamp, 'DD/MM/YYYY') || '%')
-                     )
-                    )
-                )
-            `;
+            // If no PIN is set, return links freely
+            if (!schedule.photo_pin) {
+                return addCors(Response.json({
+                    success: true,
+                    tour_name: schedule.tour_name,
+                    start_date: schedule.start_date,
+                    end_date: schedule.end_date,
+                    group_label: schedule.group_label,
+                    photo_links: schedule.photo_links || []
+                }));
+            }
 
-            const isValidPin = activeBookings.some(b => {
-                let cleanPhone = (b.phone || '').replace(/\D/g, '');
-                return cleanPhone.endsWith(pin.trim());
-            });
-
-            if (!isValidPin) {
-                // Return a friendly error message since multiple users will try this
-                return addCors(Response.json({ error: 'Không tìm thấy số điện thoại với 4 số cuối này trong danh sách đoàn. Vui lòng thử lại.' }, { status: 401 }));
+            // Validate PIN
+            if (!pin || pin.trim() !== schedule.photo_pin.trim()) {
+                return addCors(Response.json({ error: 'Mã PIN không đúng. Vui lòng thử lại.' }, { status: 401 }));
             }
 
             return addCors(Response.json({
