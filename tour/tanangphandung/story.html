@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../favicon.png">
+    <title>Hành Trình Tà Năng - Phan Dũng | CAM SITE RETREATS</title>
+    <meta name="description" content="Khám phá cung đường Tà Năng - Phan Dũng qua storyboard truyện tranh độc đáo. Lịch trình, trang bị, và những khoảnh khắc đáng nhớ được kể bằng ngôn ngữ truyện tranh.">
+    <meta property="og:title" content="Storyboard: Tà Năng - Phan Dũng | CAM SITE RETREATS">
+    <meta property="og:image" content="https://camsiteretreats.com/tour/tanangphandung/panel-hero.png">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Gloria+Hallelujah&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1008;
+            --paper: #fdf6e3;
+            --paper-dark: #f5ead0;
+            --orange: #E85D04;
+            --orange-light: #FF8C3A;
+            --yellow: #f5c842;
+            --teal: #2A9D8F;
+            --purple: #6b3fa0;
+            --panel-border: 3px solid var(--ink);
+            --panel-shadow: 5px 5px 0px var(--ink);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--paper-dark);
+            background-image:
+                radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px),
+                radial-gradient(circle, rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px, 10px 10px;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--ink);
+            overflow-x: hidden;
+        }
+
+        /* ========================
+           COVER PAGE
+        ======================== */
+        .cover {
+            background: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 40px 20px;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(232,93,4,0.06) 10px,
+                    rgba(232,93,4,0.06) 20px
+                );
+        }
+
+        .cover-badge {
+            font-family: 'Bangers', cursive;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: var(--orange);
+            border: 2px solid var(--orange);
+            padding: 6px 20px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .cover-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(4rem, 16vw, 9rem);
+            color: white;
+            text-align: center;
+            line-height: 0.9;
+            letter-spacing: 3px;
+            position: relative;
+            z-index: 2;
+            -webkit-text-stroke: 2px var(--orange);
+            text-shadow: 8px 8px 0 var(--orange), 16px 16px 0 rgba(232,93,4,0.3);
+            animation: fadeUp 0.6s ease 0.1s both;
+        }
+
+        .cover-subtitle {
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: clamp(0.8rem, 3vw, 1.1rem);
+            color: var(--yellow);
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+            animation: fadeUp 0.6s ease 0.2s both;
+        }
+
+        .cover-hero-img {
+            width: 100%;
+            max-width: 900px;
+            border: var(--panel-border);
+            border-radius: 4px;
+            box-shadow: 10px 10px 0 var(--orange);
+            margin: 32px auto 0;
+            display: block;
+            position: relative;
+            z-index: 2;
+            animation: fadeUp 0.7s ease 0.3s both;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 28px;
+            position: relative;
+            z-index: 2;
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+
+        .cover-meta-item {
+            text-align: center;
+            color: white;
+        }
+
+        .cover-meta-item .value {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            color: var(--yellow);
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .cover-meta-item .label {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            z-index: 2;
+            animation: bounce 2s ease infinite;
+        }
+
+        .scroll-indicator span {
+            font-family: 'Gloria Hallelujah', cursive;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.65rem;
+        }
+
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 3px solid rgba(255,255,255,0.4);
+            border-bottom: 3px solid rgba(255,255,255,0.4);
+            transform: rotate(45deg);
+        }
+
+        /* ========================
+           COMIC LAYOUT
+        ======================== */
+        .comic-book {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 20px 100px;
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        .chapter-label {
+            font-family: 'Bangers', cursive;
+            font-size: 0.75rem;
+            letter-spacing: 6px;
+            color: var(--orange);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .chapter-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: var(--ink);
+            letter-spacing: 2px;
+            -webkit-text-stroke: 1.5px var(--ink);
+        }
+
+        /* Comic Panel System */
+        .panel-row {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: stretch;
+        }
+
+        .panel-row.cols-1 { grid-template-columns: 1fr; }
+        .panel-row.cols-2 { grid-template-columns: 1fr 1fr; }
+        .panel-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .panel-row.cols-2-1 { grid-template-columns: 2fr 1fr; }
+        .panel-row.cols-1-2 { grid-template-columns: 1fr 2fr; }
+        .panel-row.cols-3-2 { grid-template-columns: 3fr 2fr; }
+
+        .panel {
+            background: white;
+            border: var(--panel-border);
+            border-radius: 4px;
+            box-shadow: var(--panel-shadow);
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s ease;
+        }
+
+        .panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .panel:hover {
+            box-shadow: 8px 8px 0 var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .panel-img {
+            width: 100%;
+            height: 100%;
+            min-height: 260px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .panel-img.tall { min-height: 400px; }
+        .panel-img.short { min-height: 200px; }
+
+        /* Narration Box */
+        .narration-box {
+            position: absolute;
+            background: var(--ink);
+            color: white;
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            padding: 8px 14px;
+            max-width: 85%;
+            z-index: 10;
+        }
+
+        .narration-box.top-left { top: 12px; left: 12px; }
+        .narration-box.top-right { top: 12px; right: 12px; }
+        .narration-box.bottom-left { bottom: 12px; left: 12px; }
+        .narration-box.bottom-right { bottom: 12px; right: 12px; }
+        .narration-box.center-bottom { bottom: 12px; left: 50%; transform: translateX(-50%); text-align: center; }
+
+        /* Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            background: white;
+            border: var(--panel-border);
+            border-radius: 16px;
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.65rem;
+            padding: 8px 12px;
+            max-width: 160px;
+            z-index: 10;
+            line-height: 1.5;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 20px;
+            border: 7px solid transparent;
+            border-top-color: var(--ink);
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 21px;
+            border: 6px solid transparent;
+            border-top-color: white;
+            z-index: 1;
+        }
+
+        .speech-bubble.top-right { top: 12px; right: 12px; }
+        .speech-bubble.top-left { top: 12px; left: 12px; }
+
+        /* Action Lines Panel */
+        .action-panel {
+            background: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .action-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-conic-gradient(var(--orange) 0deg, transparent 1deg, transparent 15deg, var(--orange) 16deg, transparent 17deg);
+            opacity: 0.15;
+        }
+
+        .action-text {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2.5rem, 10vw, 6rem);
+            color: var(--yellow);
+            letter-spacing: 4px;
+            text-align: center;
+            -webkit-text-stroke: 3px var(--ink);
+            text-shadow: 4px 4px 0 var(--orange);
+            z-index: 2;
+            position: relative;
+            padding: 30px;
+            line-height: 1;
+        }
+
+        /* Info Card Panel */
+        .info-panel {
+            background: var(--paper);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-panel-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+            color: var(--orange);
+            margin-bottom: 12px;
+            border-bottom: 3px solid var(--ink);
+            padding-bottom: 8px;
+        }
+
+        .info-panel-body {
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.65rem;
+            line-height: 2;
+            color: var(--ink);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+            margin-bottom: 6px;
+        }
+
+        .timeline-time {
+            font-family: 'Bangers', cursive;
+            font-size: 1rem;
+            color: var(--orange);
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        .timeline-text {
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.6rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Gear Grid */
+        .gear-panel {
+            background: var(--paper);
+            padding: 24px;
+        }
+
+        .gear-panel-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-align: center;
+            color: var(--ink);
+            -webkit-text-stroke: 1px var(--ink);
+            margin-bottom: 20px;
+            border-bottom: 3px double var(--ink);
+            padding-bottom: 10px;
+        }
+
+        .gear-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 12px;
+        }
+
+        .gear-item {
+            text-align: center;
+            border: 2px solid var(--ink);
+            padding: 10px 6px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 2px 2px 0 var(--ink);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .gear-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 4px 5px 0 var(--ink);
+        }
+
+        .gear-icon {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 6px;
+        }
+
+        .gear-name {
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.52rem;
+            line-height: 1.4;
+            color: var(--ink);
+        }
+
+        .gear-must {
+            background: var(--orange);
+            color: white;
+            font-size: 0.45rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Poses Panel */
+        .poses-panel {
+            background: var(--paper);
+            padding: 24px;
+        }
+
+        .poses-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-align: center;
+            color: var(--purple);
+            -webkit-text-stroke: 1px var(--ink);
+            margin-bottom: 20px;
+            border-bottom: 3px double var(--ink);
+            padding-bottom: 10px;
+        }
+
+        .poses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .pose-item {
+            border: 2px solid var(--ink);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 3px 3px 0 var(--ink);
+            background: white;
+        }
+
+        .pose-item img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .pose-label {
+            background: var(--ink);
+            color: var(--yellow);
+            font-family: 'Bangers', cursive;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 4px;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: var(--yellow);
+            border: var(--panel-border);
+            color: var(--ink);
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.65rem;
+            line-height: 1.8;
+            padding: 16px 20px;
+            position: relative;
+        }
+
+        .tip-box::before {
+            content: '★ MẸO HAY ★';
+            font-family: 'Bangers', cursive;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--orange);
+        }
+
+        /* Full-width divider panels */
+        .divider-panel {
+            background: var(--orange);
+            border: var(--panel-border);
+            box-shadow: var(--panel-shadow);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .divider-panel-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: white;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .divider-panel-day {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: var(--yellow);
+            letter-spacing: 4px;
+            -webkit-text-stroke: 2px var(--ink);
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        /* CTA Panel */
+        .cta-panel {
+            background: var(--ink);
+            border: var(--panel-border);
+            box-shadow: 10px 10px 0 var(--orange);
+            padding: 48px 32px;
+            text-align: center;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 12px,
+                rgba(255,255,255,0.02) 12px,
+                rgba(255,255,255,0.02) 24px
+            );
+        }
+
+        .cta-panel-subtitle {
+            font-family: 'Gloria Hallelujah', cursive;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+        }
+
+        .cta-panel-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: var(--yellow);
+            letter-spacing: 4px;
+            -webkit-text-stroke: 1px white;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: var(--orange);
+            color: white;
+            font-family: 'Bangers', cursive;
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            padding: 18px 48px;
+            border: 3px solid white;
+            box-shadow: 6px 6px 0 white;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-btn:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 9px 9px 0 white;
+        }
+
+        .cta-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 3px 3px 0 white;
+        }
+
+        .cta-back {
+            display: inline-block;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Gloria Hallelujah', cursive;
+            font-size: 0.7rem;
+            margin-top: 24px;
+            text-decoration: none;
+            position: relative;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+
+        .cta-back:hover { color: white; }
+
+        /* Panel number badge */
+        .panel-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--orange);
+            color: white;
+            font-family: 'Bangers', cursive;
+            font-size: 0.9rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            letter-spacing: 0;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .panel-row.cols-2,
+            .panel-row.cols-3,
+            .panel-row.cols-2-1,
+            .panel-row.cols-1-2,
+            .panel-row.cols-3-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .narration-box { font-size: 0.6rem; padding: 6px 10px; }
+            .cover-meta { gap: 20px; }
+            .gear-grid { grid-template-columns: repeat(3, 1fr); }
+            .poses-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Sound effect labels */
+        .sfx {
+            font-family: 'Bangers', cursive;
+            color: var(--yellow);
+            font-size: clamp(1.5rem, 6vw, 3rem);
+            -webkit-text-stroke: 2px var(--ink);
+            text-shadow: 3px 3px 0 var(--ink);
+            letter-spacing: 3px;
+            display: block;
+            text-align: center;
+            transform: rotate(-8deg);
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════
+         COVER PAGE
+    ═══════════════════════════════════════ -->
+    <section class="cover">
+        <div class="cover-badge">CAM SITE RETREATS • ADVENTURE SERIES</div>
+        <h1 class="cover-title">TÀ NĂNG<br>PHAN DŨNG</h1>
+        <p class="cover-subtitle">✦ Hành Trình 2 Ngày 1 Đêm Qua Thảo Nguyên Bay Phong ✦</p>
+        <img src="panel-hero.png" alt="Tà Năng Phan Dũng Landscape" class="cover-hero-img">
+        <div class="cover-meta">
+            <div class="cover-meta-item">
+                <span class="value">30KM</span>
+                <span class="label">Cung đường</span>
+            </div>
+            <div class="cover-meta-item">
+                <span class="value">1168M</span>
+                <span class="label">Độ cao</span>
+            </div>
+            <div class="cover-meta-item">
+                <span class="value">2N1Đ</span>
+                <span class="label">Hành trình</span>
+            </div>
+            <div class="cover-meta-item">
+                <span class="value">★★★</span>
+                <span class="label">Độ khó</span>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Lật trang</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         CHAPTER 1: CHUẨN BỊ
+    ═══════════════════════════════════════ -->
+    <main class="comic-book">
+
+        <div class="chapter-header">
+            <span class="chapter-label">CHAPTER 1</span>
+            <h2 class="chapter-title">⚔ Trang Bị Của Chiến Binh ⚔</h2>
+        </div>
+
+        <!-- Row: Full-width gear image + Info -->
+        <div class="panel-row cols-1-2" style="margin-bottom:16px">
+            <div class="panel" style="min-height:320px">
+                <img src="panel-gear.png" alt="Trekking Gear" class="panel-img tall" style="min-height:320px">
+                <div class="narration-box top-left">Trước khi xuất phát...<br>kiểm tra lại trang bị!</div>
+            </div>
+            <div class="panel gear-panel">
+                <div class="gear-panel-title">⬛ Vật Dụng Cần Mang ⬛</div>
+                <div class="gear-grid">
+                    <div class="gear-item">
+                        <img src="../../tour/Balo.png" alt="Balo" class="gear-icon">
+                        <div class="gear-name">Balo 55L</div>
+                        <span class="gear-must">BẮT BUỘC</span>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/GayTrekking.png" alt="Gậy" class="gear-icon">
+                        <div class="gear-name">Gậy Trekking</div>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/AoMua.png" alt="Áo mưa" class="gear-icon">
+                        <div class="gear-name">Áo Mưa Gọn</div>
+                        <span class="gear-must">BẮT BUỘC</span>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/NuocUong.png" alt="Nước uống" class="gear-icon">
+                        <div class="gear-name">Nước 2L+</div>
+                        <span class="gear-must">BẮT BUỘC</span>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/NMG_giay.png" alt="Giày" class="gear-icon">
+                        <div class="gear-name">Giày Thể Thao</div>
+                        <span class="gear-must">BẮT BUỘC</span>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/NMG_quanao.png" alt="Quần áo" class="gear-icon">
+                        <div class="gear-name">Quần Áo Dài</div>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/ChupAnhCamera.png" alt="Camera" class="gear-icon">
+                        <div class="gear-name">Camera / Điện Thoại</div>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/BaoHiem.png" alt="Kem chống nắng" class="gear-icon">
+                        <div class="gear-name">Kem Chống Nắng</div>
+                    </div>
+                    <div class="gear-item">
+                        <img src="../../tour/baoho.png" alt="Bao hose" class="gear-icon">
+                        <div class="gear-name">Bao Hose Giày</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tip Box -->
+        <div class="panel tip-box" style="margin-bottom:40px; opacity:1; transform:none;">
+            Tổng trọng lượng balo lý tưởng: <strong>8 - 12kg</strong>. Đừng mang quá nhiều — cung 30km sẽ "thử thách" đôi vai của bạn đấy! 😅
+            Đoàn có hỗ trợ <strong>porter</strong> nên bạn có thể gửi đồ nặng nếu cần nhé.
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             CHAPTER 2: HÀNH TRÌNH
+        ═══════════════════════════════════════ -->
+
+        <div class="chapter-header">
+            <span class="chapter-label">CHAPTER 2</span>
+            <h2 class="chapter-title">🌙 Đêm Khởi Hành</h2>
+        </div>
+
+        <!-- DAY 0 Divider -->
+        <div class="panel divider-panel" style="margin-bottom:16px">
+            <div class="divider-panel-day">NGÀY 0</div>
+            <div class="divider-panel-title">HÀNH TRÌNH BẮT ĐẦU TRONG ĐÊM</div>
+            <div style="font-family:'Gloria Hallelujah',cursive;color:rgba(255,255,255,0.8);font-size:0.7rem;">21:45 → 22:15</div>
+        </div>
+
+        <!-- Night bus row -->
+        <div class="panel-row cols-2-1">
+            <div class="panel" style="min-height:300px">
+                <img src="panel-bus.png" alt="Night Bus" class="panel-img tall" style="min-height:300px">
+                <div class="narration-box top-left">TP. HCM, 22:15 tối...</div>
+                <div class="speech-bubble top-right">Sẵn sàng chưa?!</div>
+            </div>
+            <div class="panel info-panel">
+                <div class="info-panel-title">🕙 Lịch Trình</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">21:45</span>
+                        <span class="timeline-text">Tập trung tại nhà xe Xuân Mẫn (A75/30 Bạch Đằng, Tân Bình)</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">22:15</span>
+                        <span class="timeline-text">Xe khởi hành hướng Đức Trọng, Lâm Đồng. Ngủ ngon trên xe nhé!</span>
+                    </div>
+                </div>
+                <div style="margin-top:16px; border-top:2px dashed var(--ink); padding-top:12px;">
+                    <span class="sfx" style="font-size:1.8rem;">VROOM!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 1 Divider -->
+        <div class="panel divider-panel" style="margin:16px 0">
+            <div class="divider-panel-day">NGÀY 1</div>
+            <div class="divider-panel-title">CHINH PHỤC THẢO NGUYÊN</div>
+            <div style="font-family:'Gloria Hallelujah',cursive;color:rgba(255,255,255,0.8);font-size:0.7rem;">04:30 → 18:30</div>
+        </div>
+
+        <!-- Day 1 panels row 1 -->
+        <div class="panel-row cols-2">
+            <div class="panel info-panel">
+                <div class="info-panel-title">🌅 Sáng Sớm Tại Đức Trọng</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">04:30</span>
+                        <span class="timeline-text">Đến điểm ăn sáng. Tắm, thay đồ. Sẵn sàng cho hành trình!</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">05:30</span>
+                        <span class="timeline-text">Thưởng thức bún / phở bò nóng hổi giữa trời se lạnh.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">06:30</span>
+                        <span class="timeline-text">Lên xe trung chuyển thêm 20km vào bìa rừng.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">07:30</span>
+                        <span class="timeline-text">Khởi động, phổ biến cung đường và xuất phát!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" style="min-height:280px">
+                <img src="panel-hero.png" alt="Bắt đầu leo núi" class="panel-img" style="min-height:280px; object-position: center top;">
+                <div class="narration-box bottom-left">Cỏ xanh, trời trong<br>và đôi chân sẵn sàng!</div>
+                <div class="panel-number">3</div>
+            </div>
+        </div>
+
+        <!-- Day 1 row 2: Landscape hero -->
+        <div class="panel-row cols-1" style="margin-top:16px">
+            <div class="panel" style="min-height:380px">
+                <img src="panel-hero.png" alt="Đồi cỏ Tà Năng" class="panel-img" style="min-height:380px; object-position: center 60%;">
+                <div class="narration-box top-left">11:30 — Giữa đường hành trình...</div>
+                <div class="narration-box bottom-right">Những đồng cỏ vô tận trải dài trước mắt.</div>
+            </div>
+        </div>
+
+        <!-- Day 1 row 3: lunch + campfire -->
+        <div class="panel-row cols-1-2" style="margin-top:16px">
+            <div class="panel info-panel">
+                <div class="info-panel-title">🍱 Bữa Trưa Giữa Rừng</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">11:30</span>
+                        <span class="timeline-text">Đoàn nghỉ ngơi, ăn trưa giản dị ngay tại khu rừng già. Không khí trong lành, tiếng chim hót, và những nụ cười mệt mà vui!</span>
+                    </div>
+                </div>
+                <div style="margin-top:16px">
+                    <div class="tip-box" style="position:static; border:2px dashed var(--ink); padding:12px 16px;">
+                        Nhớ ăn no nhé — chặng chiều còn dài đấy! 🥾
+                    </div>
+                </div>
+            </div>
+            <div class="panel" style="min-height:300px">
+                <img src="panel-lunch.png" alt="Bữa trưa bên suối" class="panel-img" style="min-height:300px">
+                <div class="narration-box bottom-right">Ngâm chân bên suối mát...</div>
+                <div class="panel-number">4</div>
+            </div>
+        </div>
+
+        <!-- Sunset + Camp -->
+        <div class="panel-row cols-3-2" style="margin-top:16px">
+            <div class="panel" style="min-height:340px">
+                <img src="panel-hero.png" alt="Hoàng hôn Cam'p Site" class="panel-img tall" style="min-height:340px; object-position: center 80%;">
+                <div class="narration-box top-left">16:30 — Đỉnh đồi hiện ra...</div>
+                <div class="narration-box bottom-right">Hoàng hôn cháy rực trên thảo nguyên vô tận.</div>
+                <div class="panel-number">5</div>
+            </div>
+            <div class="panel info-panel">
+                <div class="info-panel-title">🏕 Camp Site</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">16:30</span>
+                        <span class="timeline-text">Về đến Cam'p Site. Nhận lều, tắm, và tận hưởng hoàng hôn tuyệt đẹp!</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">18:30</span>
+                        <span class="timeline-text">Tiệc BBQ bên bếp lửa hồng. Âm nhạc, câu chuyện và bầu trời đầy sao.</span>
+                    </div>
+                </div>
+                <span class="sfx" style="font-size:1.4rem; margin-top:12px; display:block;">YAHHH!!! 🔥</span>
+            </div>
+        </div>
+
+        <!-- Campfire row -->
+        <div class="panel-row cols-1" style="margin-top:16px">
+            <div class="panel" style="min-height:360px">
+                <img src="panel-campfire.png" alt="Đêm BBQ bên lửa" class="panel-img" style="min-height:360px">
+                <div class="narration-box top-left">Đêm đó... không ai muốn ngủ sớm.</div>
+                <div class="speech-bubble" style="bottom:16px;right:16px;top:auto;left:auto;">Kể tui nghe<br>câu chuyện đó đi!!</div>
+                <div class="panel-number">6</div>
+            </div>
+        </div>
+
+        <!-- DAY 2 Divider -->
+        <div class="panel divider-panel" style="margin:16px 0">
+            <div class="divider-panel-day">NGÀY 2</div>
+            <div class="divider-panel-title">BÌNH MINH & RỪNG XANH</div>
+            <div style="font-family:'Gloria Hallelujah',cursive;color:rgba(255,255,255,0.8);font-size:0.7rem;">05:30 → 23:00</div>
+        </div>
+
+        <!-- Sunrise row -->
+        <div class="panel-row cols-2-1">
+            <div class="panel" style="min-height:320px">
+                <img src="panel-sunrise.png" alt="Bình minh biển mây" class="panel-img tall" style="min-height:320px">
+                <div class="narration-box top-left">05:30 sáng...</div>
+                <div class="narration-box bottom-right">Biển mây trôi bềnh bồng giữa đất trời.</div>
+                <div class="panel-number">7</div>
+            </div>
+            <div class="panel info-panel">
+                <div class="info-panel-title">☀️ Bình Minh</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">05:30</span>
+                        <span class="timeline-text">Thức dậy đón bình minh sớm. Trà nóng + cafe giữa trời se lạnh.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">06:30</span>
+                        <span class="timeline-text">Ăn sáng dưới ánh bình minh. Khoảnh khắc này... không thể diễn tả!</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">07:30</span>
+                        <span class="timeline-text">Thu dọn lều, khởi động và tiếp tục hành trình chặng 2.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Day 2 row 2: Motorbike -->
+        <div class="panel-row cols-1-2" style="margin-top:16px">
+            <div class="panel action-panel" style="min-height:240px">
+                <div class="action-text">GRAB<br>RỪNG!!</div>
+            </div>
+            <div class="panel" style="min-height:280px">
+                <img src="panel-motorbike.png" alt="Xe máy rừng" class="panel-img" style="min-height:280px">
+                <div class="narration-box top-left">14:00 — Bãi grab rừng!</div>
+                <div class="speech-bubble top-right" style="top:auto;bottom:16px;right:12px;">5km đường rừng<br>đỉnh không tưởng!!</div>
+                <div class="panel-number">8</div>
+            </div>
+        </div>
+
+        <!-- Day 2 finish -->
+        <div class="panel-row cols-2" style="margin-top:16px">
+            <div class="panel info-panel">
+                <div class="info-panel-title">🏁 Về Đích!</div>
+                <div class="info-panel-body">
+                    <div class="timeline-item">
+                        <span class="timeline-time">11:30</span>
+                        <span class="timeline-text">Dừng chân bên suối, ngâm chân và thưởng thức bữa trưa nhẹ.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">14:30</span>
+                        <span class="timeline-text">Về điểm tập kết. Tắm thay, ăn chiều no nê.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">16:00</span>
+                        <span class="timeline-text">Kiểm tra đồ đạc và lên xe về TP.HCM.</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-time">23:00</span>
+                        <span class="timeline-text">Về đến nhà xe Xuân Mẫn. Mệt, nhưng hạnh phúc! 🙌</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" style="background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; gap:16px">
+                <div style="font-family:'Bangers',cursive; font-size:4rem; color:var(--orange); -webkit-text-stroke:1px var(--ink);">DONE!</div>
+                <div style="font-family:'Gloria Hallelujah',cursive; font-size:0.7rem; text-align:center; line-height:1.8; color:#555;">
+                    30km hoàn thành.<br>
+                    Đôi chân mỏi nhưng<br>
+                    trái tim đầy ắp!
+                </div>
+                <img src="../../tour/HuyChuong.png" alt="Huy chương hoàn thành" style="width:80px; height:80px; object-fit:contain;">
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             CHAPTER 3: PHOTO POSES
+        ═══════════════════════════════════════ -->
+
+        <div class="chapter-header">
+            <span class="chapter-label">CHAPTER 3 — BONUS</span>
+            <h2 class="chapter-title">📸 Pose Như Thế Nào Để Đẹp?</h2>
+        </div>
+
+        <!-- Full Image + Tips -->
+        <div class="panel-row cols-1" style="margin-bottom:16px">
+            <div class="panel" style="min-height:400px">
+                <img src="panel-poses.png" alt="Photo Poses at Tà Năng" class="panel-img" style="min-height:400px">
+                <div class="narration-box top-left">Địa điểm xịn thì cần<br>pose xịn mới "ra" ảnh!</div>
+                <div class="panel-number">9</div>
+            </div>
+        </div>
+
+        <!-- Poses Grid + Tips -->
+        <div class="panel-row cols-2">
+            <div class="panel poses-panel">
+                <div class="poses-title">🎯 5 Pose Kinh Điển Tại Tà Năng</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:12px; border:2px solid var(--ink); padding:10px 14px; background:white; box-shadow:2px 2px 0 var(--ink);">
+                        <span style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--orange);min-width:36px">01</span>
+                        <div>
+                            <div style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px">SIÊU ANH HÙNG</div>
+                            <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.58rem;color:#666">Dang tay chữ T, để đồi cỏ làm backdrop. Tuyệt đẹp khi có ánh nắng vàng!</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:2px solid var(--ink); padding:10px 14px; background:white; box-shadow:2px 2px 0 var(--ink);">
+                        <span style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--orange);min-width:36px">02</span>
+                        <div>
+                            <div style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px">NHẢY SUNG</div>
+                            <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.58rem;color:#666">Nhảy cao trên đỉnh đồi lúc hoàng hôn. Cần chụp burst mode để chọn ảnh!</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:2px solid var(--ink); padding:10px 14px; background:white; box-shadow:2px 2px 0 var(--ink);">
+                        <span style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--orange);min-width:36px">03</span>
+                        <div>
+                            <div style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px">NGỒI NHÌN MÊNH MÔNG</div>
+                            <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.58rem;color:#666">Ngồi trên tảng đá hay vạt cỏ, nhìn ra xa. Tâm trạng nhất khi có biển mây!</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:2px solid var(--ink); padding:10px 14px; background:white; box-shadow:2px 2px 0 var(--ink);">
+                        <span style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--orange);min-width:36px">04</span>
+                        <div>
+                            <div style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px">ĐI VỀ PHÍA TRƯỚC</div>
+                            <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.58rem;color:#666">Đi thẳng trên con đường mòn, chụp từ phía sau lưng. Ảnh rất cinematic!</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; border:2px solid var(--ink); padding:10px 14px; background:white; box-shadow:2px 2px 0 var(--ink);">
+                        <span style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--orange);min-width:36px">05</span>
+                        <div>
+                            <div style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px">SELFIE BÌNH MINH</div>
+                            <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.58rem;color:#666">Selfie ngược sáng khi bình minh lên. Để ánh sáng chiếu vào mặt — golden hour magic!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel info-panel">
+                <div class="info-panel-title">📷 Tips Chụp Ảnh Đỉnh</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div class="tip-box" style="position:static; border:2px dashed var(--ink);">
+                        <strong>Thời điểm vàng:</strong> 06:30-07:30 (bình minh) và 16:30-18:00 (hoàng hôn). Ánh sáng đẹp nhất trong ngày!
+                    </div>
+                    <div style="background:var(--purple);color:white;padding:14px 16px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);">
+                        <div style="font-family:'Bangers',cursive;font-size:0.9rem;letter-spacing:2px;color:var(--yellow);margin-bottom:6px;">★ PROFILE: PORTRAIT MODE</div>
+                        <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.6rem;line-height:1.8;">iPhone Portrait hoặc f/1.8 trên máy ảnh. Background blur làm nổi bật người chụp!</div>
+                    </div>
+                    <div style="background:var(--teal);color:white;padding:14px 16px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);">
+                        <div style="font-family:'Bangers',cursive;font-size:0.9rem;letter-spacing:2px;color:var(--yellow);margin-bottom:6px;">★ LANDSCAPE: WIDE ANGLE</div>
+                        <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.6rem;line-height:1.8;">Dùng ống wide để capture toàn cảnh đồi cỏ. Tripod cho ảnh bình minh không bị mờ!</div>
+                    </div>
+                    <div style="background:var(--paper-dark);padding:14px 16px;border:2px dashed var(--ink);">
+                        <div style="font-family:'Gloria Hallelujah',cursive;font-size:0.62rem;line-height:1.8;color:var(--ink);">
+                            📱 Cam hỗ trợ <strong>1 nhiếp ảnh gia</strong> chuyên nghiệp đồng hành — bạn chỉ cần pose thôi!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             CTA SECTION
+        ═══════════════════════════════════════ -->
+        <div class="cta-panel panel" style="opacity:1;transform:none;">
+            <div class="cta-panel-subtitle">Sẵn sàng bước vào hành trình?</div>
+            <div class="cta-panel-title">ĐẶT CHUYẾN ĐI NGAY!</div>
+            <a href="../tanangphandung.html" class="cta-btn">KHÁM PHÁ TOUR & GIÁ</a>
+            <br>
+            <a href="../../index.html" class="cta-back">← Khám phá thêm các tour khác</a>
+        </div>
+
+    </main>
+
+    <script>
+        // Intersection Observer for panel reveal
+        const panels = document.querySelectorAll('.panel');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, 80 * (entry.target.dataset.delay || 0));
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        // Stagger panels in the same row
+        document.querySelectorAll('.panel-row').forEach(row => {
+            const rowPanels = row.querySelectorAll('.panel');
+            rowPanels.forEach((panel, i) => {
+                panel.dataset.delay = i;
+            });
+        });
+
+        panels.forEach(p => observer.observe(p));
+
+        // Fix CTA panel (always visible)
+        document.querySelector('.cta-panel').classList.add('visible');
+        document.querySelector('.tip-box.panel') && document.querySelector('.tip-box.panel').classList.add('visible');
+    </script>
+
+</body>
+</html>
