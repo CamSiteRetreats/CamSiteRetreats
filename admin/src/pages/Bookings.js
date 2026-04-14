@@ -384,151 +384,181 @@ export const render = () => {
 
       <!-- Edit Booking Modal (Full Detail Edit) -->
       <div id="editModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform relative" id="editModalContent">
-              <button onclick="window.closeEditModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors z-20">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
+          <div class="bg-gray-50 border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform relative" id="editModalContent">
               
-              <div class="p-8">
-                  <h2 class="text-2xl font-bold text-gray-800 mb-6">Chỉnh Sửa Đơn Hàng Chi Tiết</h2>
-
-                  <form id="editForm" class="space-y-5">
+              <!-- Sticky Header -->
+              <div class="sticky top-0 bg-gray-50/95 backdrop-blur z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
+                  <div>
+                      <h2 class="text-xl font-bold text-gray-900">✏️ Chỉnh Sửa Phiếu Đăng Ký</h2>
+                      <p class="text-xs text-gray-400 mt-0.5">Cập nhật thông tin chi tiết của đơn hàng</p>
+                  </div>
+                  <button onclick="window.closeEditModal()" class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 rounded-full p-2 transition-colors border border-gray-200">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+              </div>
+              
+              <div class="p-6">
+                  <form id="editForm" class="space-y-4">
                       <input type="hidden" id="edit-id">
 
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Họ tên *</label>
-                              <input type="text" id="edit-name" class="input-field bg-gray-50 font-medium" required>
+                      <!-- SECTION 1: Thông tin Tour & Trạng thái -->
+                      <div class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 text-sm">🗺️</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Tour & Trạng thái</h3>
                           </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">SĐT *</label>
-                              <input type="tel" id="edit-phone" class="input-field bg-gray-50 font-medium" required>
-                          </div>
-                      </div>
-
-                      <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mã CRM / Tên In Huy Chương</label>
-                          <input type="text" id="edit-medal-name" class="input-field bg-gray-50 font-bold text-csr-orange">
-                      </div>
-
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tuyến Tour</label>
-                              <select id="edit-tour" class="input-field bg-gray-50 font-medium max-w-full">
-                                  <option value="">-- Chọn Tour --</option>
-                              </select>
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày đi</label>
-                              <select id="edit-date" class="input-field bg-gray-50 font-mono">
-                                  <option value="">-- Chọn Lịch --</option>
-                              </select>
-                          </div>
-                      </div>
-
-                      <!-- New Info Fields for Edit -->
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-gray-100 pt-5 mt-2">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày sinh</label>
-                              <input type="date" id="edit-dob" class="input-field bg-gray-50 text-sm">
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới tính</label>
-                              <select id="edit-gender" class="input-field bg-gray-50 text-sm">
-                                  <option value="Khác">Khác</option>
-                                  <option value="Nam">Nam</option>
-                                  <option value="Nữ">Nữ</option>
-                              </select>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div class="md:col-span-1">
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tuyến Tour</label>
+                                  <select id="edit-tour" class="input-field bg-white font-medium">
+                                      <option value="">-- Chọn Tour --</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Khởi Hành</label>
+                                  <select id="edit-date" class="input-field bg-white font-mono">
+                                      <option value="">-- Chọn Lịch --</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Trạng Thái Đơn</label>
+                                  <select id="edit-status" class="input-field bg-white text-sm font-bold">
+                                      <option value="Chờ tư vấn">⏳ Chờ lịch</option>
+                                      <option value="Chờ cọc">🔔 Chờ cọc</option>
+                                      <option value="Chờ xác nhận cọc">💳 Chờ xác nhận cọc</option>
+                                      <option value="Đã cọc">✅ Đã cọc</option>
+                                      <option value="Đã cọc (Chờ đi)">🎒 Đã cọc (Chờ đi)</option>
+                                      <option value="Hoàn thành">🏆 Hoàn thành</option>
+                                  </select>
+                              </div>
+                              <div id="edit-sale-container" class="hidden">
+                                  <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">👤 Người Phụ Trách</label>
+                                  <select id="edit-sale" class="input-field bg-blue-50 text-sm font-bold text-blue-700 border-blue-200">
+                                      <option value="">-- Website --</option>
+                                  </select>
+                              </div>
+                              <div class="md:col-span-2">
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên In Huy Chương</label>
+                                  <input type="text" id="edit-medal-name" class="input-field bg-white font-bold text-csr-orange" placeholder="Để trống = dùng Họ Tên">
+                              </div>
                           </div>
                       </div>
 
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 border-b border-gray-100 pb-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Trạng Thái Đơn</label>
-                              <select id="edit-status" class="input-field bg-gray-50 text-sm font-medium">
-                                  <option value="Chờ xác nhận cọc">Chờ xác nhận cọc</option>
-                                  <option value="Đã cọc (Chờ đi)">Đã cọc (Chờ đi)</option>
-                                  <option value="Hoàn thành">Hoàn thành</option>
-                              </select>
+                      <!-- SECTION 2: Thông tin Cá nhân -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 text-sm">👤</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Cá nhân</h3>
                           </div>
-                          <div id="edit-sale-container" class="hidden">
-                              <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">Người Phụ Trách</label>
-                              <select id="edit-sale" class="input-field bg-blue-50 text-sm font-bold text-blue-700 border-blue-200">
-                                  <option value="">-- Website --</option>
-                              </select>
-                          </div>
-                      </div>
-
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Dị ứng / Ghi Chú Y Tế</label>
-                              <input type="text" id="edit-allergy" class="input-field bg-gray-50 text-sm" placeholder="VD: Không có">
-                          </div>
-                      </div>
-
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Chế độ ăn</label>
-                              <input type="text" id="edit-diet" class="input-field bg-gray-50 text-sm" placeholder="VD: Ăn chay, không hành...">
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
-                              <select id="edit-trekking-pole" class="input-field bg-gray-50 text-sm">
-                                  <option value="Không">Không mượn</option>
-                                  <option value="Có">Có mượn gậy</option>
-                              </select>
-                          </div>
-                      </div>
-                      
-                      <div class="grid grid-cols-1 gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa chỉ</label>
-                              <input type="text" id="edit-address" class="input-field bg-gray-50 text-sm">
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Họ và Tên *</label>
+                                  <input type="text" id="edit-name" class="input-field bg-gray-50 font-bold" required>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Số Điện Thoại *</label>
+                                  <input type="tel" id="edit-phone" class="input-field bg-gray-50 font-medium" required>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Sinh</label>
+                                  <input type="date" id="edit-dob" class="input-field bg-gray-50 text-sm">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới Tính</label>
+                                  <select id="edit-gender" class="input-field bg-gray-50 text-sm">
+                                      <option value="Khác">Khác</option>
+                                      <option value="Nam">Nam</option>
+                                      <option value="Nữ">Nữ</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">CCCD / Passport</label>
+                                  <input type="text" id="edit-id-card" class="input-field bg-gray-50 font-mono text-sm" placeholder="Số định danh">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa Chỉ</label>
+                                  <input type="text" id="edit-address" class="input-field bg-gray-50 text-sm" placeholder="Tỉnh/Thành, Quận/Huyện">
+                              </div>
+                              <div class="md:col-span-2 flex items-center gap-2 pt-1">
+                                  <input type="checkbox" id="edit-commitments" class="w-4 h-4 text-csr-orange border-gray-300 rounded focus:ring-csr-orange">
+                                  <label for="edit-commitments" class="text-xs font-bold text-gray-600 uppercase">Khách đã đồng ý Cam kết sức khỏe & Nội quy</label>
+                              </div>
                           </div>
                       </div>
 
-                      <div class="flex items-center gap-2 py-2">
-                          <input type="checkbox" id="edit-commitments" class="w-4 h-4 text-csr-orange border-gray-300 rounded focus:ring-csr-orange">
-                          <label for="edit-commitments" class="text-xs font-bold text-gray-600 uppercase">Khách đã đồng ý Cam kết sức khỏe & Nội quy</label>
+                      <!-- SECTION 3: Hậu cần -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0 text-sm">🎒</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Hậu cần</h3>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Điểm Đón</label>
+                                  <input type="text" id="edit-pickup-point" class="input-field bg-gray-50 text-sm" placeholder="VD: Đà Lạt Trung Tâm">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
+                                  <select id="edit-trekking-pole" class="input-field bg-gray-50 text-sm">
+                                      <option value="Không">Không mượn</option>
+                                      <option value="Có">✅ Có mượn gậy</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Chế Độ Ăn</label>
+                                  <input type="text" id="edit-diet" class="input-field bg-gray-50 text-sm" placeholder="VD: Ăn chay, không hành...">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-red-400 uppercase mb-1.5">Dị Ứng / Y Tế</label>
+                                  <input type="text" id="edit-allergy" class="input-field bg-red-50/30 border-red-100 text-sm" placeholder="VD: Không có">
+                              </div>
+                              <div class="md:col-span-2">
+                                  <label class="block text-xs font-bold text-blue-500 uppercase mb-1.5">💬 Ghi Chú Sale / Yêu Cầu Riêng</label>
+                                  <input type="text" id="edit-special" class="input-field bg-blue-50/30 text-sm text-blue-700 font-medium" placeholder="Lưu ý đón khách, yêu cầu đặc biệt...">
+                              </div>
+                          </div>
                       </div>
 
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ghi Chú Đơn Hàng (Sale Note)</label>
-                              <input type="text" id="edit-special" class="input-field bg-gray-50 text-sm text-blue-600 font-medium">
+                      <!-- SECTION 4: Tài chính -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 text-sm">💰</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Tài chính & Thanh toán</h3>
                           </div>
-                          <div>
+                          <div class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc)</label>
+                                  <input type="number" id="edit-total" class="input-field bg-white font-bold text-gray-900" oninput="window.updateEditRemaining()">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-red-500 uppercase mb-1.5">Giảm Giá</label>
+                                  <input type="number" id="edit-discount" class="input-field bg-red-50 text-red-600 font-bold" oninput="window.updateEditRemaining()">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-green-600 uppercase mb-1.5">Khách Đã Cọc</label>
+                                  <input type="number" id="edit-deposit" class="input-field bg-green-50 border-green-200 font-bold text-green-700" oninput="window.updateEditRemaining()">
+                              </div>
+                          </div>
+                          <div class="mb-4">
                               <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
-                              <input type="number" id="edit-deposit-required" class="input-field bg-orange-50/50 font-bold text-csr-orange" placeholder="1000000">
+                              <input type="number" id="edit-deposit-required" class="input-field bg-orange-50/50 border-orange-100 font-bold text-csr-orange" placeholder="1000000">
+                          </div>
+                          <div class="bg-gradient-to-r from-red-500 to-rose-600 p-4 rounded-xl flex justify-between items-center text-white">
+                              <span class="text-sm font-bold uppercase flex items-center gap-2">
+                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                 Còn Lại Cần Phải Thu
+                              </span>
+                              <span id="edit-remaining" class="text-2xl font-black drop-shadow">0đ</span>
                           </div>
                       </div>
 
-                      <div class="border-t border-gray-100 pt-5 grid grid-cols-1 md:grid-cols-3 gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá Tour (Gốc)</label>
-                              <input type="number" id="edit-total" class="input-field bg-gray-50 font-bold text-gray-900" oninput="window.updateEditRemaining()">
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-red-500 uppercase mb-1.5">Giảm Giá</label>
-                              <input type="number" id="edit-discount" class="input-field bg-red-50 text-red-600 font-bold" oninput="window.updateEditRemaining()">
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Khách Đã Cọc</label>
-                              <input type="number" id="edit-deposit" class="input-field bg-green-50 border-green-200 font-bold text-green-700" oninput="window.updateEditRemaining()">
-                          </div>
-                      </div>
-
-                      <div class="bg-red-50 p-4 rounded-xl flex justify-between items-center border border-red-100 mt-2">
-                          <span class="text-sm font-bold text-red-500 uppercase flex items-center gap-2">
-                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             Còn Lại Cần Phải Thu
-                          </span>
-                          <span id="edit-remaining" class="text-2xl font-black text-red-600">0đ</span>
-                      </div>
-
-                      <div class="flex gap-4 pt-6 mt-4">
-                          <button type="button" onclick="window.closeEditModal()" class="flex-1 px-4 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-sm text-sm">Hủy bỏ</button>
-                          <button type="submit" class="flex-1 px-4 py-3.5 bg-csr-orange text-white rounded-xl font-bold hover:bg-[#d65503] transition-colors shadow-lg shadow-csr-orange/30 text-sm">Lên Cập Nhật Mới</button>
+                      <!-- Action Buttons -->
+                      <div class="flex gap-3 pt-2">
+                          <button type="button" onclick="window.closeEditModal()" class="flex-1 px-4 py-4 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-sm text-sm">Hủy bỏ</button>
+                          <button type="submit" class="flex-[2] px-4 py-4 bg-csr-orange text-white rounded-xl font-bold hover:bg-[#d65503] transition-all shadow-lg shadow-csr-orange/30 text-sm flex items-center justify-center gap-2">
+                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                              Lưu Cập Nhật
+                          </button>
                       </div>
                   </form>
               </div>
@@ -1776,8 +1806,13 @@ export const afterRender = () => {
             document.getElementById('edit-gender').value = data.gender || 'Khác';
             document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
             document.getElementById('edit-address').value = data.address || '';
-            document.getElementById('edit-diet').value = data.diet || data.dietary || 'Không';
+            document.getElementById('edit-diet').value = data.diet || data.dietary || '';
             document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+            // Trường mới
+            const idCardEl = document.getElementById('edit-id-card');
+            if (idCardEl) idCardEl.value = data.id_card || data.cccd || '';
+            const pickupEl = document.getElementById('edit-pickup-point');
+            if (pickupEl) pickupEl.value = data.pickup_point || '';
         };
 
         // Điền tạm dữ liệu hiện có trong booking
@@ -1823,9 +1858,12 @@ export const afterRender = () => {
                     if (dobInput && !dobInput.value) dobInput.value = c.dob || '';
                     if (addressInput && !addressInput.value) addressInput.value = c.address || '';
                     if (allergyInput && !allergyInput.value) allergyInput.value = c.medical_notes || '';
-                    if (dietInput && (dietInput.value === 'Không' || !dietInput.value)) dietInput.value = c.dietary || 'Không';
+                    if (dietInput && !dietInput.value) dietInput.value = c.dietary || '';
                     if (genderInput && (genderInput.value === 'Khác' || !genderInput.value)) genderInput.value = c.gender || 'Khác';
                     if (medalInput && !medalInput.value) medalInput.value = c.medal_name || '';
+                    // Trường mới: CCCD
+                    const idCardEl2 = document.getElementById('edit-id-card');
+                    if (idCardEl2 && !idCardEl2.value) idCardEl2.value = c.cccd || '';
                 }
             } catch (err) { console.error("Pull CRM error:", err); }
         }
@@ -2435,6 +2473,10 @@ export const afterRender = () => {
                 const trekking_pole = document.getElementById('edit-trekking-pole').value;
                 const commitments = document.getElementById('edit-commitments').checked;
                 const special = document.getElementById('edit-special').value;
+                const idCardEl = document.getElementById('edit-id-card');
+                const id_card = idCardEl ? idCardEl.value : '';
+                const pickupEl = document.getElementById('edit-pickup-point');
+                const pickup_point = pickupEl ? pickupEl.value : '';
 
                 // Lấy thông tin Sale được chọn (chỉ khả dụng với Admin, nếu không thì lấy mặc định từ element)
                 const saleSelect = document.getElementById('edit-sale');
@@ -2472,6 +2514,8 @@ export const afterRender = () => {
                     trekking_pole: trekking_pole,
                     commitments: commitments,
                     special: special,
+                    id_card: id_card,
+                    pickup_point: pickup_point,
                     sale_id: sale_id,
                     sale_name: sale_name,
                     total_price: basePrice - discount,
