@@ -526,20 +526,36 @@ export const render = () => {
                                   <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 text-sm">✨</div>
                                   <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Dịch Vụ Bổ Sung</h3>
                               </div>
+                          </div>
+
+                          <!-- Preset services từ thiết lập tour -->
+                          <div id="presetServicesBlock" class="hidden mb-4">
+                              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2.5">📋 Dịch vụ cài sẵn của tour — chọn để thêm vào đơn</p>
+                              <div id="presetServicesList" class="grid grid-cols-1 gap-2"></div>
+                          </div>
+
+                          <!-- Đường phân cách -->
+                          <div id="servicesDivider" class="hidden border-t border-dashed border-gray-200 my-3"></div>
+
+                          <!-- Custom / Thủ công -->
+                          <div class="flex justify-between items-center mb-2">
+                              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">🖊️ Dịch vụ khác (nhập tay)</p>
                               <button type="button" id="addServiceBtn" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-lg text-xs font-bold transition-colors">
                                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                  Thêm dịch vụ
+                                  Thêm thủ công
                               </button>
                           </div>
                           <div id="servicesContainer" class="space-y-2">
-                              <!-- Dịch vụ sẽ được thêm động vào đây -->
-                              <p id="emptyServicesMsg" class="text-sm text-gray-400 italic text-center py-3">Chưa có dịch vụ đi kèm. Nhấn "⮕ Thêm dịch vụ" để bổ sung.</p>
+                              <p id="emptyServicesMsg" class="text-sm text-gray-400 italic text-center py-2">Không có dịch vụ bổ sung nào được nhập tay.</p>
                           </div>
+
+                          <!-- Tổng phí -->
                           <div id="servicesTotalRow" class="hidden mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                              <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tổng phí dịch vụ</span>
+                              <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tổng phí dịch vụ bổ sung</span>
                               <span id="servicesTotalDisplay" class="text-sm font-black text-green-600">0đ</span>
                           </div>
                       </div>
+
 
                       <!-- SECTION 5: Tài chính -->
                       <div class="bg-white border border-gray-200 rounded-2xl p-4">
@@ -1912,24 +1928,90 @@ export const afterRender = () => {
         const container = document.getElementById('servicesContainer');
         const emptyMsg = document.getElementById('emptyServicesMsg');
         const totalRow = document.getElementById('servicesTotalRow');
-        if (container) {
-            // Xóa tất cả rows cũ (giữ lại empty msg)
-            container.querySelectorAll('.service-row').forEach(r => r.remove());
-            let existingServices = [];
+        const presetBlock = document.getElementById('presetServicesBlock');
+        const presetList = document.getElementById('presetServicesList');
+        const divider = document.getElementById('servicesDivider');
+
+        // Parse danh sách dịch vụ đã được chọn trong booking
+        let bookedServices = [];
+        try {
+            if (booking.services_booked) {
+                const parsed = typeof booking.services_booked === 'string'
+                    ? JSON.parse(booking.services_booked) : booking.services_booked;
+                if (Array.isArray(parsed)) bookedServices = parsed;
+            }
+        } catch(e) {}
+
+        // Load preset services từ tour
+        if (presetList && presetBlock) {
+            presetList.innerHTML = '';
+            const matchedTourData = allTours.find(t => t.name === booking.tour);
+            let presetServices = [];
             try {
-                if (booking.services_booked) {
-                    const parsed = typeof booking.services_booked === 'string'
-                        ? JSON.parse(booking.services_booked) : booking.services_booked;
-                    if (Array.isArray(parsed)) existingServices = parsed;
+                if (matchedTourData?.services) {
+                    const ps = typeof matchedTourData.services === 'string'
+                        ? JSON.parse(matchedTourData.services) : matchedTourData.services;
+                    if (Array.isArray(ps)) presetServices = ps;
                 }
             } catch(e) {}
-            if (existingServices.length > 0) {
+
+            if (presetServices.length > 0) {
+                presetBlock.classList.remove('hidden');
+                if (divider) divider.classList.remove('hidden');
+                presetServices.forEach(ps => {
+                    const isBooked = bookedServices.some(b =>
+                        (b.label || b.name || '').toLowerCase() === (ps.label || '').toLowerCase()
+                    );
+                    const card = document.createElement('label');
+                    card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' +
+                        (isBooked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50 hover:border-orange-200');
+                    card.innerHTML = `
+                        <input type="checkbox" class="preset-service-check w-4 h-4 rounded accent-green-500 shrink-0" 
+                               data-label="${(ps.label || '').replace(/"/g, '&quot;')}" 
+                               data-price="${ps.price || 0}" 
+                               ${isBooked ? 'checked' : ''}>
+                        ${ps.image ? `<img src="${ps.image}" class="w-10 h-10 rounded-lg object-cover shrink-0">` : 
+                          '<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-500 text-lg shrink-0">✨</div>'}
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-sm text-gray-800">${ps.label || ''}</div>
+                            ${ps.description ? `<div class="text-xs text-gray-400 truncate">${ps.description}</div>` : ''}
+                        </div>
+                        <div class="text-sm font-black text-green-600 shrink-0">+${parseInt(ps.price || 0).toLocaleString('vi-VN')}đ</div>
+                    `;
+                    card.querySelector('.preset-service-check').addEventListener('change', (e) => {
+                        card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' +
+                            (e.target.checked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50 hover:border-orange-200');
+                        window.updateServicesTotal();
+                    });
+                    presetList.appendChild(card);
+                });
+            } else {
+                presetBlock.classList.add('hidden');
+                if (divider) divider.classList.add('hidden');
+            }
+        }
+
+        // Nạp manual services (các dịch vụ nhập tay - không có trong preset)
+        if (container) {
+            container.querySelectorAll('.service-row').forEach(r => r.remove());
+            // Lọc những dịch vụ đã được lưu mà không có trong preset
+            const matchedTourData2 = allTours.find(t => t.name === booking.tour);
+            let presetLabels = new Set();
+            try {
+                const ps2 = matchedTourData2?.services;
+                const arr = ps2 ? (typeof ps2 === 'string' ? JSON.parse(ps2) : ps2) : [];
+                if (Array.isArray(arr)) arr.forEach(p => presetLabels.add((p.label || '').toLowerCase()));
+            } catch(e) {}
+
+            const manualServices = bookedServices.filter(b =>
+                !presetLabels.has((b.label || b.name || '').toLowerCase())
+            );
+            if (manualServices.length > 0) {
                 if (emptyMsg) emptyMsg.classList.add('hidden');
                 if (totalRow) totalRow.classList.remove('hidden');
-                existingServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
+                manualServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
             } else {
                 if (emptyMsg) emptyMsg.classList.remove('hidden');
-                if (totalRow) totalRow.classList.add('hidden');
             }
             window.updateServicesTotal();
         }
@@ -1966,14 +2048,20 @@ export const afterRender = () => {
 
     // Logic tính toán số tiền còn lại trong Form Edit
     window.updateServicesTotal = () => {
-        const rows = document.querySelectorAll('.service-row');
         let total = 0;
-        rows.forEach(row => {
-            const priceInput = row.querySelector('.service-price-input');
-            total += parseInt(priceInput ? priceInput.value : 0) || 0;
+        // Tính tổng từ preset checkboxes
+        document.querySelectorAll('.preset-service-check:checked').forEach(cb => {
+            total += parseInt(cb.dataset.price) || 0;
+        });
+        // Tính tổng từ manual rows
+        document.querySelectorAll('.service-price-input').forEach(el => {
+            total += parseInt(el.value) || 0;
         });
         const display = document.getElementById('servicesTotalDisplay');
         if (display) display.textContent = total.toLocaleString('vi-VN') + 'đ';
+        // Hiện/ẩn total row
+        const totalRow = document.getElementById('servicesTotalRow');
+        if (totalRow) totalRow.classList.toggle('hidden', total === 0);
         window.updateEditRemaining();
         return total;
     };
@@ -2018,15 +2106,15 @@ export const afterRender = () => {
     if (addServiceBtn) addServiceBtn.addEventListener('click', () => window.addServiceRow());
 
     window.updateEditRemaining = () => {
-        const total = parseInt(document.getElementById('edit-total').value) || 0;
-        const discount = parseInt(document.getElementById('edit-discount').value) || 0;
-        const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
-        // Bao gồm phí dịch vụ bổ sung
+        const total = parseInt(document.getElementById('edit-total')?.value) || 0;
+        const discount = parseInt(document.getElementById('edit-discount')?.value) || 0;
+        const deposit = parseInt(document.getElementById('edit-deposit')?.value) || 0;
+        // Bao gồm phí dịch vụ bổ sung (cả preset + manual)
         let svTotal = 0;
+        document.querySelectorAll('.preset-service-check:checked').forEach(cb => { svTotal += parseInt(cb.dataset.price) || 0; });
         document.querySelectorAll('.service-price-input').forEach(el => { svTotal += parseInt(el.value) || 0; });
         const finalPrice = total - discount + svTotal;
         const remaining = finalPrice - deposit;
-
         const remainEl = document.getElementById('edit-remaining');
         if (remainEl) {
             remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
@@ -2582,8 +2670,15 @@ export const afterRender = () => {
                 const pickup_point = pickupEl ? pickupEl.value : '';
 
                 // Thu thập dịch vụ bổ sung
-                const serviceRows = document.querySelectorAll('.service-row');
                 const servicesArr = [];
+                // 1) Từ preset
+                document.querySelectorAll('.preset-service-check:checked').forEach(cb => {
+                    const label = cb.dataset.label;
+                    const price = parseInt(cb.dataset.price) || 0;
+                    if (label) servicesArr.push({ label, price });
+                });
+                // 2) Từ thủ công
+                const serviceRows = document.querySelectorAll('.service-row');
                 serviceRows.forEach(row => {
                     const label = (row.querySelector('.service-label-input')?.value || '').trim();
                     const price = parseInt(row.querySelector('.service-price-input')?.value) || 0;
