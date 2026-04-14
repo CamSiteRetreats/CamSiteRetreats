@@ -519,10 +519,32 @@ export const render = () => {
                           </div>
                       </div>
 
-                      <!-- SECTION 4: Tài chính -->
+                      <!-- SECTION 4: Dịch vụ bổ sung -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center justify-between mb-4">
+                              <div class="flex items-center gap-2.5">
+                                  <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 text-sm">✨</div>
+                                  <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Dịch Vụ Bổ Sung</h3>
+                              </div>
+                              <button type="button" id="addServiceBtn" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-lg text-xs font-bold transition-colors">
+                                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                  Thêm dịch vụ
+                              </button>
+                          </div>
+                          <div id="servicesContainer" class="space-y-2">
+                              <!-- Dịch vụ sẽ được thêm động vào đây -->
+                              <p id="emptyServicesMsg" class="text-sm text-gray-400 italic text-center py-3">Chưa có dịch vụ đi kèm. Nhấn "⮕ Thêm dịch vụ" để bổ sung.</p>
+                          </div>
+                          <div id="servicesTotalRow" class="hidden mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                              <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tổng phí dịch vụ</span>
+                              <span id="servicesTotalDisplay" class="text-sm font-black text-green-600">0đ</span>
+                          </div>
+                      </div>
+
+                      <!-- SECTION 5: Tài chính -->
                       <div class="bg-white border border-gray-200 rounded-2xl p-4">
                           <div class="flex items-center gap-2.5 mb-4">
-                              <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 text-sm">💰</div>
+                              <div class="w-7 h-7 rounded-lg bg-orange-50 text-csr-orange flex items-center justify-center flex-shrink-0 text-sm">💰</div>
                               <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Tài chính & Thanh toán</h3>
                           </div>
                           <div class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -1886,6 +1908,32 @@ export const afterRender = () => {
 
         window.updateEditRemaining();
 
+        // Nạp dịch vụ bổ sung
+        const container = document.getElementById('servicesContainer');
+        const emptyMsg = document.getElementById('emptyServicesMsg');
+        const totalRow = document.getElementById('servicesTotalRow');
+        if (container) {
+            // Xóa tất cả rows cũ (giữ lại empty msg)
+            container.querySelectorAll('.service-row').forEach(r => r.remove());
+            let existingServices = [];
+            try {
+                if (booking.services_booked) {
+                    const parsed = typeof booking.services_booked === 'string'
+                        ? JSON.parse(booking.services_booked) : booking.services_booked;
+                    if (Array.isArray(parsed)) existingServices = parsed;
+                }
+            } catch(e) {}
+            if (existingServices.length > 0) {
+                if (emptyMsg) emptyMsg.classList.add('hidden');
+                if (totalRow) totalRow.classList.remove('hidden');
+                existingServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
+            } else {
+                if (emptyMsg) emptyMsg.classList.remove('hidden');
+                if (totalRow) totalRow.classList.add('hidden');
+            }
+            window.updateServicesTotal();
+        }
+
         // Hiện Modal Edit
         const editModal = document.getElementById('editModal');
         const editModalContent = document.getElementById('editModalContent');
@@ -1917,11 +1965,66 @@ export const afterRender = () => {
     };
 
     // Logic tính toán số tiền còn lại trong Form Edit
+    window.updateServicesTotal = () => {
+        const rows = document.querySelectorAll('.service-row');
+        let total = 0;
+        rows.forEach(row => {
+            const priceInput = row.querySelector('.service-price-input');
+            total += parseInt(priceInput ? priceInput.value : 0) || 0;
+        });
+        const display = document.getElementById('servicesTotalDisplay');
+        if (display) display.textContent = total.toLocaleString('vi-VN') + 'đ';
+        window.updateEditRemaining();
+        return total;
+    };
+
+    window.addServiceRow = (label = '', price = 0) => {
+        const container = document.getElementById('servicesContainer');
+        const emptyMsg = document.getElementById('emptyServicesMsg');
+        const totalRow = document.getElementById('servicesTotalRow');
+        if (!container) return;
+        if (emptyMsg) emptyMsg.classList.add('hidden');
+        if (totalRow) totalRow.classList.remove('hidden');
+
+        const row = document.createElement('div');
+        row.className = 'service-row flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5';
+        row.innerHTML = `
+            <span class="text-green-500 text-sm">✨</span>
+            <input type="text" class="service-label-input flex-1 text-sm bg-transparent border-none outline-none text-gray-700 font-medium placeholder:text-gray-300" placeholder="Tên dịch vụ (VD: Thuê áo mưa, Bảo hiểm...)" value="${label.replace(/"/g, '&quot;')}">
+            <div class="flex items-center gap-1 shrink-0">
+                <span class="text-xs text-gray-400 font-medium">+</span>
+                <input type="number" class="service-price-input w-24 text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 text-green-600 font-bold text-right outline-none focus:border-green-400" placeholder="Giá" value="${price}" min="0">
+                <span class="text-xs text-gray-400">đ</span>
+            </div>
+            <button type="button" class="remove-service-btn text-gray-300 hover:text-red-400 transition-colors ml-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+        row.querySelector('.remove-service-btn').addEventListener('click', () => {
+            row.remove();
+            const remaining = container.querySelectorAll('.service-row').length;
+            if (remaining === 0) {
+                if (emptyMsg) emptyMsg.classList.remove('hidden');
+                if (totalRow) totalRow.classList.add('hidden');
+            }
+            window.updateServicesTotal();
+        });
+        row.querySelector('.service-price-input').addEventListener('input', window.updateServicesTotal);
+        container.appendChild(row);
+        window.updateServicesTotal();
+    };
+
+    const addServiceBtn = document.getElementById('addServiceBtn');
+    if (addServiceBtn) addServiceBtn.addEventListener('click', () => window.addServiceRow());
+
     window.updateEditRemaining = () => {
         const total = parseInt(document.getElementById('edit-total').value) || 0;
         const discount = parseInt(document.getElementById('edit-discount').value) || 0;
         const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
-        const finalPrice = total - discount;
+        // Bao gồm phí dịch vụ bổ sung
+        let svTotal = 0;
+        document.querySelectorAll('.service-price-input').forEach(el => { svTotal += parseInt(el.value) || 0; });
+        const finalPrice = total - discount + svTotal;
         const remaining = finalPrice - deposit;
 
         const remainEl = document.getElementById('edit-remaining');
@@ -2478,6 +2581,16 @@ export const afterRender = () => {
                 const pickupEl = document.getElementById('edit-pickup-point');
                 const pickup_point = pickupEl ? pickupEl.value : '';
 
+                // Thu thập dịch vụ bổ sung
+                const serviceRows = document.querySelectorAll('.service-row');
+                const servicesArr = [];
+                serviceRows.forEach(row => {
+                    const label = (row.querySelector('.service-label-input')?.value || '').trim();
+                    const price = parseInt(row.querySelector('.service-price-input')?.value) || 0;
+                    if (label) servicesArr.push({ label, price });
+                });
+                const services_booked = servicesArr.length > 0 ? JSON.stringify(servicesArr) : null;
+
                 // Lấy thông tin Sale được chọn (chỉ khả dụng với Admin, nếu không thì lấy mặc định từ element)
                 const saleSelect = document.getElementById('edit-sale');
                 let sale_id = undefined;
@@ -2516,6 +2629,7 @@ export const afterRender = () => {
                     special: special,
                     id_card: id_card,
                     pickup_point: pickup_point,
+                    services_booked: services_booked,
                     sale_id: sale_id,
                     sale_name: sale_name,
                     total_price: basePrice - discount,
