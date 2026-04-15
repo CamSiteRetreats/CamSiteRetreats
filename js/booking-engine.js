@@ -555,8 +555,8 @@ const BookingEngine = {
                 </div>
                 <div style="background:#f9fafb; border-radius:12px; padding:14px; text-align:left;">
                     <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Ngân hàng</span><span style="font-weight:700;">BIDV</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Số tài khoản</span><span style="font-weight:700; color:#E85D04;">96247CAMSITERETREAT</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Chủ tài khoản</span><span style="font-weight:700;">PHAM THIEN AN</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Số tài khoản</span><span style="font-weight:700; color:#E85D04;">8818429610</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span style="color:#9ca3af;">Chủ tài khoản</span><span style="font-weight:700;">HO KINH DOANH CAM SITE RETREATS</span></div>
                     <div style="background:#fff3e8; border-radius:8px; padding:10px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
                         <div>
                             <div style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-bottom:3px;">Nội dung chuyển khoản</div>
@@ -759,7 +759,7 @@ const BookingEngine = {
     },
 
     _getQRUrl(amount, code) {
-        return `https://qr.sepay.vn/img?acc=96247CAMSITERETREAT&bank=BIDV&amount=${amount}&des=${encodeURIComponent(code)}`;
+        return `https://qr.sepay.vn/img?acc=8818429610&bank=BIDV&amount=${amount}&des=${encodeURIComponent(code)}`;
     },
 
     _copyCode() {
