@@ -1,4 +1,4 @@
-import{S as ee,H as te}from"./Header-Dmidaim7.js";const ne=()=>`
+import{S as ee,H as te}from"./Header-CsK1zS95.js";const ne=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800 font-sans">
         <!-- Sidebar is hidden when printing -->
         <div class="print:hidden">

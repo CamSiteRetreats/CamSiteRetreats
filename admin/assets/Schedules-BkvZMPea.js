@@ -1,4 +1,4 @@
-import{S as q,H as V}from"./Header-Dmidaim7.js";const R=()=>`
+import{S as q,H as V}from"./Header-CsK1zS95.js";const R=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${q()}
         

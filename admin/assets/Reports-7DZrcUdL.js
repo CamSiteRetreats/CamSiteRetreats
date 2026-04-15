@@ -1,4 +1,4 @@
-import{S as R,H as F}from"./Header-Dmidaim7.js";const q=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const y=localStorage.getItem("csr_user");y&&(f=JSON.parse(y))}catch{}const T=f.role==="admin";return`
+import{S as R,H as F}from"./Header-CsK1zS95.js";const q=()=>{let f={role:"sale",fullName:"Guest",id:null};try{const y=localStorage.getItem("csr_user");y&&(f=JSON.parse(y))}catch{}const T=f.role==="admin";return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${R()}
         <div class="flex flex-col flex-1 w-full overflow-hidden">

@@ -1,4 +1,4 @@
-import{S as h,H as v}from"./Header-Dmidaim7.js";const g=["Hướng Dẫn Viên","Leader","Photo","Guider","Hậu Cần","Học Việc"],m={"Hướng Dẫn Viên":"bg-blue-100 text-blue-700 border-blue-200",Leader:"bg-purple-100 text-purple-700 border-purple-200",Photo:"bg-pink-100 text-pink-700 border-pink-200",Guider:"bg-cyan-100 text-cyan-700 border-cyan-200","Hậu Cần":"bg-amber-100 text-amber-700 border-amber-200","Học Việc":"bg-gray-100 text-gray-600 border-gray-200"},k=()=>`
+import{S as h,H as v}from"./Header-CsK1zS95.js";const g=["Hướng Dẫn Viên","Leader","Photo","Guider","Hậu Cần","Học Việc"],m={"Hướng Dẫn Viên":"bg-blue-100 text-blue-700 border-blue-200",Leader:"bg-purple-100 text-purple-700 border-purple-200",Photo:"bg-pink-100 text-pink-700 border-pink-200",Guider:"bg-cyan-100 text-cyan-700 border-cyan-200","Hậu Cần":"bg-amber-100 text-amber-700 border-amber-200","Học Việc":"bg-gray-100 text-gray-600 border-gray-200"},k=()=>`
     <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800 font-sans">
         ${h()}
         <div class="flex flex-col flex-1 w-full overflow-hidden">

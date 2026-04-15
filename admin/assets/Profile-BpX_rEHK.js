@@ -1,4 +1,4 @@
-import{S as y,H as x}from"./Header-Dmidaim7.js";const k=()=>{let e={id:"",username:"",fullName:"",role:"",avatar:"",phone:"",email:"",payment_info:null};try{const r=localStorage.getItem("csr_user");r&&(e=JSON.parse(r))}catch{}const o=e.payment_info||{};return`
+import{S as y,H as x}from"./Header-CsK1zS95.js";const k=()=>{let e={id:"",username:"",fullName:"",role:"",avatar:"",phone:"",email:"",payment_info:null};try{const r=localStorage.getItem("csr_user");r&&(e=JSON.parse(r))}catch{}const o=e.payment_info||{};return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${y()}
         
