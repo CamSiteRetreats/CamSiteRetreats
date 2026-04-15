@@ -119,7 +119,7 @@ const UIComponents = {
 
                     <!-- Legal Info Divider -->
                     <div class="mt-16 pt-8 border-t border-gray-200">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div class="flex flex-col gap-2">
                             <!-- HKD Legal Info -->
                             <div class="text-xs text-gray-500 space-y-1 leading-relaxed">
                                 <div class="font-bold text-gray-700 uppercase tracking-wide text-[11px]">Thông tin pháp lý</div>
@@ -127,22 +127,6 @@ const UIComponents = {
                                 <div><span class="font-semibold">MST:</span> 080099010826</div>
                                 <div><span class="font-semibold">Địa chỉ ĐKKD:</span> Số nhà 86, Ấp 9, Xã Rạch Kiến, Tỉnh Tây Ninh, Việt Nam</div>
                                 <div><span class="font-semibold">Email:</span> admin@camsiteretreats.com &nbsp;|&nbsp; <span class="font-semibold">SĐT:</span> 0819 685 878</div>
-                            </div>
-                            <!-- BCT Badge -->
-                            <div class="flex items-center gap-3">
-                                <a href="http://online.gov.vn" target="_blank" rel="noopener noreferrer"
-                                    title="Đã thông báo Bộ Công Thương" class="block flex-shrink-0">
-                                    <img src="${prefix}bct-badge.png" alt="Đã thông báo Bộ Công Thương"
-                                        class="h-12 w-auto object-contain"
-                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div style="display:none;" class="flex items-center gap-2 border border-red-200 rounded-lg px-3 py-2 bg-red-50">
-                                        <span class="text-red-600 text-lg">🏛️</span>
-                                        <div>
-                                            <div class="text-[10px] font-bold text-red-700 uppercase">Đã thông báo</div>
-                                            <div class="text-[10px] text-red-600">Bộ Công Thương</div>
-                                        </div>
-                                    </div>
-                                </a>
                             </div>
                         </div>
                         <div class="mt-6 text-center font-bold text-gray-800 text-sm uppercase tracking-wide">
