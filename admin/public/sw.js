@@ -1,5 +1,5 @@
 // Service Worker for CAM SITE RETREATS Admin PWA
-const CACHE_NAME = 'csr-admin-v1';
+const CACHE_NAME = 'csr-admin-v2';
 const STATIC_ASSETS = [
   '/admin/',
   '/admin/index.html',

@@ -1,4 +1,4 @@
-import{S as T,H as M}from"./Header-CsK1zS95.js";const $=()=>`
+import{S as T,H as M}from"./Header-DFYmXmuY.js";const $=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${T()}
         

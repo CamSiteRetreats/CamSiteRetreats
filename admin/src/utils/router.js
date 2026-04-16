@@ -39,15 +39,33 @@ export const initRouter = () => {
 
         // Mock Auth Guard
         const isAuthenticated = localStorage.getItem('csr_admin_token') !== null;
+        
+        let userRole = 'sale';
+        try {
+            const userStr = localStorage.getItem('csr_user');
+            if (userStr) {
+                userRole = JSON.parse(userStr).role || 'sale';
+            }
+        } catch (e) {}
 
         if (!isAuthenticated && path !== '/admin/login') {
             navigateTo('/admin/login');
             return;
         }
 
-        if (isAuthenticated && path === '/admin/login') {
-            navigateTo('/admin/');
-            return;
+        // Redirect based on role
+        if (isAuthenticated) {
+            if (userRole === 'tour_guide') {
+                if (path !== '/admin/playbook' && path !== '/admin/profile') {
+                    navigateTo('/admin/playbook');
+                    return;
+                }
+            } else {
+                if (path === '/admin/login') {
+                    navigateTo('/admin/');
+                    return;
+                }
+            }
         }
 
         try {

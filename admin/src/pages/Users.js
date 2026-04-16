@@ -34,7 +34,7 @@ export const render = () => {
                   <div class="flex justify-between items-end">
                       <div>
                           <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">Quản Lý Người Phụ Trách</h1>
-                          <p class="text-gray-500 text-sm">Quản trị tài khoản đăng nhập nội bộ (Admin / Sale).</p>
+                          <p class="text-gray-500 text-sm">Quản trị tài khoản đăng nhập nội bộ (Admin / Sale / Tour Guide).</p>
                       </div>
                       <button id="btnAddNewUser" class="bg-gray-900 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-csr-orange hover:shadow-lg transition-all flex items-center gap-2">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -106,6 +106,7 @@ export const render = () => {
                           <select id="userRole" name="role" required class="input-field w-full font-bold">
                               <option value="sale">Sale</option>
                               <option value="admin">Admin</option>
+                              <option value="tour_guide">🧭 Tour Guide (HDV)</option>
                           </select>
                       </div>
                       <div>
@@ -181,6 +182,8 @@ export const afterRender = () => {
             let roleBadge = `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-gray-200">Sale</span>`;
             if (u.role === 'admin') {
                 roleBadge = `<span class="bg-red-50 text-red-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-red-100">Admin</span>`;
+            } else if (u.role === 'tour_guide') {
+                roleBadge = `<span class="bg-teal-50 text-teal-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-teal-100">🧭 Tour Guide</span>`;
             }
 
             let statusBadge = `<span class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded uppercase flex items-center gap-1 w-max mx-auto"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>`;
