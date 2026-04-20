@@ -106,10 +106,10 @@
             animation: bounce 2s infinite;
         }
         .scroll-down div {
-            font-family: 'Gloria Hallelujah', cursive;
+            font-family: 'Montserrat', sans-serif;
             margin-bottom: 8px;
             color: var(--orange);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         /* Comic Panel Layout */
@@ -191,12 +191,13 @@
             border: 3px solid var(--ink);
             padding: 10px 20px;
             color: var(--ink);
-            font-family: 'Gloria Hallelujah', cursive;
+            font-family: 'Montserrat', sans-serif;
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             box-shadow: 4px 4px 0 var(--ink);
             transform: rotate(-3deg);
             max-width: 80%;
+            z-index: 10;
         }
         .panel-row:nth-child(even) .caption-box {
             right: auto;
@@ -217,6 +218,7 @@
             font-size: 1.3rem;
             transform: rotate(-5deg);
             box-shadow: 4px 4px 0 var(--orange);
+            z-index: 10;
         }
         .panel-row:nth-child(even) .time-box {
             left: auto;
@@ -264,11 +266,13 @@
             align-items: center;
             justify-content: flex-end;
             min-height: 220px;
+            z-index: 1;
         }
 
         .gear-item:hover {
             transform: translateY(-5px);
             box-shadow: 10px 10px 0 var(--teal);
+            z-index: 10;
         }
         
         .gear-item img {
@@ -284,8 +288,8 @@
         }
 
         .gear-item p {
-            font-family: 'Gloria Hallelujah', cursive;
-            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
             font-size: 1.2rem;
             color: var(--ink);
             margin: 0;
@@ -410,9 +414,9 @@
             <div class="panel-wrapper">
                 <div class="comic-panel">
                     <div class="time-box">23:00 Đêm Hôm Trước</div>
-                    <img src="story_assets/la_scene_bus.png" alt="Khởi hành Phương Trang" class="panel-img">
+                    <img src="story_assets/la_scene_bus.png" alt="Khởi hành xe 16 chỗ" class="panel-img">
                     <div class="caption-box">
-                        Khởi hành bằng xe Phương Trang vượt sương đêm (Khách có thể tự chạy trước lên Bảo Lộc nhen). GO!!!
+                        Khởi hành bằng xe 16 chỗ vượt sương đêm (Khách có thể tự chạy trước lên Bảo Lộc nhen). GO!!!
                     </div>
                 </div>
             </div>
