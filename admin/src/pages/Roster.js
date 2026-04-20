@@ -296,6 +296,10 @@ export const afterRender = async () => {
             id: 'col-extra', label: 'Dịch Vụ Phát Sinh', default: true,
             render: (b) => renderExtraServices(b)
         },
+        {
+            id: 'col-sale', label: 'Sale Phụ Trách', default: true,
+            render: (b) => `<div class="font-bold text-indigo-700 text-sm whitespace-nowrap">${b.sale_name && b.sale_name !== 'null' && b.sale_name !== 'Website' ? b.sale_name : '<span class="text-gray-400 font-normal">Website</span>'}</div>`
+        },
         // --- Ẩn mặc định, tick để hiện ---
         { id: 'col-gender', label: 'Giới Tính', default: false, render: (b) => b.gender || '-' },
         { id: 'col-cccd', label: 'CCCD / Passport', default: false, render: (b) => b.id_card || b.cccd || '-' },
