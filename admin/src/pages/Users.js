@@ -106,6 +106,7 @@ export const render = () => {
                           <select id="userRole" name="role" required class="input-field w-full font-bold">
                               <option value="sale">Sale</option>
                               <option value="admin">Admin</option>
+                              <option value="tour_leader">👑 Leader Tour</option>
                               <option value="tour_guide">🧭 Tour Guide (HDV)</option>
                           </select>
                       </div>
@@ -184,6 +185,8 @@ export const afterRender = () => {
                 roleBadge = `<span class="bg-red-50 text-red-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-red-100">Admin</span>`;
             } else if (u.role === 'tour_guide') {
                 roleBadge = `<span class="bg-teal-50 text-teal-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-teal-100">🧭 Tour Guide</span>`;
+            } else if (u.role === 'tour_leader') {
+                roleBadge = `<span class="bg-purple-50 text-purple-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-purple-100">👑 Leader Tour</span>`;
             }
 
             let statusBadge = `<span class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded uppercase flex items-center gap-1 w-max mx-auto"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>`;

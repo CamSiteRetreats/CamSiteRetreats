@@ -1,4 +1,4 @@
-import{S as Be,H as Le}from"./Header-DFYmXmuY.js";console.log("Bookings V3 - Cache Busted!");const _e=()=>`
+import{S as Be,H as Le}from"./Header-CtRUqTZE.js";console.log("Bookings V3 - Cache Busted!");const _e=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${Be()}
         

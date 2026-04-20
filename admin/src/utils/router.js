@@ -60,6 +60,11 @@ export const initRouter = () => {
                     navigateTo('/admin/playbook');
                     return;
                 }
+            } else if (userRole === 'tour_leader') {
+                if (path !== '/admin/playbook' && path !== '/admin/profile' && path !== '/admin/schedules') {
+                    navigateTo('/admin/schedules');
+                    return;
+                }
             } else {
                 if (path === '/admin/login') {
                     navigateTo('/admin/');

@@ -1,4 +1,4 @@
-import{S as y,H as x}from"./Header-DFYmXmuY.js";const k=()=>{let e={id:"",username:"",fullName:"",role:"",avatar:"",phone:"",email:"",payment_info:null};try{const r=localStorage.getItem("csr_user");r&&(e=JSON.parse(r))}catch{}const o=e.payment_info||{};return`
+import{S as y,H as x}from"./Header-CtRUqTZE.js";const k=()=>{let e={id:"",username:"",fullName:"",role:"",avatar:"",phone:"",email:"",payment_info:null};try{const r=localStorage.getItem("csr_user");r&&(e=JSON.parse(r))}catch{}const o=e.payment_info||{};return`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${y()}
         
@@ -43,7 +43,7 @@ import{S as y,H as x}from"./Header-DFYmXmuY.js";const k=()=>{let e={id:"",userna
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Vai Trò</label>
-                                    <input type="text" value="${e.role==="admin"?"Quản Trị Viên (Admin)":"Nhân Viên Sale"}" class="input-field w-full bg-gray-100 text-gray-500 cursor-not-allowed border-dashed" disabled>
+                                    <input type="text" value="${e.role==="admin"?"Quản Trị Viên (Admin)":e.role==="tour_leader"?"Leader Tour 👑":e.role==="tour_guide"?"Hướng Dẫn Viên (HDV)":"Nhân Viên Sale"}" class="input-field w-full bg-gray-100 text-gray-500 cursor-not-allowed border-dashed" disabled>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-2">Số Điện Thoại</label>
