@@ -308,7 +308,8 @@ export const afterRender = async () => {
         { id: 'col-pole', label: 'Gậy Trekking', default: false, render: (b) => (b.trekking_pole === 'Có') ? '<span class="text-orange-600 font-bold">Có</span>' : 'Không' },
         { id: 'col-allergy', label: 'Dị Ứng / Bệnh', default: false, render: (b) => b.medical_notes || b.allergy || '-' },
         { id: 'col-special', label: 'Yêu Cầu ĐB', default: false, render: (b) => b.special || b.special_notes || '-' },
-        { id: 'col-medal', label: 'Tên Huy Chương', default: false, render: (b) => b.medal_name || b.name || '-' }
+        { id: 'col-medal', label: 'Tên Huy Chương', default: false, render: (b) => b.medal_name || b.name || '-' },
+        { id: 'col-pickup', label: 'Điểm Đón', default: false, render: (b) => b.pickup_point || '-' }
     ];
 
     const params = new URLSearchParams(window.location.search);
