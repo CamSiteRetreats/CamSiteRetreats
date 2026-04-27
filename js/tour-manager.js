@@ -126,6 +126,33 @@ const TourManager = {
                 tourSchedules = tour.defaultSchedules;
             }
 
+            // Filter out past schedules
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            tourSchedules = tourSchedules.filter(sch => {
+                let schDate = null;
+                if (sch.startDate) {
+                    schDate = new Date(sch.startDate);
+                } else if (sch.date) {
+                    if (sch.date === 'Mỗi ngày') return true;
+                    const parts = sch.date.split(' - ')[0].split('/');
+                    if (parts.length === 2) {
+                        schDate = new Date();
+                        schDate.setMonth(parseInt(parts[1]) - 1, parseInt(parts[0]));
+                        if (schDate < today && (today.getMonth() - schDate.getMonth()) > 6) {
+                            schDate.setFullYear(schDate.getFullYear() + 1);
+                        }
+                    }
+                }
+                
+                if (schDate && !isNaN(schDate.getTime())) {
+                    schDate.setHours(0, 0, 0, 0);
+                    return schDate >= today;
+                }
+                return true;
+            });
+
             // Calculate availability for each schedule
             tour.schedules = tourSchedules.map(sch => {
                 // Prioritize API data (bookedCount) if available, otherwise fallback to local calculation
