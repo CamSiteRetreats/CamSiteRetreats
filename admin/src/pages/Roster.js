@@ -263,6 +263,8 @@ export const render = () => {
                                       <option value="Đã cọc">✅ Đã cọc</option>
                                       <option value="Đã cọc (Chờ đi)">🎒 Đã cọc (Chờ đi)</option>
                                       <option value="Hoàn thành">🏆 Hoàn thành</option>
+                                      <option value="Bảo lưu">⏸️ Bảo lưu</option>
+                                      <option value="Đã hủy">❌ Đã hủy</option>
                                   </select>
                               </div>
                               <div id="edit-sale-container" class="hidden">
@@ -457,6 +459,10 @@ export const afterRender = async () => {
             return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                         Đã Hủy</span>`;
+        }
+        if (s.includes('bảo lưu')) {
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-500 border border-gray-300">
+                        ⏸️ Bảo lưu</span>`;
         }
         return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">${status || 'Chờ cọc'}</span>`;
     };
@@ -875,8 +881,9 @@ export const afterRender = async () => {
             return sGender === '' || bGender === sGender;
         });
 
-        document.getElementById('text-visible-count').textContent = filtered.length;
-        pTotalEl.textContent = filtered.length;
+        const activeFiltered = filtered.filter(b => b.status !== 'Đã hủy' && b.status !== 'Bảo lưu');
+        document.getElementById('text-visible-count').textContent = activeFiltered.length;
+        pTotalEl.textContent = activeFiltered.length;
 
         if (filtered.length === 0) {
             tbody.innerHTML = '<tr><td colspan="12" class="p-12 text-center text-gray-500 bg-gray-50">Không tìm thấy khách hàng nào khớp với điều kiện lọc.</td></tr>';
@@ -885,7 +892,9 @@ export const afterRender = async () => {
 
         tbody.innerHTML = filtered.map((b, index) => {
             const isEven = index % 2 === 0;
-            return `<tr onclick="if(!event.target.closest('.seat-badge') && !event.target.closest('a')) { if(window.actionEdit) window.actionEdit('${b.id}'); else alert('Chưa tải xong logic chỉnh sửa!'); }" class="${isEven ? 'bg-white' : 'bg-gray-50/40'} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group row-clickable cursor-pointer" data-booking-id="${b.id}">` +
+            const isCanceledOrHeld = (b.status === 'Đã hủy' || b.status === 'Bảo lưu');
+            const rowClass = isCanceledOrHeld ? 'bg-gray-100 opacity-60' : (isEven ? 'bg-white' : 'bg-gray-50/40');
+            return `<tr onclick="if(!event.target.closest('.seat-badge') && !event.target.closest('a')) { if(window.actionEdit) window.actionEdit('${b.id}'); else alert('Chưa tải xong logic chỉnh sửa!'); }" class="${rowClass} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group row-clickable cursor-pointer" data-booking-id="${b.id}">` +
                 COLUMNS.map(c => `
                     <td class="px-4 py-3 align-middle ${c.id === 'col-extra' ? 'min-w-[220px]' : ''} ${visibleCols.has(c.id) ? '' : 'col-hidden'}" data-col="${c.id}">
                         ${c.render(b, index)}
@@ -1119,7 +1128,8 @@ export const afterRender = async () => {
         // Build seatMap: { seatNumber: booking }
         const seatMap = {};
         allBookings.forEach(b => {
-            if (b.seat_number) seatMap[String(b.seat_number)] = b;
+            const isCanceledOrHeld = (b.status === 'Đã hủy' || b.status === 'Bảo lưu');
+            if (b.seat_number && !isCanceledOrHeld) seatMap[String(b.seat_number)] = b;
         });
 
         const assignedCount = Object.keys(seatMap).length;

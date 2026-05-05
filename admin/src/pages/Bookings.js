@@ -106,6 +106,8 @@ export const render = () => {
                              <option value="Đã cọc">Đã cọc</option>
                              <option value="Đã cọc (Chờ đi)">Đã cọc (Chờ đi)</option>
                              <option value="Hoàn thành">Hoàn thành</option>
+                             <option value="Bảo lưu">Bảo lưu</option>
+                             <option value="Đã hủy">Đã hủy</option>
                          </select>
                      </div>
                      <button id="exportExcelBtn" class="bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors border border-green-200 shadow-sm h-10 whitespace-nowrap">
@@ -429,6 +431,8 @@ export const render = () => {
                                       <option value="Đã cọc">✅ Đã cọc</option>
                                       <option value="Đã cọc (Chờ đi)">🎒 Đã cọc (Chờ đi)</option>
                                       <option value="Hoàn thành">🏆 Hoàn thành</option>
+                                      <option value="Bảo lưu">⏸️ Bảo lưu</option>
+                                      <option value="Đã hủy">❌ Đã hủy</option>
                                   </select>
                               </div>
                               <div id="edit-sale-container" class="hidden">
@@ -840,12 +844,13 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-                // 'Chờ xác nhận cọc' thuộc về tab pending, không được hiện ở đây
-                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && b.status !== 'Chờ xác nhận cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+            } else if (activeTab === 'upcoming') {
+                // 'Chờ xác nhận cọc' thuộc về tab pending, không được hiện ở đây. Tương tự với hủy/bảo lưu.
+                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && b.status !== 'Chờ xác nhận cọc' && b.status !== 'Đã hủy' && b.status !== 'Bảo lưu' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
+                tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && b.status !== 'Đã hủy' && b.status !== 'Bảo lưu' && !isDonePast;
             } else if (activeTab === 'completed') {
-                tabMatch = isDonePast;
+                tabMatch = isDonePast || b.status === 'Đã hủy' || b.status === 'Bảo lưu';
             }
             if (!tabMatch) return false;
 
@@ -1015,7 +1020,11 @@ export const afterRender = () => {
                 const formatedRemain = remainPrice > 0 ? remainPrice.toLocaleString('vi-VN') + 'đ' : (remainPrice === 0 && totalPrice > 0 ? 'Đã thu trọn' : '-');
 
                 let statusBadge = '';
-                if (b.status === 'Hoàn thành' || b.status === 'Đã đi') {
+                if (b.status === 'Đã hủy') {
+                    statusBadge = '<span class="bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">❌ Đã hủy</span>';
+                } else if (b.status === 'Bảo lưu') {
+                    statusBadge = '<span class="bg-gray-100 text-gray-500 border border-gray-300 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">⏸️ Bảo lưu</span>';
+                } else if (b.status === 'Hoàn thành' || b.status === 'Đã đi') {
                     statusBadge = '<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded text-xs block w-full text-center">Hoàn thành</span>';
                 } else if (b.status === 'Chờ xác nhận cọc') {
                     statusBadge = `<button class="action-btn confirm-deposit-btn bg-csr-orange text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-[#d65503] w-full" data-id="${b.id}">Xác nhận cọc</button>`;
@@ -1596,6 +1605,8 @@ export const afterRender = () => {
             'Đã cọc': 'bg-blue-100 text-blue-700 border-blue-200',
             'Đã cọc (Chờ đi)': 'bg-blue-100 text-blue-700 border-blue-200',
             'Hoàn thành': 'bg-green-100 text-green-700 border-green-200',
+            'Bảo lưu': 'bg-gray-100 text-gray-700 border-gray-300',
+            'Đã hủy': 'bg-red-50 text-red-600 border-red-200 line-through',
         };
         const statusClass = statusColor[booking.status] || 'bg-gray-100 text-gray-700 border-gray-200';
 
