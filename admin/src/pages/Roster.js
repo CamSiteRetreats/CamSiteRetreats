@@ -874,14 +874,14 @@ export const afterRender = async () => {
             floors: [{
                 label: null,
                 rows: [
-                        // Layout thực tế Solati 16 chỗ: 2 cột TRÁI + 1 cột PHẢI (bất đối xứng)
-                        // null = ô trống, null cuối = giãn cách lề phải
-                        [{ n: 'LÁI', driver: true }, null, null, { n: 1 }],   // Đầu xe: lái + 1 khách
-                        [{ n: 2 }, { n: 3 }, null, { n: 4 }],                 // 2 trái + 1 phải
-                        [{ n: 5 }, { n: 6 }, null, { n: 7 }],
-                        [{ n: 8 }, { n: 9 }, null, { n: 10 }],
-                        [{ n: 11 }, { n: 12 }, null, { n: 13 }],
-                        [null, { n: 14 }, { n: 15 }, null],                   // Cuối xe: 2 ghế giữa
+                        // Row 1: Lái xe (trái) + 2 ghế phải
+                        [{ n: 'LÁI', driver: true }, null, { n: 1 }, { n: 2 }],
+                        // Row 2–4: 2 ghế trái + 1 ghế phải
+                        [{ n: 3 }, { n: 4 }, null, { n: 5 }],
+                        [{ n: 6 }, { n: 7 }, null, { n: 8 }],
+                        [{ n: 9 }, { n: 10 }, null, { n: 11 }],
+                        // Row 5: 4 ghế cuối liền nhau
+                        [{ n: 12 }, { n: 13 }, { n: 14 }, { n: 15 }],
                     ]
             }],
             legend: null
