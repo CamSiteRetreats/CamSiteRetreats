@@ -837,19 +837,20 @@ export const afterRender = () => {
                 return false;
             };
 
-            const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
+            // Phân loại logic Tab
+            const bStatus = b.status || '';
+            const isFuture = !isPastTour(b.date);
 
             if (activeTab === 'consult') {
-                tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
+                tabMatch = bStatus === 'Chờ tư vấn' && isFuture;
             } else if (activeTab === 'pending') {
-                tabMatch = (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
+                tabMatch = (bStatus === 'Chờ cọc' || bStatus === 'Chờ xác nhận cọc' || bStatus === '') && isFuture;
             } else if (activeTab === 'upcoming') {
-                // 'Chờ xác nhận cọc' thuộc về tab pending, không được hiện ở đây. Tương tự với hủy/bảo lưu.
-                tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && b.status !== 'Chờ xác nhận cọc' && b.status !== 'Đã hủy' && b.status !== 'Bảo lưu' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+                tabMatch = (bStatus === 'Đã cọc' && !isFullyPaid) && isFuture;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && b.status !== 'Đã hủy' && b.status !== 'Bảo lưu' && !isDonePast;
+                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Đã cọc (Chờ đi)') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
             } else if (activeTab === 'completed') {
-                tabMatch = isDonePast || b.status === 'Đã hủy' || b.status === 'Bảo lưu';
+                tabMatch = !isFuture || bStatus === 'Đã đi' || bStatus === 'Đã hủy' || bStatus === 'Bảo lưu';
             }
             if (!tabMatch) return false;
 
@@ -939,19 +940,19 @@ export const afterRender = () => {
             if (statTitle2) statTitle2.textContent = 'Chưa Xác Nhận Cọc';
             if (statTitle3) statTitle3.textContent = 'Chờ Thanh Toán Còn Lại';
 
-            let unconfirmedCount = 0;
+            let waitingConfirmationCount = 0;
             let partialPaidCount = 0;
 
             filteredData.forEach(b => {
                 if (b.status === 'Chờ xác nhận cọc') {
-                    unconfirmedCount++;
+                    waitingConfirmationCount++;
                 } else if (parseInt(b.deposit) > 0 && parseInt(b.total_price) > parseInt(b.deposit)) {
                     partialPaidCount++;
                 }
             });
 
             if (statTotalCustomers) statTotalCustomers.textContent = totalCustomersCount;
-            if (statTotalRevenue) statTotalRevenue.textContent = unconfirmedCount + ' Khách';
+            if (statTotalRevenue) statTotalRevenue.textContent = waitingConfirmationCount + ' Khách';
             if (statTotalCollected) statTotalCollected.textContent = partialPaidCount + ' Khách';
         } else if (activeTab === 'ready') {
             // Dashboard cho Khách Chờ Lên Xe
