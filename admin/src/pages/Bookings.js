@@ -853,9 +853,9 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (bStatus === 'Chờ cọc' || bStatus === 'Chờ xác nhận cọc' || bStatus === '') && isFuture;
             } else if (activeTab === 'upcoming') {
-                tabMatch = (bStatus === 'Đã cọc' && !isFullyPaid) && isFuture;
+                tabMatch = (bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)') && !isFullyPaid && isFuture;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Đã cọc (Chờ đi)') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
+                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
             } else if (activeTab === 'completed') {
                 tabMatch = !isFuture || bStatus === 'Đã đi' || bStatus === 'Đã hủy' || bStatus === 'Bảo lưu';
             }
