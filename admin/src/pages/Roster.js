@@ -1422,9 +1422,17 @@ export const afterRender = async () => {
                 opt.disabled = true;
                 opt.textContent = label.replace('chỗ trống', 'HẾT CHỖ');
             }
+            // Normalize currentDateVal về DD/MM/YYYY để so sánh
+            let normalizedCurrentDate = currentDateVal || '';
+            if (normalizedCurrentDate.includes('-') && normalizedCurrentDate.length >= 10) {
+                // ISO format: "2026-06-13" → "13/06/2026"
+                const p = normalizedCurrentDate.substring(0, 10).split('-');
+                if (p.length === 3) normalizedCurrentDate = `${p[2]}/${p[1]}/${p[0]}`;
+            }
+
             if (currentScheduleId && String(s.id) === String(currentScheduleId)) {
                 opt.selected = true;
-            } else if (!currentScheduleId && currentDateVal && dateStr === currentDateVal) {
+            } else if (!currentScheduleId && normalizedCurrentDate && dateStr === normalizedCurrentDate) {
                 opt.selected = true;
             }
             dateSelect.appendChild(opt);
