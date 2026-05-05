@@ -439,6 +439,7 @@ export const render = () => {
 };
 
 export const afterRender = async () => {
+    console.log("[Roster] VERSION 3.2 LOADED - READY TO EDIT");
     // 1. Column Definition
     const renderStatus = (status) => {
         const s = (status || '').toLowerCase();
@@ -884,7 +885,7 @@ export const afterRender = async () => {
 
         tbody.innerHTML = filtered.map((b, index) => {
             const isEven = index % 2 === 0;
-            return `<tr class="${isEven ? 'bg-white' : 'bg-gray-50/40'} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group row-clickable cursor-pointer" data-booking-id="${b.id}">` +
+            return `<tr onclick="if(!event.target.closest('.seat-badge') && !event.target.closest('a')) { if(window.actionEdit) window.actionEdit('${b.id}'); else alert('Chưa tải xong logic chỉnh sửa!'); }" class="${isEven ? 'bg-white' : 'bg-gray-50/40'} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group row-clickable cursor-pointer" data-booking-id="${b.id}">` +
                 COLUMNS.map(c => `
                     <td class="px-4 py-3 align-middle ${c.id === 'col-extra' ? 'min-w-[220px]' : ''} ${visibleCols.has(c.id) ? '' : 'col-hidden'}" data-col="${c.id}">
                         ${c.render(b, index)}
@@ -1376,7 +1377,10 @@ export const afterRender = async () => {
         dateSelect.innerHTML = '<option value="">-- Chọn Lịch --</option>';
         if (!tourName) return;
 
-        const matched = allSchedules.filter(s => s.tour_name === tourName || tourName.includes(s.tour_name) || s.tour_name.includes(tourName));
+        const matched = allSchedules.filter(s => {
+            if (!s.tour_name) return false;
+            return s.tour_name === tourName || tourName.includes(s.tour_name) || s.tour_name.includes(tourName);
+        });
         if (matched.length === 0) {
             dateSelect.innerHTML = '<option value="">Chưa có lịch cho tour này</option>';
             return;
@@ -1495,138 +1499,146 @@ export const afterRender = async () => {
     if (addServiceBtn) addServiceBtn.addEventListener('click', () => window.addServiceRow());
 
     window.actionEdit = async (bookingId) => {
-        const booking = allBookings.find(b => b.id == bookingId);
-        if (!booking) return;
-
-        document.getElementById('edit-id').value = bookingId;
-        document.getElementById('edit-name').value = booking.name || '';
-        document.getElementById('edit-phone').value = booking.phone || '';
-        document.getElementById('edit-medal-name').value = booking.medal_name || '';
-        document.getElementById('edit-tour').value = booking.tour || '';
-        populateDateDropdown('edit-date', booking.tour || '', booking.date || '', booking.schedule_id || null);
-
-        const fillEditForm = (data) => {
-            let dobVal = data.dob || '';
-            if (dobVal && dobVal.includes('/')) {
-                const parts = dobVal.split('/');
-                if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-            }
-            document.getElementById('edit-dob').value = dobVal;
-            document.getElementById('edit-gender').value = data.gender || 'Khác';
-            document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
-            document.getElementById('edit-address').value = data.address || '';
-            document.getElementById('edit-diet').value = data.diet || data.dietary || '';
-            document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
-            document.getElementById('edit-id-card').value = data.id_card || data.cccd || '';
-            document.getElementById('edit-pickup-point').value = data.pickup_point || '';
-        };
-
-        fillEditForm(booking);
-        document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
-        document.getElementById('edit-commitments').checked = !!booking.commitments;
-        document.getElementById('edit-special').value = booking.special || '';
-
         try {
-            const userStr = localStorage.getItem('csr_user');
-            if (userStr) {
-                const userObj = JSON.parse(userStr);
-                if (userObj.role === 'admin') {
-                    const saleContainer = document.getElementById('edit-sale-container');
-                    if (saleContainer) saleContainer.classList.remove('hidden');
-                    const saleSelect = document.getElementById('edit-sale');
-                    if (saleSelect) saleSelect.value = booking.sale_id || '';
+            const booking = allBookings.find(b => b.id == bookingId);
+            if (!booking) {
+                alert("Không tìm thấy thông tin khách hàng!");
+                return;
+            }
+
+            document.getElementById('edit-id').value = bookingId;
+            document.getElementById('edit-name').value = booking.name || '';
+            document.getElementById('edit-phone').value = booking.phone || '';
+            document.getElementById('edit-medal-name').value = booking.medal_name || '';
+            document.getElementById('edit-tour').value = booking.tour || '';
+            populateDateDropdown('edit-date', booking.tour || '', booking.date || '', booking.schedule_id || null);
+
+            const fillEditForm = (data) => {
+                let dobVal = data.dob || '';
+                if (dobVal && dobVal.includes('/')) {
+                    const parts = dobVal.split('/');
+                    if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                 }
-            }
-        } catch (e) {}
+                document.getElementById('edit-dob').value = dobVal;
+                document.getElementById('edit-gender').value = data.gender || 'Khác';
+                document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
+                document.getElementById('edit-address').value = data.address || '';
+                document.getElementById('edit-diet').value = data.diet || data.dietary || '';
+                document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+                document.getElementById('edit-id-card').value = data.id_card || data.cccd || '';
+                document.getElementById('edit-pickup-point').value = data.pickup_point || '';
+            };
 
-        const fillTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
-        document.getElementById('edit-total').value = fillTotal;
-        document.getElementById('edit-discount').value = booking.discount || 0;
-        document.getElementById('edit-deposit').value = booking.deposit || 0;
-        const bDepReq = parseInt(booking.deposit_required);
-        document.getElementById('edit-deposit-required').value = !isNaN(bDepReq) ? bDepReq : 1000000;
-        window.updateEditRemaining();
+            fillEditForm(booking);
+            document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
+            document.getElementById('edit-commitments').checked = !!booking.commitments;
+            document.getElementById('edit-special').value = booking.special || '';
 
-        const container = document.getElementById('servicesContainer');
-        const emptyMsg = document.getElementById('emptyServicesMsg');
-        const totalRow = document.getElementById('servicesTotalRow');
-        const presetBlock = document.getElementById('presetServicesBlock');
-        const presetList = document.getElementById('presetServicesList');
-        const divider = document.getElementById('servicesDivider');
-
-        let bookedServices = [];
-        try {
-            if (booking.services_booked) {
-                const parsed = typeof booking.services_booked === 'string' ? JSON.parse(booking.services_booked) : booking.services_booked;
-                if (Array.isArray(parsed)) bookedServices = parsed;
-            }
-        } catch(e) {}
-
-        if (presetList && presetBlock) {
-            presetList.innerHTML = '';
-            const matchedTourData = allTours.find(t => t.name === booking.tour);
-            let presetServices = [];
             try {
-                if (matchedTourData?.services) {
-                    const ps = typeof matchedTourData.services === 'string' ? JSON.parse(matchedTourData.services) : matchedTourData.services;
-                    if (Array.isArray(ps)) presetServices = ps;
+                const userStr = localStorage.getItem('csr_user');
+                if (userStr) {
+                    const userObj = JSON.parse(userStr);
+                    if (userObj.role === 'admin') {
+                        const saleContainer = document.getElementById('edit-sale-container');
+                        if (saleContainer) saleContainer.classList.remove('hidden');
+                        const saleSelect = document.getElementById('edit-sale');
+                        if (saleSelect) saleSelect.value = booking.sale_id || '';
+                    }
+                }
+            } catch (e) {}
+
+            const fillTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+            document.getElementById('edit-total').value = fillTotal;
+            document.getElementById('edit-discount').value = booking.discount || 0;
+            document.getElementById('edit-deposit').value = booking.deposit || 0;
+            const bDepReq = parseInt(booking.deposit_required);
+            document.getElementById('edit-deposit-required').value = !isNaN(bDepReq) ? bDepReq : 1000000;
+            window.updateEditRemaining();
+
+            const container = document.getElementById('servicesContainer');
+            const emptyMsg = document.getElementById('emptyServicesMsg');
+            const totalRow = document.getElementById('servicesTotalRow');
+            const presetBlock = document.getElementById('presetServicesBlock');
+            const presetList = document.getElementById('presetServicesList');
+            const divider = document.getElementById('servicesDivider');
+
+            let bookedServices = [];
+            try {
+                if (booking.services_booked) {
+                    const parsed = typeof booking.services_booked === 'string' ? JSON.parse(booking.services_booked) : booking.services_booked;
+                    if (Array.isArray(parsed)) bookedServices = parsed;
                 }
             } catch(e) {}
 
-            if (presetServices.length > 0) {
-                presetBlock.classList.remove('hidden');
-                if (divider) divider.classList.remove('hidden');
-                presetServices.forEach(ps => {
-                    const isBooked = bookedServices.some(b => (b.label || b.name || '').toLowerCase() === (ps.label || '').toLowerCase());
-                    const card = document.createElement('label');
-                    card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (isBooked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
-                    card.innerHTML = `
-                        <input type="checkbox" class="preset-service-check w-4 h-4 rounded accent-green-500 shrink-0" data-label="${(ps.label || '').replace(/"/g, '&quot;')}" data-price="${ps.price || 0}" ${isBooked ? 'checked' : ''}>
-                        <div class="flex-1 min-w-0"><div class="font-bold text-sm text-gray-800">${ps.label || ''}</div></div>
-                        <div class="text-sm font-black text-green-600 shrink-0">+${parseInt(ps.price || 0).toLocaleString('vi-VN')}đ</div>
-                    `;
-                    card.querySelector('.preset-service-check').addEventListener('change', (e) => {
-                        card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (e.target.checked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
-                        window.updateServicesTotal();
+            if (presetList && presetBlock) {
+                presetList.innerHTML = '';
+                const matchedTourData = allTours.find(t => t.name === booking.tour);
+                let presetServices = [];
+                try {
+                    if (matchedTourData?.services) {
+                        const ps = typeof matchedTourData.services === 'string' ? JSON.parse(matchedTourData.services) : matchedTourData.services;
+                        if (Array.isArray(ps)) presetServices = ps;
+                    }
+                } catch(e) {}
+
+                if (presetServices.length > 0) {
+                    presetBlock.classList.remove('hidden');
+                    if (divider) divider.classList.remove('hidden');
+                    presetServices.forEach(ps => {
+                        const isBooked = bookedServices.some(b => (b.label || b.name || '').toLowerCase() === (ps.label || '').toLowerCase());
+                        const card = document.createElement('label');
+                        card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (isBooked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
+                        card.innerHTML = `
+                            <input type="checkbox" class="preset-service-check w-4 h-4 rounded accent-green-500 shrink-0" data-label="${(ps.label || '').replace(/"/g, '&quot;')}" data-price="${ps.price || 0}" ${isBooked ? 'checked' : ''}>
+                            <div class="flex-1 min-w-0"><div class="font-bold text-sm text-gray-800">${ps.label || ''}</div></div>
+                            <div class="text-sm font-black text-green-600 shrink-0">+${parseInt(ps.price || 0).toLocaleString('vi-VN')}đ</div>
+                        `;
+                        card.querySelector('.preset-service-check').addEventListener('change', (e) => {
+                            card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (e.target.checked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
+                            window.updateServicesTotal();
+                        });
+                        presetList.appendChild(card);
                     });
-                    presetList.appendChild(card);
-                });
-            } else {
-                presetBlock.classList.add('hidden');
-                if (divider) divider.classList.add('hidden');
+                } else {
+                    presetBlock.classList.add('hidden');
+                    if (divider) divider.classList.add('hidden');
+                }
             }
-        }
 
-        if (container) {
-            container.querySelectorAll('.service-row').forEach(r => r.remove());
-            const matchedTourData2 = allTours.find(t => t.name === booking.tour);
-            let presetLabels = new Set();
-            try {
-                const ps2 = matchedTourData2?.services;
-                const arr = ps2 ? (typeof ps2 === 'string' ? JSON.parse(ps2) : ps2) : [];
-                if (Array.isArray(arr)) arr.forEach(p => presetLabels.add((p.label || '').toLowerCase()));
-            } catch(e) {}
+            if (container) {
+                container.querySelectorAll('.service-row').forEach(r => r.remove());
+                const matchedTourData2 = allTours.find(t => t.name === booking.tour);
+                let presetLabels = new Set();
+                try {
+                    const ps2 = matchedTourData2?.services;
+                    const arr = ps2 ? (typeof ps2 === 'string' ? JSON.parse(ps2) : ps2) : [];
+                    if (Array.isArray(arr)) arr.forEach(p => presetLabels.add((p.label || '').toLowerCase()));
+                } catch(e) {}
 
-            const manualServices = bookedServices.filter(b => !presetLabels.has((b.label || b.name || '').toLowerCase()));
-            if (manualServices.length > 0) {
-                if (emptyMsg) emptyMsg.classList.add('hidden');
-                if (totalRow) totalRow.classList.remove('hidden');
-                manualServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
-            } else {
-                if (emptyMsg) emptyMsg.classList.remove('hidden');
+                const manualServices = bookedServices.filter(b => !presetLabels.has((b.label || b.name || '').toLowerCase()));
+                if (manualServices.length > 0) {
+                    if (emptyMsg) emptyMsg.classList.add('hidden');
+                    if (totalRow) totalRow.classList.remove('hidden');
+                    manualServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
+                } else {
+                    if (emptyMsg) emptyMsg.classList.remove('hidden');
+                }
+                window.updateServicesTotal();
             }
-            window.updateServicesTotal();
-        }
 
-        const editModal = document.getElementById('editModal');
-        const editModalContent = document.getElementById('editModalContent');
-        if (editModal && editModalContent) {
-            editModal.classList.remove('hidden');
-            setTimeout(() => {
-                editModal.classList.add('opacity-100');
-                editModalContent.classList.remove('scale-95', 'translate-y-4');
-                editModalContent.classList.add('scale-100', 'translate-y-0');
-            }, 10);
+            const editModal = document.getElementById('editModal');
+            const editModalContent = document.getElementById('editModalContent');
+            if (editModal && editModalContent) {
+                editModal.classList.remove('hidden');
+                setTimeout(() => {
+                    editModal.classList.add('opacity-100');
+                    editModalContent.classList.remove('scale-95', 'translate-y-4');
+                    editModalContent.classList.add('scale-100', 'translate-y-0');
+                }, 10);
+            }
+        } catch (err) {
+            console.error("Lỗi khi mở form Edit:", err);
+            alert("Lỗi khi mở form Edit: " + err.message);
         }
     };
 
@@ -1725,17 +1737,7 @@ export const afterRender = async () => {
         });
     }
 
-    // Row click event -> Action Edit Modal
-    document.getElementById('rosterList')?.addEventListener('click', (e) => {
-        if (e.target.closest('.seat-badge') || e.target.closest('a')) return;
-        const tr = e.target.closest('tr[data-booking-id]');
-        if (tr) {
-            const bookingId = tr.getAttribute('data-booking-id');
-            if (window.actionEdit) {
-                window.actionEdit(bookingId);
-            }
-        }
-    });
+    // Row click event (Now handled by inline onclick in renderTable)
 
     // Run
     buildColumnToggles();
