@@ -331,9 +331,9 @@ export const render = () => {
                               <input type="text" id="addSpecial" class="input-field bg-blue-50/30" placeholder="Lưu ý đón khách, yêu cầu riêng...">
                           </div>
                           
-                          <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-4 gap-4">
+                          <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                               <div>
-                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Giá Gốc (đ)</label>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Giá Tour (Gốc - Chưa gồm DV)</label>
                                   <input type="number" id="addTourPrice" class="input-field bg-white font-bold" value="0">
                               </div>
                               <div>
@@ -499,7 +499,10 @@ export const render = () => {
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div class="md:col-span-1">
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Điểm Đón</label>
-                                  <input type="text" id="edit-pickup-point" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors" placeholder="VD: Đà Lạt Trung Tâm">
+                                  <select id="edit-pickup-point" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors">
+                                      <option value="">— Chưa chọn —</option>
+                                  </select>
+                                  <input type="text" id="edit-pickup-custom" class="w-full mt-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors hidden" placeholder="Nhập điểm đón tuỳ chỉnh...">
                               </div>
                               <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
@@ -569,7 +572,7 @@ export const render = () => {
                           </div>
                           <div class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                               <div>
-                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc)</label>
+                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc - Chưa gồm DV)</label>
                                   <input type="number" id="edit-total" class="input-field bg-white font-bold text-gray-900" oninput="window.updateEditRemaining()">
                               </div>
                               <div>
@@ -580,6 +583,10 @@ export const render = () => {
                                   <label class="block text-xs font-bold text-green-600 uppercase mb-1.5">Khách Đã Cọc</label>
                                   <input type="number" id="edit-deposit" class="input-field bg-green-50 border-green-200 font-bold text-green-700" oninput="window.updateEditRemaining()">
                               </div>
+                          </div>
+                          <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl flex justify-between items-center mb-4">
+                              <span class="text-sm font-bold text-blue-700 uppercase">Tổng Cộng Đơn Hàng</span>
+                              <span id="edit-grand-total" class="text-lg font-black text-blue-800">0đ</span>
                           </div>
                           <div class="mb-4">
                               <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
@@ -2002,7 +2009,67 @@ export const afterRender = () => {
             }
         }
 
-        // Nạp manual services (các dịch vụ nhập tay - không có trong preset)
+        // Nạp điểm đón từ cấu hình tour vào select
+        const pickupSelect = document.getElementById('edit-pickup-point');
+        if (pickupSelect) {
+            const matchedTourForPickup = allTours.find(t => t.name === booking.tour);
+            let pickupPoints = [];
+            try {
+                if (matchedTourForPickup?.pickup_points) {
+                    const pp = typeof matchedTourForPickup.pickup_points === 'string'
+                        ? JSON.parse(matchedTourForPickup.pickup_points) : matchedTourForPickup.pickup_points;
+                    if (Array.isArray(pp)) pickupPoints = pp;
+                }
+            } catch(e) {}
+
+            // Xây dựng lại options từ tour config
+            pickupSelect.innerHTML = '<option value="">— Chưa chọn —</option>';
+            pickupPoints.forEach(p => {
+                const label = (p.label || p.name || p) + (p.time ? ` (${p.time})` : '');
+                const val = p.label || p.name || p;
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = label;
+                pickupSelect.appendChild(opt);
+            });
+
+            // Thêm option Khác ở cuối
+            const otherOpt = document.createElement('option');
+            otherOpt.value = '__custom__';
+            otherOpt.textContent = '\u270f\ufe0f Kh\u00e1c (nh\u1eadp tay)';
+            pickupSelect.appendChild(otherOpt);
+
+            const customInput = document.getElementById('edit-pickup-custom');
+            const toggleCustom = (val) => {
+                if (customInput) {
+                    if (val === '__custom__') {
+                        customInput.classList.remove('hidden');
+                        customInput.focus();
+                    } else {
+                        customInput.classList.add('hidden');
+                        if (customInput) customInput.value = '';
+                    }
+                }
+            };
+
+            // Nếu giá trị booking không có trong danh sách → chọn Khác và điền input
+            const savedPickup = booking.pickup_point || '';
+            if (savedPickup) {
+                const exists = pickupPoints.some(p => (p.label || p.name || p) === savedPickup);
+                if (!exists) {
+                    pickupSelect.value = '__custom__';
+                    if (customInput) {
+                        customInput.value = savedPickup;
+                        customInput.classList.remove('hidden');
+                    }
+                } else {
+                    pickupSelect.value = savedPickup;
+                }
+            }
+
+            pickupSelect.addEventListener('change', () => toggleCustom(pickupSelect.value));
+        }
+
         if (container) {
             container.querySelectorAll('.service-row').forEach(r => r.remove());
             // Lọc những dịch vụ đã được lưu mà không có trong preset
@@ -2124,8 +2191,15 @@ export const afterRender = () => {
         let svTotal = 0;
         document.querySelectorAll('.preset-service-check:checked').forEach(cb => { svTotal += parseInt(cb.dataset.price) || 0; });
         document.querySelectorAll('.service-price-input').forEach(el => { svTotal += parseInt(el.value) || 0; });
+        
         const finalPrice = total - discount + svTotal;
         const remaining = finalPrice - deposit;
+
+        const grandTotalEl = document.getElementById('edit-grand-total');
+        if (grandTotalEl) {
+            grandTotalEl.textContent = finalPrice.toLocaleString('vi-VN') + 'đ';
+        }
+
         const remainEl = document.getElementById('edit-remaining');
         if (remainEl) {
             remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
@@ -2678,7 +2752,10 @@ export const afterRender = () => {
                 const idCardEl = document.getElementById('edit-id-card');
                 const id_card = idCardEl ? idCardEl.value : '';
                 const pickupEl = document.getElementById('edit-pickup-point');
-                const pickup_point = pickupEl ? pickupEl.value : '';
+                const pickupCustomEl = document.getElementById('edit-pickup-custom');
+                const pickup_point = (pickupEl?.value === '__custom__')
+                    ? (pickupCustomEl?.value?.trim() || '')
+                    : (pickupEl?.value || '');
 
                 // Thu thập dịch vụ bổ sung
                 const servicesArr = [];
@@ -2717,6 +2794,11 @@ export const afterRender = () => {
                 const editDepReqVal = parseInt(document.getElementById('edit-deposit-required').value);
                 const deposit_required = !isNaN(editDepReqVal) ? editDepReqVal : 1000000;
 
+                // Tính toán tổng tiền cuối cùng (Grand Total) bao gồm cả dịch vụ
+                let svTotalForSave = 0;
+                servicesArr.forEach(s => svTotalForSave += s.price);
+                const finalTotalPrice = basePrice - discount + svTotalForSave;
+
                 const bookingPayload = {
                     id: bookingId,
                     name: name,
@@ -2738,7 +2820,7 @@ export const afterRender = () => {
                     services_booked: services_booked,
                     sale_id: sale_id,
                     sale_name: sale_name,
-                    total_price: basePrice - discount,
+                    total_price: finalTotalPrice,
                     discount: discount,
                     deposit: deposit,
                     deposit_required: deposit_required,
