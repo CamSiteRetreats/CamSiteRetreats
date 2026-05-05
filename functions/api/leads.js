@@ -69,11 +69,10 @@ export async function onRequest(context) {
                 let mailStatus = null;
                 if (newLead) {
                     mailStatus = await sendEmail({
-                        env,
                         subject: `🍀 Khách hàng mới: ${newLead.name}`,
                         html: `
                             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                                <h2 style="color: #E85D04;">Có khách hàng mới đăng kỹ tư vấn!</h2>
+                                <h2 style="color: #E85D04;">Có khách hàng mới đăng ký tư vấn!</h2>
                                 <p><b>Họ và tên:</b> ${newLead.name}</p>
                                 <p><b>Số điện thoại:</b> ${newLead.phone}</p>
                                 <p><b>Link Zalo:</b> <a href="https://zalo.me/${newLead.phone}">https://zalo.me/${newLead.phone}</a></p>
@@ -84,7 +83,7 @@ export async function onRequest(context) {
                                 <p style="font-size: 12px; color: #999;">Email được gửi tự động từ hệ thống CAM SITE RETREATS.</p>
                             </div>
                         `
-                    });
+                    }, env);
                 }
 
                 return Response.json({ ...newLead, _mailStatus: mailStatus, _bookingId: newBookingId }, {

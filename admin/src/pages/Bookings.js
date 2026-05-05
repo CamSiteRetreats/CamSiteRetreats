@@ -844,7 +844,6 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (!b.status || b.status === 'Chờ cọc' || b.status === 'Chờ xác nhận cọc') && !isDonePast;
             } else if (activeTab === 'upcoming') {
-            } else if (activeTab === 'upcoming') {
                 // 'Chờ xác nhận cọc' thuộc về tab pending, không được hiện ở đây. Tương tự với hủy/bảo lưu.
                 tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && b.status !== 'Chờ xác nhận cọc' && b.status !== 'Đã hủy' && b.status !== 'Bảo lưu' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
             } else if (activeTab === 'ready') {
