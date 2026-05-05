@@ -215,6 +215,226 @@ export const render = () => {
               th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
       </style>
+
+      <!-- Edit Booking Modal (Full Detail Edit) -->
+      <div id="editModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+          <div class="bg-gray-50 border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl scale-95 transition-transform duration-300 transform relative" id="editModalContent">
+              
+              <!-- Sticky Header -->
+              <div class="sticky top-0 bg-gray-50/95 backdrop-blur z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
+                  <div>
+                      <h2 class="text-xl font-bold text-gray-900">✏️ Chỉnh Sửa Phiếu Đăng Ký</h2>
+                      <p class="text-xs text-gray-400 mt-0.5">Cập nhật thông tin chi tiết của khách hàng trong đoàn</p>
+                  </div>
+                  <button onclick="window.closeEditModal()" class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 rounded-full p-2 transition-colors border border-gray-200">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+              </div>
+              
+              <div class="p-6">
+                  <form id="editForm" class="space-y-4">
+                      <input type="hidden" id="edit-id">
+
+                      <!-- SECTION 1: Thông tin Tour & Trạng thái -->
+                      <div class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 text-sm">🗺️</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Tour & Trạng thái</h3>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div class="md:col-span-1">
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tuyến Tour</label>
+                                  <select id="edit-tour" class="input-field bg-white font-medium">
+                                      <option value="">-- Chọn Tour --</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Khởi Hành</label>
+                                  <select id="edit-date" class="input-field bg-white font-mono">
+                                      <option value="">-- Chọn Lịch --</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Trạng Thái Đơn</label>
+                                  <select id="edit-status" class="input-field bg-white text-sm font-bold">
+                                      <option value="Chờ tư vấn">⏳ Chờ lịch</option>
+                                      <option value="Chờ cọc">🔔 Chờ cọc</option>
+                                      <option value="Chờ xác nhận cọc">💳 Chờ xác nhận cọc</option>
+                                      <option value="Đã cọc">✅ Đã cọc</option>
+                                      <option value="Đã cọc (Chờ đi)">🎒 Đã cọc (Chờ đi)</option>
+                                      <option value="Hoàn thành">🏆 Hoàn thành</option>
+                                  </select>
+                              </div>
+                              <div id="edit-sale-container" class="hidden">
+                                  <label class="block text-xs font-bold text-blue-600 uppercase mb-1.5">👤 Người Phụ Trách</label>
+                                  <select id="edit-sale" class="input-field bg-blue-50 text-sm font-bold text-blue-700 border-blue-200">
+                                      <option value="">-- Website --</option>
+                                  </select>
+                              </div>
+                              <div class="md:col-span-2">
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên In Huy Chương</label>
+                                  <input type="text" id="edit-medal-name" class="input-field bg-white font-bold text-csr-orange" placeholder="Để trống = dùng Họ Tên">
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- SECTION 2: Thông tin Cá nhân -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 text-sm">👤</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Cá nhân</h3>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Họ và Tên *</label>
+                                  <input type="text" id="edit-name" class="input-field bg-gray-50 font-bold" required>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Số Điện Thoại *</label>
+                                  <input type="tel" id="edit-phone" class="input-field bg-gray-50 font-medium" required>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ngày Sinh</label>
+                                  <input type="date" id="edit-dob" class="input-field bg-gray-50 text-sm">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới Tính</label>
+                                  <select id="edit-gender" class="input-field bg-gray-50 text-sm">
+                                      <option value="Khác">Khác</option>
+                                      <option value="Nam">Nam</option>
+                                      <option value="Nữ">Nữ</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">CCCD / Passport</label>
+                                  <input type="text" id="edit-id-card" class="input-field bg-gray-50 font-mono text-sm" placeholder="Số định danh">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa Chỉ</label>
+                                  <input type="text" id="edit-address" class="input-field bg-gray-50 text-sm" placeholder="Tỉnh/Thành, Quận/Huyện">
+                              </div>
+                              <div class="md:col-span-2 flex items-center gap-2 pt-1">
+                                  <input type="checkbox" id="edit-commitments" class="w-4 h-4 text-csr-orange border-gray-300 rounded focus:ring-csr-orange">
+                                  <label for="edit-commitments" class="text-xs font-bold text-gray-600 uppercase">Khách đã đồng ý Cam kết sức khỏe & Nội quy</label>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- SECTION 3: Hậu cần -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0 text-sm">🎒</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Hậu cần</h3>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Điểm Đón</label>
+                                  <input type="text" id="edit-pickup-point" class="input-field bg-gray-50 text-sm" placeholder="VD: Đà Lạt Trung Tâm">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
+                                  <select id="edit-trekking-pole" class="input-field bg-gray-50 text-sm">
+                                      <option value="Không">Không mượn</option>
+                                      <option value="Có">✅ Có mượn gậy</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Chế Độ Ăn</label>
+                                  <input type="text" id="edit-diet" class="input-field bg-gray-50 text-sm" placeholder="VD: Ăn chay, không hành...">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-red-400 uppercase mb-1.5">Dị Ứng / Y Tế</label>
+                                  <input type="text" id="edit-allergy" class="input-field bg-red-50/30 border-red-100 text-sm" placeholder="VD: Không có">
+                              </div>
+                              <div class="md:col-span-2">
+                                  <label class="block text-xs font-bold text-blue-500 uppercase mb-1.5">💬 Ghi Chú Sale / Yêu Cầu Riêng</label>
+                                  <input type="text" id="edit-special" class="input-field bg-blue-50/30 text-sm text-blue-700 font-medium" placeholder="Lưu ý đón khách, yêu cầu đặc biệt...">
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- SECTION 4: Dịch vụ bổ sung -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center justify-between mb-4">
+                              <div class="flex items-center gap-2.5">
+                                  <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 text-sm">✨</div>
+                                  <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Dịch Vụ Bổ Sung</h3>
+                              </div>
+                          </div>
+
+                          <!-- Preset services từ thiết lập tour -->
+                          <div id="presetServicesBlock" class="hidden mb-4">
+                              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2.5">📋 Dịch vụ cài sẵn của tour — chọn để thêm vào đơn</p>
+                              <div id="presetServicesList" class="grid grid-cols-1 gap-2"></div>
+                          </div>
+
+                          <!-- Đường phân cách -->
+                          <div id="servicesDivider" class="hidden border-t border-dashed border-gray-200 my-3"></div>
+
+                          <!-- Custom / Thủ công -->
+                          <div class="flex justify-between items-center mb-2">
+                              <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">🖊️ Dịch vụ khác (nhập tay)</p>
+                              <button type="button" id="addServiceBtn" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-lg text-xs font-bold transition-colors">
+                                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                  Thêm thủ công
+                              </button>
+                          </div>
+                          <div id="servicesContainer" class="space-y-2">
+                              <p id="emptyServicesMsg" class="text-sm text-gray-400 italic text-center py-2">Không có dịch vụ bổ sung nào được nhập tay.</p>
+                          </div>
+
+                          <!-- Tổng phí -->
+                          <div id="servicesTotalRow" class="hidden mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                              <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tổng phí dịch vụ bổ sung</span>
+                              <span id="servicesTotalDisplay" class="text-sm font-black text-green-600">0đ</span>
+                          </div>
+                      </div>
+
+                      <!-- SECTION 5: Tài chính -->
+                      <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                          <div class="flex items-center gap-2.5 mb-4">
+                              <div class="w-7 h-7 rounded-lg bg-orange-50 text-csr-orange flex items-center justify-center flex-shrink-0 text-sm">💰</div>
+                              <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Tài chính & Thanh toán</h3>
+                          </div>
+                          <div class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc)</label>
+                                  <input type="number" id="edit-total" class="input-field bg-white font-bold text-gray-900" oninput="window.updateEditRemaining()">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-red-500 uppercase mb-1.5">Giảm Giá</label>
+                                  <input type="number" id="edit-discount" class="input-field bg-red-50 text-red-600 font-bold" oninput="window.updateEditRemaining()">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-green-600 uppercase mb-1.5">Khách Đã Cọc</label>
+                                  <input type="number" id="edit-deposit" class="input-field bg-green-50 border-green-200 font-bold text-green-700" oninput="window.updateEditRemaining()">
+                              </div>
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
+                              <input type="number" id="edit-deposit-required" class="input-field bg-orange-50/50 border-orange-100 font-bold text-csr-orange" placeholder="1000000">
+                          </div>
+                          <div class="bg-gradient-to-r from-red-500 to-rose-600 p-4 rounded-xl flex justify-between items-center text-white">
+                              <span class="text-sm font-bold uppercase flex items-center gap-2">
+                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                 Còn Lại Cần Phải Thu
+                              </span>
+                              <span id="edit-remaining" class="text-2xl font-black drop-shadow">0đ</span>
+                          </div>
+                      </div>
+
+                      <!-- Action Buttons -->
+                      <div class="flex gap-3 pt-2">
+                          <button type="button" onclick="window.closeEditModal()" class="flex-1 px-4 py-4 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-sm text-sm">Hủy bỏ</button>
+                          <button type="submit" class="flex-[2] px-4 py-4 bg-csr-orange text-white rounded-xl font-bold hover:bg-[#d65503] transition-all shadow-lg shadow-csr-orange/30 text-sm flex items-center justify-center gap-2">
+                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                              Lưu Cập Nhật
+                          </button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
     `;
 };
 
@@ -664,7 +884,7 @@ export const afterRender = async () => {
 
         tbody.innerHTML = filtered.map((b, index) => {
             const isEven = index % 2 === 0;
-            return `<tr class="${isEven ? 'bg-white' : 'bg-gray-50/40'} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group" data-booking-id="${b.id}">` +
+            return `<tr class="${isEven ? 'bg-white' : 'bg-gray-50/40'} hover:bg-amber-50/40 transition-colors border-b border-gray-100 group row-clickable cursor-pointer" data-booking-id="${b.id}">` +
                 COLUMNS.map(c => `
                     <td class="px-4 py-3 align-middle ${c.id === 'col-extra' ? 'min-w-[220px]' : ''} ${visibleCols.has(c.id) ? '' : 'col-hidden'}" data-col="${c.id}">
                         ${c.render(b, index)}
@@ -1100,8 +1320,425 @@ export const afterRender = async () => {
     // Patch loadData to call renderSeatMap after loading
     const origLoadData = loadData;
 
+    // ===== MODAL EDIT LOGIC TỪ BOOKINGS.JS =====
+    let allTours = [];
+    let allSchedules = [];
+    let allUsers = [];
+
+    const loadToursAndSchedules = async () => {
+        try {
+            const [toursRes, schedulesRes, usersRes] = await Promise.all([
+                fetch('/api/tours'),
+                fetch('/api/schedules'),
+                fetch('/api/users')
+            ]);
+            allTours = toursRes.ok ? await toursRes.json() : [];
+            allSchedules = schedulesRes.ok ? await schedulesRes.json() : [];
+            allUsers = usersRes.ok ? await usersRes.json() : [];
+
+            populateTourDropdown('edit-tour');
+            populateSaleDropdown('edit-sale');
+        } catch (err) {
+            console.error('Lỗi tải tours/schedules:', err);
+        }
+    };
+
+    const populateSaleDropdown = (selectId) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Website --</option>';
+        allUsers.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = `${u.full_name || u.fullName} (${u.role})`;
+            select.appendChild(opt);
+        });
+    };
+
+    const populateTourDropdown = (selectId) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const currentVal = select.value;
+        const firstOption = select.options[0]?.outerHTML || '<option value="">-- Chọn Tour --</option>';
+        select.innerHTML = firstOption;
+        allTours.filter(t => t.is_visible !== false).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.name;
+            opt.textContent = t.name;
+            if (t.name === currentVal) opt.selected = true;
+            select.appendChild(opt);
+        });
+    };
+
+    const populateDateDropdown = (dateSelectId, tourName, currentDateVal, currentScheduleId) => {
+        const dateSelect = document.getElementById(dateSelectId);
+        if (!dateSelect) return;
+        dateSelect.innerHTML = '<option value="">-- Chọn Lịch --</option>';
+        if (!tourName) return;
+
+        const matched = allSchedules.filter(s => s.tour_name === tourName || tourName.includes(s.tour_name) || s.tour_name.includes(tourName));
+        if (matched.length === 0) {
+            dateSelect.innerHTML = '<option value="">Chưa có lịch cho tour này</option>';
+            return;
+        }
+
+        matched.sort((a, b) => new Date(a.start_date) - new Date(b.start_date)).forEach(s => {
+            const booked = parseInt(s.booked_count) || 0;
+            const remaining = (s.slots || 0) - booked;
+            const sDate = new Date(s.start_date);
+            const eDate = s.end_date ? new Date(s.end_date) : null;
+            const fmtDate = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            let label = fmtDate(sDate);
+            if (eDate) label += ' - ' + fmtDate(eDate);
+            if (s.group_label) label += ` · ${s.group_label}`;
+            label += ` (${remaining >= 0 ? remaining : 0} chỗ trống)`;
+
+            const opt = document.createElement('option');
+            const dateStr = `${sDate.getDate().toString().padStart(2, '0')}/${(sDate.getMonth() + 1).toString().padStart(2, '0')}/${sDate.getFullYear()}`;
+            opt.value = `${s.id}::${dateStr}`;
+            opt.dataset.scheduleId = s.id;
+            opt.dataset.date = dateStr;
+            opt.textContent = label;
+
+            if (remaining <= 0) {
+                opt.disabled = true;
+                opt.textContent = label.replace('chỗ trống', 'HẾT CHỖ');
+            }
+            if (currentScheduleId && String(s.id) === String(currentScheduleId)) {
+                opt.selected = true;
+            } else if (!currentScheduleId && currentDateVal && dateStr === currentDateVal) {
+                opt.selected = true;
+            }
+            dateSelect.appendChild(opt);
+        });
+    };
+
+    const editTourSelect = document.getElementById('edit-tour');
+    if (editTourSelect) {
+        editTourSelect.addEventListener('change', (e) => {
+            populateDateDropdown('edit-date', e.target.value);
+        });
+    }
+
+    window.closeEditModal = () => {
+        document.getElementById('editModal').classList.remove('opacity-100');
+        const mc = document.getElementById('editModalContent');
+        if (mc) {
+            mc.classList.remove('scale-100', 'translate-y-0');
+            mc.classList.add('scale-95', 'translate-y-4');
+        }
+        setTimeout(() => document.getElementById('editModal').classList.add('hidden'), 300);
+    };
+
+    window.updateEditRemaining = () => {
+        const total = parseInt(document.getElementById('edit-total')?.value) || 0;
+        const discount = parseInt(document.getElementById('edit-discount')?.value) || 0;
+        const deposit = parseInt(document.getElementById('edit-deposit')?.value) || 0;
+        let svTotal = 0;
+        document.querySelectorAll('.preset-service-check:checked').forEach(cb => { svTotal += parseInt(cb.dataset.price) || 0; });
+        document.querySelectorAll('.service-price-input').forEach(el => { svTotal += parseInt(el.value) || 0; });
+        const finalPrice = total - discount + svTotal;
+        const remaining = finalPrice - deposit;
+        const remainEl = document.getElementById('edit-remaining');
+        if (remainEl) remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
+    };
+
+    window.updateServicesTotal = () => {
+        let total = 0;
+        document.querySelectorAll('.preset-service-check:checked').forEach(cb => { total += parseInt(cb.dataset.price) || 0; });
+        document.querySelectorAll('.service-price-input').forEach(el => { total += parseInt(el.value) || 0; });
+        const display = document.getElementById('servicesTotalDisplay');
+        if (display) display.textContent = total.toLocaleString('vi-VN') + 'đ';
+        const totalRow = document.getElementById('servicesTotalRow');
+        if (totalRow) totalRow.classList.toggle('hidden', total === 0);
+        window.updateEditRemaining();
+        return total;
+    };
+
+    window.addServiceRow = (label = '', price = 0) => {
+        const container = document.getElementById('servicesContainer');
+        const emptyMsg = document.getElementById('emptyServicesMsg');
+        const totalRow = document.getElementById('servicesTotalRow');
+        if (!container) return;
+        if (emptyMsg) emptyMsg.classList.add('hidden');
+        if (totalRow) totalRow.classList.remove('hidden');
+
+        const row = document.createElement('div');
+        row.className = 'service-row flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5';
+        row.innerHTML = `
+            <span class="text-green-500 text-sm">✨</span>
+            <input type="text" class="service-label-input flex-1 text-sm bg-transparent border-none outline-none text-gray-700 font-medium placeholder:text-gray-300" placeholder="Tên dịch vụ (VD: Thuê áo mưa...)" value="${label.replace(/"/g, '&quot;')}">
+            <div class="flex items-center gap-1 shrink-0">
+                <span class="text-xs text-gray-400 font-medium">+</span>
+                <input type="number" class="service-price-input w-24 text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 text-green-600 font-bold text-right outline-none focus:border-green-400" placeholder="Giá" value="${price}" min="0">
+                <span class="text-xs text-gray-400">đ</span>
+            </div>
+            <button type="button" class="remove-service-btn text-gray-300 hover:text-red-400 transition-colors ml-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+        row.querySelector('.remove-service-btn').addEventListener('click', () => {
+            row.remove();
+            if (container.querySelectorAll('.service-row').length === 0) {
+                if (emptyMsg) emptyMsg.classList.remove('hidden');
+                if (totalRow) totalRow.classList.add('hidden');
+            }
+            window.updateServicesTotal();
+        });
+        row.querySelector('.service-price-input').addEventListener('input', window.updateServicesTotal);
+        container.appendChild(row);
+        window.updateServicesTotal();
+    };
+
+    const addServiceBtn = document.getElementById('addServiceBtn');
+    if (addServiceBtn) addServiceBtn.addEventListener('click', () => window.addServiceRow());
+
+    window.actionEdit = async (bookingId) => {
+        const booking = allBookings.find(b => b.id == bookingId);
+        if (!booking) return;
+
+        document.getElementById('edit-id').value = bookingId;
+        document.getElementById('edit-name').value = booking.name || '';
+        document.getElementById('edit-phone').value = booking.phone || '';
+        document.getElementById('edit-medal-name').value = booking.medal_name || '';
+        document.getElementById('edit-tour').value = booking.tour || '';
+        populateDateDropdown('edit-date', booking.tour || '', booking.date || '', booking.schedule_id || null);
+
+        const fillEditForm = (data) => {
+            let dobVal = data.dob || '';
+            if (dobVal && dobVal.includes('/')) {
+                const parts = dobVal.split('/');
+                if (parts.length === 3) dobVal = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            document.getElementById('edit-dob').value = dobVal;
+            document.getElementById('edit-gender').value = data.gender || 'Khác';
+            document.getElementById('edit-allergy').value = data.allergy || data.medical_notes || '';
+            document.getElementById('edit-address').value = data.address || '';
+            document.getElementById('edit-diet').value = data.diet || data.dietary || '';
+            document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
+            document.getElementById('edit-id-card').value = data.id_card || data.cccd || '';
+            document.getElementById('edit-pickup-point').value = data.pickup_point || '';
+        };
+
+        fillEditForm(booking);
+        document.getElementById('edit-status').value = booking.status || 'Chờ xác nhận cọc';
+        document.getElementById('edit-commitments').checked = !!booking.commitments;
+        document.getElementById('edit-special').value = booking.special || '';
+
+        try {
+            const userStr = localStorage.getItem('csr_user');
+            if (userStr) {
+                const userObj = JSON.parse(userStr);
+                if (userObj.role === 'admin') {
+                    const saleContainer = document.getElementById('edit-sale-container');
+                    if (saleContainer) saleContainer.classList.remove('hidden');
+                    const saleSelect = document.getElementById('edit-sale');
+                    if (saleSelect) saleSelect.value = booking.sale_id || '';
+                }
+            }
+        } catch (e) {}
+
+        const fillTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+        document.getElementById('edit-total').value = fillTotal;
+        document.getElementById('edit-discount').value = booking.discount || 0;
+        document.getElementById('edit-deposit').value = booking.deposit || 0;
+        const bDepReq = parseInt(booking.deposit_required);
+        document.getElementById('edit-deposit-required').value = !isNaN(bDepReq) ? bDepReq : 1000000;
+        window.updateEditRemaining();
+
+        const container = document.getElementById('servicesContainer');
+        const emptyMsg = document.getElementById('emptyServicesMsg');
+        const totalRow = document.getElementById('servicesTotalRow');
+        const presetBlock = document.getElementById('presetServicesBlock');
+        const presetList = document.getElementById('presetServicesList');
+        const divider = document.getElementById('servicesDivider');
+
+        let bookedServices = [];
+        try {
+            if (booking.services_booked) {
+                const parsed = typeof booking.services_booked === 'string' ? JSON.parse(booking.services_booked) : booking.services_booked;
+                if (Array.isArray(parsed)) bookedServices = parsed;
+            }
+        } catch(e) {}
+
+        if (presetList && presetBlock) {
+            presetList.innerHTML = '';
+            const matchedTourData = allTours.find(t => t.name === booking.tour);
+            let presetServices = [];
+            try {
+                if (matchedTourData?.services) {
+                    const ps = typeof matchedTourData.services === 'string' ? JSON.parse(matchedTourData.services) : matchedTourData.services;
+                    if (Array.isArray(ps)) presetServices = ps;
+                }
+            } catch(e) {}
+
+            if (presetServices.length > 0) {
+                presetBlock.classList.remove('hidden');
+                if (divider) divider.classList.remove('hidden');
+                presetServices.forEach(ps => {
+                    const isBooked = bookedServices.some(b => (b.label || b.name || '').toLowerCase() === (ps.label || '').toLowerCase());
+                    const card = document.createElement('label');
+                    card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (isBooked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
+                    card.innerHTML = `
+                        <input type="checkbox" class="preset-service-check w-4 h-4 rounded accent-green-500 shrink-0" data-label="${(ps.label || '').replace(/"/g, '&quot;')}" data-price="${ps.price || 0}" ${isBooked ? 'checked' : ''}>
+                        <div class="flex-1 min-w-0"><div class="font-bold text-sm text-gray-800">${ps.label || ''}</div></div>
+                        <div class="text-sm font-black text-green-600 shrink-0">+${parseInt(ps.price || 0).toLocaleString('vi-VN')}đ</div>
+                    `;
+                    card.querySelector('.preset-service-check').addEventListener('change', (e) => {
+                        card.className = 'preset-service-card flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (e.target.checked ? 'border-green-400 bg-green-50' : 'border-gray-100 bg-gray-50');
+                        window.updateServicesTotal();
+                    });
+                    presetList.appendChild(card);
+                });
+            } else {
+                presetBlock.classList.add('hidden');
+                if (divider) divider.classList.add('hidden');
+            }
+        }
+
+        if (container) {
+            container.querySelectorAll('.service-row').forEach(r => r.remove());
+            const matchedTourData2 = allTours.find(t => t.name === booking.tour);
+            let presetLabels = new Set();
+            try {
+                const ps2 = matchedTourData2?.services;
+                const arr = ps2 ? (typeof ps2 === 'string' ? JSON.parse(ps2) : ps2) : [];
+                if (Array.isArray(arr)) arr.forEach(p => presetLabels.add((p.label || '').toLowerCase()));
+            } catch(e) {}
+
+            const manualServices = bookedServices.filter(b => !presetLabels.has((b.label || b.name || '').toLowerCase()));
+            if (manualServices.length > 0) {
+                if (emptyMsg) emptyMsg.classList.add('hidden');
+                if (totalRow) totalRow.classList.remove('hidden');
+                manualServices.forEach(sv => window.addServiceRow(sv.label || sv.name || '', sv.price || 0));
+            } else {
+                if (emptyMsg) emptyMsg.classList.remove('hidden');
+            }
+            window.updateServicesTotal();
+        }
+
+        const editModal = document.getElementById('editModal');
+        const editModalContent = document.getElementById('editModalContent');
+        if (editModal && editModalContent) {
+            editModal.classList.remove('hidden');
+            setTimeout(() => {
+                editModal.classList.add('opacity-100');
+                editModalContent.classList.remove('scale-95', 'translate-y-4');
+                editModalContent.classList.add('scale-100', 'translate-y-0');
+            }, 10);
+        }
+    };
+
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Đang lưu cập nhật...';
+            btn.disabled = true;
+
+            try {
+                const bookingId = document.getElementById('edit-id').value;
+                const name = document.getElementById('edit-name').value;
+                const phone = document.getElementById('edit-phone').value;
+                const medalName = document.getElementById('edit-medal-name').value;
+                const tour = document.getElementById('edit-tour').value;
+                const rawEditDate = document.getElementById('edit-date').value;
+                let date = rawEditDate;
+                let editScheduleId = undefined;
+                if (rawEditDate && rawEditDate.includes('::')) {
+                    const parts = rawEditDate.split('::');
+                    editScheduleId = parseInt(parts[0]) || null;
+                    date = parts[1];
+                }
+                const dob = document.getElementById('edit-dob').value;
+                const gender = document.getElementById('edit-gender').value;
+                const status = document.getElementById('edit-status').value;
+                const allergy = document.getElementById('edit-allergy').value;
+                const address = document.getElementById('edit-address').value;
+                const diet = document.getElementById('edit-diet').value;
+                const trekking_pole = document.getElementById('edit-trekking-pole').value;
+                const commitments = document.getElementById('edit-commitments').checked;
+                const special = document.getElementById('edit-special').value;
+                const id_card = document.getElementById('edit-id-card').value;
+                const pickup_point = document.getElementById('edit-pickup-point').value;
+
+                const servicesArr = [];
+                document.querySelectorAll('.preset-service-check:checked').forEach(cb => {
+                    servicesArr.push({ label: cb.dataset.label, price: parseInt(cb.dataset.price) || 0 });
+                });
+                document.querySelectorAll('.service-row').forEach(row => {
+                    const label = (row.querySelector('.service-label-input')?.value || '').trim();
+                    const price = parseInt(row.querySelector('.service-price-input')?.value) || 0;
+                    if (label) servicesArr.push({ label, price });
+                });
+                const services_booked = servicesArr.length > 0 ? JSON.stringify(servicesArr) : null;
+
+                const saleSelect = document.getElementById('edit-sale');
+                let sale_id = undefined;
+                let sale_name = undefined;
+                if (saleSelect && !saleSelect.parentElement.classList.contains('hidden')) {
+                    sale_id = saleSelect.value || null;
+                    sale_name = 'Website';
+                    if (sale_id) {
+                        const u = allUsers.find(x => String(x.id) === String(sale_id));
+                        if (u) sale_name = u.full_name || u.fullName;
+                    }
+                }
+
+                const basePrice = parseInt(document.getElementById('edit-total').value) || 0;
+                const discount = parseInt(document.getElementById('edit-discount').value) || 0;
+                const deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
+                const editDepReqVal = parseInt(document.getElementById('edit-deposit-required').value);
+                const deposit_required = !isNaN(editDepReqVal) ? editDepReqVal : 1000000;
+
+                const bookingPayload = {
+                    id: bookingId, name, phone, medal_name: medalName, tour, date, dob, gender,
+                    status, allergy, address, diet, trekking_pole, commitments, special, id_card, pickup_point,
+                    services_booked, sale_id, sale_name, total_price: basePrice - discount, discount, deposit, deposit_required,
+                    ...(editScheduleId !== undefined ? { schedule_id: editScheduleId } : {})
+                };
+
+                const res = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingPayload)
+                });
+
+                if (res.ok) {
+                    alert("✅ Đã cập nhật thành công Chi tiết Đơn hàng!");
+                    window.closeEditModal();
+                    loadData(); // Tải lại bảng roster
+                } else {
+                    const errDB = await res.json();
+                    throw new Error(errDB.error || "Gặp sự cố khi Cập nhật API.");
+                }
+
+            } catch (err) {
+                alert("❌ Lỗi Cập nhật: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Row click event -> Action Edit Modal
+    document.getElementById('rosterList')?.addEventListener('click', (e) => {
+        if (e.target.closest('.seat-badge') || e.target.closest('a')) return;
+        const tr = e.target.closest('tr[data-booking-id]');
+        if (tr) {
+            const bookingId = tr.getAttribute('data-booking-id');
+            if (window.actionEdit) {
+                window.actionEdit(bookingId);
+            }
+        }
+    });
+
     // Run
     buildColumnToggles();
     buildTableHeader();
-    loadData().then(() => renderSeatMap()).catch(() => renderSeatMap());
+    Promise.all([loadData(), loadToursAndSchedules()]).then(() => renderSeatMap()).catch(() => renderSeatMap());
 };
