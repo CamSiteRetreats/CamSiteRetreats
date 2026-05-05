@@ -54,7 +54,8 @@ export async function onRequest(context) {
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit', 'discount',
                     'sale_id', 'sale_name', 'customer_id', 'dob', 'gender', 'address',
                     'id_card', 'diet', 'trekking_pole', 'allergy', 'special', 'medal_name', 'commitments', 'deposit_required', 'schedule_id', 'services_booked',
-                    'commission_paid', 'commission_paid_at', 'commission_payment_id'
+                    'commission_paid', 'commission_paid_at', 'commission_payment_id',
+                    'seat_number', 'pickup_point'
                 ];
 
                 const fields = [];
