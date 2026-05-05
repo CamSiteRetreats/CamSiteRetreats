@@ -1925,7 +1925,16 @@ export const afterRender = () => {
         }
 
         // Tài chính
-        const existingTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+        let initialSvTotal = 0;
+        try {
+            const bookedSv = typeof booking.services_booked === 'string'
+                ? JSON.parse(booking.services_booked) : (booking.services_booked || []);
+            if (Array.isArray(bookedSv)) {
+                bookedSv.forEach(s => initialSvTotal += (parseInt(s.price) || 0));
+            }
+        } catch(e) {}
+
+        const existingTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0) - initialSvTotal;
         // Nếu đơn chưa có giá (total_price = 0 hoặc null), tự động look up giá từ tour
         let fillTotal = existingTotal;
         if (fillTotal === 0 && booking.tour) {
