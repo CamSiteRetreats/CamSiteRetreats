@@ -327,9 +327,9 @@ export const render = () => {
                               <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Thông tin Hậu cần</h3>
                           </div>
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
+                              <div class="md:col-span-1">
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Điểm Đón</label>
-                                  <input type="text" id="edit-pickup-point" class="input-field bg-gray-50 text-sm" placeholder="VD: Đà Lạt Trung Tâm">
+                                  <input type="text" id="edit-pickup-point" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors" placeholder="VD: Đà Lạt Trung Tâm">
                               </div>
                               <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
