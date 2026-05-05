@@ -331,7 +331,10 @@ export const render = () => {
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div class="md:col-span-1">
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Điểm Đón</label>
-                                  <input type="text" id="edit-pickup-point" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors" placeholder="VD: Đà Lạt Trung Tâm">
+                                  <select id="edit-pickup-point" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors">
+                                      <option value="">— Chưa chọn —</option>
+                                  </select>
+                                  <input type="text" id="edit-pickup-custom" class="w-full mt-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg text-sm focus:border-csr-orange focus:ring-1 focus:ring-csr-orange outline-none transition-colors hidden" placeholder="Nhập điểm đón tuỳ chỉnh...">
                               </div>
                               <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mượn Gậy</label>
@@ -1536,7 +1539,7 @@ export const afterRender = async () => {
                 document.getElementById('edit-diet').value = data.diet || data.dietary || '';
                 document.getElementById('edit-trekking-pole').value = data.trekking_pole || 'Không';
                 document.getElementById('edit-id-card').value = data.id_card || data.cccd || '';
-                document.getElementById('edit-pickup-point').value = data.pickup_point || '';
+                // pickup_point sẽ được nạp sau khi build select từ tour config
             };
 
             fillEditForm(booking);
@@ -1615,6 +1618,65 @@ export const afterRender = async () => {
                 }
             }
 
+            // Nạp điểm đón từ cấu hình tour vào select
+            const pickupSelect = document.getElementById('edit-pickup-point');
+            if (pickupSelect) {
+                const matchedTourForPickup = allTours.find(t => t.name === booking.tour);
+                let pickupPoints = [];
+                try {
+                    if (matchedTourForPickup?.pickup_points) {
+                        const pp = typeof matchedTourForPickup.pickup_points === 'string'
+                            ? JSON.parse(matchedTourForPickup.pickup_points) : matchedTourForPickup.pickup_points;
+                        if (Array.isArray(pp)) pickupPoints = pp;
+                    }
+                } catch(e) {}
+
+                pickupSelect.innerHTML = '<option value="">— Chưa chọn —</option>';
+                pickupPoints.forEach(p => {
+                    const label = (p.label || p.name || p) + (p.time ? ` (${p.time})` : '');
+                    const val = p.label || p.name || p;
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = label;
+                    pickupSelect.appendChild(opt);
+                });
+
+                // Thêm option Khác ở cuối
+                const otherOpt = document.createElement('option');
+                otherOpt.value = '__custom__';
+                otherOpt.textContent = '\u270f\ufe0f Khác (nhập tay)';
+                pickupSelect.appendChild(otherOpt);
+
+                const customInput = document.getElementById('edit-pickup-custom');
+                const toggleCustom = (val) => {
+                    if (customInput) {
+                        if (val === '__custom__') {
+                            customInput.classList.remove('hidden');
+                            customInput.focus();
+                        } else {
+                            customInput.classList.add('hidden');
+                            customInput.value = '';
+                        }
+                    }
+                };
+
+                const savedPickup = booking.pickup_point || '';
+                if (savedPickup) {
+                    const exists = pickupPoints.some(p => (p.label || p.name || p) === savedPickup);
+                    if (!exists) {
+                        pickupSelect.value = '__custom__';
+                        if (customInput) {
+                            customInput.value = savedPickup;
+                            customInput.classList.remove('hidden');
+                        }
+                    } else {
+                        pickupSelect.value = savedPickup;
+                    }
+                }
+
+                pickupSelect.addEventListener('change', () => toggleCustom(pickupSelect.value));
+            }
+
             if (container) {
                 container.querySelectorAll('.service-row').forEach(r => r.remove());
                 const matchedTourData2 = allTours.find(t => t.name === booking.tour);
@@ -1685,7 +1747,11 @@ export const afterRender = async () => {
                 const commitments = document.getElementById('edit-commitments').checked;
                 const special = document.getElementById('edit-special').value;
                 const id_card = document.getElementById('edit-id-card').value;
-                const pickup_point = document.getElementById('edit-pickup-point').value;
+                const pickupEl = document.getElementById('edit-pickup-point');
+                const pickupCustomEl = document.getElementById('edit-pickup-custom');
+                const pickup_point = (pickupEl?.value === '__custom__')
+                    ? (pickupCustomEl?.value?.trim() || '')
+                    : (pickupEl?.value || '');
 
                 const servicesArr = [];
                 document.querySelectorAll('.preset-service-check:checked').forEach(cb => {
