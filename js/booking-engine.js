@@ -292,7 +292,12 @@ const BookingEngine = {
                 <select class="be-input" id="be-pickup" required>
                     <option value="">Chọn điểm đón...</option>
                     ${pickups.map(p => `<option value="${p.label || p}" ${d.pickupPoint === (p.label || p) ? 'selected' : ''}>${p.label || p}${p.time ? ' - ' + p.time : ''}</option>`).join('')}
+                    <option value="__custom__" ${ !pickups.some(p => (p.label || p) === d.pickupPoint) && d.pickupPoint ? 'selected' : '' }>✏️ Khác (nhập tay)</option>
                 </select>
+                <input class="be-input" id="be-pickup-custom" type="text"
+                    style="margin-top:8px; background:#fff7ed; border-color:#fdba74; ${( !pickups.some(p => (p.label || p) === d.pickupPoint) && d.pickupPoint) ? '' : 'display:none;'}"
+                    placeholder="Nhập điểm đón tuỳ chỉnh..."
+                    value="${ !pickups.some(p => (p.label || p) === d.pickupPoint) && d.pickupPoint ? d.pickupPoint : '' }">
             </div>` : ''}
 
             ${cfg.show_medal_name !== false ? `
@@ -615,6 +620,21 @@ const BookingEngine = {
         if (step === 2) {
             const btn = document.getElementById('be-step2-next');
             if (btn) btn.addEventListener('click', () => { this._saveStep2(); this._renderStep(3); });
+
+            // Toggle ô nhập tay khi chọn "Khác"
+            const pickupSel = document.getElementById('be-pickup');
+            const pickupCustom = document.getElementById('be-pickup-custom');
+            if (pickupSel && pickupCustom) {
+                pickupSel.addEventListener('change', () => {
+                    if (pickupSel.value === '__custom__') {
+                        pickupCustom.style.display = '';
+                        pickupCustom.focus();
+                    } else {
+                        pickupCustom.style.display = 'none';
+                        pickupCustom.value = '';
+                    }
+                });
+            }
         }
         if (step === 4) {
             // Scroll-to-bottom detection: mở khóa checkbox khi đã đọc hết
@@ -677,9 +697,14 @@ const BookingEngine = {
         };
     },
     _saveStep2() {
+        const pickupEl = document.getElementById('be-pickup');
+        const pickupCustomEl = document.getElementById('be-pickup-custom');
+        const pickupVal = (pickupEl?.value === '__custom__')
+            ? (pickupCustomEl?.value?.trim() || '')
+            : (pickupEl?.value || '');
         this.bookingData = {
             ...this.bookingData,
-            pickupPoint: document.getElementById('be-pickup')?.value || '',
+            pickupPoint: pickupVal,
             medalName: document.getElementById('be-medal')?.value.trim() || this.bookingData.name || '',
             vegetarian: document.getElementById('be-vegetarian')?.checked || false,
             trekkingPole: document.getElementById('be-trekkingpole')?.checked || false,
