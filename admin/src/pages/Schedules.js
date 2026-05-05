@@ -112,6 +112,15 @@ export const render = () => {
                           <input type="text" id="sch-group-label" class="input-field bg-blue-50/50 font-bold text-blue-700 border-blue-200" placeholder="VD: Nhóm 1, VIP, Budget...">
                           <p class="text-[10px] text-gray-400 mt-1 italic">Nhập nhãn nếu mở nhiều đoàn cùng ngày để phân biệt trong form đặt chỗ.</p>
                       </div>
+                      <div>
+                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">🚗 Loại Xe</label>
+                          <select id="sch-vehicle-type" class="input-field bg-gray-50 font-medium">
+                              <option value="solati_16">🚐 Solati 16 chỗ ngồi</option>
+                              <option value="limo_34">🚌 Limousine 34 chỗ nằm (3 dãy A/B/C)</option>
+                              <option value="sleeper_45">🛏️ Giường nằm 45 chỗ (2 tầng A/B)</option>
+                          </select>
+                          <p class="text-[10px] text-gray-400 mt-1 italic">Sơ đồ ghế trên trang vận hành sẽ hiển thị đúng loại xe này.</p>
+                      </div>
                       <div class="pt-3 flex gap-3">
                           <button type="button" id="cancelScheduleBtn" class="flex-1 px-6 py-3 border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-all">
                               Hủy
@@ -230,6 +239,7 @@ export const afterRender = () => {
             document.getElementById('sch-status').value = editData.status || 'Đang mở';
             document.getElementById('sch-group-label').value = editData.group_label || '';
             document.getElementById('sch-zalo-link').value = editData.zalo_link || '';
+            document.getElementById('sch-vehicle-type').value = editData.vehicle_type || 'solati_16';
         } else {
             title.textContent = 'Thêm Lịch Khởi Hành';
             scheduleForm.reset();
@@ -451,7 +461,7 @@ export const afterRender = () => {
                             <button class="sch-review-btn bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border border-yellow-200 rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-1.5 flex-[1.5] md:flex-none" data-id="${item.id}" title="Copy Link Đánh Giá">
                                 ⭐ Link ĐG
                             </button>
-                            <button class="sch-details-btn bg-csr-orange hover:opacity-90 text-white rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 flex-[2] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" data-date="${item.start_date}" data-group-label="${item.group_label || ''}" title="Xem Danh Sách Đoàn">
+                            <button class="sch-details-btn bg-csr-orange hover:opacity-90 text-white rounded-lg px-3 py-2 md:py-2.5 text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 flex-[2] md:flex-none" data-id="${item.id}" data-tour="${item.tour_name}" data-date="${item.start_date}" data-group-label="${item.group_label || ''}" data-vehicle="${item.vehicle_type || 'solati_16'}" title="Xem Danh Sách Đoàn">
                                 <svg class="w-4 h-4 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 📋 DS Đoàn
                             </button>
@@ -731,7 +741,7 @@ export const afterRender = () => {
             const safeDate = dateStr && dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
             const groupLabel = detailsBtn.getAttribute('data-group-label') || '';
             // Open schedule details using the new V2 router
-            const url = `/admin/roster?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(safeDate)}&scheduleId=${schId}&groupLabel=${encodeURIComponent(groupLabel)}`;
+            const url = `/admin/roster?tour=${encodeURIComponent(tourName)}&date=${encodeURIComponent(safeDate)}&scheduleId=${schId}&groupLabel=${encodeURIComponent(groupLabel)}&vehicleType=${encodeURIComponent(detailsBtn.getAttribute('data-vehicle') || 'solati_16')}`;
 
             // Navigate cleanly using History API
             history.pushState(null, null, url);
@@ -756,7 +766,8 @@ export const afterRender = () => {
             slots: parseInt(document.getElementById('sch-slots').value),
             status: document.getElementById('sch-status').value,
             group_label: document.getElementById('sch-group-label').value.trim() || null,
-            zalo_link: document.getElementById('sch-zalo-link').value.trim() || null
+            zalo_link: document.getElementById('sch-zalo-link').value.trim() || null,
+            vehicle_type: document.getElementById('sch-vehicle-type').value || 'solati_16'
         };
 
         try {

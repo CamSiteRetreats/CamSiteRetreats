@@ -61,7 +61,7 @@ export async function onRequest(context) {
 
         } else if (method === 'POST') {
             const body = await request.json();
-            const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin } = body;
+            const { id, tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin, vehicle_type } = body;
 
             if (!tour_name || !start_date || !end_date) {
                 return addCors(Response.json({ error: 'Missing required fields' }, { status: 400 }));
@@ -72,30 +72,32 @@ export async function onRequest(context) {
             const groupVal = group_label || null;
             const zaloVal = zalo_link || null;
             const pinVal = photo_pin || null;
+            const vehicleVal = vehicle_type || 'solati_16';
             // Must cast to JSONB explicitly for Neon serverless
             const photoLinksJson = JSON.stringify(photo_links || []);
 
             if (id) {
                 await sql`
                     UPDATE schedules
-                    SET tour_name   = ${tour_name},
-                        start_date  = ${start_date},
-                        end_date    = ${end_date},
-                        slots       = ${slotsVal},
-                        status      = ${statusVal},
-                        group_label = ${groupVal},
-                        zalo_link   = ${zaloVal},
-                        photo_links = ${photoLinksJson}::jsonb,
-                        photo_pin   = ${pinVal}
+                    SET tour_name    = ${tour_name},
+                        start_date   = ${start_date},
+                        end_date     = ${end_date},
+                        slots        = ${slotsVal},
+                        status       = ${statusVal},
+                        group_label  = ${groupVal},
+                        zalo_link    = ${zaloVal},
+                        photo_links  = ${photoLinksJson}::jsonb,
+                        photo_pin    = ${pinVal},
+                        vehicle_type = ${vehicleVal}
                     WHERE id = ${id}
                 `;
                 return addCors(Response.json({ success: true, message: 'Updated schedule' }));
             } else {
                 await sql`
                     INSERT INTO schedules
-                        (tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin)
+                        (tour_name, start_date, end_date, slots, status, group_label, zalo_link, photo_links, photo_pin, vehicle_type)
                     VALUES
-                        (${tour_name}, ${start_date}, ${end_date}, ${slotsVal}, ${statusVal}, ${groupVal}, ${zaloVal}, ${photoLinksJson}::jsonb, ${pinVal})
+                        (${tour_name}, ${start_date}, ${end_date}, ${slotsVal}, ${statusVal}, ${groupVal}, ${zaloVal}, ${photoLinksJson}::jsonb, ${pinVal}, ${vehicleVal})
                 `;
                 return addCors(Response.json({ success: true, message: 'Created schedule' }));
             }
