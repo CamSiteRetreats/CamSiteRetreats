@@ -1505,22 +1505,16 @@ export const afterRender = async () => {
         const remainEl = document.getElementById('edit-remaining');
         if (remainEl) remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
 
-        // Tự động chuyển trạng thái dựa trên số tiền
+        // Chỉ tự động chuyển sang "Đã cọc" khi admin nhập deposit > 0
+        // LƯU Ý: "Hoàn tất phí" CHỈ được set bởi SeePay API, không auto-set tại đây
         const statusEl = document.getElementById('edit-status');
         if (statusEl) {
             const currentStatus = statusEl.value;
-            // Không tự động đổi nếu đang ở các trạng thái cuối
-            if (!['Hoàn thành', 'Đã hủy', 'Bảo lưu'].includes(currentStatus)) {
-                if (remaining <= 0 && finalPrice > 0) {
-                    statusEl.value = 'Hoàn tất phí';
-                } else if (remaining > 0 && deposit > 0) {
-                    if (['Chờ tư vấn', 'Chờ cọc', 'Chờ xác nhận cọc'].includes(currentStatus)) {
-                        statusEl.value = 'Đã cọc';
-                    }
-                } else if (deposit === 0 && finalPrice > 0) {
-                    if (['Đã cọc', 'Hoàn tất phí', 'Đã cọc (Chờ đi)'].includes(currentStatus)) {
-                        statusEl.value = 'Chờ xác nhận cọc';
-                    }
+            if (['Chờ tư vấn', 'Chờ cọc', 'Chờ xác nhận cọc'].includes(currentStatus)) {
+                if (deposit > 0 && remaining > 0) {
+                    statusEl.value = 'Đã cọc';
+                } else if (deposit === 0) {
+                    statusEl.value = currentStatus; // giữ nguyên
                 }
             }
         }
