@@ -82,12 +82,17 @@ export const render = () => {
                                   <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                               </div>
 
-                              <select id="filterStatus" class="input-field py-2 text-sm max-w-[180px]">
-                                  <option value="">-- Tất cả Trạng thái --</option>
-                                  <option value="Đã cọc">Đã cọc / Hoàn tất</option>
-                                  <option value="Chờ cọc">Chờ cọc</option>
-                                  <option value="Đã hủy">Đã hủy</option>
-                              </select>
+                              <select id="filterStatus" class="input-field py-2 text-sm max-w-[210px]">
+                                   <option value="">-- Tất cả Trạng thái --</option>
+                                   <option value="Chờ cọc">Chờ cọc</option>
+                                   <option value="Chờ xác nhận cọc">Chờ xác nhận cọc</option>
+                                   <option value="Đã cọc">Đã cọc</option>
+                                   <option value="Đã cọc (Chờ đi)">Đã cọc (Chờ đi)</option>
+                                   <option value="Hoàn tất phí">✅ Hoàn tất phí (QR/SeePay)</option>
+                                   <option value="Hoàn thành">🏆 Hoàn thành (Thủ công)</option>
+                                   <option value="Bảo lưu">Bảo lưu</option>
+                                   <option value="Đã hủy">Đã hủy</option>
+                               </select>
                               <select id="filterGender" class="input-field py-2 text-sm max-w-[150px]">
                                   <option value="">-- Giới tính --</option>
                                   <option value="Nam">Nam</option>
@@ -403,7 +408,7 @@ export const render = () => {
                           </div>
                           <div class="bg-gray-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                               <div>
-                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc)</label>
+                                  <label class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Giá Tour (Gốc - Chưa gồm DV)</label>
                                   <input type="number" id="edit-total" class="input-field bg-white font-bold text-gray-900" oninput="window.updateEditRemaining()">
                               </div>
                               <div>
@@ -414,6 +419,10 @@ export const render = () => {
                                   <label class="block text-xs font-bold text-green-600 uppercase mb-1.5">Khách Đã Cọc</label>
                                   <input type="number" id="edit-deposit" class="input-field bg-green-50 border-green-200 font-bold text-green-700" oninput="window.updateEditRemaining()">
                               </div>
+                          </div>
+                          <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl flex justify-between items-center mb-4">
+                              <span class="text-sm font-bold text-blue-700 uppercase">Tổng Cộng Đơn Hàng</span>
+                              <span id="edit-grand-total" class="text-lg font-black text-blue-800">0đ</span>
                           </div>
                           <div class="mb-4">
                               <label class="block text-xs font-bold text-csr-orange uppercase mb-1.5">Số Tiền Cọc Cần Thu</label>
@@ -448,10 +457,17 @@ export const afterRender = async () => {
     // 1. Column Definition
     const renderStatus = (status) => {
         const s = (status || '').toLowerCase();
-        if (s.includes('hoàn tất') || s.includes('hoàn thành') || s.includes('đã thanh toán') || s.includes('thanh toán')) {
+        // "Hoàn tất phí" = SeePay API tự động (QR online)
+        if (s === 'hoàn tất phí' || s.includes('hoàn tất')) {
             return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        Đã Thanh Toán</span>`;
+                        Hoàn Tất Phí</span>`;
+        }
+        // "Hoàn thành" = Admin chuyển thủ công (thu tiền mặt / xong tour)
+        if (s === 'hoàn thành' || s.includes('hoàn thành')) {
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700 border border-violet-200">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                        Hoàn Thành</span>`;
         }
         if (s.includes('đã cọc') || s.includes('da coc')) {
             return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
@@ -870,12 +886,25 @@ export const afterRender = async () => {
                 if (!searchStr.includes(sSearch)) return false;
             }
 
-            // 2. Status filter
-            const bStatus = (b.status || '').toLowerCase();
-            const statusMatch = sStatus === '' ||
-                (sStatus === 'chờ cọc' && (bStatus.includes('chờ cọc') || bStatus.includes('chờ xác nhận'))) ||
-                (sStatus === 'đã cọc' && (bStatus.includes('đã cọc') || bStatus.includes('hoàn tất') || bStatus.includes('hoàn thành'))) ||
-                (sStatus === 'đã hủy' && bStatus.includes('hủy'));
+            // 2. Status filter — so sánh chính xác với trạng thái được chọn
+            const bStatusRaw = (b.status || '');
+            const bStatus = bStatusRaw.toLowerCase();
+            const sStatusLower = sStatus.toLowerCase();
+            const statusMatch = sStatus === '' || bStatus === sStatusLower ||
+                // Nhóm "Chờ cọc": bao gồm cả "Chờ xác nhận cọc"
+                (sStatusLower === 'chờ cọc' && (bStatus === 'chờ cọc' || bStatus === 'chờ xác nhận cọc')) ||
+                // Nhóm "Đã cọc": chỉ trạng thái chính xác
+                (sStatusLower === 'đã cọc' && bStatus === 'đã cọc') ||
+                // Nhóm "Đã cọc (Chờ đi)": chính xác
+                (sStatusLower === 'đã cọc (chờ đi)' && bStatus === 'đã cọc (chờ đi)') ||
+                // Nhóm "Hoàn tất phí": SeePay QR tự động
+                (sStatusLower === 'hoàn tất phí' && bStatus.includes('hoàn tất')) ||
+                // Nhóm "Hoàn thành": Admin set thủ công — TÁCH RIÊNG, không lẫn hoàn tất
+                (sStatusLower === 'hoàn thành' && bStatus === 'hoàn thành') ||
+                // Nhóm "Bảo lưu"
+                (sStatusLower === 'bảo lưu' && bStatus === 'bảo lưu') ||
+                // Nhóm "Đã hủy"
+                (sStatusLower === 'đã hủy' && bStatus.includes('hủy'));
 
             if (!statusMatch) return false;
 
@@ -1460,11 +1489,18 @@ export const afterRender = async () => {
         const total = parseInt(document.getElementById('edit-total')?.value) || 0;
         const discount = parseInt(document.getElementById('edit-discount')?.value) || 0;
         const deposit = parseInt(document.getElementById('edit-deposit')?.value) || 0;
+        // Bao gồm phí dịch vụ bổ sung (cả preset + manual)
         let svTotal = 0;
         document.querySelectorAll('.preset-service-check:checked').forEach(cb => { svTotal += parseInt(cb.dataset.price) || 0; });
         document.querySelectorAll('.service-price-input').forEach(el => { svTotal += parseInt(el.value) || 0; });
         const finalPrice = total - discount + svTotal;
         const remaining = finalPrice - deposit;
+
+        const grandTotalEl = document.getElementById('edit-grand-total');
+        if (grandTotalEl) {
+            grandTotalEl.textContent = finalPrice.toLocaleString('vi-VN') + 'đ';
+        }
+
         const remainEl = document.getElementById('edit-remaining');
         if (remainEl) remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
     };
@@ -1568,7 +1604,23 @@ export const afterRender = async () => {
                 }
             } catch (e) {}
 
-            const fillTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0);
+            // Tính lại giá tour gốc (chưa gồm DV): lấy total_price + discount - svTotal
+            let initialSvTotal = 0;
+            try {
+                const bookedSv = typeof booking.services_booked === 'string'
+                    ? JSON.parse(booking.services_booked) : (booking.services_booked || []);
+                if (Array.isArray(bookedSv)) {
+                    bookedSv.forEach(s => initialSvTotal += (parseInt(s.price) || 0));
+                }
+            } catch(e) {}
+            const existingTotal = (parseInt(booking.total_price) || 0) + (parseInt(booking.discount) || 0) - initialSvTotal;
+            let fillTotal = existingTotal;
+            if (fillTotal === 0 && booking.tour) {
+                const matchedTour = allTours.find(t => t.name === booking.tour);
+                if (matchedTour && parseInt(matchedTour.price) > 0) {
+                    fillTotal = parseInt(matchedTour.price);
+                }
+            }
             document.getElementById('edit-total').value = fillTotal;
             document.getElementById('edit-discount').value = booking.discount || 0;
             document.getElementById('edit-deposit').value = booking.deposit || 0;

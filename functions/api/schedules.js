@@ -36,7 +36,7 @@ export async function onRequest(context) {
                     SELECT 
                         s.*, 
                         (SELECT COUNT(*) FROM bookings b 
-                         WHERE b.status NOT IN ('Đã hủy', 'Cancelled', 'Bảo lưu')
+                         WHERE b.status NOT IN ('Đã hủy', 'Cancelled', 'Bảo lưu', 'Chờ tư vấn')
                          AND (
                              (b.schedule_id = s.id)
                              OR 

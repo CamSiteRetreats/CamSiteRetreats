@@ -1039,8 +1039,10 @@ export const afterRender = () => {
                     statusBadge = '<span class="bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">❌ Đã hủy</span>';
                 } else if (b.status === 'Bảo lưu') {
                     statusBadge = '<span class="bg-gray-100 text-gray-500 border border-gray-300 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">⏸️ Bảo lưu</span>';
+                } else if (b.status === 'Hoàn tất phí') {
+                    statusBadge = '<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-bold block w-full text-center">Hoàn Tất Phí</span>';
                 } else if (b.status === 'Hoàn thành' || b.status === 'Đã đi') {
-                    statusBadge = '<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded text-xs block w-full text-center">Hoàn thành</span>';
+                    statusBadge = '<span class="bg-violet-100 text-violet-700 border border-violet-200 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">Hoàn Thành</span>';
                 } else if (b.status === 'Chờ xác nhận cọc') {
                     statusBadge = `<button class="action-btn confirm-deposit-btn bg-csr-orange text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-[#d65503] w-full" data-id="${b.id}">Xác nhận cọc</button>`;
                 } else if (depositPrice > 0 && remainPrice === 0) {
@@ -1619,7 +1621,8 @@ export const afterRender = () => {
             'Chờ xác nhận cọc': 'bg-orange-100 text-orange-700 border-orange-200',
             'Đã cọc': 'bg-blue-100 text-blue-700 border-blue-200',
             'Đã cọc (Chờ đi)': 'bg-blue-100 text-blue-700 border-blue-200',
-            'Hoàn thành': 'bg-green-100 text-green-700 border-green-200',
+            'Hoàn tất phí': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+            'Hoàn thành': 'bg-violet-100 text-violet-700 border-violet-200',
             'Bảo lưu': 'bg-gray-100 text-gray-700 border-gray-300',
             'Đã hủy': 'bg-red-50 text-red-600 border-red-200 line-through',
         };
