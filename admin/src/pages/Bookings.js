@@ -430,6 +430,7 @@ export const render = () => {
                                       <option value="Chờ xác nhận cọc">💳 Chờ xác nhận cọc</option>
                                       <option value="Đã cọc">✅ Đã cọc</option>
                                       <option value="Đã cọc (Chờ đi)">🎒 Đã cọc (Chờ đi)</option>
+                                      <option value="Hoàn tất phí">✅ Hoàn tất phí (QR/SeePay)</option>
                                       <option value="Hoàn thành">🏆 Hoàn thành</option>
                                       <option value="Bảo lưu">⏸️ Bảo lưu</option>
                                       <option value="Đã hủy">❌ Đã hủy</option>
@@ -2223,6 +2224,26 @@ export const afterRender = () => {
         const remainEl = document.getElementById('edit-remaining');
         if (remainEl) {
             remainEl.textContent = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '0đ';
+        }
+
+        // Tự động chuyển trạng thái dựa trên số tiền
+        const statusEl = document.getElementById('edit-status');
+        if (statusEl) {
+            const currentStatus = statusEl.value;
+            // Không tự động đổi nếu đang ở các trạng thái cuối
+            if (!['Hoàn thành', 'Đã hủy', 'Bảo lưu'].includes(currentStatus)) {
+                if (remaining <= 0 && finalPrice > 0) {
+                    statusEl.value = 'Hoàn tất phí';
+                } else if (remaining > 0 && deposit > 0) {
+                    if (['Chờ tư vấn', 'Chờ cọc', 'Chờ xác nhận cọc'].includes(currentStatus)) {
+                        statusEl.value = 'Đã cọc';
+                    }
+                } else if (deposit === 0 && finalPrice > 0) {
+                    if (['Đã cọc', 'Hoàn tất phí', 'Đã cọc (Chờ đi)'].includes(currentStatus)) {
+                        statusEl.value = 'Chờ xác nhận cọc';
+                    }
+                }
+            }
         }
     };
 
