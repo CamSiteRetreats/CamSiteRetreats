@@ -52,7 +52,14 @@ export async function onRequest(context) {
                               )
                              )
                           )
-                        ) as booked_count
+                        ) as booked_count,
+                        COALESCE(
+                            (SELECT json_agg(json_build_object('id', g.id, 'full_name', g.full_name, 'role', g.role, 'phone', g.phone))
+                             FROM schedule_guides sg
+                             JOIN guides g ON sg.guide_id = g.id
+                             WHERE sg.schedule_id = s.id
+                            ), '[]'::json
+                        ) as assigned_guides
                     FROM schedules s
                     ORDER BY s.start_date ASC
                 `;

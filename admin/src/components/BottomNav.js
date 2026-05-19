@@ -131,6 +131,7 @@ export const BottomNav = () => {
             ${[
                 { path: '/admin/customers', icon: '👥', label: 'Khách Hàng' },
                 { path: '/admin/tours', icon: '🗺️', label: 'Quản Lý Tour' },
+                { path: '/admin/calendar', icon: '📅', label: 'Lịch Tổng Quan' },
                 { path: '/admin/roster', icon: '📋', label: 'Danh Sách Đoàn' },
                 { path: '/admin/reports', icon: '📊', label: 'Báo Cáo' },
                 { path: '/admin/reviews', icon: '⭐', label: 'Đánh Giá' },

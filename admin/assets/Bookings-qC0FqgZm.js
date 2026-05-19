@@ -1,4 +1,4 @@
-import{S as $e,H as _e}from"./Header-CtRUqTZE.js";console.log("Bookings V3 - Cache Busted!");const De=()=>`
+import{S as $e,H as _e}from"./Header-CARqqxjt.js";console.log("Bookings V3 - Cache Busted!");const De=()=>`
       <div class="flex h-screen overflow-hidden bg-gray-50 text-gray-800">
         ${$e()}
         

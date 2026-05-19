@@ -10,6 +10,7 @@ export const initRouter = () => {
         '/admin/tours': () => import('../pages/Tours.js'),
         '/admin/tour-settings': () => import('../pages/TourSettings.js'),
         '/admin/schedules': () => import('../pages/Schedules.js'),
+        '/admin/calendar': () => import('../pages/Calendar.js'),
         '/admin/guides': () => import('../pages/Guides.js'),
         '/admin/reports': () => import('../pages/Reports.js'),
         '/admin/users': () => import('../pages/Users.js'),
@@ -61,7 +62,7 @@ export const initRouter = () => {
                     return;
                 }
             } else if (userRole === 'tour_leader') {
-                if (path !== '/admin/playbook' && path !== '/admin/profile' && path !== '/admin/schedules') {
+                if (path !== '/admin/playbook' && path !== '/admin/profile' && path !== '/admin/schedules' && path !== '/admin/calendar') {
                     navigateTo('/admin/schedules');
                     return;
                 }
