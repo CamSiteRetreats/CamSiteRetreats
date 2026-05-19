@@ -197,8 +197,9 @@ export const afterRender = () => {
     const getFiltered = () => {
         const y = viewDate.getFullYear(), m = viewDate.getMonth();
         return allSchedules.filter(s => {
-            const d = new Date(s.start_date);
-            if (d.getFullYear() !== y || d.getMonth() !== m) return false;
+            const dateStr = (s.start_date || '').split('T')[0]; // YYYY-MM-DD
+            const [sy, sm] = dateStr.split('-').map(Number);
+            if (sy !== y || sm !== m + 1) return false;
             if (filterTour && s.tour_name !== filterTour) return false;
             if (filterGuide) {
                 const guides = s.assigned_guides || [];
@@ -226,7 +227,7 @@ export const afterRender = () => {
         // Build schedule map
         const dayMap = {};
         filtered.forEach(s => {
-            const key = new Date(s.start_date).toISOString().split('T')[0];
+            const key = (s.start_date || '').split('T')[0]; // YYYY-MM-DD, tránh timezone shift
             if (!dayMap[key]) dayMap[key] = [];
             dayMap[key].push(s);
         });
