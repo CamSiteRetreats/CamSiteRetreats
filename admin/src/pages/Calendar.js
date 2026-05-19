@@ -160,7 +160,8 @@ export const afterRender = () => {
     const loadNotes = async () => {
         try {
             const res = await fetch(`/api/calendar-notes?month=${getMonthStr()}`);
-            allNotes = await res.json();
+            const data = await res.json();
+            allNotes = Array.isArray(data) ? data : [];
         } catch(e) { allNotes = []; }
     };
 
