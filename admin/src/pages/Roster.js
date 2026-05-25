@@ -14,7 +14,7 @@ export const render = () => {
               ${Header()}
           </div>
           
-          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6 print:p-0 print:bg-white print:overflow-visible">
+          <main class="flex-1 overflow-x-auto overflow-y-auto bg-gray-50 p-3 md:p-6 print:p-0 print:bg-white print:overflow-visible">
                <div class="max-w-[1400px] mx-auto space-y-6 print:space-y-4">
                   
                   <!-- Top Bar (Hidden on Print) -->
@@ -139,7 +139,8 @@ export const render = () => {
 
                       <!-- LEFT: Data Table -->
                       <div class="flex-1 min-w-0 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden print:border-none print:shadow-none print:rounded-none">
-                          <div class="overflow-x-auto print:overflow-visible">
+                          <!-- Desktop: Table (hidden on mobile) -->
+                          <div class="hidden md:block overflow-x-auto print:block print:overflow-visible">
                               <table class="w-full text-left border-collapse" id="rosterTable">
                                   <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-200 print:bg-white print:text-black print:border-b-2 print:border-gray-800">
                                       <tr id="table-header-row">
@@ -150,6 +151,10 @@ export const render = () => {
                                       <tr><td colspan="14" class="p-8 text-center text-gray-400">Đang tải dữ liệu...</td></tr>
                                   </tbody>
                               </table>
+                          </div>
+                          <!-- Mobile: Card View (hidden on md+) -->
+                          <div class="md:hidden" id="rosterMobileCards">
+                              <div class="p-6 text-center text-gray-400 text-sm">Đang tải dữ liệu...</div>
                           </div>
                       </div>
 
@@ -934,6 +939,60 @@ export const afterRender = async () => {
                     </td>
                 `).join('') +
                 '</tr>';
+        }).join('');
+
+        // Render mobile card view
+        renderMobileCards(filtered);
+    };
+
+    // ─── Mobile Card View ──────────────────────────────────────────────────────
+    const renderMobileCards = (filtered) => {
+        const container = document.getElementById('rosterMobileCards');
+        if (!container) return;
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">Không tìm thấy khách hàng nào.</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map((b, index) => {
+            const isCanceled = (b.status === 'Đã hủy' || b.status === 'Bảo lưu');
+            const statusBadge = renderStatus(b.status);
+            const genderIcon = b.gender === 'Nữ' ? '👩' : b.gender === 'Nam' ? '👨' : '👤';
+            const depositFmt = (parseInt(b.deposit) || 0).toLocaleString('vi-VN');
+            const totalFmt = (parseInt(b.total_price) || 0).toLocaleString('vi-VN');
+            const remaining = (parseInt(b.total_price) || 0) - (parseInt(b.deposit) || 0);
+            const remainFmt = remaining > 0 ? remaining.toLocaleString('vi-VN') + 'đ' : '<span class="text-emerald-600 font-bold">✅ Đủ</span>';
+
+            return `
+            <div class="${isCanceled ? 'opacity-50' : ''} border-b border-gray-100 p-4 hover:bg-amber-50/30 transition-colors active:bg-amber-50 cursor-pointer"
+                 onclick="if(window.actionEdit) window.actionEdit('${b.id}')">
+                <!-- Row 1: STT + Tên + Giới tính + Status -->
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="text-xs font-bold text-gray-400 w-6 shrink-0">${index + 1}</span>
+                        <div class="min-w-0">
+                            <div class="font-bold text-gray-900 text-sm truncate">${genderIcon} ${b.name || '—'}</div>
+                            <div class="text-xs text-gray-500">${b.phone || ''}</div>
+                        </div>
+                    </div>
+                    <div class="shrink-0">${statusBadge}</div>
+                </div>
+                <!-- Row 2: Ngày sinh + Điểm đón -->
+                <div class="flex items-center gap-3 mb-2 pl-8">
+                    ${b.dob ? `<span class="text-xs text-gray-500"><span class="text-gray-400">🎂</span> ${b.dob}</span>` : ''}
+                    ${b.pickup_point ? `<span class="text-xs text-gray-500 truncate"><span class="text-gray-400">📍</span> ${b.pickup_point}</span>` : ''}
+                </div>
+                <!-- Row 3: Tài chính -->
+                <div class="flex items-center justify-between pl-8">
+                    <div class="text-xs text-gray-500">
+                        <span class="font-medium text-gray-700">${totalFmt}đ</span>
+                        ${remaining > 0 ? `<span class="text-red-500 ml-1">• Còn: ${remainFmt}</span>` : `<span class="text-emerald-500 ml-1">• Đủ</span>`}
+                    </div>
+                    ${b.seat_number ? `<span class="text-xs bg-orange-100 text-csr-orange font-bold px-2 py-0.5 rounded-full">💺 Ghế ${b.seat_number}</span>` : ''}
+                </div>
+                ${b.note ? `<div class="mt-1.5 pl-8 text-xs text-amber-600 italic">ℹ️ ${b.note}</div>` : ''}
+            </div>`;
         }).join('');
     };
 
