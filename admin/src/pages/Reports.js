@@ -509,25 +509,30 @@ export const afterRender = () => {
             return;
         }
 
-        const buildSection = (title, color, items) => {
+        const buildSection = (title, color, items, isCompletedSection = false) => {
             if (items.length === 0) return '';
             return `
                 <div class="mb-1">
-                    <div class="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-${color}-600 bg-${color}-50 border-b border-${color}-100">── ${title} (${items.length}) ──</div>
-                    ${items.map((b, idx) => buildOrderRow(b, idx)).join('')}
+                    <div class="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-${color}-600 bg-${color}-50 border-b border-${color}-100 flex items-center justify-between">
+                        <span>── ${title} (${items.length}) ──</span>
+                        ${isCompletedSection && items.length > 0 ? `
+                        <button onclick="window.selectAllCompleted()" class="text-[10px] font-bold bg-green-600 text-white px-2.5 py-1 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 normal-case tracking-normal">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            Chọn tất cả
+                        </button>` : ''}
+                    </div>
+                    ${items.map((b) => buildOrderRow(b, isCompletedSection)).join('')}
                 </div>`;
         };
 
-        const sttBase = { completedIdx: 0, depositedIdx: completed.length, paidIdx: completed.length + deposited.length };
-
-        const buildOrderRow = (b, idx) => {
+        const buildOrderRow = (b, isCompleted = false) => {
             const { rate, servicesTotal, basePrice, commission } = calcCommission(b, allTours);
             const isPaid = b.commission_paid;
             const canSelect = !isPaid;
             const isChecked = selectedBookingIds.has(b.id);
             return `
                 <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${isPaid ? 'opacity-60' : ''}">
-                    <input type="checkbox" class="order-checkbox w-4 h-4 accent-csr-orange shrink-0 ${canSelect ? '' : 'cursor-not-allowed'}"
+                    <input type="checkbox" class="order-checkbox w-4 h-4 accent-csr-orange shrink-0 ${canSelect ? '' : 'cursor-not-allowed'} ${isCompleted && !isPaid ? 'completed-checkbox' : ''}"
                         data-id="${b.id}" data-commission="${commission}" ${isChecked ? 'checked' : ''} ${!canSelect ? 'disabled' : ''}
                         onchange="window.onOrderCheck(this)">
                     <div class="text-xs text-gray-400 font-mono w-12 shrink-0 text-center">#${b.id}</div>
@@ -564,9 +569,9 @@ export const afterRender = () => {
                 <div class="w-40 text-right">Giá Đơn · Hoa Hồng</div>
                 <div class="w-24 text-right">Trạng Thái</div>
             </div>
-            ${buildSection('ĐÃ HOÀN THÀNH', 'green', completed)}
-            ${buildSection('ĐÃ CỌC', 'blue', deposited)}
-            ${buildSection('ĐÃ THANH TOÁN HOA HỒNG', 'gray', paidComm)}
+            ${buildSection('ĐÃ HOÀN THÀNH', 'green', completed, true)}
+            ${buildSection('ĐÃ CỌC', 'blue', deposited, false)}
+            ${buildSection('ĐÃ THANH TOÁN HOA HỒNG', 'gray', paidComm, false)}
         `;
     };
 
@@ -622,6 +627,27 @@ export const afterRender = () => {
             if (masterCheckbox.checked) selectedBookingIds.add(id);
             else selectedBookingIds.delete(id);
         });
+        updatePayToolbar();
+    };
+
+    // Tick nhanh chỉ những đơn "Đã Hoàn Thành"
+    window.selectAllCompleted = () => {
+        const completedCbs = document.querySelectorAll('.completed-checkbox:not(:disabled)');
+        const allChecked = [...completedCbs].every(cb => cb.checked);
+        completedCbs.forEach(cb => {
+            cb.checked = !allChecked;
+            const id = parseInt(cb.dataset.id);
+            if (!allChecked) selectedBookingIds.add(id);
+            else selectedBookingIds.delete(id);
+        });
+        // Cập nhật master checkbox
+        const master = document.getElementById('selectAllOrders');
+        if (master) {
+            const allCbs = document.querySelectorAll('.order-checkbox:not(:disabled)');
+            const totalChecked = [...allCbs].filter(cb => cb.checked).length;
+            master.indeterminate = totalChecked > 0 && totalChecked < allCbs.length;
+            master.checked = totalChecked === allCbs.length && allCbs.length > 0;
+        }
         updatePayToolbar();
     };
 
