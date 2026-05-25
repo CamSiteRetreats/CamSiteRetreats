@@ -264,10 +264,19 @@ export const afterRender = () => {
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
 
+    // Kiểm tra đã thanh toán đủ: dựa trên status string HOẶC deposit >= total_price
+    // (giống logic Bookings page để đồng bộ)
+    const isFullyPaid = (b) => {
+        const statusOk = b.status && (b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
+        const depositOk = (parseInt(b.deposit) || 0) > 0
+            && (parseInt(b.total_price) || 0) > 0
+            && (parseInt(b.deposit) || 0) >= (parseInt(b.total_price) || 0);
+        return statusOk || depositOk;
+    };
+
     const isSuccessStatus = (b) => b.status && (b.status.includes('Đã cọc') || b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
     const isCompletedTrip = (b) => {
-        const isFullyPaid = b.status && (b.status.includes('Hoàn tất') || b.status.includes('Hoàn thành'));
-        if (!isFullyPaid) return false;
+        if (!isFullyPaid(b)) return false;
         const d = parseBookingDate(b.date); return d && d < today;
     };
 
@@ -553,7 +562,9 @@ export const afterRender = () => {
                             ? `<span class="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">✅ Đã TT HH</span>`
                             : isCompletedTrip(b)
                                 ? `<span class="inline-block bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded border border-green-200">Hoàn thành</span>`
-                                : `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded border border-blue-200">Đã cọc</span>`
+                                : isFullyPaid(b)
+                                    ? `<span class="inline-block bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded border border-emerald-200">Hoàn tất phí</span>`
+                                    : `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded border border-blue-200">Đã cọc</span>`
                         }
                     </div>
                 </div>`;
