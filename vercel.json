@@ -14,6 +14,10 @@
   ],
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/admin/"
+    },
+    {
       "source": "/tour/thacliengai",
       "destination": "/tour"
     },
