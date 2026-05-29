@@ -1,5 +1,17 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/:path((?!admin(?:/.*)?$|api(?:/.*)?$).*)",
+      "destination": "/admin",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/tour/thacliengai",
