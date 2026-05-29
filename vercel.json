@@ -18,6 +18,26 @@
       "destination": "/admin/"
     },
     {
+      "source": "/admin/assets/:path*",
+      "destination": "/admin/assets/:path*"
+    },
+    {
+      "source": "/admin/manifest.json",
+      "destination": "/admin/manifest.json"
+    },
+    {
+      "source": "/admin/icon-512.png",
+      "destination": "/admin/icon-512.png"
+    },
+    {
+      "source": "/admin/sw.js",
+      "destination": "/admin/sw.js"
+    },
+    {
+      "source": "/admin/vite.svg",
+      "destination": "/admin/vite.svg"
+    },
+    {
       "source": "/tour/thacliengai",
       "destination": "/tour"
     },
@@ -42,7 +62,7 @@
       "destination": "/api/media?slug=:slug"
     },
     {
-      "source": "/admin/(.*)",
+      "source": "/admin/:path*",
       "destination": "/admin/"
     }
   ],
