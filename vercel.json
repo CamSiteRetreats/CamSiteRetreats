@@ -2,6 +2,18 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/tour/thacliengai",
+      "destination": "/tour"
+    },
+    {
+      "source": "/tour/thacliengai.html",
+      "destination": "/tour"
+    },
+    {
+      "source": "/thacliengai/:path*",
+      "destination": "/tour"
+    },
+    {
       "source": "/pay/:id",
       "destination": "/pay?id=:id"
     },

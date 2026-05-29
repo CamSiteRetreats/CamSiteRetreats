@@ -4,6 +4,7 @@
  */
 
 const TOURS_KEY = 'cam_site_tours';
+const HIDDEN_TOUR_SLUGS = ['thacliengai'];
 
 const TourManager = {
     // Get all tours from LocalStorage or API
@@ -29,7 +30,11 @@ const TourManager = {
         }
 
         // Filter out hidden tours for public view
-        return tours.filter(t => t.is_visible !== false);
+        return tours.filter(t => {
+            if (t.is_visible === false) return false;
+            const tourUrl = (t.custom_domain || t.url || '').toLowerCase();
+            return !HIDDEN_TOUR_SLUGS.some(slug => tourUrl.includes(slug));
+        });
     },
 
     // NEW: Fetch from Backend API

@@ -444,8 +444,8 @@
             const container = document.getElementById('schedule-list');
             if (!container) return;
 
+            const hiddenTourKeywords = ['thác liêng ài', 'thac lieng ai', 'thacliengai'];
             const tourLinks = {
-                'Thác Liêng Ài': '/tour/thacliengai',
                 'Tà Năng - Phan Dũng': '/tour/tanangphandung',
                 'Bidoup Tà Giang': '/tour/bidouptagiang',
                 'Thác Mưa Bay': '/tour/thacmuabay',
@@ -468,7 +468,11 @@
 
                 const today = new Date(); today.setHours(0, 0, 0, 0);
                 const upcoming = all
-                    .filter(s => new Date(s.start_date) >= today)
+                    .filter(s => {
+                        if (new Date(s.start_date) < today) return false;
+                        const tourName = (s.tour_name || '').toLowerCase();
+                        return !hiddenTourKeywords.some(keyword => tourName.includes(keyword));
+                    })
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 
                 if (upcoming.length === 0) {
