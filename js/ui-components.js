@@ -117,18 +117,8 @@ const UIComponents = {
                         </div>
                     </div>
 
-                    <!-- Legal Info Divider -->
+                    <!-- Footer Bottom -->
                     <div class="mt-16 pt-8 border-t border-gray-200">
-                        <div class="flex flex-col gap-2">
-                            <!-- HKD Legal Info -->
-                            <div class="text-xs text-gray-500 space-y-1 leading-relaxed">
-                                <div class="font-bold text-gray-700 uppercase tracking-wide text-[11px]">Thông tin pháp lý</div>
-                                <div><span class="font-semibold">Tên HKD:</span> HỘ KINH DOANH CAM SITE RETREATS</div>
-                                <div><span class="font-semibold">MST:</span> 080099010826</div>
-                                <div><span class="font-semibold">Địa chỉ ĐKKD:</span> Số nhà 86, Ấp 9, Xã Rạch Kiến, Tỉnh Tây Ninh, Việt Nam</div>
-                                <div><span class="font-semibold">Email:</span> admin@camsiteretreats.com &nbsp;|&nbsp; <span class="font-semibold">SĐT:</span> 0819 685 878</div>
-                            </div>
-                        </div>
                         <div class="mt-6 text-center font-bold text-gray-800 text-sm uppercase tracking-wide">
                             Chúc bạn có một hành trình rực rỡ tại CAM SITE RETREATS
                         </div>
