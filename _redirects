@@ -1,9 +1,4 @@
 /admin /admin/index.html 200
-/admin/assets/* /admin/assets/:splat 200
-/admin/manifest.json /admin/manifest.json 200
-/admin/icon-512.png /admin/icon-512.png 200
-/admin/sw.js /admin/sw.js 200
-/admin/vite.svg /admin/vite.svg 200
 /admin/* /admin/index.html 200
 /api/* /api/:splat 200
 /pay/* /pay.html?id=:splat 200
