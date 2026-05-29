@@ -1,8 +1,6 @@
 /admin/* /admin/index.html 200
-/api/* /api/:splat 200
 /pay/* /pay.html?id=:splat 200
 /admin_v2/* /admin/:splat 301
 /tour/thacliengai /tour 302
 /tour/thacliengai.html /tour 302
 /thacliengai/* /tour 302
-/* /admin 302
