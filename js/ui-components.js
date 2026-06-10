@@ -42,7 +42,7 @@ const UIComponents = {
 
                     <button onclick="window.location.href='${prefix}#contact'"
                         class="hidden md:block bg-primary text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-opacity-90 transition-all transform hover:scale-105 active:scale-95 shadow-lg">
-                        ĐĂNG KÝ NGAY
+                        LIÊN HỆ
                     </button>
                     
                     <!-- Mobile Menu Dropdown -->
@@ -51,7 +51,7 @@ const UIComponents = {
                         <a href="${prefix}tour" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Tất cả Tour</a>
                         <a href="${prefix}#about" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Về chúng tôi</a>
                         <a href="${prefix}#contact" class="font-bold text-gray-800 py-2 border-b border-gray-50 uppercase text-xs tracking-widest">Liên hệ</a>
-                        <button onclick="window.location.href='${prefix}#contact'" class="bg-primary text-white py-3 px-8 rounded-xl font-bold uppercase tracking-widest text-xs w-fit self-center shadow-lg shadow-primary/20">Đăng ký ngay</button>
+                        <button onclick="window.location.href='${prefix}#contact'" class="bg-primary text-white py-3 px-8 rounded-xl font-bold uppercase tracking-widest text-xs w-fit self-center shadow-lg shadow-primary/20">Liên hệ</button>
                     </div>
                 </div>
             </nav>

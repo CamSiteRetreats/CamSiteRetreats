@@ -415,12 +415,12 @@
         }
     </style>
 
-    <section id="lich-trinh" class="hidden py-16 px-6 md:px-20 bg-[#FAFAFA]">
+    <section id="lich-trinh" class="py-16 px-6 md:px-20 bg-[#FAFAFA]">
         <div class="max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <p class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Cập nhật liên tục</p>
-                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase">Lịch Khởi Hành Sắp Tới</h2>
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase">Lịch Khởi Hành Hiện Hành</h2>
                 </div>
                 <a href="tour" class="hidden md:flex items-center gap-1 text-sm font-bold text-primary hover:underline">
                     Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -468,11 +468,26 @@
 
                 const today = new Date(); today.setHours(0, 0, 0, 0);
                 const upcoming = all
-                    .filter(s => new Date(s.start_date) >= today)
+                    .filter(s => {
+                        const startDate = new Date(s.start_date);
+                        const booked = parseInt(s.booked_count) || 0;
+                        const slots = parseInt(s.slots) || 0;
+                        const remaining = Math.max(0, slots - booked);
+                        const status = (s.status || '').toLowerCase();
+
+                        return startDate >= today
+                            && remaining > 0
+                            && !status.includes('hết')
+                            && !status.includes('huy')
+                            && !status.includes('hủy')
+                            && !status.includes('cancel')
+                            && !status.includes('đóng')
+                            && !status.includes('dong');
+                    })
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 
                 if (upcoming.length === 0) {
-                    container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành sắp tới.</div>';
+                    container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành đang mở.</div>';
                     return;
                 }
 
@@ -498,8 +513,7 @@
                         const remaining = Math.max(0, slots - booked);
 
                         let statusClass, statusText;
-                        if (remaining <= 0) { statusClass = 'cs-red'; statusText = 'Hết chỗ'; }
-                        else if (remaining <= 3) { statusClass = 'cs-orange'; statusText = `Còn ${remaining}`; }
+                        if (remaining <= 3) { statusClass = 'cs-orange'; statusText = `Còn ${remaining}`; }
                         else { statusClass = 'cs-green'; statusText = `Còn ${remaining}`; }
 
                         const startFmt = fmtDate(s.start_date);
@@ -527,8 +541,7 @@
             }
         }
 
-        // Temporarily disabled with the homepage schedule section hidden.
-        // document.addEventListener('DOMContentLoaded', loadUpcomingSchedules);
+        document.addEventListener('DOMContentLoaded', loadUpcomingSchedules);
     </script>
 
 
@@ -726,7 +739,7 @@
         })();
     </script>
 
-    <!-- Contact & Booking Section -->
+    <!-- Contact Section -->
 
     <section id="contact" class="py-24 bg-[#FAFAFA] relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -737,92 +750,43 @@
                     Bắt đầu hành trình<br>của bạn
                 </h2>
                 <p class="text-gray-500 text-lg mb-0 mx-auto max-w-md leading-relaxed">
-                    Để lại thông tin, đội ngũ CAM SITE sẽ liên hệ tư vấn lộ trình phù hợp nhất với thể lực và mong muốn
-                    của bạn.
+                    Xem lịch khởi hành hiện hành trên trang chủ. Khi cần giữ chỗ hoặc tư vấn lộ trình, vui lòng liên hệ
+                    trực tiếp với CAM SITE RETREATS.
                 </p>
             </div>
 
-            <!-- Right Side: Booking Form Card -->
+            <!-- Right Side: Direct contact card -->
             <div class="animate__animated animate__fadeInRight">
                 <div
-                    class="bg-white p-8 md:p-12 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border-2 border-primary/20">
-                    <div class="flex items-center gap-3 mb-10">
+                    class="bg-white p-8 md:p-12 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border-2 border-primary/20">
+                    <div class="flex items-center gap-3 mb-8">
                         <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                            <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                            <i data-lucide="phone-call" class="w-6 h-6"></i>
                         </div>
-                        <h3 class="text-2xl font-black text-[#1A202C] uppercase tracking-tight">ĐẶT CHỖ NGAY</h3>
+                        <h3 class="text-2xl font-black text-[#1A202C] uppercase tracking-tight">LIÊN HỆ TRỰC TIẾP</h3>
                     </div>
 
-                    <form id="home-booking-form" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Họ
-                                    tên</label>
-                                <input type="text" id="home-cust-name" required placeholder="Nhập họ tên..."
-                                    class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Số
-                                    điện thoại</label>
-                                <input type="tel" id="home-cust-phone" required placeholder="09xxxx..."
-                                    class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Chọn
-                                tour</label>
-                            <select id="home-tour-select" onchange="loadHomeSchedules()" required
-                                class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none cursor-pointer">
-                                <!-- Tours will be loaded here -->
-                            </select>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Chọn ngày
-                                đi</label>
-                            <div id="home-date-selector" class="grid grid-cols-2 gap-4">
-                                <!-- Dates will be loaded here -->
-                            </div>
-                            <input type="hidden" id="home-selected-date-input" required>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Lời
-                                nhắn</label>
-                            <textarea id="home-cust-message" rows="3" placeholder="hãy để lại yêu cầu của bạn tại đây"
-                                class="w-full bg-[#F7F9FC] border-none rounded-2xl px-6 py-4 text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-none"></textarea>
-                        </div>
-
-                        <button type="submit"
-                            class="w-full bg-primary text-white font-black py-5 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 text-lg uppercase tracking-widest mt-4">
-                            GỬI YÊU CẦU
-                        </button>
-                    </form>
+                    <div class="space-y-4">
+                        <a href="tel:0819685878"
+                            class="flex items-center justify-between gap-4 bg-[#F7F9FC] px-5 py-4 rounded-xl hover:bg-primary/5 transition-all">
+                            <span class="font-bold text-gray-700">Hotline</span>
+                            <span class="font-black text-primary">0819 685 878</span>
+                        </a>
+                        <a href="mailto:admin@camsiteretreats.com"
+                            class="flex items-center justify-between gap-4 bg-[#F7F9FC] px-5 py-4 rounded-xl hover:bg-primary/5 transition-all">
+                            <span class="font-bold text-gray-700">Email</span>
+                            <span class="font-black text-primary break-all text-right">admin@camsiteretreats.com</span>
+                        </a>
+                        <a href="#lich-trinh"
+                            class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-sm uppercase tracking-widest mt-2">
+                            <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                            Xem lịch hiện hành
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSuccessModal()"></div>
-        <div
-            class="bg-white rounded-[40px] p-12 max-w-md w-full mx-6 relative z-10 text-center shadow-2xl animate__animated animate__zoomIn">
-            <div
-                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 mx-auto mb-8 shadow-inner">
-                <i data-lucide="check-circle-2" class="w-12 h-12"></i>
-            </div>
-            <h3 class="text-3xl font-black text-gray-800 mb-4 uppercase tracking-tight">GỬI THÀNH CÔNG</h3>
-            <p class="text-gray-500 mb-8 leading-relaxed">
-                Cảm ơn bạn đã tin tưởng CAM SITE RETREATS. Đội ngũ tư vấn sẽ liên hệ với bạn trong thời gian sớm nhất!
-            </p>
-            <button onclick="closeSuccessModal()"
-                class="w-full bg-[#1A202C] text-white font-bold py-4 rounded-2xl hover:bg-primary transition-all active:scale-95 shadow-lg">
-                ĐỒNG Ý
-            </button>
-        </div>
-    </div>
 
     <!-- Footer -->
     <!-- Footer Placeholder -->
@@ -1003,133 +967,7 @@
         // Initialize Everything
         document.addEventListener('DOMContentLoaded', () => {
             initTours();
-            loadHomeBookingData();
-
-            // Handle Form Submit
-            const bookingForm = document.getElementById('home-booking-form');
-            if (bookingForm) {
-                bookingForm.addEventListener('submit', handleHomeBookingSubmit);
-            }
         });
-
-        // Load Tours into Dropdown
-        function loadHomeBookingData() {
-            const tours = TourManager.getAllTours();
-            const select = document.getElementById('home-tour-select');
-            if (!select) return;
-
-            select.innerHTML = '<option value="" disabled selected>Chọn tour bạn quan tâm</option>' +
-                tours.map(t => `<option value="${t.name}" data-id="${t.id}">${t.name}</option>`).join('');
-        }
-
-        // Load Schedules for Selected Tour
-        function loadHomeSchedules() {
-            const select = document.getElementById('home-tour-select');
-            const selectedOption = select.options[select.selectedIndex];
-            const tourId = selectedOption.dataset.id;
-
-            const dateSelector = document.getElementById('home-date-selector');
-            const dateInput = document.getElementById('home-selected-date-input');
-            dateSelector.innerHTML = '';
-            dateInput.value = '';
-
-            const tour = TourManager.getTourById(tourId);
-            if (tour && tour.schedules && tour.schedules.length > 0) {
-                tour.schedules.forEach(item => {
-                    let formattedDisplay = item.date;
-
-                    // If date is missing (e.g. from Admin/LocalStorage), format from start/end
-                    if (!formattedDisplay && item.startDate && item.endDate) {
-                        const start = new Date(item.startDate);
-                        const end = new Date(item.endDate);
-                        formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
-                    }
-
-                    const remaining = item.remaining;
-                    const statusText = item.calculatedStatus;
-                    const opacityClass = statusText === 'Hết chỗ' ? 'opacity-40 grayscale cursor-not-allowed' : 'cursor-pointer hover:border-primary hover:bg-primary/5';
-                    const statusClass = statusText === 'Hết chỗ' ? 'text-gray-400' : 'text-primary';
-
-                    const html = `
-                        <div class="home-date-option p-4 rounded-2xl border-2 border-gray-100 flex flex-col items-center justify-center gap-1 transition-all ${opacityClass}"
-                             onclick="${statusText !== 'Hết chỗ' ? `selectHomeDate(this, '${formattedDisplay}')` : ''}">
-                            <span class="text-sm font-bold text-gray-700">${formattedDisplay}</span>
-                            <span class="text-[11px] font-bold ${statusClass}">${statusText === 'Hết chỗ' ? 'Hết chỗ' : `Còn ${remaining} chỗ`}</span>
-                        </div>
-                    `;
-                    dateSelector.insertAdjacentHTML('beforeend', html);
-                });
-            } else {
-                dateSelector.innerHTML = '<div class="col-span-2 py-4 text-center text-gray-400 text-sm italic">Tour này chưa có lịch khởi hành cụ thể.</div>';
-            }
-        }
-
-        function selectHomeDate(element, date) {
-            document.querySelectorAll('.home-date-option').forEach(opt => {
-                opt.classList.remove('border-primary', 'bg-primary/5', 'selected');
-                opt.classList.add('border-gray-100');
-            });
-            element.classList.remove('border-gray-100');
-            element.classList.add('border-primary', 'bg-primary/5', 'selected');
-            document.getElementById('home-selected-date-input').value = date;
-        }
-
-        async function handleHomeBookingSubmit(e) {
-            e.preventDefault();
-
-            // Show loading
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerText;
-            btn.innerText = 'ĐANG GỬI...';
-            btn.disabled = true;
-
-            const newLead = {
-                name: document.getElementById('home-cust-name').value,
-                phone: document.getElementById('home-cust-phone').value,
-                tour: document.getElementById('home-tour-select').value,
-                date: document.getElementById('home-selected-date-input').value,
-                message: document.getElementById('home-cust-message').value,
-                status: 'Chờ tư vấn'
-            };
-
-            try {
-                const response = await fetch('/api/leads', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newLead)
-                });
-
-                if (!response.ok) throw new Error('Network response was not ok');
-
-                const result = await response.json();
-                console.log('Lead submitted Successfully:', result);
-                if (result._mailStatus) {
-                    console.log('[Mail Diagnostic]', result._mailStatus);
-                }
-
-                // Show Modal
-                const modal = document.getElementById('success-modal');
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-
-                // Reset
-                e.target.reset();
-                document.getElementById('home-date-selector').innerHTML = '';
-                document.getElementById('home-selected-date-input').value = '';
-
-            } catch (error) {
-                console.error('Error submitting lead:', error);
-                alert('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau hoặc liên hệ hotline!');
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        function closeSuccessModal() {
-            document.getElementById('success-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
 
         if (btnSouth && btnNorth) {
             btnSouth.addEventListener('click', () => filterTours('south'));
@@ -1154,12 +992,11 @@
             console.log('Tours updated from API, refreshing UI...');
             // Tăng debounce lên 1s để tránh nháy khi load nhiều
             initTours(true); // skipFilter = true to avoid fade
-            loadHomeBookingData();
         }, 1000));
 
         window.addEventListener('schedules-updated', debounce(() => {
-            console.log('Schedules updated from API, refreshing booking flow...');
-            loadHomeSchedules();
+            console.log('Schedules updated from API, refreshing current schedule...');
+            loadUpcomingSchedules();
         }, 500));
     </script>
 </body>
