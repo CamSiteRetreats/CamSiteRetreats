@@ -35,17 +35,6 @@ app.all('/api/:route', async (req, res) => {
     }
 });
 
-// Specific Vercel Rewrites (from vercel.json)
-app.get('/pay/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pay.html'));
-});
-
-app.post('/api/sepay-webhook', async (req, res) => {
-    req.query.action = 'webhook';
-    const handler = require('./api/payment.js');
-    await handler(req, res);
-});
-
 // Catch-all for SPA or Admin
 app.get('/admin/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin/index.html'));

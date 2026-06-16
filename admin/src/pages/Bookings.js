@@ -1053,9 +1053,6 @@ export const afterRender = () => {
                 }
 
                 let invoiceLink = '';
-                if (depositPrice > 0) {
-                    invoiceLink = `<a href="/invoice.html?id=${b.id}" target="_blank" class="mt-1.5 block text-center text-[11px] text-blue-600 hover:text-blue-800 hover:underline font-medium" onclick="event.stopPropagation()">🧾 Xem hóa đơn</a>`;
-                }
 
                 return `
                 <tr class="${rowClass} cursor-pointer row-clickable block md:table-row p-4 md:p-0 mb-4 md:mb-0 glass-panel md:glass-none border-l-4 border-green-500 md:border-none relative" data-id="${b.id}">
@@ -1102,8 +1099,7 @@ export const afterRender = () => {
                     </td>
                     <td class="py-2 md:p-4 align-top text-right block md:table-cell border-t md:border-none border-gray-100 pt-2 md:pt-4">
                         <div class="flex justify-between items-center md:justify-end gap-2">
-                             <div class="md:hidden">${invoiceLink}</div>
-                             <button class="action-btn payment-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 md:px-3 md:py-1.5 rounded-lg md:rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">Thanh toán</button>
+                             <!-- Đã tắt thanh toán trực tuyến -->
                         </div>
                     </td>
                 </tr>
@@ -1122,10 +1118,6 @@ export const afterRender = () => {
                 }
                 const actionBtn = `
                     <button class="action-btn process-btn bg-csr-orange hover:bg-[#d65503] text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors mr-1" data-id="${b.id}">📝 Thông Tin</button>
-                    ${b.customer_id
-                        ? `<button class="action-btn payment-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">💳 Thanh toán</button>`
-                        : `<button class="action-btn pay-terms-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors" data-id="${b.id}">🔗 Cọc Tour</button>`
-                    }
                 `;
 
                 return `
@@ -2356,71 +2348,9 @@ export const afterRender = () => {
                 window.actionDelete(bookingId);
                 return;
             }
-            // COPY LINK THÔNG TIN (FORM)
+            // MỞ CHI TIẾT CHỈNH SỬA THÔNG TIN
             else if (btn.classList.contains('process-btn')) {
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const baseUrl = isLocal
-                    ? 'http://localhost:8888'
-                    : window.location.origin;
-
-                const url = baseUrl + `/booking/process.html?id=${bookingId}`;
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('📋 Đã sao chép Link Điền Thông Tin!\\nGửi cho khách: ' + url);
-                }).catch(err => {
-                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
-                });
-            }
-            // COPY LINK THANH TOÁN (KÈM ĐIỀU KHOẢN)
-            else if (btn.classList.contains('pay-terms-btn')) {
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const baseUrl = isLocal
-                    ? 'http://localhost:8888'
-                    : window.location.origin;
-
-                const url = baseUrl + `/pay-terms.html?id=${bookingId}`;
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('📋 Đã sao chép Link Cọc Tour!\\nGửi cho khách: ' + url);
-                }).catch(err => {
-                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
-                });
-            }
-            // GỬI LINK CỌC (SHORT URL)
-            else if (btn.classList.contains('send-btn')) {
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const baseUrl = isLocal
-                    ? 'http://localhost:8888'
-                    : window.location.origin;
-
-                const url = baseUrl + `/pay?id=${bookingId}`;
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('📋 Đã sao chép Link Thanh Toán Cọc! Gửi cho khách qua Zalo nhé:\\n' + url);
-                }).catch(err => {
-                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
-                });
-            }
-            // NÚT THANH TOÁN → COPY LINK KÈM NỘI DUNG NHẮN TIN
-            else if (btn.classList.contains('payment-btn')) {
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const baseUrl = isLocal
-                    ? 'http://localhost:8888'
-                    : window.location.origin;
-
-                const payUrl = baseUrl + `/pay?id=${bookingId}`;
-                const message = `Dạ sắp đến ngày khởi hành rồi, cảm ơn anh chị đã tin tưởng và lựa chọn CAM SITE RETREATS trong hành trình lần này, em xin phép nhận nốt thanh toán phần tiền còn lại để chuẩn bị thật tốt cho chuyến đi nhennn!!!\nDạ mình thanh toán ở link này giúp em nhé: ${payUrl}`;
-
-                navigator.clipboard.writeText(message).then(() => {
-                    const originalText = btn.textContent;
-                    btn.textContent = '✅ Đã copy!';
-                    btn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                    btn.classList.add('bg-green-500');
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-                        btn.classList.remove('bg-green-500');
-                    }, 2000);
-                }).catch(() => {
-                    alert('🔗 Nội dung đã chuẩn bị (copy thủ công):\n\n' + message);
-                });
+                window.actionEdit(bookingId);
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
             else if (btn.classList.contains('view-btn')) {

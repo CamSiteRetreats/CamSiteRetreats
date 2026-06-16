@@ -1,3 +1,2 @@
-﻿/admin/* /admin/index.html 200
-/pay/* /pay.html?id=:splat 200
+/admin/* /admin/index.html 200
 /admin_v2/* /admin/:splat 301

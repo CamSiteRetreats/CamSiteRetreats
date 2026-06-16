@@ -113,6 +113,7 @@ const UIComponents = {
                                 <li><a href="${prefix}chinh-sach.html#an-toan" class="hover:text-primary transition-colors">Quy định an toàn</a></li>
                                 <li><a href="${prefix}chinh-sach.html#mien-tru" class="hover:text-primary transition-colors">Miễn trừ trách nhiệm</a></li>
                                 <li><a href="${prefix}chinh-sach.html#hoan-huy" class="hover:text-primary transition-colors">Chính sách hoàn / hủy tour</a></li>
+                                <li><a href="${prefix}chinh-sach-bao-mat.html" class="hover:text-primary transition-colors">Chính sách bảo mật</a></li>
                             </ul>
                         </div>
                     </div>

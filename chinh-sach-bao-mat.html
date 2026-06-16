@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Global Error Guard to prevent blank screens
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            console.error('CRITICAL ERROR:', msg, url, lineNo);
+            const errorDiv = document.createElement('div');
+            errorDiv.style = "position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:15px;text-align:center;z-index:9999;font-weight:bold;font-family:sans-serif;";
+            errorDiv.innerHTML = "Có lỗi xảy ra khi tải trang. Vui lòng nhấn <b>Tải lại trang</b> hoặc liên hệ hỗ trợ. <br><small>" + msg + "</small>";
+            errorDiv.onclick = function () { location.reload(); };
+            document.documentElement.appendChild(errorDiv);
+            return false;
+        };
+    </script>
+    <title>Chính Sách Bảo Mật - CAM SITE RETREATS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="js/ui-components.js?v=2"></script>
+    <style>
+        :root {
+            --primary: #E85D04;
+            --secondary: #FFF8F0;
+            --accent: #F48C06;
+            --text: #333333;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('bg-texture.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-blend-mode: screen, multiply;
+            color: var(--text);
+            scroll-behavior: smooth;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(232, 93, 4, 0.1);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .policy-section {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1
+                class="text-4xl md:text-5xl font-black text-gray-800 mb-6 uppercase tracking-tight animate__animated animate__fadeInDown">
+                CHÍNH SÁCH BẢO MẬT
+            </h1>
+            <p class="text-lg text-gray-600 animate__animated animate__fadeInUp">
+                CAM SITE RETREATS cam kết bảo vệ tuyệt đối dữ liệu cá nhân của khách hàng theo các quy định
+                pháp luật Việt Nam (Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân).
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 pb-32 space-y-12">
+
+        <section class="glass-card rounded-[32px] p-8 md:p-12 shadow-sm border-l-8 border-l-primary animate__animated animate__fadeInUp">
+            <div class="space-y-8 text-gray-600 leading-relaxed">
+                
+                <!-- 1. Thu thập thông tin -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase tracking-tight flex items-center gap-2">
+                        <i data-lucide="database" class="w-5 h-5 text-primary"></i> 1. Thu thập dữ liệu cá nhân
+                    </h3>
+                    <p class="mb-3">Khi quý khách liên hệ đăng ký tham gia các tour trekking/leo núi, chúng tôi chỉ thu thập các thông tin cần thiết tối thiểu bao gồm:</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Họ và tên, Số điện thoại liên hệ, thông tin nick Zalo.</li>
+                        <li>Ngày sinh, Giới tính (phục vụ việc khai báo tạm trú và bảo hiểm du lịch).</li>
+                        <li>Số định danh cá nhân (CCCD hoặc Hộ chiếu) - <em>đây là thông tin bắt buộc phải cung cấp để làm thủ tục xin giấy phép với cơ quan Kiểm lâm, Ban quản lý rừng và Bộ đội Biên phòng tại địa bàn tour diễn ra</em>.</li>
+                        <li>Điểm đón khách, chế độ ăn uống, dị ứng thực phẩm hoặc tiền sử sức khỏe đặc biệt (hen suyễn, tim mạch, khớp...) nhằm hỗ trợ chuẩn bị hậu cần tốt nhất cho đoàn.</li>
+                    </ul>
+                </div>
+
+                <!-- 2. Mục đích sử dụng -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase tracking-tight flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i> 2. Mục đích xử lý dữ liệu
+                    </h3>
+                    <p class="mb-3">Dữ liệu cá nhân của quý khách chỉ được CAM SITE RETREATS xử lý cho các mục đích cụ thể sau:</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Tư vấn chi tiết về hành trình, thông tin chuẩn bị thể lực, trang thiết bị cần thiết.</li>
+                        <li>Mua bảo hiểm du lịch bắt buộc dành riêng cho tuyến trekking đăng ký.</li>
+                        <li>Nộp danh sách cấp phép lưu trú cho Ban quản lý Vườn Quốc gia, cơ quan Kiểm lâm địa phương, đồn Biên phòng địa bàn.</li>
+                        <li>Hỗ trợ sắp xếp ăn uống (theo chế độ kiêng/chay) và chuẩn bị y tế phù hợp nếu quý khách có các lưu ý về sức khỏe.</li>
+                    </ul>
+                </div>
+
+                <!-- 3. Cam kết bảo mật -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase tracking-tight flex items-center gap-2">
+                        <i data-lucide="lock" class="w-5 h-5 text-primary"></i> 3. Cam kết bảo mật thông tin
+                    </h3>
+                    <p class="mb-3">Chúng tôi tuyệt đối tuân thủ nguyên tắc an toàn thông tin cá nhân:</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Không mua bán, trao đổi, chia sẻ thông tin cá nhân của khách hàng cho bất kỳ bên thứ ba nào vì mục đích thương mại.</li>
+                        <li>Chỉ chia sẻ thông tin cần thiết cho nhà cung cấp dịch vụ bảo hiểm du lịch đối tác và các cơ quan quản lý nhà nước có thẩm quyền phục vụ cho việc cấp phép đi rừng và khai báo tạm trú theo luật định.</li>
+                        <li>Mọi thông tin lưu giữ trên hệ thống quản lý nội bộ được mã hóa và bảo vệ chặt chẽ bằng các biện pháp kỹ thuật phù hợp.</li>
+                    </ul>
+                </div>
+
+                <!-- 4. Quyền của khách hàng -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase tracking-tight flex items-center gap-2">
+                        <i data-lucide="user-cog" class="w-5 h-5 text-primary"></i> 4. Quyền của chủ thể dữ liệu
+                    </h3>
+                    <p>Quý khách có toàn quyền yêu cầu chúng tôi cập nhật, sửa đổi hoặc xóa bỏ hoàn toàn dữ liệu cá nhân của mình ra khỏi cơ sở dữ liệu nội bộ sau khi tour kết thúc. Vui lòng liên hệ trực tiếp qua Hotline/Zalo chính thức của CAM SITE RETREATS để được xử lý ngay lập tức.</p>
+                </div>
+
+                <!-- Liên hệ -->
+                <div class="flex gap-3 bg-primary/5 border border-primary/10 text-gray-700 p-6 rounded-2xl text-sm leading-relaxed mt-8">
+                    <i data-lucide="phone-call" class="w-6 h-6 text-primary shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong>Yêu cầu chỉnh sửa hoặc xóa thông tin:</strong><br>
+                        Quý khách vui lòng liên hệ qua Hotline/Zalo: <strong>0819 685 878</strong> để được hỗ trợ kiểm tra và thực hiện nhanh nhất.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

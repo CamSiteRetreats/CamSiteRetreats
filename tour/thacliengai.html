@@ -1100,24 +1100,7 @@
             }
         }
 
-        function selectDate(element, dateStr) {
-            console.log('Selecting date:', dateStr);
-            document.querySelectorAll('.date-option').forEach(opt => {
-                opt.classList.remove('selected', 'border-primary', 'bg-primary/10');
-            });
-            element.classList.add('selected', 'border-primary', 'bg-primary/10');
-
-            const input = document.getElementById('selected-date-input');
-            if (input) input.value = dateStr;
-
-            const btn = document.getElementById('btn-book-now');
-            if (btn) {
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.classList.add('hover:scale-[1.02]');
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-            }
-        }
+        
 
         // Biến lưu dữ liệu tour lấy trực tiếp từ API (không qua localStorage)
         window._liengAiTourData = null;
@@ -1155,55 +1138,12 @@
             }
         }
 
-        function getCurrentTourData() {
-            // Ưu tiên 1: Dữ liệu fresh từ API vừa fetch
-            if (window._liengAiTourData) {
-                return window._liengAiTourData;
-            }
+        
 
-            // Ưu tiên 2: Thử tìm trong TourManager (localStorage cache)
-            const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
-            const matchingTours = tours.filter(t =>
-                (t.name && t.name.toLowerCase().includes('li\u00eang \u00e0i')) ||
-                (t.url && t.url.toLowerCase().includes('thacliengai'))
-            );
-
-            let currentTour = matchingTours.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
-            if (!currentTour && matchingTours.length > 0) currentTour = matchingTours[0];
-
-            // Fallback cuối: trả object rỗng không có hardcode giá
-            // (sẽ hiện Chưa định giá trên hóa đơn -- đúng hơn là sai giá)
-            if (!currentTour) {
-                currentTour = { id: 3, name: 'Th\u00e1c Li\u00eang \u00c0i', price: null };
-            }
-
-            return currentTour;
-        }
-
-        function initiateBooking() {
-            const dateStr = document.getElementById('selected-date-input').value;
-            if (!dateStr) {
-                alert('Vui lòng chọn ngày khởi hành');
-                return;
-            }
-
-            const currentTour = getCurrentTourData();
-
-            if (!currentTour.price || currentTour.price === 'Update') {
-                console.warn('[ThacLiengAi] Giá tour chưa xác định, sẽ ghi null vào DB.');
-            }
-
-            if (window.BookingFlow) {
-                // Truyền giá từ DB (hoặc null nếu chưa thiết lập)
-                const priceToSend = (currentTour.price && currentTour.price !== 'Update') ? parseFloat(currentTour.price) : null;
-                window.BookingFlow.open(currentTour.name, priceToSend, dateStr, currentTour.id || null);
-            } else {
-                alert('Lỗi: Không tìm thấy module BookingFlow. Vui lòng tải lại trang.');
-            }
-        }
+        
 
         // Alias để mobile CTA button gọi được
-        window.openBookingModal = initiateBooking;
+        
 
         // Initialize Data & Recommendations
         document.addEventListener('DOMContentLoaded', () => {
@@ -1211,7 +1151,7 @@
             fetchTourDataFromAPI();
 
             loadTourOptions();
-            filterSchedules(); // Initial load
+             // Initial load
 
             // Render Recommended Tours (Excluding current Liêng Ài ID = 3)
             TourManager.renderRecommendations('recc-marquee', 3);
@@ -1221,14 +1161,14 @@
             window.addEventListener('tours-updated', () => {
                 console.log('UI refreshing from API update...');
                 loadTourOptions();
-                filterSchedules();
+                
                 TourManager.renderRecommendations('recc-marquee', 3);
                 lucide.createIcons();
             });
 
             window.addEventListener('schedules-updated', () => {
                 console.log('UI refreshing from schedule update...');
-                filterSchedules();
+                
             });
         });
 
@@ -1237,92 +1177,7 @@
             // Keeping empty to avoid breaking legacy calls on DOMContentLoaded
         }
 
-        function filterSchedules() {
-            const dateSelector = document.getElementById('date-selector');
-            const priceDisplay = document.getElementById('tour-price-display');
-            const mobilePriceDisplay = document.getElementById('mobile-tour-price-display');
-
-            const currentTour = getCurrentTourData();
-
-            // Sync Price
-            if (currentTour && currentTour.price) {
-                const formattedPrice = TourManager.formatPrice(currentTour.price);
-                if (priceDisplay) priceDisplay.textContent = formattedPrice;
-                if (mobilePriceDisplay) mobilePriceDisplay.textContent = formattedPrice;
-            } else {
-                const defaultPrice = '3.750.000đ';
-                if (priceDisplay) priceDisplay.textContent = defaultPrice;
-                if (mobilePriceDisplay) mobilePriceDisplay.textContent = defaultPrice;
-            }
-
-            // Sync dynamic Name (in case Admin changed it)
-            const tourNameDisplays = document.querySelectorAll('.tour-dynamic-name');
-            tourNameDisplays.forEach(el => el.textContent = currentTour.name);
-
-            if (!dateSelector) return;
-            dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Đang tải lịch trình...</div>';
-
-            const tourWithSchedules = TourManager.getTourById(currentTour.id);
-
-            dateSelector.innerHTML = '';
-
-            if (tourWithSchedules && tourWithSchedules.schedules && tourWithSchedules.schedules.length > 0) {
-                tourWithSchedules.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-                tourWithSchedules.schedules.forEach(item => {
-                    const remaining = item.remaining;
-                    const statusText = item.calculatedStatus;
-
-                    let statusDisplay = '';
-                    let statusClass = '';
-                    let opacityClass = '';
-                    let isClickable = true;
-
-                    if (statusText === 'Hết chỗ') {
-                        statusDisplay = 'Hết chỗ';
-                        statusClass = 'text-gray-400';
-                        opacityClass = 'opacity-50 cursor-not-allowed bg-gray-100';
-                        isClickable = false;
-                    } else if (remaining <= 3) {
-                        statusDisplay = `Chỉ còn ${remaining} chỗ`;
-                        statusClass = 'text-orange-500';
-                        opacityClass = '';
-                    } else {
-                        statusDisplay = `Còn ${remaining} chỗ`;
-                        statusClass = 'text-primary';
-                        opacityClass = '';
-                    }
-
-                    let formattedDisplay = item.date;
-                    if (!formattedDisplay) {
-                        const start = new Date(item.startDate);
-                        const end = new Date(item.endDate);
-                        formattedDisplay = `${start.getDate()}/${start.getMonth() + 1} - ${end.getDate()}/${end.getMonth() + 1}`;
-                    }
-
-                    // Format startDate: strip ISO 'T...' and convert YYYY-MM-DD for BookingFlow
-                    let safeStart = item.startDate;
-                    if (safeStart instanceof Date) {
-                        safeStart = safeStart.toISOString().split('T')[0];
-                    } else if (typeof safeStart === 'string' && safeStart.includes('T')) {
-                        safeStart = safeStart.split('T')[0];
-                    }
-
-                    const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
-
-                    const scheduleHTML = `
-                        <div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 cursor-pointer ${opacityClass}"
-                            ${clickAction}>
-                            <span class="text-[12px] font-bold leading-tight">${formattedDisplay}</span>
-                            <span class="text-[13px] date-status ${statusClass} font-bold">${statusDisplay}</span>
-                        </div>
-                    `;
-                    dateSelector.insertAdjacentHTML('beforeend', scheduleHTML);
-                });
-            } else {
-                dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>';
-            }
-        }
+        
 
 
         lucide.createIcons();

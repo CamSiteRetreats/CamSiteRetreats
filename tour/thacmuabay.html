@@ -1069,96 +1069,31 @@
             }
         }
 
-        function getCurrentTourData() {
-            if (window._currentTourData) return window._currentTourData;
-            const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
-            const matching = tours.filter(t =>
-                (t.name && t.name.toLowerCase().includes('mưa bay')) ||
-                (t.url && t.url.toLowerCase().includes('thacmuabay'))
-            );
-            let found = matching.find(t => t.price && t.price !== 'Update' && parseFloat(t.price) > 0);
-            if (!found && matching.length > 0) found = matching[0];
-            return found || { name: 'Thác Mưa Bay', price: null };
-        }
+        
 
-        function initiateBooking() {
-            const dateStr = document.getElementById('selected-date-input').value;
-            if (!dateStr) {
-                alert('Vui lòng chọn ngày khởi hành');
-                return;
-            }
-            const tour = getCurrentTourData();
-            const price = (tour.price && tour.price !== 'Update') ? parseFloat(tour.price) : null;
-            if (window.BookingFlow) {
-                window.BookingFlow.open(tour.name, price, dateStr, tour.id || null);
-            } else {
-                alert('Lỗi: Không tìm thấy module BookingFlow. Vui lòng tải lại trang.');
-            }
-        }
-        window.openBookingModal = initiateBooking;
+        
+        
 
         // Initialize Data & Recommendations
         document.addEventListener('DOMContentLoaded', () => {
             fetchTourDataFromAPI();
-            filterSchedules();
+            
             TourManager.renderRecommendations('recc-marquee', null);
             lucide.createIcons();
 
             window.addEventListener('tours-updated', () => {
-                filterSchedules();
+                
                 TourManager.renderRecommendations('recc-marquee', null);
                 lucide.createIcons();
             });
             window.addEventListener('schedules-updated', () => {
-                filterSchedules();
+                
             });
         });
 
-        function selectDate(element, dateStr) {
-            document.querySelectorAll('.date-option').forEach(opt => opt.classList.remove('selected', 'border-primary', 'bg-primary/10'));
-            element.classList.add('selected', 'border-primary', 'bg-primary/10');
-            const input = document.getElementById('selected-date-input');
-            if (input) input.value = dateStr;
-            const btn = document.getElementById('btn-book-now');
-            if (btn) { btn.classList.remove('opacity-50', 'cursor-not-allowed'); btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
-        }
+        
 
-        function filterSchedules() {
-            const dateSelector = document.getElementById('date-selector');
-            const priceDisplay = document.getElementById('tour-price-display');
-            const mobilePriceDisplay = document.getElementById('mobile-tour-price-display');
-            const currentTour = getCurrentTourData();
-
-            if (currentTour && currentTour.price) {
-                const fp = TourManager.formatPrice(currentTour.price);
-                if (priceDisplay) priceDisplay.textContent = fp;
-                if (mobilePriceDisplay) mobilePriceDisplay.textContent = fp;
-            }
-
-            if (!dateSelector) return;
-            dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Đang tải lịch trình...</div>';
-
-            const tourWithSched = currentTour && currentTour.id ? TourManager.getTourById(currentTour.id) : null;
-            dateSelector.innerHTML = '';
-            if (tourWithSched && tourWithSched.schedules && tourWithSched.schedules.length > 0) {
-                tourWithSched.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-                tourWithSched.schedules.forEach(item => {
-                    const remaining = item.remaining;
-                    const statusText = item.calculatedStatus;
-                    let statusDisplay = '', statusClass = '', opacityClass = '', isClickable = true;
-                    if (statusText === 'Hết chỗ') { statusDisplay = 'Hết chỗ'; statusClass = 'text-gray-400'; opacityClass = 'opacity-50 cursor-not-allowed bg-gray-100'; isClickable = false; }
-                    else if (remaining <= 3) { statusDisplay = `Chỉ còn ${remaining} chỗ`; statusClass = 'text-orange-500'; }
-                    else { statusDisplay = `Còn ${remaining} chỗ`; statusClass = 'text-primary'; }
-                    let fd = item.date;
-                    if (!fd) { const s = new Date(item.startDate), e = new Date(item.endDate); fd = `${s.getDate()}/${s.getMonth()+1} - ${e.getDate()}/${e.getMonth()+1}`; }
-                    let safeStart = (item.startDate || '').includes('T') ? item.startDate.split('T')[0] : item.startDate;
-                    const clickAction = isClickable ? `onclick="selectDate(this, '${safeStart}')"` : '';
-                    dateSelector.insertAdjacentHTML('beforeend', `<div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 ${opacityClass}" ${clickAction}><span class="text-[12px] font-bold leading-tight">${fd}</span><span class="text-[13px] date-status ${statusClass} font-bold">${statusDisplay}</span></div>`);
-                });
-            } else {
-                dateSelector.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>';
-            }
-        }
+        
 
         function closeSuccessModal() {
             const m = document.getElementById('success-modal');
