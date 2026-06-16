@@ -1109,9 +1109,9 @@
                 if (!res.ok) return;
                 const tours = await res.json();
                 const matching = tours.filter(t =>
-                (t.url && t.url.toLowerCase().includes('yangdoan')) ||
+                    (t.url && t.url.toLowerCase().includes('yangdoan')) ||
                 (t.name && (t.name.toLowerCase().includes('yang đoan') || t.name.toLowerCase().includes('yang d')))
-            );
+                );
                 let found = matching.find(t => t.price && parseFloat(t.price) > 0);
                 if (!found && matching.length > 0) found = matching[0];
                 if (found) {
@@ -1121,19 +1121,135 @@
                     const mpd = document.getElementById('mobile-tour-price-display');
                     if (pd) pd.textContent = fp;
                     if (mpd) mpd.textContent = fp;
-                    
+                    filterSchedules();
                 }
             } catch (err) { console.warn('Could not load tour data', err); }
         }
 
-        
+        function getCurrentTourData() {
+            if (window._currentTourData) return window._currentTourData;
+            const tours = typeof TourManager !== 'undefined' ? TourManager.getAllTours() : [];
+            const matching = tours.filter(t =>
+                (t.url && t.url.toLowerCase().includes('yangdoan')) ||
+                (t.name && (t.name.toLowerCase().includes('yang đoan') || t.name.toLowerCase().includes('yang d')))
+            );
+            let found = matching.find(t => t.price && parseFloat(t.price) > 0);
+            if (!found && matching.length > 0) found = matching[0];
+            return found || { name: 'Yang Đoan', price: null };
+        }
 
-        
-        
+        function initiateBooking() {
+            const dateStr = document.getElementById('selected-date-input').value;
+            if (!dateStr) { alert('Vui lòng chọn ngày khởi hành'); return; }
+            openContactModal();
+        }
+        window.openBookingModal = initiateBooking;
 
-        
+        function selectDate(element, dateStr) {
+            document.querySelectorAll('.date-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            const input = document.getElementById('selected-date-input');
+            if (input) input.value = dateStr;
+            const btn = document.getElementById('btn-book-now');
+            if (btn) btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
 
-        
+        function filterSchedules() {
+            const ds = document.getElementById('date-selector');
+            if (!ds) return;
+            const tour = getCurrentTourData();
+            if (!tour || !tour.id) { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>'; return; }
+            const full = TourManager.getTourById(tour.id);
+            ds.innerHTML = '';
+            if (full && full.schedules && full.schedules.length > 0) {
+                full.schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                full.schedules.forEach(item => {
+                    const rem = item.remaining; const st = item.calculatedStatus;
+                    let sd='', sc='', oc='', ck=true;
+                    if (st === 'Hết chỗ') { sd='Hết chỗ'; sc='text-gray-400'; oc='opacity-50 cursor-not-allowed bg-gray-100'; ck=false; }
+                    else if (rem<=3) { sd='Chỉ còn '+rem+' chỗ'; sc='text-orange-500'; }
+                    else { sd='Còn '+rem+' chỗ'; sc='text-primary'; }
+                    let fd=item.date;
+                    if (!fd) { const s=new Date(item.startDate),e=new Date(item.endDate); fd=s.getDate()+'/'+(s.getMonth()+1)+' - '+e.getDate()+'/'+(e.getMonth()+1); }
+                    let ss=(item.startDate||'').includes('T')?item.startDate.split('T')[0]:item.startDate;
+                    const ca=ck?'onclick="selectDate(this, \''+ss+'\')"':'';
+                    ds.insertAdjacentHTML('beforeend','<div class="date-option p-2 rounded-xl flex flex-col items-center text-center justify-center gap-1 '+oc+'" '+ca+'><span class="text-[12px] font-bold leading-tight">'+fd+'</span><span class="text-[13px] date-status '+sc+' font-bold">'+sd+'</span></div>');
+                });
+            } else { ds.innerHTML = '<div class="col-span-2 text-center py-4 text-gray-400 text-xs italic">Chưa có lịch khởi hành.</div>'; }
+        }
+
+        function openContactModal() {
+            const dateInput = document.getElementById('selected-date-input');
+            const dateStr = dateInput ? dateInput.value : '';
+            if (!dateStr) {
+                alert('Vui lòng chọn ngày khởi hành');
+                return;
+            }
+            let displayDate = dateStr;
+            try {
+                if (dateStr.includes('-')) {
+                    const [y, m, d] = dateStr.split('-');
+                    displayDate = `${d}/${m}`;
+                }
+            } catch(e) {}
+            
+            const tour = getCurrentTourData();
+            
+            let modal = document.getElementById('contact-modal');
+            if (!modal) {
+                const modalHtml = `
+                    <div id="contact-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-[32px] max-w-md w-full p-8 relative animate__animated animate__zoomIn animate__faster shadow-2xl border border-primary/10">
+                            <button onclick="closeContactModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 mx-auto">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-black text-center text-gray-800 uppercase tracking-tight mb-2">Liên Hệ Đặt Tour</h3>
+                            <p class="text-sm text-gray-500 text-center mb-6 leading-relaxed">
+                                Bạn đang quan tâm đến hành trình <strong id="modal-tour-name" class="text-primary"></strong> khởi hành ngày <strong id="modal-selected-date" class="text-gray-800"></strong>. Vui lòng liên hệ trực tiếp với chúng tôi để hoàn tất đặt chỗ.
+                            </p>
+                            <div class="space-y-3">
+                                <a id="modal-call-btn" href="tel:0819685878"
+                                    class="w-full flex items-center justify-center gap-3 bg-primary text-white py-3.5 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02] active:scale-95 transition-all text-sm">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    Gọi Ngay: 0819 685 878
+                                </a>
+                                <a id="modal-zalo-btn" href="https://zalo.me/0819685878" target="_blank"
+                                    class="w-full flex items-center justify-center gap-3 bg-[#0068ff] text-white py-3.5 rounded-xl font-bold uppercase tracking-widest shadow-lg hover:scale-[1.02] active:scale-95 transition-all text-sm">
+                                    <svg class="w-4 h-4" viewBox="0 0 32 32" fill="currentColor">
+                                        <path d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13 13-5.832 13-13S23.168 3 16 3zm5.5 18.5h-2l-3-5v5h-2V10.5h2l3 5v-5h2V21.5z"/>
+                                    </svg>
+                                    Nhắn Tin Zalo
+                                </a>
+                            </div>
+                            <p class="text-[10px] text-gray-400 text-center mt-4 italic">* Đội ngũ CAM SITE sẽ phản hồi và hỗ trợ bạn trong vòng 5-10 phút.</p>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modal = document.getElementById('contact-modal');
+            }
+            
+            const modalTourName = document.getElementById('modal-tour-name');
+            const modalSelectedDate = document.getElementById('modal-selected-date');
+            if (modalTourName) modalTourName.textContent = tour.name;
+            if (modalSelectedDate) modalSelectedDate.textContent = displayDate;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById('contact-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+        }
         // ===== END BOOKING MODAL INTEGRATION =====
 
 
