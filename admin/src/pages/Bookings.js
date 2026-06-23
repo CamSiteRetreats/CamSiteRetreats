@@ -833,23 +833,39 @@ export const afterRender = () => {
             let tabMatch = false;
             const isFullyPaid = parseInt(b.total_price) > 0 && parseInt(b.total_price) === parseInt(b.deposit);
 
-            // Helper để check xem Tour đã qua hay chưa
+            // Helper để check xem Tour đã qua hay chưa (Đã tối ưu hóa tương thích chéo trình duyệt)
             const isPastTour = (dateStr) => {
                 if (!dateStr) return false;
                 try {
-                    const parts = dateStr.split('/'); // DD/MM/YYYY
-                    if (parts.length === 3) {
-                        const tourDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        return tourDate.getTime() < today.getTime();
-                    } else if (dateStr.includes('-')) {
-                        const tourDate = new Date(`${dateStr}T00:00:00`);
+                    let targetDate = dateStr.trim();
+                    if (targetDate.includes('-') && !/^\d{4}-\d{2}-\d{2}/.test(targetDate)) {
+                        targetDate = targetDate.split('-')[0].trim();
+                    }
+                    if (targetDate.includes('/')) {
+                        const parts = targetDate.split('/');
+                        if (parts.length >= 2) {
+                            const d = parseInt(parts[0], 10);
+                            const m = parseInt(parts[1], 10) - 1;
+                            const y = parts.length === 3 ? parseInt(parts[2], 10) : new Date().getFullYear();
+                            const tourDate = new Date(y, m, d);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return tourDate.getTime() < today.getTime();
+                        }
+                    }
+                    if (/^\d{4}-\d{2}-\d{2}/.test(targetDate)) {
+                        const parts = targetDate.split('-');
+                        const y = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10) - 1;
+                        const d = parseInt(parts[2], 10);
+                        const tourDate = new Date(y, m, d);
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
                         return tourDate.getTime() < today.getTime();
                     }
-                } catch (e) { }
+                } catch (e) {
+                    console.warn("isPastTour error parsing:", dateStr, e);
+                }
                 return false;
             };
 
@@ -864,7 +880,7 @@ export const afterRender = () => {
             } else if (activeTab === 'upcoming') {
                 tabMatch = (bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)') && !isFullyPaid && isFuture;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
+                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Hoàn tất phí' || bStatus === 'Hoàn tất') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
             } else if (activeTab === 'completed') {
                 tabMatch = !isFuture || bStatus === 'Đã đi' || bStatus === 'Đã hủy' || bStatus === 'Bảo lưu';
             }
@@ -1337,22 +1353,38 @@ export const afterRender = () => {
                 const isPastTour = (dateStr) => {
                     if (!dateStr) return false;
                     try {
-                        const parts = dateStr.split('/');
-                        if (parts.length === 3) {
-                            const tourDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            return tourDate.getTime() < today.getTime();
-                        } else if (dateStr.includes('-')) {
-                            const tourDate = new Date(`${dateStr}T00:00:00`);
+                        let targetDate = dateStr.trim();
+                        if (targetDate.includes('-') && !/^\d{4}-\d{2}-\d{2}/.test(targetDate)) {
+                            targetDate = targetDate.split('-')[0].trim();
+                        }
+                        if (targetDate.includes('/')) {
+                            const parts = targetDate.split('/');
+                            if (parts.length >= 2) {
+                                const d = parseInt(parts[0], 10);
+                                const m = parseInt(parts[1], 10) - 1;
+                                const y = parts.length === 3 ? parseInt(parts[2], 10) : new Date().getFullYear();
+                                const tourDate = new Date(y, m, d);
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return tourDate.getTime() < today.getTime();
+                            }
+                        }
+                        if (/^\d{4}-\d{2}-\d{2}/.test(targetDate)) {
+                            const parts = targetDate.split('-');
+                            const y = parseInt(parts[0], 10);
+                            const m = parseInt(parts[1], 10) - 1;
+                            const d = parseInt(parts[2], 10);
+                            const tourDate = new Date(y, m, d);
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
                             return tourDate.getTime() < today.getTime();
                         }
-                    } catch (e) { }
+                    } catch (e) {
+                        console.warn("isPastTour error parsing in export:", dateStr, e);
+                    }
                     return false;
                 };
-                const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
+                const isDonePast = (b.status === 'Hoàn thành' || b.status === 'Hoàn tất' || b.status === 'Hoàn tất phí' || b.status === 'Đã đi' || isFullyPaid) && isPastTour(b.date);
 
                 if (activeTab === 'consult') {
                     tabMatch = b.status === 'Chờ tư vấn' && !isDonePast;
