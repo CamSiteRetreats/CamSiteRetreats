@@ -797,7 +797,10 @@ const BookingEngine = {
             }
         } catch(e) {}
 
-        if (!isUpdate) {
+        if (isUpdate) {
+            // Khi khách hàng cập nhật thông tin qua form, tự động đẩy trạng thái sang 'Hoàn tất phí' (Chờ lên xe)
+            payload.status = 'Hoàn tất phí';
+        } else {
             // Chỉ gán deposit và status mặc định khi TẠO MỚI, tránh ghi đè dữ liệu của Admin
             payload.deposit_required = this.getDepositAmount();
             payload.status = 'Chờ xác nhận cọc';
