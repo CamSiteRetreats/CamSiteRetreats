@@ -2380,9 +2380,19 @@ export const afterRender = () => {
                 window.actionDelete(bookingId);
                 return;
             }
-            // MỞ CHI TIẾT CHỈNH SỬA THÔNG TIN
+            // COPY LINK THÔNG TIN (FORM)
             else if (btn.classList.contains('process-btn')) {
-                window.actionEdit(bookingId);
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const baseUrl = isLocal
+                    ? 'http://localhost:8888'
+                    : window.location.origin;
+
+                const url = baseUrl + `/booking/process.html?id=${bookingId}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('📋 Đã sao chép Link Điền Thông Tin!\nGửi cho khách: ' + url);
+                }).catch(err => {
+                    alert('Lỗi khi Copy Clipboard. Link là: ' + url);
+                });
             }
             // THAO TÁC ROW ACTION MODAL (CHI TIẾT)
             else if (btn.classList.contains('view-btn')) {
