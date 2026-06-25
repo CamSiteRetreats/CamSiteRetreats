@@ -19,6 +19,17 @@
 <title>Ky Quan San | CAM SITE RETREATS</title>
 <meta name="description"
     content="Khám phá hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan San, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m cùng CAM SITE RETREATS.">
+<!-- Open Graph / Link Preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ky Quan San | CAM SITE RETREATS">
+<meta property="og:description" content="Khám phá hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan San, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m cùng CAM SITE RETREATS.">
+<meta property="og:image" content="Ky quan sang/Untitled-25.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ky Quan San | CAM SITE RETREATS">
+<meta name="twitter:description" content="Khám phá hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan San, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m cùng CAM SITE RETREATS.">
+<meta name="twitter:image" content="Ky quan sang/Untitled-25.jpg">
 <script src="https://cdn.tailwindcss.com"></script>
 <link
     href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
@@ -301,6 +312,89 @@
             transform: translateX(-50%);
         }
     }
+
+    /* Lightbox */
+    #lightbox-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(8px);
+    }
+    #lightbox-overlay.active {
+        display: flex;
+    }
+    #lightbox-img {
+        max-width: 92vw;
+        max-height: 88vh;
+        border-radius: 16px;
+        object-fit: contain;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+        animation: lbFadeIn 0.3s ease;
+    }
+    @keyframes lbFadeIn {
+        from { opacity: 0; transform: scale(0.93); }
+        to   { opacity: 1; transform: scale(1); }
+    }
+    #lightbox-close {
+        position: fixed;
+        top: 20px;
+        right: 24px;
+        width: 44px;
+        height: 44px;
+        background: rgba(255,255,255,0.15);
+        border: 1.5px solid rgba(255,255,255,0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 22px;
+        transition: background 0.2s;
+        z-index: 100000;
+    }
+    #lightbox-close:hover { background: rgba(232,93,4,0.6); }
+    #lightbox-prev, #lightbox-next {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        background: rgba(255,255,255,0.12);
+        border: 1.5px solid rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 20px;
+        transition: background 0.2s;
+        z-index: 100000;
+    }
+    #lightbox-prev { left: 16px; }
+    #lightbox-next { right: 16px; }
+    #lightbox-prev:hover, #lightbox-next:hover { background: rgba(232,93,4,0.6); }
+    #lightbox-counter {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        z-index: 100000;
+    }
+    .gallery-thumb {
+        cursor: zoom-in;
+    }
 </style>
 </head>
 
@@ -312,8 +406,8 @@
     <!-- SECTION 1: HERO -->
     <section
         class="relative h-[60vh] md:h-[75vh] w-full flex items-end justify-center overflow-hidden mt-0 pb-16 md:pb-24">
-        <img src="hero.jpg" class="absolute inset-0 w-full h-full object-cover object-center"
-            alt="Tà Năng Phan Dũng Hero">
+        <img src="Ky quan sang/Untitled-25.jpg" class="absolute inset-0 w-full h-full object-cover object-center"
+            alt="Ky Quan San Hero">
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="relative z-10 text-center px-6">
             <span
@@ -611,114 +705,82 @@
                             <!-- Image 1 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide1.png" loading="lazy"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 1">
+                                <img src="Ky quan sang/Untitled-3.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 0)"
+                                    alt="Ky Quan San 1">
                             </div>
                             <!-- Image 2 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(1).png" loading="lazy"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 2">
+                                <img src="Ky quan sang/Untitled-7.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 1)"
+                                    alt="Ky Quan San 2">
                             </div>
                             <!-- Image 3 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(2).png" loading="lazy"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 3">
+                                <img src="Ky quan sang/Untitled-11.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 2)"
+                                    alt="Ky Quan San 3">
                             </div>
                             <!-- Image 4 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(3).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 4">
+                                <img src="Ky quan sang/Untitled-15.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 3)"
+                                    alt="Ky Quan San 4">
                             </div>
                             <!-- Image 5 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(4).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 5">
+                                <img src="Ky quan sang/Untitled-19.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 4)"
+                                    alt="Ky Quan San 5">
                             </div>
                             <!-- Image 6 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(5).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 6">
+                                <img src="Ky quan sang/Untitled-23.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 5)"
+                                    alt="Ky Quan San 6">
                             </div>
                             <!-- Image 7 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(6).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 7">
+                                <img src="Ky quan sang/Untitled-25.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 6)"
+                                    alt="Ky Quan San 7">
                             </div>
                             <!-- Image 8 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(7).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 8">
+                                <img src="Ky quan sang/Untitled-27.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 7)"
+                                    alt="Ky Quan San 8">
                             </div>
                             <!-- Image 9 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(8).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 9">
+                                <img src="Ky quan sang/Untitled-31.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 8)"
+                                    alt="Ky Quan San 9">
                             </div>
                             <!-- Image 10 -->
                             <div
                                 class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(9).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 10">
-                            </div>
-                            <!-- Image 11 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(10).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 11">
-                            </div>
-                            <!-- Image 12 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(11).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 12">
-                            </div>
-                            <!-- Image 13 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(12).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 13">
-                            </div>
-                            <!-- Image 14 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(13).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 14">
-                            </div>
-                            <!-- Image 15 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(14).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 15">
-                            </div>
-                            <!-- Image 16 -->
-                            <div
-                                class="min-w-[70%] md:min-w-[32%] h-64 rounded-2xl overflow-hidden snap-start shadow-md bg-gray-200">
-                                <img src="Tanang/slide%20(15).png"
-                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                                    alt="Tà Năng 16">
+                                <img src="Ky quan sang/Untitled-35.jpg" loading="lazy"
+                                    class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 gallery-thumb"
+                                    onclick="openLightbox(this, 9)"
+                                    alt="Ky Quan San 10">
                             </div>
                         </div>
                     </div>
@@ -1516,6 +1578,81 @@
                 }, 15000);
             }
         });
+    </script>
+
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="lightbox-overlay" onclick="closeLightboxOnBg(event)">
+        <button id="lightbox-close" onclick="closeLightbox()" aria-label="Đóng">&times;</button>
+        <button id="lightbox-prev" onclick="lightboxNav(-1)" aria-label="Ảnh trước">&#8249;</button>
+        <img id="lightbox-img" src="" alt="Lightbox">
+        <button id="lightbox-next" onclick="lightboxNav(1)" aria-label="Ảnh tiếp">›</button>
+        <div id="lightbox-counter"></div>
+    </div>
+
+    <script>
+        // ===== LIGHTBOX =====
+        const lbImages = [
+            'Ky quan sang/Untitled-3.jpg',
+            'Ky quan sang/Untitled-7.jpg',
+            'Ky quan sang/Untitled-11.jpg',
+            'Ky quan sang/Untitled-15.jpg',
+            'Ky quan sang/Untitled-19.jpg',
+            'Ky quan sang/Untitled-23.jpg',
+            'Ky quan sang/Untitled-25.jpg',
+            'Ky quan sang/Untitled-27.jpg',
+            'Ky quan sang/Untitled-31.jpg',
+            'Ky quan sang/Untitled-35.jpg'
+        ];
+        let lbIndex = 0;
+
+        function openLightbox(imgEl, index) {
+            lbIndex = index;
+            const overlay = document.getElementById('lightbox-overlay');
+            const lbImg = document.getElementById('lightbox-img');
+            lbImg.src = lbImages[lbIndex];
+            lbImg.alt = imgEl.alt;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            updateLightboxCounter();
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeLightboxOnBg(e) {
+            if (e.target === document.getElementById('lightbox-overlay')) {
+                closeLightbox();
+            }
+        }
+
+        function lightboxNav(dir) {
+            lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+            const lbImg = document.getElementById('lightbox-img');
+            lbImg.style.opacity = 0;
+            setTimeout(() => {
+                lbImg.src = lbImages[lbIndex];
+                lbImg.style.opacity = 1;
+            }, 150);
+            updateLightboxCounter();
+        }
+
+        function updateLightboxCounter() {
+            document.getElementById('lightbox-counter').textContent =
+                (lbIndex + 1) + ' / ' + lbImages.length;
+        }
+
+        document.addEventListener('keydown', function(e) {
+            const overlay = document.getElementById('lightbox-overlay');
+            if (!overlay.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') lightboxNav(-1);
+            if (e.key === 'ArrowRight') lightboxNav(1);
+        });
+
+        // Smooth opacity transition for lightbox image
+        document.getElementById('lightbox-img').style.transition = 'opacity 0.15s ease';
     </script>
 </body>
 
