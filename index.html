@@ -555,12 +555,12 @@
 
                 <!-- Region Tabs -->
                 <div class="flex justify-center space-x-3">
+                    <button id="btn-all"
+                        class="px-6 py-2 rounded-full bg-primary text-white font-bold shadow-lg transition-all border-2 border-primary hover:bg-primary hover:text-white text-sm">TẤT CẢ</button>
                     <button id="btn-south"
-                        class="px-6 py-2 rounded-full bg-primary text-white font-bold shadow-lg transition-all border-2 border-primary hover:bg-primary hover:text-white text-sm">MIỀN
-                        NAM</button>
+                        class="px-6 py-2 rounded-full bg-white text-gray-500 font-bold hover:text-primary transition-all border-2 border-transparent hover:border-primary text-sm">MIỀN NAM</button>
                     <button id="btn-north"
-                        class="px-6 py-2 rounded-full bg-white text-gray-500 font-bold hover:text-primary transition-all border-2 border-transparent hover:border-primary text-sm">MIỀN
-                        BẮC</button>
+                        class="px-6 py-2 rounded-full bg-white text-gray-500 font-bold hover:text-primary transition-all border-2 border-transparent hover:border-primary text-sm">MIỀN BẮC</button>
                 </div>
             </div>
 
@@ -892,7 +892,7 @@
         });
 
         // Initialize Tours Logic
-        let currentRegion = 'south';
+        let currentRegion = 'all';
 
         function initTours(skipFilter = false) {
             const tours = TourManager.getAllTours();
@@ -909,7 +909,7 @@
                     // Update display immediately without fade
                     const allTourCards = document.querySelectorAll('.tour-card');
                     allTourCards.forEach(card => {
-                        if (card.dataset.region === currentRegion) {
+                        if (currentRegion === 'all' || card.dataset.region === currentRegion) {
                             card.classList.remove('hidden');
                         } else {
                             card.classList.add('hidden');
@@ -920,6 +920,7 @@
         }
 
         // Region Filtering Logic
+        const btnAll = document.getElementById('btn-all');
         const btnSouth = document.getElementById('btn-south');
         const btnNorth = document.getElementById('btn-north');
 
@@ -934,7 +935,7 @@
             setTimeout(() => {
                 // Update Cards
                 allTourCards.forEach(card => {
-                    if (card.dataset.region === region) {
+                    if (region === 'all' || card.dataset.region === region) {
                         card.classList.remove('hidden');
                     } else {
                         card.classList.add('hidden');
@@ -949,19 +950,22 @@
             }, 300);
 
             // Update Buttons (Immediate)
-            if (region === 'south') {
-                btnSouth.classList.add('bg-primary', 'text-white', 'border-primary');
-                btnSouth.classList.remove('bg-white', 'text-gray-500', 'border-transparent');
+            const buttons = [
+                { el: document.getElementById('btn-all'), key: 'all' },
+                { el: document.getElementById('btn-south'), key: 'south' },
+                { el: document.getElementById('btn-north'), key: 'north' }
+            ];
 
-                btnNorth.classList.add('bg-white', 'text-gray-500', 'border-transparent');
-                btnNorth.classList.remove('bg-primary', 'text-white', 'border-primary');
-            } else {
-                btnNorth.classList.add('bg-primary', 'text-white', 'border-primary');
-                btnNorth.classList.remove('bg-white', 'text-gray-500', 'border-transparent');
-
-                btnSouth.classList.add('bg-white', 'text-gray-500', 'border-transparent');
-                btnSouth.classList.remove('bg-primary', 'text-white', 'border-primary');
-            }
+            buttons.forEach(b => {
+                if (!b.el) return;
+                if (b.key === region) {
+                    b.el.classList.add('bg-primary', 'text-white', 'border-primary');
+                    b.el.classList.remove('bg-white', 'text-gray-500', 'border-transparent');
+                } else {
+                    b.el.classList.add('bg-white', 'text-gray-500', 'border-transparent');
+                    b.el.classList.remove('bg-primary', 'text-white', 'border-primary');
+                }
+            });
         };
 
         // Initialize Everything
@@ -969,10 +973,12 @@
             initTours();
         });
 
-        if (btnSouth && btnNorth) {
-            btnSouth.addEventListener('click', () => filterTours('south'));
-            btnNorth.addEventListener('click', () => filterTours('north'));
-        }
+        const bAll = document.getElementById('btn-all');
+        const bSouth = document.getElementById('btn-south');
+        const bNorth = document.getElementById('btn-north');
+        if (bAll) bAll.addEventListener('click', () => filterTours('all'));
+        if (bSouth) bSouth.addEventListener('click', () => filterTours('south'));
+        if (bNorth) bNorth.addEventListener('click', () => filterTours('north'));
 
         // Debounce helper
         function debounce(func, wait) {
