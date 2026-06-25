@@ -372,7 +372,7 @@ const TourManager = {
             },
             {
                 id: 7,
-                name: 'Ky Quan San',
+                name: 'Ky Quan Sang',
                 image: 'tour/Tanang/thumb1.jpg',
                 image2: 'tour/Tanang/thumb2.jpg',
                 image3: 'tour/Tanang/thumb3.jpg',
@@ -383,8 +383,8 @@ const TourManager = {
                 price: 'Update',
                 level: 'Khó',
                 altitude: '3.046M',
-                url: 'tour/kyquansan',
-                shortDesc: 'Hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan San, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m.',
+                url: 'tour/kyquansang',
+                shortDesc: 'Hành trình chinh phục Bạch Mộc Lương Tử - Ky Quan Sang, săn biển mây kì ảo và ngắm bình minh trên độ cao 3.046m.',
                 defaultSchedules: [
                     { date: '25/03 - 28/03', slots: 12, status: 'Đang mở' }
                 ]

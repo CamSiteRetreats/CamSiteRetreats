@@ -14,7 +14,7 @@ const updatedPrices = [
     { name: 'Mũi Kê Gà', price: 1550000 },
     { name: 'Yang Đoan', price: 1100000 },
     { name: 'Thác Mưa Bay', price: 2450000 },
-    { name: 'Kỳ Quan San', price: 1000000 }
+    { name: 'Kỳ Quan Sang', price: 1000000 }
 ];
 
 async function updatePrices() {
