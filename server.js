@@ -36,7 +36,8 @@ app.all('/api/:route', async (req, res) => {
 });
 
 // Catch-all for SPA or Admin
-app.get('/admin/*', (req, res) => {
+
+app.get(/^\/admin(?:\/.*)?$/, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin/index.html'));
 });
 
