@@ -8,7 +8,6 @@ const TOURS_KEY = 'cam_site_tours';
 const TourManager = {
     // Get all tours from LocalStorage or API
     getAllTours: function () {
-
         // Try to fetch from API in background to update cache
         this.fetchToursFromAPI();
         this.fetchSchedulesFromAPI(); // NEW: Fetch schedules too
@@ -27,6 +26,14 @@ const TourManager = {
             taNang.url = 'tour/tanangphandung';
             localStorage.setItem(TOURS_KEY, JSON.stringify(tours));
         }
+
+        // Sort tours by sort_order ASC, then by id ASC
+        tours.sort((a, b) => {
+            const orderA = a.sort_order !== undefined ? parseInt(a.sort_order) : 999;
+            const orderB = b.sort_order !== undefined ? parseInt(b.sort_order) : 999;
+            if (orderA !== orderB) return orderA - orderB;
+            return a.id - b.id;
+        });
 
         // Filter out hidden tours for public view
         return tours.filter(t => t.is_visible !== false);
