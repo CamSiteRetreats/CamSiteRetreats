@@ -323,11 +323,17 @@
     <style>
         .cal-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
+            .cal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
             .cal-grid {
                 grid-template-columns: 1fr;
             }
@@ -428,7 +434,7 @@
             </div>
 
             <div id="schedule-list" class="cal-grid">
-                <div class="col-span-3 text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
+                <div style="grid-column: 1 / -1;" class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
             </div>
 
             <div class="flex justify-center mt-5 md:hidden">
@@ -502,7 +508,7 @@
                     grouped[key].items.push(s);
                 });
 
-                const monthCols = Object.values(grouped).slice(0, 3); // tối đa 3 tháng
+                const monthCols = Object.values(grouped); // hiển thị tất cả các tháng
 
                 let html = '';
                 monthCols.forEach(col => {
