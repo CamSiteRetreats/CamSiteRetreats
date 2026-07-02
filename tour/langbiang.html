@@ -438,21 +438,21 @@
                         </div>
                         <h4 class="text-lg font-bold text-primary mb-2 mt-2">1. Khách hàng tự di chuyển (Đón tại Đà Lạt)</h4>
                         <p class="text-sm text-gray-600 leading-relaxed italic font-medium">
-                            Có mặt tại <strong>Homestay CP 12</strong> lúc <strong>6:00</strong> sáng. Tại đây có khu vực gửi đồ, nhà vệ sinh và chỗ nghỉ ngơi thoải mái nếu bạn cần.
+                            Anh chị có thể tự túc di chuyển lên Đà Lạt trước. Đội ngũ sẽ hỗ trợ đón anh chị tại bến xe Liên Tỉnh lúc <strong>3h00 sáng</strong> hoặc các điểm đón thuận tiện khác ở Đà Lạt. Sau khi kết thúc hành trình trekking lúc 10h00, đoàn sẽ di chuyển về homestay để nhận phòng và nghỉ ngơi tự do.
                         </p>
                     </div>
 
                     <div class="space-y-6">
                         <h4 class="text-lg font-bold text-gray-800 uppercase mb-4">2. Khách hàng di chuyển cùng đoàn</h4>
                         
-                        <!-- Timeline -->
+                        <!-- Day 0: Accordion (Starts Open) -->
                         <div class="relative pl-8 itinerary-step active">
                             <div class="absolute left-[-5px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-md transition-colors duration-300"
                                 id="dot-day-0"></div>
                             <button onclick="toggleDay(0)" class="w-full text-left group">
                                 <div class="flex justify-between items-center mb-4">
                                     <h4 class="text-lg font-bold text-primary uppercase group-hover:text-primary transition-colors">
-                                        Lộ trình chi tiết</h4>
+                                        Ngày 0: Khởi hành</h4>
                                     <i data-lucide="chevron-down"
                                         class="w-5 h-5 text-gray-400 group-hover:text-primary transition-transform duration-300"
                                         id="icon-day-0" style="transform: rotate(180deg);"></i>
@@ -460,35 +460,53 @@
                             </button>
                             <div id="content-day-0" class="space-y-4 overflow-hidden pb-6">
                                 <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">22h30:</span>
-                                    <span class="font-light italic text-gray-600">Đón khách tại Hàng Xanh</span>
+                                    <span class="font-bold text-gray-800 shrink-0">18h30:</span>
+                                    <span class="font-light italic text-gray-600">Tập trung tại bến xe Miền Tây<br>
+                                    <span class="text-xs font-semibold text-primary/80 block mt-1">(Anh chị có thể tự túc di chuyển và đội ngũ sẽ hỗ trợ đón ở Đà Lạt)</span></span>
                                 </div>
                                 <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">23h30:</span>
-                                    <span class="font-light italic text-gray-600">Đón khách tại Bến Xe Miền Đông Mới</span>
+                                    <span class="font-bold text-gray-800 shrink-0">19h00:</span>
+                                    <span class="font-light italic text-gray-600">Khởi hành đến Đà Lạt</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Day 1: Accordion -->
+                        <div class="relative pl-8 itinerary-step">
+                            <div class="absolute left-[-5px] top-0 w-4 h-4 rounded-full bg-gray-300 border-4 border-white shadow-md transition-colors duration-300"
+                                id="dot-day-1"></div>
+                            <button onclick="toggleDay(1)" class="w-full text-left group">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-lg font-bold text-primary uppercase group-hover:text-primary transition-colors">
+                                        Ngày 1: Chinh phục Langbiang</h4>
+                                    <i data-lucide="chevron-down"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-primary transition-transform duration-300"
+                                        id="icon-day-1"></i>
+                                </div>
+                            </button>
+                            <div id="content-day-1" class="hidden space-y-4 overflow-hidden pb-6">
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">03h00:</span>
+                                    <span class="font-light italic text-gray-600">Có mặt tại bến xe Liên Tỉnh, vệ sinh cá nhân</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">03h30:</span>
+                                    <span class="font-light italic text-gray-600">Lên xe 16 chỗ di chuyển đến Langbiang, có thể gửi đồ lại xe 16 chỗ</span>
+                                </div>
+                                <div class="flex gap-3 text-base">
+                                    <span class="font-bold text-gray-800 shrink-0">04h00:</span>
+                                    <span class="font-light italic text-gray-600">Bắt đầu trekking giữa ban sớm</span>
                                 </div>
                                 <div class="flex gap-3 text-base border-l-2 border-primary/20 pl-4 py-1 bg-primary/5 rounded-r-lg">
-                                    <span class="font-bold text-gray-800 shrink-0">05h30:</span>
-                                    <span class="font-light italic text-gray-600 font-semibold">Đến Đà Lạt, trung chuyển về Homestay CP 12 (228/6 Phù Đổng Thiên Vương) vệ sinh cá nhân - ăn sáng</span>
+                                    <span class="font-bold text-gray-800 shrink-0">06h30:</span>
+                                    <span class="font-light italic text-gray-600 font-semibold text-gray-800">Checkin đỉnh Langbiang, đón nắng sớm, ăn sáng nhẹ</span>
                                 </div>
                                 <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">07h00:</span>
-                                    <span class="font-light italic text-gray-600">Lên xe trung chuyển vào Langbiang</span>
+                                    <span class="font-bold text-gray-800 shrink-0">10h00:</span>
+                                    <span class="font-light italic text-gray-600">Kết thúc hành trình, di chuyển về homestay và hoạt động tự do</span>
                                 </div>
                                 <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">11h00:</span>
-                                    <span class="font-light italic text-gray-600">Checkin đỉnh Langbiang - Nóc Nhà Đà Lạt</span>
-                                </div>
-                                <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">12h30:</span>
-                                    <span class="font-light italic text-gray-600">Thưởng thức bữa ăn trưa tại rừng thông</span>
-                                </div>
-                                <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">15h00:</span>
-                                    <span class="font-light italic text-gray-600">Kết thúc hành trình, quay về homestay tắm thay và hoạt động tự do</span>
-                                </div>
-                                <div class="flex gap-3 text-base">
-                                    <span class="font-bold text-gray-800 shrink-0">22h00:</span>
+                                    <span class="font-bold text-gray-800 shrink-0">21h30:</span>
                                     <span class="font-light italic text-gray-600">Lên xe quay về lại HCM</span>
                                 </div>
                             </div>
