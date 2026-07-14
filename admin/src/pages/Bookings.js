@@ -39,11 +39,11 @@ export const render = () => {
                           <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Chờ Cọc
                           </button>
-                          <!-- <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
-                              Sắp Tham Gia
-                          </button> -->
+                          <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                              Đã cọc
+                          </button>
                           <button data-tab="ready" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
-                              Chờ Lên Xe
+                              Đã Hoàn Tất
                           </button>
                           <button data-tab="completed" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Lịch Sử
@@ -878,9 +878,9 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (bStatus === 'Chờ cọc' || bStatus === 'Chờ xác nhận cọc' || bStatus === '') && isFuture;
             } else if (activeTab === 'upcoming') {
-                tabMatch = false;
+                tabMatch = (bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)' || bStatus === 'Hoàn tất phí') && !isFullyPaid && isFuture;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Hoàn tất phí' || bStatus === 'Hoàn tất' || bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
+                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Hoàn tất') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
             } else if (activeTab === 'completed') {
                 tabMatch = !isFuture || bStatus === 'Đã đi' || bStatus === 'Đã hủy' || bStatus === 'Bảo lưu';
             }
@@ -987,10 +987,10 @@ export const afterRender = () => {
             if (statTotalRevenue) statTotalRevenue.textContent = waitingConfirmationCount + ' Khách';
             if (statTotalCollected) statTotalCollected.textContent = partialPaidCount + ' Khách';
         } else if (activeTab === 'ready') {
-            // Dashboard cho Khách Chờ Lên Xe
-            if (statTitle1) statTitle1.textContent = 'Khách Sẵn Sàng (Full)';
+            // Dashboard cho Khách Đã Hoàn Tất
+            if (statTitle1) statTitle1.textContent = 'Khách Đã Hoàn Tất';
             if (statTitle2) statTitle2.textContent = 'Tổng Doanh Thu Tab';
-            if (statTitle3) statTitle3.textContent = 'Thực Thu (Full Tận Nơi)';
+            if (statTitle3) statTitle3.textContent = 'Thực Thu';
 
             let totalRevenueSum = 0;
             let totalCollectedSum = 0;
@@ -1025,7 +1025,7 @@ export const afterRender = () => {
 
         const colSpan = isDetailView ? 8 : 4;
         if (!filteredData || filteredData.length === 0) {
-            let emptyMsg = activeTab === 'consult' ? 'Chưa có khách hàng tư vấn nào.' : (activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : (activeTab === 'ready' ? 'Chưa có khách sẵn sàng.' : 'Danh sách rỗng.')));
+            let emptyMsg = activeTab === 'consult' ? 'Chưa có khách hàng tư vấn nào.' : (activeTab === 'pending' ? 'Chưa có Khách chờ cọc.' : (activeTab === 'upcoming' ? 'Chưa có Khách nào Đã Cọc.' : (activeTab === 'ready' ? 'Chưa có khách hoàn tất.' : 'Danh sách rỗng.')));
             tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-gray-500">${emptyMsg}</td></tr>`;
             return;
         }
@@ -1393,9 +1393,9 @@ export const afterRender = () => {
                 } else if (activeTab === 'pending') {
                     tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
                 } else if (activeTab === 'upcoming') {
-                    tabMatch = false;
+                    tabMatch = (b.status === 'Đã cọc' || b.status === 'Đã cọc (Chờ đi)' || b.status === 'Hoàn tất phí') && !isFullyPaid && !isDonePast;
                 } else if (activeTab === 'ready') {
-                    tabMatch = (isFullyPaid || b.status === 'Hoàn thành' || b.status === 'Hoàn tất phí' || b.status === 'Hoàn tất' || b.status === 'Đã cọc' || b.status === 'Đã cọc (Chờ đi)') && !isDonePast;
+                    tabMatch = (isFullyPaid || b.status === 'Hoàn thành' || b.status === 'Hoàn tất') && !isDonePast;
                 } else if (activeTab === 'completed') {
                     tabMatch = isDonePast;
                 }
