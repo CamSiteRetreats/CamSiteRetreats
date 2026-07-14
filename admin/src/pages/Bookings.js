@@ -1056,16 +1056,18 @@ export const afterRender = () => {
                     statusBadge = '<span class="bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">❌ Đã hủy</span>';
                 } else if (b.status === 'Bảo lưu') {
                     statusBadge = '<span class="bg-gray-100 text-gray-500 border border-gray-300 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">⏸️ Bảo lưu</span>';
-                } else if (b.status === 'Hoàn tất phí') {
-                    statusBadge = '<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-bold block w-full text-center">Hoàn Tất Phí</span>';
                 } else if (b.status === 'Hoàn thành' || b.status === 'Đã đi') {
                     statusBadge = '<span class="bg-violet-100 text-violet-700 border border-violet-200 px-2 py-0.5 rounded text-xs block w-full text-center font-bold">Hoàn Thành</span>';
                 } else if (b.status === 'Chờ xác nhận cọc') {
                     statusBadge = `<button class="action-btn confirm-deposit-btn bg-csr-orange text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm hover:bg-[#d65503] w-full" data-id="${b.id}">Xác nhận cọc</button>`;
                 } else if (depositPrice > 0 && remainPrice === 0) {
-                    statusBadge = '<span class="bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Hoàn tất phí</span>';
+                    // Đã thanh toán toàn bộ (deposit == total)
+                    statusBadge = '<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-bold block w-full text-center">✅ Hoàn Tất Phí</span>';
+                } else if (b.status === 'Hoàn tất phí' || depositPrice > 0) {
+                    // Đã cọc (bao gồm trạng thái "Hoàn tất phí" từ form khách → Chờ lên xe)
+                    statusBadge = '<span class="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">✅ Đã Cọc</span>';
                 } else {
-                    statusBadge = '<span class="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Đã Cọc</span>';
+                    statusBadge = '<span class="bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded text-xs font-medium block w-full text-center">Chưa cọc</span>';
                 }
 
                 let invoiceLink = '';
@@ -2641,6 +2643,7 @@ export const afterRender = () => {
                     deposit_required: depositRequired,
                     commitments: true,
                     schedule_id: scheduleId,  // ID lịch cụ thể để phân biệt đoàn cùng ngày
+                    admin_create: true,       // Đơn do admin tạo thủ công → không gửi email
                     // Gán các trường chi tiết
                     dob: dob,
                     gender: gender,

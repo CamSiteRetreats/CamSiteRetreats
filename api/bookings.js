@@ -34,6 +34,9 @@ module.exports = async (req, res) => {
                 const values = [];
                 let idx = 1;
 
+                // Lấy flag customer_submit: true = khách tự điền form, cần gửi email thông báo admin
+                const isCustomerSubmit = body.customer_submit === true;
+
                 // List of possible fields to update
                 const possibleFields = [
                     'name', 'phone', 'tour', 'date', 'status', 'total_price', 'deposit', 'discount',
@@ -62,14 +65,59 @@ module.exports = async (req, res) => {
                 `;
                 const { rows } = await db.query(query, values);
                 if (rows.length === 0) return res.status(404).json({ error: 'Booking not found' });
-                return res.status(200).json(rows[0]);
+                const updatedBooking = rows[0];
+
+                // --- Gửi email thông báo admin khi KHÁCH tự điền form xác nhận thông tin ---
+                if (isCustomerSubmit && updatedBooking) {
+                    const formattedPrice = (updatedBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
+                    const depositReq = (updatedBooking.deposit_required || 1000000).toLocaleString('vi-VN') + 'đ';
+
+                    await sendEmail({
+                        subject: `📋 KHÁCH ĐÃ ĐĂNG KÝ THÔNG TIN: ${updatedBooking.name} - Tour ${updatedBooking.tour}`,
+                        html: `
+                            <div style="font-family: sans-serif; padding: 25px; border: 2px solid #10b981; border-radius: 15px; max-width: 600px;">
+                                <h2 style="color: #10b981; margin-top: 0;">✅ Khách hàng đã hoàn tất điền thông tin đăng ký!</h2>
+                                <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                    <p style="margin: 5px 0;"><b>Mã đơn:</b> <span style="color: #E85D04; font-weight: bold;">#CSR${updatedBooking.id}</span></p>
+                                    <p style="margin: 5px 0;"><b>Tour:</b> ${updatedBooking.tour}</p>
+                                    <p style="margin: 5px 0;"><b>Ngày khởi hành:</b> ${updatedBooking.date}</p>
+                                    <p style="margin: 5px 0;"><b>Tổng tiền:</b> <span style="color: #E85D04; font-size: 18px;">${formattedPrice}</span></p>
+                                    <p style="margin: 5px 0;"><b>Tiền cọc yêu cầu:</b> ${depositReq}</p>
+                                    <p style="margin: 5px 0;"><b>Trạng thái:</b> <span style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-weight: bold;">${updatedBooking.status}</span></p>
+                                </div>
+                                
+                                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Thông tin khách hàng đã đăng ký</h3>
+                                <p><b>Họ và tên:</b> ${updatedBooking.name}</p>
+                                <p><b>Số điện thoại:</b> ${updatedBooking.phone}</p>
+                                <p><b>Link Zalo:</b> <a href="https://zalo.me/${updatedBooking.phone}">https://zalo.me/${updatedBooking.phone}</a></p>
+                                <p><b>CCCD:</b> ${updatedBooking.id_card || '(Chưa cung cấp)'}</p>
+                                <p><b>Ngày sinh:</b> ${updatedBooking.dob || '(Chưa cung cấp)'}</p>
+                                <p><b>Địa chỉ:</b> ${updatedBooking.address || '(Chưa cung cấp)'}</p>
+                                <p><b>Điểm đón:</b> ${updatedBooking.pickup_point || '(Chưa chọn)'}</p>
+                                
+                                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Yêu cầu đặc biệt</h3>
+                                <p><b>Ăn uống:</b> ${updatedBooking.diet || 'Bình thường'}</p>
+                                <p><b>Gậy trekking:</b> ${updatedBooking.trekking_pole || 'Không'}</p>
+                                <p><b>Dị ứng/Lưu ý:</b> ${updatedBooking.allergy || 'Không'}</p>
+                                <p><b>Yêu cầu thêm:</b> ${updatedBooking.special || '(Không có)'}</p>
+                                
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+                                <p style="text-align:center; font-size:13px; color: #6b7280;">📌 Vui lòng xác nhận đơn và hướng dẫn khách chuyển khoản cọc.</p>
+                                <p style="font-size: 11px; color: #999; text-align: center;">Hệ thống CAM SITE RETREATS - Tự động thông báo</p>
+                            </div>
+                        `
+                    }).catch(err => console.warn('[Mail] Customer submit notify error:', err));
+                }
+
+                return res.status(200).json(updatedBooking);
             } else {
                 // Insert
                 const {
                     name, phone, tour, date, status, total_price, deposit, discount,
                     sale_id, sale_name, customer_id, dob, gender, address,
                     id_card, diet, trekking_pole, allergy, special, medal_name, commitments, deposit_required,
-                    services_booked, coupon_code, pickup_point
+                    services_booked, coupon_code, pickup_point,
+                    admin_create // flag: true = admin tạo thủ công, không gửi email
                 } = body;
 
                 const query = `
@@ -92,8 +140,9 @@ module.exports = async (req, res) => {
                 const newBooking = rows[0];
 
                 // --- Send Email Notification ---
+                // Chỉ gửi email khi khách tự đặt từ website (admin_create != true)
                 let mailStatus = null;
-                if (newBooking) {
+                if (newBooking && !admin_create) {
                     const formattedPrice = (newBooking.total_price || 0).toLocaleString('vi-VN') + 'đ';
                     const formattedDeposit = (newBooking.deposit || 0).toLocaleString('vi-VN') + 'đ';
 

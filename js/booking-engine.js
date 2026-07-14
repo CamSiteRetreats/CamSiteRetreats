@@ -800,6 +800,8 @@ const BookingEngine = {
         if (isUpdate) {
             // Khi khách hàng cập nhật thông tin qua form, tự động đẩy trạng thái sang 'Hoàn tất phí' (Chờ lên xe)
             payload.status = 'Hoàn tất phí';
+            // Đánh dấu đây là khách tự điền form → API sẽ gửi email thông báo admin
+            payload.customer_submit = true;
         } else {
             // Chỉ gán deposit và status mặc định khi TẠO MỚI, tránh ghi đè dữ liệu của Admin
             payload.deposit_required = this.getDepositAmount();
