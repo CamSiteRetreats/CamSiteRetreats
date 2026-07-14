@@ -39,9 +39,9 @@ export const render = () => {
                           <button data-tab="pending" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Chờ Cọc
                           </button>
-                          <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                          <!-- <button data-tab="upcoming" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Sắp Tham Gia
-                          </button>
+                          </button> -->
                           <button data-tab="ready" class="tab-btn border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                               Chờ Lên Xe
                           </button>
@@ -878,9 +878,9 @@ export const afterRender = () => {
             } else if (activeTab === 'pending') {
                 tabMatch = (bStatus === 'Chờ cọc' || bStatus === 'Chờ xác nhận cọc' || bStatus === '') && isFuture;
             } else if (activeTab === 'upcoming') {
-                tabMatch = (bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)') && !isFullyPaid && isFuture;
+                tabMatch = false;
             } else if (activeTab === 'ready') {
-                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Hoàn tất phí' || bStatus === 'Hoàn tất') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
+                tabMatch = (isFullyPaid || bStatus === 'Hoàn thành' || bStatus === 'Hoàn tất phí' || bStatus === 'Hoàn tất' || bStatus === 'Đã cọc' || bStatus === 'Đã cọc (Chờ đi)') && isFuture && bStatus !== 'Đã hủy' && bStatus !== 'Bảo lưu';
             } else if (activeTab === 'completed') {
                 tabMatch = !isFuture || bStatus === 'Đã đi' || bStatus === 'Đã hủy' || bStatus === 'Bảo lưu';
             }
@@ -1393,9 +1393,9 @@ export const afterRender = () => {
                 } else if (activeTab === 'pending') {
                     tabMatch = (!b.status || b.status === 'Chờ cọc') && !isDonePast;
                 } else if (activeTab === 'upcoming') {
-                    tabMatch = b.status && b.status !== 'Chờ tư vấn' && b.status !== 'Chờ cọc' && !isFullyPaid && b.status !== 'Hoàn thành' && !isDonePast;
+                    tabMatch = false;
                 } else if (activeTab === 'ready') {
-                    tabMatch = (isFullyPaid || b.status === 'Hoàn thành') && !isDonePast;
+                    tabMatch = (isFullyPaid || b.status === 'Hoàn thành' || b.status === 'Hoàn tất phí' || b.status === 'Hoàn tất' || b.status === 'Đã cọc' || b.status === 'Đã cọc (Chờ đi)') && !isDonePast;
                 } else if (activeTab === 'completed') {
                     tabMatch = isDonePast;
                 }
