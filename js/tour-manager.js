@@ -310,6 +310,7 @@ const TourManager = {
                 price: 3050000,
                 level: 'Trung Bình',
                 url: '#',
+                is_visible: false,
                 shortDesc: 'Trải nghiệm đu dây vượt thác đầy phấn khích tại một trong những con thác hoang sơ nhất.',
                 defaultSchedules: [
                     { date: '10/03 - 11/03', slots: 6, status: 'Đang mở' }
