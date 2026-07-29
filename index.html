@@ -370,8 +370,10 @@
                 </a>
             </div>
 
-            <div id="schedule-list" class="cal-grid">
-                <div style="grid-column: 1 / -1;" class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
+            <div class="bg-white rounded-[32px] p-6 md:p-10 shadow-[0_20px_50px_rgba(232,93,4,0.03)] border border-gray-100/80">
+                <div id="schedule-list" class="cal-grid">
+                    <div style="grid-column: 1 / -1;" class="text-center py-8 text-gray-400 text-sm">Đang tải lịch trình...</div>
+                </div>
             </div>
 
             <div class="flex justify-center mt-5 md:hidden">
@@ -407,10 +409,27 @@
                 return `${d.getDate()}/${d.getMonth() + 1}`;
             };
 
-            const vehicleLabels = {
-                'solati_16': 'Xe 16 chỗ',
-                'limo_34': 'Xe Limousine 34 chỗ',
-                'sleeper_45': 'Xe Giường nằm 45 chỗ'
+            // Dynamic specs lookup map from tour detail pages
+            const tourSpecs = {
+                'tà năng - phan dũng': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe giường nằm' },
+                'bidoup tà giang': { groupSize: 'Khoảng 15 khách', vehicle: 'Xe giường nằm' },
+                'thác liêng ài': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' },
+                'thác mưa bay': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' },
+                'kỳ quan sang': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe giường nằm' },
+                'bạch mộc lương tử': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe giường nằm' },
+                'bạch mộc': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe giường nằm' },
+                'yang đoan': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' },
+                'yangdoan': { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' },
+                'langbiang': { groupSize: 'Khoảng 10 khách', vehicle: 'Xe Phương Trang' }
+            };
+
+            const getTourSpecs = (tourName) => {
+                if (!tourName) return { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' };
+                const norm = tourName.toLowerCase().trim();
+                if (tourSpecs[norm]) return tourSpecs[norm];
+                const key = Object.keys(tourSpecs).find(k => norm.includes(k) || k.includes(norm));
+                if (key) return tourSpecs[key];
+                return { groupSize: 'Khoảng 13 khách', vehicle: 'Xe 16 chỗ' };
             };
 
             try {
@@ -545,7 +564,9 @@
                         const tourPrice = tourInfo ? formatPrice(tourInfo.price) : 'Liên hệ';
                         const tourDuration = tourInfo && tourInfo.duration ? tourInfo.duration : 'Đang cập nhật';
                         const tourDesc = tourInfo && (tourInfo.short_desc || tourInfo.shortDesc) ? (tourInfo.short_desc || tourInfo.shortDesc) : 'Trải nghiệm hành trình tuyệt vời cùng Cam Site Retreats.';
-                        const vehicleLabel = vehicleLabels[s.vehicle_type] || 'Xe 16 chỗ';
+                        
+                        // Specs from tour details
+                        const specs = getTourSpecs(s.tour_name);
 
                         html += `
                         <a href="${tourUrl}" class="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 border border-gray-100/50 relative cursor-pointer text-decoration-none">
@@ -570,14 +591,14 @@
                             
                             <!-- Arrow Icon -->
                             <div class="ml-auto text-gray-300 group-hover:text-[#E85D04] group-hover:translate-x-1 transition-all duration-300 shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>
                                 </svg>
                             </div>
 
                             <!-- Popup Hover (Tooltip) -->
-                            <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[320px] bg-white rounded-2xl p-5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left">
+                            <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[320px] bg-white rounded-2xl p-5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left animate-duration-150">
                                 <h5 class="text-gray-900 font-extrabold text-base mb-3 leading-snug">${s.tour_name}</h5>
                                 
                                 <div class="flex flex-col gap-2.5">
@@ -606,7 +627,7 @@
                                             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                         </svg>
-                                        <span>Tối đa ${slots} khách</span>
+                                        <span>${specs.groupSize}</span>
                                     </div>
                                     <!-- Vehicle -->
                                     <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
@@ -617,7 +638,7 @@
                                             <circle cx="7" cy="18" r="1"></circle>
                                             <circle cx="17" cy="18" r="1"></circle>
                                         </svg>
-                                        <span>${vehicleLabel}</span>
+                                        <span>${specs.vehicle}</span>
                                     </div>
                                 </div>
 
