@@ -323,101 +323,38 @@
     <style>
         .cal-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
         @media (max-width: 1024px) {
             .cal-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
             }
         }
 
         @media (max-width: 640px) {
             .cal-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
         }
 
-        .cal-col {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #f0f0f0;
-            overflow: hidden;
+        /* Tooltip FadeIn Animation */
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 8px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
         }
 
-        .cal-col-header {
-            background: #E85D04;
-            color: white;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 10px 16px;
-        }
-
-        .cal-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 14px;
-            border-bottom: 1px solid #f5f5f5;
-            text-decoration: none;
-            transition: background 0.15s;
-        }
-
-        .cal-item:last-child {
-            border-bottom: none;
-        }
-
-        .cal-item:hover {
-            background: #FFF8F0;
-        }
-
-        .cal-date {
-            font-size: 11px;
-            font-weight: 800;
-            color: #E85D04;
-            background: #FFF8F0;
-            padding: 2px 8px;
-            border-radius: 999px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .cal-tour {
-            font-size: 11px;
-            font-weight: 600;
-            color: #374151;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-        }
-
-        .cal-status {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 999px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .cs-green {
-            background: #ECFDF5;
-            color: #059669;
-        }
-
-        .cs-orange {
-            background: #FFF7ED;
-            color: #D97706;
-        }
-
-        .cs-red {
-            background: #FEF2F2;
-            color: #DC2626;
+        .animate-tooltip {
+            animation: tooltipFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
 
@@ -470,9 +407,43 @@
                 return `${d.getDate()}/${d.getMonth() + 1}`;
             };
 
+            const vehicleLabels = {
+                'solati_16': 'Xe 16 chỗ',
+                'limo_34': 'Xe Limousine 34 chỗ',
+                'sleeper_45': 'Xe Giường nằm 45 chỗ'
+            };
+
             try {
-                const res = await fetch('/api/schedules?t=' + Date.now());
-                const all = await res.json();
+                // Fetch schedules and tours concurrently to map details
+                const [schedulesRes, toursRes] = await Promise.all([
+                    fetch('/api/schedules?t=' + Date.now()),
+                    fetch('/api/tours?t=' + Date.now()).catch(() => null)
+                ]);
+                
+                const all = await schedulesRes.json();
+                let allTours = [];
+                if (toursRes && toursRes.ok) {
+                    allTours = await toursRes.json();
+                } else if (typeof TourManager !== 'undefined') {
+                    allTours = TourManager.getAllTours();
+                }
+
+                // Map tours by name for quick lookup
+                const toursMap = {};
+                allTours.forEach(t => {
+                    if (t.name) {
+                        toursMap[t.name.toLowerCase().trim()] = t;
+                    }
+                });
+
+                const findTourInfo = (tourName) => {
+                    if (!tourName) return null;
+                    const normName = tourName.toLowerCase().trim();
+                    if (toursMap[normName]) return toursMap[normName];
+                    const key = Object.keys(toursMap).find(k => normName.includes(k) || k.includes(normName));
+                    if (key) return toursMap[key];
+                    return null;
+                };
 
                 const today = new Date(); today.setHours(0, 0, 0, 0);
                 const upcoming = all
@@ -511,9 +482,26 @@
                 const monthCols = Object.values(grouped); // hiển thị tất cả các tháng
 
                 let html = '';
-                monthCols.forEach(col => {
-                    html += `<div class="cal-col">
-                        <div class="cal-col-header">${col.label}</div>`;
+                monthCols.forEach((col, colIdx) => {
+                    const isLastColumn = colIdx === monthCols.length - 1;
+
+                    html += `
+                    <div class="flex flex-col gap-6">
+                        <!-- Column Header -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-sm shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 tracking-wide">${col.label}</h3>
+                        </div>
+                        
+                        <!-- Cards List -->
+                        <div class="flex flex-col gap-4">`;
 
                     col.items.forEach(s => {
                         const booked = parseInt(s.booked_count) || 0;
@@ -521,25 +509,140 @@
                         const remaining = Math.max(0, slots - booked);
 
                         let statusClass, statusText;
-                        if (remaining <= 3) { statusClass = 'cs-orange'; statusText = `Còn ${remaining}`; }
-                        else { statusClass = 'cs-green'; statusText = `Còn ${remaining}`; }
+                        if (remaining <= 3) {
+                            statusClass = 'bg-orange-50 text-orange-600';
+                            statusText = `Chỉ còn ${remaining} suất`;
+                        } else {
+                            statusClass = 'bg-emerald-50 text-emerald-600';
+                            statusText = `Còn ${remaining} chỗ`;
+                        }
 
                         const startFmt = fmtDate(s.start_date);
                         const endFmt = s.end_date ? fmtDate(s.end_date) : '';
-                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}–${endFmt}` : startFmt;
+                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt} - ${endFmt}` : startFmt;
 
-                        const link = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k))
-                            ? tourLinks[Object.keys(tourLinks).find(k => s.tour_name.includes(k))]
-                            : '#';
+                        // Find tour details for Image, URL, and Popup Info
+                        const tourInfo = findTourInfo(s.tour_name);
+                        const tourImage = tourInfo && tourInfo.image ? tourInfo.image : 'logo.png';
+                        
+                        let tourUrl = '#';
+                        if (tourInfo && tourInfo.url) {
+                            tourUrl = tourInfo.url.startsWith('/') ? tourInfo.url : '/' + tourInfo.url;
+                        } else {
+                            const mappedKey = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k));
+                            if (mappedKey) tourUrl = tourLinks[mappedKey];
+                        }
 
-                        html += `<a class="cal-item" href="${link}">
-                            <span class="cal-date">${dateLabel}</span>
-                            <span class="cal-tour">${s.tour_name}</span>
-                            <span class="cal-status ${statusClass}">${statusText}</span>
+                        const formatPrice = (price) => {
+                            if (!price || price === 'Update' || (typeof price === 'string' && price.toLowerCase().includes('update'))) {
+                                return 'Liên hệ';
+                            }
+                            const numericPrice = parseInt(price);
+                            if (isNaN(numericPrice) || numericPrice === 0) return 'Liên hệ';
+                            return numericPrice.toLocaleString('vi-VN') + 'đ';
+                        };
+
+                        const tourPrice = tourInfo ? formatPrice(tourInfo.price) : 'Liên hệ';
+                        const tourDuration = tourInfo && tourInfo.duration ? tourInfo.duration : 'Đang cập nhật';
+                        const tourDesc = tourInfo && (tourInfo.short_desc || tourInfo.shortDesc) ? (tourInfo.short_desc || tourInfo.shortDesc) : 'Trải nghiệm hành trình tuyệt vời cùng Cam Site Retreats.';
+                        const vehicleLabel = vehicleLabels[s.vehicle_type] || 'Xe 16 chỗ';
+
+                        html += `
+                        <a href="${tourUrl}" class="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 border border-gray-100/50 relative cursor-pointer text-decoration-none">
+                            <!-- Thumbnail Image -->
+                            <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100 shadow-sm relative">
+                                <img src="${tourImage}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${s.tour_name}" onerror="this.src='logo.png'">
+                            </div>
+                            
+                            <!-- Details -->
+                            <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+                                <!-- Date range -->
+                                <span class="text-[11px] font-extrabold text-[#E85D04] tracking-wide uppercase">${dateLabel}</span>
+                                <!-- Tour name -->
+                                <h4 class="text-sm md:text-base font-bold text-gray-800 tracking-wide line-clamp-1 group-hover:text-[#E85D04] transition-colors">${s.tour_name}</h4>
+                                <!-- Remaining Slots Badge -->
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${statusClass}">
+                                        ${statusText}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Arrow Icon -->
+                            <div class="ml-auto text-gray-300 group-hover:text-[#E85D04] group-hover:translate-x-1 transition-all duration-300 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </div>
+
+                            <!-- Popup Hover (Tooltip) -->
+                            <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[320px] bg-white rounded-2xl p-5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left">
+                                <h5 class="text-gray-900 font-extrabold text-base mb-3 leading-snug">${s.tour_name}</h5>
+                                
+                                <div class="flex flex-col gap-2.5">
+                                    <!-- Duration -->
+                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        <span>${tourDuration}</span>
+                                    </div>
+                                    <!-- Price -->
+                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                            <line x1="12" y1="10" x2="12" y2="14"></line>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                        </svg>
+                                        <span class="text-[#E85D04] font-black text-sm">${tourPrice}</span>
+                                    </div>
+                                    <!-- Slots -->
+                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                        <span>Tối đa ${slots} khách</span>
+                                    </div>
+                                    <!-- Vehicle -->
+                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="10" width="18" height="12" rx="2"></rect>
+                                            <path d="M12 2v8"></path>
+                                            <path d="M9 6h6"></path>
+                                            <circle cx="7" cy="18" r="1"></circle>
+                                            <circle cx="17" cy="18" r="1"></circle>
+                                        </svg>
+                                        <span>${vehicleLabel}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="text-gray-400 text-xs italic mt-3 pt-3 border-t border-gray-100 line-clamp-2 leading-relaxed">
+                                    ${tourDesc}
+                                </div>
+
+                                <!-- Tooltip Arrow -->
+                                <div class="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-gray-100/80 rotate-45 pointer-events-none"></div>
+                            </div>
                         </a>`;
                     });
 
-                    html += `</div>`;
+                    // Add dashed placeholder for last column
+                    if (isLastColumn) {
+                        html += `
+                        <div class="border-2 border-dashed border-gray-200/80 rounded-2xl p-4 flex items-center justify-center bg-gray-50/20 mt-1 min-h-[96px]">
+                            <span class="text-xs font-medium italic text-gray-400">More expeditions coming soon...</span>
+                        </div>`;
+                    }
+
+                    html += `
+                        </div>
+                    </div>`;
                 });
 
                 container.innerHTML = html;

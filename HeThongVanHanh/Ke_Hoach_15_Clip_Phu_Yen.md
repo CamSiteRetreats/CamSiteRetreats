@@ -9,12 +9,12 @@ Tài liệu này vạch ra kịch bản chi tiết cho chuỗi **15 video ngắn
 
 Để đảm bảo tính nhất quán của thương hiệu, việc phân bổ tư liệu hình ảnh và nội dung giữa 3 kênh được quy định rõ ràng như sau:
 
-1.  **Kênh Cam Quýt (Kênh cá nhân Founder):** Sử dụng **tư liệu quay mới trực tiếp tại Phú Yên** kết hợp kể chuyện (Storytelling). Tập trung vào thông điệp: *Thay đổi văn phòng làm việc từ xa để tìm cảm hứng thiết kế, vận hành tour cọc 2/9 tốt nhất cho khách.* Kênh này sẽ dẫn dắt người xem click sang kênh thương hiệu.
-2.  **Kênh Cam Site Retreats (Kênh Branding):** Tuyệt đối không nhắc tới Phú Yên. Sử dụng **100% tư liệu sẵn có (Footage lưu trữ)** về các dịch vụ cắm trại, ăn uống, lều trại cao cấp của CAM để thuyết phục khách hàng về chất lượng dịch vụ.
-3.  **Kênh Tà Năng Phan Dũng (Kênh chuyên tuyến):** Tuyệt đối không nhắc tới Phú Yên. Sử dụng **100% tư liệu sẵn có (Footage lưu trữ)** về cảnh đồi cỏ xanh, biển mây, dốc núi Tà Năng thực tế để đánh thẳng vào nhu cầu chinh phục và hướng dẫn đi tour trực tiếp.
+1.  **Kênh Cam Quýt (Kênh cá nhân Founder):** Sử dụng **tư liệu hình ảnh từ chuyến đi xa của Founder** kết hợp kể chuyện (Storytelling) dã ngoại mộc mạc. Tập trung vào thông điệp: *Thay đổi văn phòng làm việc ra giữa thiên nhiên để tìm cảm hứng thiết kế, vận hành tour cọc 2/9 tốt nhất cho khách.* Kênh này sẽ dẫn dắt người xem click sang kênh thương hiệu.
+2.  **Kênh Cam Site Retreats (Kênh Branding):** Tuyệt đối không nhắc tới chuyến đi xa hay địa danh không liên quan. Sử dụng **100% tư liệu sẵn có (Footage lưu trữ)** về các dịch vụ cắm trại, ăn uống, lều trại cao cấp của CAM để thuyết phục khách hàng về chất lượng dịch vụ.
+3.  **Kênh Tà Năng Phan Dũng (Kênh chuyên tuyến):** Tuyệt đối không nhắc tới chuyến đi xa hay địa danh không liên quan. Sử dụng **100% tư liệu sẵn có (Footage lưu trữ)** về cảnh đồi cỏ xanh, biển mây, dốc núi Tà Năng thực tế để chốt booking trực tiếp.
 
 ```
-[KÊNH CAM QUÝT] ➡️ Kể chuyện tìm cảm hứng tại Phú Yên, nói về việc nâng cấp dịch vụ cho CAM.
+[KÊNH CAM QUÝT] ➡️ Kể chuyện đi tìm cảm hứng dã ngoại ven biển, nâng cấp dịch vụ cho CAM.
        ⬇️ (Điều hướng khách xem tư liệu thực tế)
 [KÊNH CAM SITE / TÀ NĂNG] ➡️ Show tư liệu sẵn có (ẩm thực, lều bạt, đồi cỏ Tà Năng) để chốt booking.
 ```
@@ -25,30 +25,30 @@ Tài liệu này vạch ra kịch bản chi tiết cho chuỗi **15 video ngắn
 
 ---
 
-### KÊNH 1: CAM QUÝT (Thương hiệu cá nhân - Tư liệu mới quay tại Phú Yên)
+### KÊNH 1: CAM QUÝT (Thương hiệu cá nhân - Tư liệu mới quay ngoài thiên nhiên)
 *Vibe: Tự do, năng động, kể chuyện hậu trường thiết kế và vận hành tour từ xa.*
 
-#### 🎥 Clip 1: "Mình đã bê chiếc bàn làm việc Sài Gòn ra biển Phú Yên để tìm ý tưởng thế nào?"
-*   **Bối cảnh quay:** Cảnh ngồi gõ máy tính trên bãi cỏ Mũi Điện hoặc bãi biển Phú Yên.
-*   **Nội dung/Script:** *"Có người bảo: Bí ý tưởng thì hãy chọn đi đâu đó để khai phá tư duy. Mình quyết định mang văn phòng của CAM SITE RETREATS ra trước biển Phú Yên. Thay đổi chỗ ngồi giúp mình có nhiều cảm hứng để tối ưu lại kịch bản chăm sóc khách hàng và chuẩn bị kịch bản đón các đoàn đi tour lễ 2/9 sắp tới."*
+#### 🎥 Clip 1: "Mình đã bê chiếc bàn làm việc Sài Gòn ra biển xanh hoang sơ để tìm ý tưởng thế nào?"
+*   **Bối cảnh quay:** Cảnh ngồi gõ máy tính trên bãi cỏ sát vách đá hoặc bờ biển rộng lộng gió.
+*   **Nội dung/Script:** *"Có người bảo: Bí ý tưởng thì hãy chọn đi đâu đó để khai phá tư duy. Mình quyết định mang văn phòng của CAM SITE RETREATS ra trước biển khơi lộng gió. Thay đổi chỗ ngồi giúp mình có nhiều cảm hứng để tối ưu lại kịch bản chăm sóc khách hàng và chuẩn bị kịch bản đón các đoàn đi tour lễ 2/9 sắp tới."*
 *   **CTA:** *"Lễ này nếu bạn cũng muốn trốn deadline để sạc lại pin, đi rừng cùng Cam và các bạn Quýt nhỏ nhé! Chi tiết các tuyến tour Cam để ở kênh @camsiteretreats nha."*
 
 #### 🎥 Clip 2: "Một ngày làm việc từ xa (Remote Work) của người làm tour dã ngoại có gì?"
-*   **Bối cảnh:** Cảnh dở khóc dở cười: vừa ngắm biển Phú Yên vừa phải ôm laptop check mã cọc SePay, gửi thông tin xe cộ cho đội Support thực địa.
+*   **Bối cảnh:** Cảnh dở khóc dở cười: vừa ngắm biển xanh vừa phải ôm laptop check mã cọc SePay, gửi thông tin xe cộ cho đội Support thực địa.
 *   **Nội dung/Script:** *"Đi du lịch kết hợp làm việc nhìn thì chill nhưng thực tế là cát bay đầy bàn phím và liên tục rep tin nhắn chốt chỗ lễ 2/9. Nhưng cảm giác được tự do di chuyển và tự tay kiểm tra khâu hậu cần cho từng nhóm khách đi Tà Năng từ xa lại là thứ khiến mình cực kỳ nghiện."*
 *   **CTA:** *"CAM chỉ nhận tối đa 17 khách/đoàn dịp lễ để chăm sóc chu đáo nhất. Mọi người xem thử hình ảnh bãi trại của CAM tại kênh thương hiệu nha!"*
 
 #### 🎥 Clip 3: "Chuyến đi tìm kiếm hương vị ẩm thực dã ngoại mới"
-*   **Bối cảnh:** Thưởng thức đặc sản nướng dã ngoại bờ biển Phú Yên, founder ngồi ghi chép ghi lại công thức gia vị.
+*   **Bối cảnh:** Thưởng thức đặc sản nướng dã ngoại ven bờ biển hoang sơ, founder ngồi ghi chép ghi lại công thức gia vị.
 *   **Nội dung/Script:** *"Để khách của CAM SITE RETREATS ăn ngon và chữa lành tốt nhất, đi đến đâu Cam cũng tìm kiếm các công thức gia vị dã ngoại đặc sắc. Cam đang thử nghiệm biến tấu một món nướng đặc trưng biển để mang vào tiệc BBQ đồi thông Tà Năng dịp lễ này. Cả nhà cùng chờ đón nhé!"*
 
 #### 🎥 Clip 4: "Tại sao làm tour chữa lành lại không nhận đoàn quá 17 người?"
-*   **Bối cảnh:** Ngồi uống nước dừa ngắm bãi biển vắng vẻ yên tĩnh tại Phú Yên.
-*   **Nội dung/Script:** *"Lễ ai cũng sợ chen chúc, xô bồ. Đó là lý do từ Phú Yên, Cam vẫn liên tục nhắc nhở đội ngũ Sale: Tuyệt đối không nhận quá 17 khách/đoàn cho tour lễ 2/9. CAM thà nhận ít người để mọi người có không gian tĩnh lặng chữa lành và kết bạn chân tình, còn hơn làm đại trà đông đúc mất chất."*
+*   **Bối cảnh:** Ngồi uống nước dừa ngắm bãi biển vắng vẻ yên tĩnh chiều hoàng hôn.
+*   **Nội dung/Script:** *"Lễ ai cũng sợ chen chúc, xô bồ. Đó là lý do dù đang ở một nơi xa, Cam vẫn liên tục nhắc nhở đội ngũ Sale: Tuyệt đối không nhận quá 17 khách/đoàn cho tour lễ 2/9. CAM thà nhận ít người để mọi người có không gian tĩnh lặng chữa lành và kết bạn chân tình, còn hơn làm đại trà đông đúc mất chất."*
 
 #### 🎥 Clip 5: "Người làm tour thì tự sạc pin tâm hồn bằng cách nào?"
-*   **Bối cảnh:** Founder đi dạo thong dong đón ánh bình minh sớm nhất tại Mũi Điện Phú Yên.
-*   **Nội dung/Script:** *"Cả tuần làm việc hỗ trợ các bạn Quýt nhỏ đặt tour, đây là lúc Cam tự sạc pin cho mình bằng bình minh Mũi Điện. Người thiết kế tour chữa lành phải có một tâm hồn đầy năng lượng thì mới truyền được năng lượng tích cực đó đến các Anh/Chị đi tour cùng tụi mình được."*
+*   **Bối cảnh:** Founder đi dạo thong dong đón ánh bình minh rạng rỡ ngoài chân trời xa bên bờ biển hoang sơ.
+*   **Nội dung/Script:** *"Cả tuần làm việc hỗ trợ các bạn Quýt nhỏ đặt tour, đây là lúc Cam tự sạc pin cho mình bằng bình minh biển khơi. Người thiết kế tour chữa lành phải có một tâm hồn đầy năng lượng thì mới truyền được năng lượng tích cực đó đến các Anh/Chị đi tour cùng tụi mình được."*
 
 ---
 

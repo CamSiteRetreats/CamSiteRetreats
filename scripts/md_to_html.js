@@ -15,6 +15,17 @@ function parseMarkdown(md) {
         .replace(/&lt;!--/g, '<!--')
         .replace(/--&gt;/g, '-->');
 
+    // Restore allowed HTML tags for custom grid layouts and styling
+    html = html
+        .replace(/&lt;div([\s\S]*?)&gt;/g, '<div$1>')
+        .replace(/&lt;\/div&gt;/g, '</div>')
+        .replace(/&lt;img([\s\S]*?)&gt;/g, '<img$1>')
+        .replace(/&lt;p([\s\S]*?)&gt;/g, '<p$1>')
+        .replace(/&lt;\/p&gt;/g, '</p>');
+
+    // Parse standard markdown images ![alt](src)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="my-4 rounded-xl max-w-full mx-auto" />');
+
     // Parse mermaid blocks (hide them in print or represent them simply)
     html = html.replace(/```mermaid([\s\S]*?)```/g, (match, code) => {
         return `<div class="bg-orange-50 border border-orange-200 p-4 rounded-xl my-4 italic text-sm text-orange-800">
