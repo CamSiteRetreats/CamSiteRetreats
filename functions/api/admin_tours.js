@@ -33,7 +33,8 @@ export async function onRequest(context) {
                 region, type, altitude,
                 sort_order, custom_domain, is_visible,
                 form_config, pickup_points, services,
-                itinerary, inclusions, exclusions, preparing, faqs
+                itinerary, inclusions, exclusions, preparing, faqs,
+                specs
             } = body;
 
             if (!name || !duration || !level || !image) {
@@ -69,19 +70,21 @@ export async function onRequest(context) {
                 slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
             }
 
+            const specVal = specs ? JSON.stringify(specs) : '{}';
+
             const rows = await sql`
                 INSERT INTO tours 
                     (name, duration, level, price, image, image2, image3, image4,
                      short_desc, region, type, altitude, sort_order, custom_domain, slug, is_visible,
                      form_config, pickup_points, services,
-                     itinerary, inclusions, exclusions, preparing, faqs) 
+                     itinerary, inclusions, exclusions, preparing, faqs, specs) 
                 VALUES 
                     (${name}, ${duration}, ${level}, ${price || null}, ${image},
                      ${image2 || null}, ${image3 || null}, ${image4 || null},
                      ${desc}, ${region || 'Miền Nam'}, ${type || 'TREKKING'},
                      ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${slugVal}, ${visible},
                      ${fConfig}::jsonb, ${pPoints}::jsonb, ${srvs}::jsonb,
-                     ${itin}::jsonb, ${incl}::jsonb, ${excl}::jsonb, ${prep}::jsonb, ${faqList}::jsonb)
+                     ${itin}::jsonb, ${incl}::jsonb, ${excl}::jsonb, ${prep}::jsonb, ${faqList}::jsonb, ${specVal}::jsonb)
                 RETURNING *
             `;
             response = Response.json({ success: true, message: 'Thêm Tour thành công', data: rows[0] }, { status: 201, headers: corsHeaders });
@@ -97,7 +100,8 @@ export async function onRequest(context) {
                 region, type, altitude,
                 sort_order, custom_domain, is_visible,
                 commission_rate, form_config, pickup_points, services,
-                itinerary, inclusions, exclusions, preparing, faqs
+                itinerary, inclusions, exclusions, preparing, faqs,
+                specs
             } = body;
 
             // Nếu chỉ update commission_rate (từ trang Reports)
@@ -148,6 +152,8 @@ export async function onRequest(context) {
                     slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
                 }
 
+                const specVal = specs ? JSON.stringify(specs) : '{}';
+
                 const rows = await sql`
                     UPDATE tours SET
                         name=${name}, duration=${duration}, level=${level}, price=${price || null},
@@ -156,7 +162,7 @@ export async function onRequest(context) {
                         altitude=${altitude || null}, sort_order=${sort_order || 0},
                         custom_domain=${custom_domain || null}, slug=${slugVal}, is_visible=${visible},
                         itinerary=${itin}::jsonb, inclusions=${incl}::jsonb, exclusions=${excl}::jsonb,
-                        preparing=${prep}::jsonb, faqs=${faqList}::jsonb
+                        preparing=${prep}::jsonb, faqs=${faqList}::jsonb, specs=${specVal}::jsonb
                     WHERE id=${id} RETURNING *
                 `;
 

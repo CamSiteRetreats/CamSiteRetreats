@@ -41,6 +41,7 @@ export async function onRequest(context) {
         const exclusions = Array.isArray(tour.exclusions) ? tour.exclusions : [];
         const preparing = Array.isArray(tour.preparing) ? tour.preparing : [];
         const faqs = Array.isArray(tour.faqs) ? tour.faqs : [];
+        const specs = tour.specs && typeof tour.specs === 'object' ? tour.specs : {};
 
         // Build Itinerary HTML
         let itineraryHTML = '';
@@ -294,37 +295,72 @@ export async function onRequest(context) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- LEFT COLUMN (70%) -->
             <div class="lg:col-span-2 space-y-12">
-                <!-- Highlights Specs Grid -->
-                <div class="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="flex items-center gap-3">
+                <!-- SECTION 3: SPECS (8 Items Grid - User Requested) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Spec 1: Location -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="map-pin" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Địa điểm</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${specs.location || regionLabel}</p>
+                        </div>
+                    </div>
+                    <!-- Spec 2: Duration -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
                         <div class="spec-item"><i data-lucide="clock" class="w-5 h-5 text-primary"></i></div>
                         <div>
-                            <p class="text-[9px] text-gray-400 uppercase font-black tracking-wider">Thời lượng</p>
-                            <p class="text-sm font-bold text-gray-800">${tour.duration}</p>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Thời gian</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${tour.duration}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="spec-item"><i data-lucide="compass" class="w-5 h-5 text-primary"></i></div>
+                    <!-- Spec 3: Length -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="footprints" class="w-5 h-5 text-primary"></i></div>
                         <div>
-                            <p class="text-[9px] text-gray-400 uppercase font-black tracking-wider">Khu vực</p>
-                            <p class="text-sm font-bold text-gray-800">${regionLabel}</p>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ dài</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${specs.distance || '-'}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="spec-item"><i data-lucide="activity" class="w-5 h-5 text-primary"></i></div>
-                        <div>
-                            <p class="text-[9px] text-gray-400 uppercase font-black tracking-wider">Cấp độ khó</p>
-                            <p class="text-sm font-bold text-gray-800">${tour.level}</p>
-                        </div>
-                    </div>
-                    ${tour.altitude ? `
-                    <div class="flex items-center gap-3">
+                    <!-- Spec 4: Elevation -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
                         <div class="spec-item"><i data-lucide="mountain" class="w-5 h-5 text-primary"></i></div>
                         <div>
-                            <p class="text-[9px] text-gray-400 uppercase font-black tracking-wider">Độ cao</p>
-                            <p class="text-sm font-bold text-gray-800">${tour.altitude}</p>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ cao</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${tour.altitude || '-'}</p>
                         </div>
-                    </div>` : ''}
+                    </div>
+                    <!-- Spec 5: Level -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="dumbbell" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Độ khó</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${tour.level}</p>
+                        </div>
+                    </div>
+                    <!-- Spec 6: Transport -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="bus" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Phương tiện</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${specs.transport || '-'}</p>
+                        </div>
+                    </div>
+                    <!-- Spec 7: Quantity -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="users" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">Số lượng</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">${specs.groupSize || '-'}</p>
+                        </div>
+                    </div>
+                    <!-- Spec 8: Guide Ratio -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3 hover:border-primary/50 transition-colors">
+                        <div class="spec-item"><i data-lucide="user-check" class="w-5 h-5 text-primary"></i></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400">HDV</h4>
+                            <p class="text-sm font-bold text-gray-800 whitespace-nowrap">2 Người</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Lộ trình chi tiết -->

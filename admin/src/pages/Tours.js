@@ -138,6 +138,26 @@ export const render = () => {
                                   <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold text-base" placeholder="3000000" required>
                               </div>
                           </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Địa điểm cụ thể</label>
+                                  <input type="text" id="tour-location" class="input-field bg-gray-50 text-base" placeholder="VD: Di Linh, Lâm Đồng">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Quãng đường (Độ dài)</label>
+                                  <input type="text" id="tour-distance" class="input-field bg-gray-50 text-base" placeholder="VD: ~18 km">
+                              </div>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Phương tiện</label>
+                                  <input type="text" id="tour-transport" class="input-field bg-gray-50 text-base" placeholder="VD: Xe 16 chỗ">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giới hạn số lượng (Khách)</label>
+                                  <input type="text" id="tour-groupsize" class="input-field bg-gray-50 text-base" placeholder="VD: Tối đa 13 khách">
+                              </div>
+                          </div>
                           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
                                   <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ khó</label>
@@ -531,6 +551,12 @@ export const afterRender = () => {
             document.getElementById('tour-custom-domain').value = editData.custom_domain || '';
             document.getElementById('tour-is-visible').checked = editData.is_visible !== false;
 
+            const specs = editData.specs || {};
+            document.getElementById('tour-location').value = specs.location || '';
+            document.getElementById('tour-distance').value = specs.distance || '';
+            document.getElementById('tour-transport').value = specs.transport || '';
+            document.getElementById('tour-groupsize').value = specs.groupSize || '';
+
             // Render dynamic tabs lists
             renderItinerary(editData.itinerary || []);
             renderInclusions(editData.inclusions || []);
@@ -545,6 +571,11 @@ export const afterRender = () => {
             document.getElementById('tour-custom-domain').value = 'https://camsiteretreats.com/tour/';
             // Reset tất cả preview về trạng thái trống
             ['main','2','3','4'].forEach(slot => resetSlotPreview(slot, ''));
+
+            document.getElementById('tour-location').value = '';
+            document.getElementById('tour-distance').value = '';
+            document.getElementById('tour-transport').value = '';
+            document.getElementById('tour-groupsize').value = '';
 
             // Empty the dynamic lists
             renderItinerary([]);
@@ -899,6 +930,13 @@ export const afterRender = () => {
             }
         });
 
+        const specs = {
+            location: document.getElementById('tour-location').value.trim() || null,
+            distance: document.getElementById('tour-distance').value.trim() || null,
+            transport: document.getElementById('tour-transport').value.trim() || null,
+            groupSize: document.getElementById('tour-groupsize').value.trim() || null
+        };
+
         const payload = {
             id: id ? parseInt(id) : null,
             name: document.getElementById('tour-name').value,
@@ -917,6 +955,7 @@ export const afterRender = () => {
             custom_domain: document.getElementById('tour-custom-domain').value.trim() || null,
             is_visible: document.getElementById('tour-is-visible').checked,
             
+            specs,
             itinerary,
             inclusions,
             exclusions,
