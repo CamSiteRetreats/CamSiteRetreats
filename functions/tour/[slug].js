@@ -16,12 +16,9 @@ export async function onRequest(context) {
     }
 
     try {
-        // Query the database to find the tour matching the slug
-        // Check url column, custom_domain or try matching normalized name
         const rows = await sql`
             SELECT * FROM tours 
-            WHERE url = ${'tour/' + slug} 
-               OR url = ${slug} 
+            WHERE slug = ${slug}
                OR custom_domain LIKE ${'%' + slug}
                OR LOWER(name) = ${slug.replace(/-/g, ' ')}
             LIMIT 1

@@ -57,17 +57,29 @@ export async function onRequest(context) {
             const prep = preparing ? JSON.stringify(preparing) : '[]';
             const faqList = faqs ? JSON.stringify(faqs) : '[]';
 
+            let slugVal = null;
+            if (custom_domain) {
+                const match = custom_domain.match(/\/tour\/([^/]+)/);
+                if (match) {
+                    slugVal = match[1];
+                } else {
+                    slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+                }
+            } else {
+                slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+            }
+
             const rows = await sql`
                 INSERT INTO tours 
                     (name, duration, level, price, image, image2, image3, image4,
-                     short_desc, region, type, altitude, sort_order, custom_domain, is_visible,
+                     short_desc, region, type, altitude, sort_order, custom_domain, slug, is_visible,
                      form_config, pickup_points, services,
                      itinerary, inclusions, exclusions, preparing, faqs) 
                 VALUES 
                     (${name}, ${duration}, ${level}, ${price || null}, ${image},
                      ${image2 || null}, ${image3 || null}, ${image4 || null},
                      ${desc}, ${region || 'Miền Nam'}, ${type || 'TREKKING'},
-                     ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${visible},
+                     ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${slugVal}, ${visible},
                      ${fConfig}::jsonb, ${pPoints}::jsonb, ${srvs}::jsonb,
                      ${itin}::jsonb, ${incl}::jsonb, ${excl}::jsonb, ${prep}::jsonb, ${faqList}::jsonb)
                 RETURNING *
@@ -124,13 +136,25 @@ export async function onRequest(context) {
                 const prep = preparing ? JSON.stringify(preparing) : '[]';
                 const faqList = faqs ? JSON.stringify(faqs) : '[]';
 
+                let slugVal = null;
+                if (custom_domain) {
+                    const match = custom_domain.match(/\/tour\/([^/]+)/);
+                    if (match) {
+                        slugVal = match[1];
+                    } else {
+                        slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+                    }
+                } else {
+                    slugVal = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+                }
+
                 const rows = await sql`
                     UPDATE tours SET
                         name=${name}, duration=${duration}, level=${level}, price=${price || null},
                         image=${image}, image2=${image2 || null}, image3=${image3 || null}, image4=${image4 || null},
                         short_desc=${desc}, region=${region || 'Miền Nam'}, type=${type || 'TREKKING'},
                         altitude=${altitude || null}, sort_order=${sort_order || 0},
-                        custom_domain=${custom_domain || null}, is_visible=${visible},
+                        custom_domain=${custom_domain || null}, slug=${slugVal}, is_visible=${visible},
                         itinerary=${itin}::jsonb, inclusions=${incl}::jsonb, exclusions=${excl}::jsonb,
                         preparing=${prep}::jsonb, faqs=${faqList}::jsonb
                     WHERE id=${id} RETURNING *
