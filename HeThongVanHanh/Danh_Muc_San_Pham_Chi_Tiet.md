@@ -43,7 +43,19 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ---
 
-## 2. TOUR TÀ NĂNG - PHAN DŨNG
+## 2. TOUR TÓC TIÊN - THỊ VẢI
+*   **Thời lượng:** 1 Ngày 1 Đêm
+*   **Giá bán lẻ:** 460.000đ
+*   **Cấp độ (Level):** Trung Bình
+*   **Tiền cọc yêu cầu:** 1,000,000đ / khách
+
+### 📅 Lịch trình chi tiết:
+*   **đi vũng tàu**
+    *   **8h** xuất phát
+
+---
+
+## 3. TOUR TÀ NĂNG - PHAN DŨNG
 *   **Thời lượng:** 2 Ngày 1 Đêm
 *   **Giá bán lẻ:** 2.850.000đ
 *   **Cấp độ (Level):** Trung Bình
@@ -73,7 +85,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ---
 
-## 3. TOUR LANGBIANG - TOUR SĂN MÂY
+## 4. TOUR LANGBIANG - TOUR SĂN MÂY
 *   **Thời lượng:** 1 Ngày 1 Đêm
 *   **Giá bán lẻ:** 850.000đ
 *   **Cấp độ (Level):** Trung Bình
@@ -93,7 +105,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ---
 
-## 4. TOUR YANG ĐOAN
+## 5. TOUR YANG ĐOAN
 *   **Thời lượng:** 1 Ngày 1 Đêm
 *   **Giá bán lẻ:** 1.100.000đ
 *   **Cấp độ (Level):** Trung Bình
@@ -114,7 +126,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ---
 
-## 5. TOUR BIDOUP - TÀ GIANG
+## 6. TOUR BIDOUP - TÀ GIANG
 *   **Thời lượng:** 2 Ngày 1 Đêm
 *   **Giá bán lẻ:** 3.550.000đ
 *   **Cấp độ (Level):** Trung Bình
@@ -142,7 +154,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ---
 
-## 6. TOUR THÁC MƯA BAY
+## 7. TOUR THÁC MƯA BAY
 *   **Thời lượng:** 1 Ngày 1 Đêm
 *   **Giá bán lẻ:** 1.100.000đ
 *   **Cấp độ (Level):** Trung Bình
