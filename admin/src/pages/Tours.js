@@ -669,7 +669,7 @@ export const afterRender = () => {
         if (hiddenInput) hiddenInput.value = url || '';
     };
 
-    /** Nén ảnh bằng Canvas (client-side): max 1200px, quality 85% */
+    /** Nén ảnh bằng Canvas (client-side): max 1200px, quality 85%, đảm bảo dưới 2MB */
     const compressTourImage = (file) => new Promise((resolve, reject) => {
         const MAX_PX = 1200;
         const reader = new FileReader();
@@ -681,10 +681,39 @@ export const afterRender = () => {
                     if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX; }
                     else               { width  = Math.round(width * MAX_PX / height);  height = MAX_PX; }
                 }
+                
+                let quality = 0.85;
+                let scale = 1.0;
+                let resultBase64 = '';
+                let sizeInBytes = Infinity;
+                const MAX_SIZE = 2 * 1024 * 1024; // 2MB limit
+                
                 const canvas = document.createElement('canvas');
-                canvas.width = width; canvas.height = height;
-                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.85));
+                const ctx = canvas.getContext('2d');
+                
+                // Vòng lặp nén tối ưu dung lượng dưới 2MB
+                while (sizeInBytes > MAX_SIZE && quality > 0.1) {
+                    canvas.width = Math.round(width * scale);
+                    canvas.height = Math.round(height * scale);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    resultBase64 = canvas.toDataURL('image/jpeg', quality);
+                    
+                    const base64Data = resultBase64.split(',')[1] || resultBase64;
+                    sizeInBytes = base64Data.length * 0.75;
+                    
+                    if (sizeInBytes > MAX_SIZE) {
+                        if (quality > 0.50) {
+                            quality -= 0.10;
+                        } else {
+                            scale *= 0.8;
+                        }
+                    }
+                }
+                
+                console.log(`[compressTourImage] Nén hoàn tất: ${Math.round(sizeInBytes/1024)}KB (Chất lượng: ${Math.round(quality*100)}%, Tỷ lệ: ${Math.round(scale*100)}%)`);
+                resolve(resultBase64);
             };
             img.onerror = reject;
             img.src = e.target.result;
