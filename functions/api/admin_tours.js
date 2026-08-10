@@ -32,7 +32,8 @@ export async function onRequest(context) {
                 shortDesc, short_desc,
                 region, type, altitude,
                 sort_order, custom_domain, is_visible,
-                form_config, pickup_points, services
+                form_config, pickup_points, services,
+                itinerary, inclusions, exclusions, preparing, faqs
             } = body;
 
             if (!name || !duration || !level || !image) {
@@ -50,18 +51,25 @@ export async function onRequest(context) {
             });
             const pPoints = pickup_points ? JSON.stringify(pickup_points) : '[]';
             const srvs = services ? JSON.stringify(services) : '[]';
+            const itin = itinerary ? JSON.stringify(itinerary) : '[]';
+            const incl = inclusions ? JSON.stringify(inclusions) : '[]';
+            const excl = exclusions ? JSON.stringify(exclusions) : '[]';
+            const prep = preparing ? JSON.stringify(preparing) : '[]';
+            const faqList = faqs ? JSON.stringify(faqs) : '[]';
 
             const rows = await sql`
                 INSERT INTO tours 
                     (name, duration, level, price, image, image2, image3, image4,
                      short_desc, region, type, altitude, sort_order, custom_domain, is_visible,
-                     form_config, pickup_points, services) 
+                     form_config, pickup_points, services,
+                     itinerary, inclusions, exclusions, preparing, faqs) 
                 VALUES 
                     (${name}, ${duration}, ${level}, ${price || null}, ${image},
                      ${image2 || null}, ${image3 || null}, ${image4 || null},
                      ${desc}, ${region || 'Miền Nam'}, ${type || 'TREKKING'},
                      ${altitude || null}, ${sort_order || 0}, ${custom_domain || null}, ${visible},
-                     ${fConfig}::jsonb, ${pPoints}::jsonb, ${srvs}::jsonb)
+                     ${fConfig}::jsonb, ${pPoints}::jsonb, ${srvs}::jsonb,
+                     ${itin}::jsonb, ${incl}::jsonb, ${excl}::jsonb, ${prep}::jsonb, ${faqList}::jsonb)
                 RETURNING *
             `;
             response = Response.json({ success: true, message: 'Thêm Tour thành công', data: rows[0] }, { status: 201, headers: corsHeaders });
@@ -76,7 +84,8 @@ export async function onRequest(context) {
                 shortDesc, short_desc,
                 region, type, altitude,
                 sort_order, custom_domain, is_visible,
-                commission_rate, form_config, pickup_points, services
+                commission_rate, form_config, pickup_points, services,
+                itinerary, inclusions, exclusions, preparing, faqs
             } = body;
 
             // Nếu chỉ update commission_rate (từ trang Reports)
@@ -109,6 +118,11 @@ export async function onRequest(context) {
             } else {
                 const desc = shortDesc || short_desc || null;
                 const visible = is_visible !== false ? true : false;
+                const itin = itinerary ? JSON.stringify(itinerary) : '[]';
+                const incl = inclusions ? JSON.stringify(inclusions) : '[]';
+                const excl = exclusions ? JSON.stringify(exclusions) : '[]';
+                const prep = preparing ? JSON.stringify(preparing) : '[]';
+                const faqList = faqs ? JSON.stringify(faqs) : '[]';
 
                 const rows = await sql`
                     UPDATE tours SET
@@ -116,7 +130,9 @@ export async function onRequest(context) {
                         image=${image}, image2=${image2 || null}, image3=${image3 || null}, image4=${image4 || null},
                         short_desc=${desc}, region=${region || 'Miền Nam'}, type=${type || 'TREKKING'},
                         altitude=${altitude || null}, sort_order=${sort_order || 0},
-                        custom_domain=${custom_domain || null}, is_visible=${visible}
+                        custom_domain=${custom_domain || null}, is_visible=${visible},
+                        itinerary=${itin}::jsonb, inclusions=${incl}::jsonb, exclusions=${excl}::jsonb,
+                        preparing=${prep}::jsonb, faqs=${faqList}::jsonb
                     WHERE id=${id} RETURNING *
                 `;
 

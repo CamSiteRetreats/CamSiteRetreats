@@ -58,126 +58,196 @@ export const render = () => {
                   <h2 id="tourModalTitle" class="text-xl md:text-2xl font-bold text-gray-800 mb-6">Thêm Tour Mới</h2>
                   <form id="tourForm" class="space-y-4 md:space-y-5">
                       <input type="hidden" id="tour-edit-id">
-                      
-                      <!-- Tên & Mô tả -->
-                      <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên Tour *</label>
-                          <input type="text" id="tour-name" class="input-field bg-gray-50 text-base" placeholder="VD: Tà Năng - Phan Dũng" required>
-                      </div>
-                      <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mô tả ngắn</label>
-                          <textarea id="tour-short-desc" class="input-field bg-gray-50 h-20 resize-none text-base" placeholder="Mô tả ngắn hiển thị trên card tour..."></textarea>
+
+                      <!-- Tab Navigation -->
+                      <div class="border-b border-gray-200">
+                          <nav class="flex gap-4 md:gap-6 overflow-x-auto pb-1" aria-label="Tabs" id="tour-modal-tabs">
+                              <button type="button" class="tab-btn active border-b-2 border-csr-orange py-2 px-1 text-sm font-bold text-csr-orange shrink-0" data-tab="general">Thông tin chung</button>
+                              <button type="button" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:border-gray-300 shrink-0" data-tab="itinerary">Lộ trình</button>
+                              <button type="button" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:border-gray-300 shrink-0" data-tab="cost">Chi phí</button>
+                              <button type="button" class="tab-btn border-b-2 border-transparent py-2 px-1 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:border-gray-300 shrink-0" data-tab="prep-faq">Chuẩn bị & FAQ</button>
+                          </nav>
                       </div>
 
-                      <!-- Ảnh chính -->
-                      <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính *</label>
-                          <div id="tour-img-zone-main"
-                               class="relative w-full h-36 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
-                               ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
-                               ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
-                               ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'main');"
-                               onclick="document.getElementById('tour-img-input-main').click()">
-                              <div id="tour-img-preview-main" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
-                                  <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                  <span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span>
-                                  <span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>
-                              </div>
-                              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-main">
-                                  <span class="text-white font-bold text-sm">ĐỔI ẢNH</span>
-                              </div>
-                          </div>
-                          <input type="file" id="tour-img-input-main" accept="image/*" class="hidden" data-slot="main">
-                          <input type="hidden" id="tour-image" value="">
-                      </div>
-
-                      <!-- Ảnh phụ 1,2,3 -->
-                      <div class="grid grid-cols-3 gap-3">
-                          ${['2','3','4'].map(n => `
+                      <!-- Tab panels -->
+                      <div id="tab-panel-general" class="tab-panel space-y-4 md:space-y-5">
+                          <!-- Tên & Mô tả -->
                           <div>
-                              <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ ${parseInt(n)-1}</label>
-                              <div id="tour-img-zone-${n}"
-                                   class="relative h-24 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên Tour *</label>
+                              <input type="text" id="tour-name" class="input-field bg-gray-50 text-base" placeholder="VD: Tà Năng - Phan Dũng" required>
+                          </div>
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Mô tả ngắn</label>
+                              <textarea id="tour-short-desc" class="input-field bg-gray-50 h-20 resize-none text-base" placeholder="Mô tả ngắn hiển thị trên card tour..."></textarea>
+                          </div>
+
+                          <!-- Ảnh chính -->
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Ảnh chính *</label>
+                              <div id="tour-img-zone-main"
+                                   class="relative w-full h-36 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
                                    ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
                                    ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
-                                   ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'${n}');"
-                                   onclick="document.getElementById('tour-img-input-${n}').click()">
-                                  <div id="tour-img-preview-${n}" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
-                                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
-                                      <span class="text-[9px] font-bold uppercase">Thêm ảnh</span>
+                                   ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'main');"
+                                   onclick="document.getElementById('tour-img-input-main').click()">
+                                  <div id="tour-img-preview-main" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                      <span class="text-xs font-bold uppercase">Kéo thả hoặc click để chọn ảnh</span>
+                                      <span class="text-[10px] text-gray-400">JPG, PNG, WEBP — tối đa 10MB, tự động nén</span>
                                   </div>
-                                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-${n}">
-                                      <span class="text-white font-bold text-[10px]">ĐỔI ẢNH</span>
+                                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-main">
+                                      <span class="text-white font-bold text-sm">ĐỔI ẢNH</span>
                                   </div>
                               </div>
-                              <input type="file" id="tour-img-input-${n}" accept="image/*" class="hidden" data-slot="${n}">
-                              <input type="hidden" id="tour-image${n}" value="">
-                          </div>`).join('')}
+                              <input type="file" id="tour-img-input-main" accept="image/*" class="hidden" data-slot="main">
+                              <input type="hidden" id="tour-image" value="">
+                          </div>
+
+                          <!-- Ảnh phụ 1,2,3 -->
+                          <div class="grid grid-cols-3 gap-3">
+                              ${['2','3','4'].map(n => `
+                              <div>
+                                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Ảnh phụ ${parseInt(n)-1}</label>
+                                  <div id="tour-img-zone-${n}"
+                                       class="relative h-24 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden cursor-pointer hover:border-csr-orange transition-colors group flex items-center justify-center bg-gray-50"
+                                       ondragover="event.preventDefault(); this.classList.add('border-csr-orange','bg-orange-50');"
+                                       ondragleave="this.classList.remove('border-csr-orange','bg-orange-50');"
+                                       ondrop="event.preventDefault(); this.classList.remove('border-csr-orange','bg-orange-50'); window.handleTourImgDrop(event,'${n}');"
+                                       onclick="document.getElementById('tour-img-input-${n}').click()">
+                                      <div id="tour-img-preview-${n}" class="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-1">
+                                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                                          <span class="text-[9px] font-bold uppercase">Thêm ảnh</span>
+                                      </div>
+                                      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden" id="tour-img-overlay-${n}">
+                                          <span class="text-white font-bold text-[10px]">ĐỔI ẢNH</span>
+                                      </div>
+                                  </div>
+                                  <input type="file" id="tour-img-input-${n}" accept="image/*" class="hidden" data-slot="${n}">
+                                  <input type="hidden" id="tour-image${n}" value="">
+                              </div>`).join('')}
+                          </div>
+
+                          <!-- Thông số -->
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thời lượng *</label>
+                                  <input type="text" id="tour-duration" class="input-field bg-gray-50 text-base" placeholder="2 Ngày 1 Đêm" required>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá (VNĐ) *</label>
+                                  <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold text-base" placeholder="3000000" required>
+                              </div>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ khó</label>
+                                  <select id="tour-level" class="input-field bg-gray-50 text-base">
+                                      <option value="Dễ">Dễ</option>
+                                      <option value="Trung Bình" selected>Trung Bình</option>
+                                      <option value="Khó">Khó</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Vùng miền</label>
+                                  <select id="tour-region" class="input-field bg-gray-50 text-base">
+                                      <option value="Miền Nam">Miền Nam</option>
+                                      <option value="Miền Bắc">Miền Bắc</option>
+                                      <option value="Miền Trung">Miền Trung</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Loại hình</label>
+                                  <select id="tour-type" class="input-field bg-gray-50 text-base">
+                                      <option value="TREKKING">TREKKING</option>
+                                      <option value="CAMPING">CAMPING</option>
+                                      <option value="CANYONING">CANYONING</option>
+                                      <option value="HIKING">HIKING</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ cao</label>
+                                  <input type="text" id="tour-altitude" class="input-field bg-gray-50 text-base" placeholder="VD: 2.287M">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thứ tự hiển thị</label>
+                                  <input type="number" id="tour-sort-order" class="input-field bg-gray-50 text-base" value="0" placeholder="0">
+                              </div>
+                          </div>
+
+                          <!-- Domain & Visibility -->
+                          <div>
+                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên miền riêng (Custom Domain)</label>
+                              <input type="text" id="tour-custom-domain" class="input-field bg-gray-50 text-base" placeholder="https://camsiteretreats.com/tour/tanangphandung">
+                          </div>
+                          <div>
+                              <label class="flex items-center gap-3 cursor-pointer py-2">
+                                  <input type="checkbox" id="tour-is-visible" checked class="w-6 h-6 rounded border-gray-200 text-csr-orange focus:ring-csr-orange">
+                                  <span class="text-base font-bold text-gray-700">Hiển thị tour này trên website</span>
+                              </label>
+                          </div>
                       </div>
 
-                      <!-- Thông số -->
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thời lượng *</label>
-                              <input type="text" id="tour-duration" class="input-field bg-gray-50 text-base" placeholder="2 Ngày 1 Đêm" required>
+                      <!-- Tab Panel: Lộ trình -->
+                      <div id="tab-panel-itinerary" class="tab-panel hidden space-y-4">
+                          <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lộ trình chi tiết</h3>
+                              <button type="button" id="add-day-btn" class="text-xs font-bold text-csr-orange hover:underline">+ Thêm Ngày</button>
                           </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Giá (VNĐ) *</label>
-                              <input type="text" id="tour-price" class="input-field bg-gray-50 font-bold text-base" placeholder="3000000" required>
-                          </div>
-                      </div>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ khó</label>
-                              <select id="tour-level" class="input-field bg-gray-50 text-base">
-                                  <option value="Dễ">Dễ</option>
-                                  <option value="Trung Bình" selected>Trung Bình</option>
-                                  <option value="Khó">Khó</option>
-                              </select>
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Vùng miền</label>
-                              <select id="tour-region" class="input-field bg-gray-50 text-base">
-                                  <option value="Miền Nam">Miền Nam</option>
-                                  <option value="Miền Bắc">Miền Bắc</option>
-                                  <option value="Miền Trung">Miền Trung</option>
-                              </select>
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Loại hình</label>
-                              <select id="tour-type" class="input-field bg-gray-50 text-base">
-                                  <option value="TREKKING">TREKKING</option>
-                                  <option value="CAMPING">CAMPING</option>
-                                  <option value="CANYONING">CANYONING</option>
-                                  <option value="HIKING">HIKING</option>
-                              </select>
-                          </div>
-                      </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Độ cao</label>
-                              <input type="text" id="tour-altitude" class="input-field bg-gray-50 text-base" placeholder="VD: 2.287M">
-                          </div>
-                          <div>
-                              <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Thứ tự hiển thị</label>
-                              <input type="number" id="tour-sort-order" class="input-field bg-gray-50 text-base" value="0" placeholder="0">
+                          <div id="days-container" class="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+                              <!-- Days will be dynamically generated -->
                           </div>
                       </div>
 
-                      <!-- Domain & Visibility -->
-                      <div>
-                          <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tên miền riêng (Custom Domain)</label>
-                          <input type="text" id="tour-custom-domain" class="input-field bg-gray-50 text-base" placeholder="https://camsiteretreats.com/tour/tanangphandung">
+                      <!-- Tab Panel: Chi phí -->
+                      <div id="tab-panel-cost" class="tab-panel hidden space-y-6">
+                          <div>
+                              <div class="flex justify-between items-center mb-3">
+                                  <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Chi phí bao gồm (Inclusions)</h3>
+                                  <button type="button" id="add-inclusion-btn" class="text-xs font-bold text-csr-orange hover:underline">+ Thêm khoản</button>
+                              </div>
+                              <div id="inclusions-container" class="space-y-3 max-h-[30vh] overflow-y-auto pr-1">
+                                  <!-- Dynamic Inclusions -->
+                              </div>
+                          </div>
+                          <hr class="border-gray-100">
+                          <div>
+                              <div class="flex justify-between items-center mb-3">
+                                  <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider text-red-500">Chi phí không bao gồm (Exclusions)</h3>
+                                  <button type="button" id="add-exclusion-btn" class="text-xs font-bold text-csr-orange hover:underline">+ Thêm khoản</button>
+                              </div>
+                              <div id="exclusions-container" class="space-y-3 max-h-[30vh] overflow-y-auto pr-1">
+                                  <!-- Dynamic Exclusions -->
+                              </div>
+                          </div>
                       </div>
-                      <div>
-                          <label class="flex items-center gap-3 cursor-pointer py-2">
-                              <input type="checkbox" id="tour-is-visible" checked class="w-6 h-6 rounded border-gray-200 text-csr-orange focus:ring-csr-orange">
-                              <span class="text-base font-bold text-gray-700">Hiển thị tour này trên website</span>
-                          </label>
+
+                      <!-- Tab Panel: Chuẩn bị & FAQ -->
+                      <div id="tab-panel-prep-faq" class="tab-panel hidden space-y-6">
+                          <div>
+                              <div class="flex justify-between items-center mb-3">
+                                  <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Vật dụng cần chuẩn bị</h3>
+                                  <button type="button" id="add-prep-btn" class="text-xs font-bold text-csr-orange hover:underline">+ Thêm vật dụng</button>
+                              </div>
+                              <div id="preparing-container" class="space-y-3 max-h-[30vh] overflow-y-auto pr-1">
+                                  <!-- Dynamic Preparing -->
+                              </div>
+                          </div>
+                          <hr class="border-gray-100">
+                          <div>
+                              <div class="flex justify-between items-center mb-3">
+                                  <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Câu hỏi thường gặp (FAQs)</h3>
+                                  <button type="button" id="add-faq-btn" class="text-xs font-bold text-csr-orange hover:underline">+ Thêm câu hỏi</button>
+                              </div>
+                              <div id="faqs-container" class="space-y-3 max-h-[30vh] overflow-y-auto pr-1">
+                                  <!-- Dynamic FAQs -->
+                              </div>
+                          </div>
                       </div>
 
                       <!-- Buttons -->
-                      <div class="pt-3 flex gap-3">
+                      <div class="pt-3 flex gap-3 border-t border-gray-100">
                           <button type="button" id="cancelTourBtn" class="flex-1 min-h-[50px] border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-all">Hủy</button>
                           <button type="submit" class="flex-1 min-h-[50px] bg-csr-orange text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all">Lưu Tour</button>
                       </div>
@@ -196,6 +266,247 @@ export const afterRender = () => {
 
     let tours = [];
     const API_TOURS = '/api/admin_tours';
+
+    // --- TAB SYSTEM BINDING ---
+    const bindTabEvents = () => {
+        const tabBtns = document.querySelectorAll('#tour-modal-tabs .tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'border-csr-orange', 'text-csr-orange');
+                    b.classList.add('border-transparent', 'text-gray-500');
+                    b.classList.remove('font-bold');
+                    b.classList.add('font-semibold');
+                });
+                btn.classList.add('active', 'border-csr-orange', 'text-csr-orange');
+                btn.classList.remove('border-transparent', 'text-gray-500');
+                btn.classList.remove('font-semibold');
+                btn.classList.add('font-bold');
+
+                const activeTab = btn.dataset.tab;
+                panels.forEach(p => {
+                    if (p.id === `tab-panel-${activeTab}`) {
+                        p.classList.remove('hidden');
+                    } else {
+                        p.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    };
+
+    const resetTabs = () => {
+        const firstTab = document.querySelector('#tour-modal-tabs .tab-btn[data-tab="general"]');
+        if (firstTab) firstTab.click();
+    };
+
+    // --- DYNAMIC BUILDERS HELPERS ---
+    
+    // Preset options for Inclusion Images
+    const INCLUSION_PRESETS = [
+        { value: 'XeTrungChuyen.png', label: 'Xe đưa đón (XeTrungChuyen.png)' },
+        { value: 'HuongDanVien-SuaLai.png', label: 'Hướng dẫn viên (HuongDanVien-SuaLai.png)' },
+        { value: 'DoAn-SuaLai.png', label: 'Ăn uống (DoAn-SuaLai.png)' },
+        { value: 'NuocUong.png', label: 'Nước uống (NuocUong.png)' },
+        { value: 'NuocTam-SuaLai_20260113000157.png', label: 'Tắm nước nóng (NuocTam...)' },
+        { value: 'GayTrekking.png', label: 'Gậy trekking (GayTrekking.png)' },
+        { value: 'HuyChuong.png', label: 'Huy chương (HuyChuong.png)' },
+        { value: 'AoMua.png', label: 'Áo mưa (AoMua.png)' },
+        { value: 'BaoHiem.png', label: 'Bảo hiểm (BaoHiem.png)' }
+    ];
+
+    // Preset options for Preparing Images
+    const PREP_PRESETS = [
+        { value: 'NMG_giay.png', label: 'Giày Trekking (NMG_giay.png)' },
+        { value: 'NMG_balo.png', label: 'Balo Trekking (NMG_balo.png)' },
+        { value: 'NMG_quanao.png', label: 'Trang phục (NMG_quanao.png)' },
+        { value: 'NMG_dungcu.png', label: 'Dụng cụ cá nhân (NMG_dungcu.png)' }
+    ];
+
+    const createDayElement = (dayData = { dayTitle: '', steps: [] }, dayIdx) => {
+        const div = document.createElement('div');
+        div.className = 'day-block bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3 relative';
+        div.dataset.index = dayIdx;
+
+        div.innerHTML = `
+            <button type="button" class="remove-day-btn absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors" title="Xóa Ngày">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Tên ngày (Ví dụ: Ngày 1: Khám phá...)</label>
+                <input type="text" class="day-title-input input-field bg-white text-sm" value="${dayData.dayTitle || ''}" placeholder="VD: Ngày 1: Đỉnh Yang Đoan" required>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase">Mốc thời gian</label>
+                    <button type="button" class="add-time-btn text-[10px] font-bold text-csr-orange hover:underline">+ Thêm mốc</button>
+                </div>
+                <div class="times-container space-y-2"></div>
+            </div>
+        `;
+
+        const timesContainer = div.querySelector('.times-container');
+        const steps = dayData.steps || [];
+        steps.forEach((step, stepIdx) => {
+            timesContainer.appendChild(createTimeRowElement(step, dayIdx, stepIdx));
+        });
+
+        // Event listener for adding a time
+        div.querySelector('.add-time-btn').addEventListener('click', () => {
+            const currentStepsCount = timesContainer.children.length;
+            timesContainer.appendChild(createTimeRowElement({ time: '', desc: '' }, dayIdx, currentStepsCount));
+        });
+
+        // Event listener for removing day
+        div.querySelector('.remove-day-btn').addEventListener('click', () => {
+            div.remove();
+        });
+
+        return div;
+    };
+
+    const createTimeRowElement = (stepData = { time: '', desc: '' }, dayIdx, stepIdx) => {
+        const div = document.createElement('div');
+        div.className = 'time-row flex gap-2 items-center';
+        div.innerHTML = `
+            <input type="text" class="time-input input-field bg-white text-xs w-20 shrink-0" value="${stepData.time || ''}" placeholder="08h30" required>
+            <input type="text" class="desc-input input-field bg-white text-xs" value="${stepData.desc || ''}" placeholder="Đoàn xuất phát..." required>
+            <button type="button" class="remove-time-btn p-1 text-gray-400 hover:text-red-500 rounded" title="Xóa mốc">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+        `;
+        div.querySelector('.remove-time-btn').addEventListener('click', () => {
+            div.remove();
+        });
+        return div;
+    };
+
+    const createInclusionRow = (inclData = { title: '', desc: '', image: 'XeTrungChuyen.png' }) => {
+        const div = document.createElement('div');
+        div.className = 'inclusion-row flex gap-2 items-center bg-gray-50 p-2.5 rounded-xl border border-gray-150';
+        
+        const presetOptions = INCLUSION_PRESETS.map(p => 
+            `<option value="${p.value}" ${inclData.image === p.value ? 'selected' : ''}>${p.label}</option>`
+        ).join('');
+
+        div.innerHTML = `
+            <select class="incl-image-select input-field bg-white text-xs w-44 shrink-0">
+                ${presetOptions}
+                <option value="custom" ${!INCLUSION_PRESETS.some(p => p.value === inclData.image) && inclData.image ? 'selected' : ''}>Tự nhập path...</option>
+            </select>
+            <input type="text" class="incl-image-custom input-field bg-white text-xs w-32 shrink-0 ${!INCLUSION_PRESETS.some(p => p.value === inclData.image) && inclData.image ? '' : 'hidden'}" value="${inclData.image || ''}" placeholder="đường_dẫn_ảnh.png">
+            <input type="text" class="incl-title-input input-field bg-white text-xs w-36 shrink-0" value="${inclData.title || ''}" placeholder="Tiêu đề" required>
+            <input type="text" class="incl-desc-input input-field bg-white text-xs" value="${inclData.desc || ''}" placeholder="Mô tả chi tiết" required>
+            <button type="button" class="remove-incl-btn p-1 text-gray-400 hover:text-red-500 rounded" title="Xóa">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+
+        const imageSelect = div.querySelector('.incl-image-select');
+        const customInput = div.querySelector('.incl-image-custom');
+        
+        imageSelect.addEventListener('change', () => {
+            if (imageSelect.value === 'custom') {
+                customInput.classList.remove('hidden');
+            } else {
+                customInput.classList.add('hidden');
+                customInput.value = imageSelect.value;
+            }
+        });
+
+        div.querySelector('.remove-incl-btn').addEventListener('click', () => {
+            div.remove();
+        });
+
+        return div;
+    };
+
+    const createExclusionRow = (exclData = { title: '', desc: '' }) => {
+        const div = document.createElement('div');
+        div.className = 'exclusion-row flex gap-2 items-start bg-gray-50 p-2.5 rounded-xl border border-gray-150';
+        div.innerHTML = `
+            <input type="text" class="excl-title-input input-field bg-white text-xs w-44 shrink-0 font-bold text-red-500" value="${exclData.title || ''}" placeholder="VD: Bữa ăn trưa" required>
+            <textarea class="excl-desc-input input-field bg-white text-xs h-12 resize-none" placeholder="Mô tả..." required>${exclData.desc || ''}</textarea>
+            <button type="button" class="remove-excl-btn p-1 text-gray-400 hover:text-red-500 rounded self-center" title="Xóa">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+        div.querySelector('.remove-excl-btn').addEventListener('click', () => {
+            div.remove();
+        });
+        return div;
+    };
+
+    const createPreparingRow = (prepData = { title: '', desc: '', image: 'NMG_giay.png' }) => {
+        const div = document.createElement('div');
+        div.className = 'preparing-row flex gap-2 items-center bg-gray-50 p-2.5 rounded-xl border border-gray-150';
+        
+        const presetOptions = PREP_PRESETS.map(p => 
+            `<option value="${p.value}" ${prepData.image === p.value ? 'selected' : ''}>${p.label}</option>`
+        ).join('');
+
+        div.innerHTML = `
+            <select class="prep-image-select input-field bg-white text-xs w-44 shrink-0">
+                ${presetOptions}
+            </select>
+            <input type="text" class="prep-title-input input-field bg-white text-xs w-36 shrink-0" value="${prepData.title || ''}" placeholder="Giày Trekking" required>
+            <input type="text" class="prep-desc-input input-field bg-white text-xs" value="${prepData.desc || ''}" placeholder="Lựa chọn giày có độ bám tốt..." required>
+            <button type="button" class="remove-prep-btn p-1 text-gray-400 hover:text-red-500 rounded" title="Xóa">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+        div.querySelector('.remove-prep-btn').addEventListener('click', () => {
+            div.remove();
+        });
+        return div;
+    };
+
+    const createFaqRow = (faqData = { q: '', a: '' }) => {
+        const div = document.createElement('div');
+        div.className = 'faq-row flex flex-col gap-2 bg-gray-50 p-3 rounded-xl border border-gray-150 relative';
+        div.innerHTML = `
+            <button type="button" class="remove-faq-btn absolute top-2 right-2 text-gray-400 hover:text-red-500" title="Xóa">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <input type="text" class="faq-q-input input-field bg-white text-xs font-bold" value="${faqData.q || ''}" placeholder="Câu hỏi (VD: Tour này có khó đi không?)" required>
+            <textarea class="faq-a-input input-field bg-white text-xs h-14 resize-none" placeholder="Trả lời..." required>${faqData.a || ''}</textarea>
+        `;
+        div.querySelector('.remove-faq-btn').addEventListener('click', () => {
+            div.remove();
+        });
+        return div;
+    };
+
+    const renderInclusions = (list = []) => {
+        const container = document.getElementById('inclusions-container');
+        container.innerHTML = '';
+        list.forEach(item => container.appendChild(createInclusionRow(item)));
+    };
+
+    const renderExclusions = (list = []) => {
+        const container = document.getElementById('exclusions-container');
+        container.innerHTML = '';
+        list.forEach(item => container.appendChild(createExclusionRow(item)));
+    };
+
+    const renderPreparing = (list = []) => {
+        const container = document.getElementById('preparing-container');
+        container.innerHTML = '';
+        list.forEach(item => container.appendChild(createPreparingRow(item)));
+    };
+
+    const renderFaqs = (list = []) => {
+        const container = document.getElementById('faqs-container');
+        container.innerHTML = '';
+        list.forEach(item => container.appendChild(createFaqRow(item)));
+    };
+
+    const renderItinerary = (list = []) => {
+        const container = document.getElementById('days-container');
+        container.innerHTML = '';
+        list.forEach((day, idx) => container.appendChild(createDayElement(day, idx)));
+    };
 
     // --- MODAL LOGIC ---
     const openModal = (editData = null) => {
@@ -219,6 +530,13 @@ export const afterRender = () => {
             document.getElementById('tour-sort-order').value = editData.sort_order || 0;
             document.getElementById('tour-custom-domain').value = editData.custom_domain || '';
             document.getElementById('tour-is-visible').checked = editData.is_visible !== false;
+
+            // Render dynamic tabs lists
+            renderItinerary(editData.itinerary || []);
+            renderInclusions(editData.inclusions || []);
+            renderExclusions(editData.exclusions || []);
+            renderPreparing(editData.preparing || []);
+            renderFaqs(editData.faqs || []);
         } else {
             title.textContent = 'Thêm Tour Mới';
             form.reset();
@@ -227,8 +545,16 @@ export const afterRender = () => {
             document.getElementById('tour-custom-domain').value = 'https://camsiteretreats.com/tour/';
             // Reset tất cả preview về trạng thái trống
             ['main','2','3','4'].forEach(slot => resetSlotPreview(slot, ''));
+
+            // Empty the dynamic lists
+            renderItinerary([]);
+            renderInclusions([]);
+            renderExclusions([]);
+            renderPreparing([]);
+            renderFaqs([]);
         }
 
+        resetTabs();
         modal.classList.remove('hidden');
         setTimeout(() => {
             modal.classList.add('opacity-100');
@@ -251,6 +577,30 @@ export const afterRender = () => {
     document.getElementById('closeTourModalBtn').addEventListener('click', closeModal);
     document.getElementById('cancelTourBtn').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Add buttons list action bindings
+    document.getElementById('add-day-btn').addEventListener('click', () => {
+        const nextIdx = document.querySelectorAll('.day-block').length;
+        document.getElementById('days-container').appendChild(createDayElement({ dayTitle: '', steps: [] }, nextIdx));
+    });
+
+    document.getElementById('add-inclusion-btn').addEventListener('click', () => {
+        document.getElementById('inclusions-container').appendChild(createInclusionRow());
+    });
+
+    document.getElementById('add-exclusion-btn').addEventListener('click', () => {
+        document.getElementById('exclusions-container').appendChild(createExclusionRow());
+    });
+
+    document.getElementById('add-prep-btn').addEventListener('click', () => {
+        document.getElementById('preparing-container').appendChild(createPreparingRow());
+    });
+
+    document.getElementById('add-faq-btn').addEventListener('click', () => {
+        document.getElementById('faqs-container').appendChild(createFaqRow());
+    });
+
+    bindTabEvents();
 
     // ── IMAGE UPLOAD HELPERS ────────────────────────────────────────────────
     const SLOTS = ['main', '2', '3', '4'];
@@ -487,6 +837,68 @@ export const afterRender = () => {
         btn.disabled = true;
 
         const id = document.getElementById('tour-edit-id').value;
+
+        // Serialize Itinerary
+        const itinerary = [];
+        document.querySelectorAll('.day-block').forEach(dayBlock => {
+            const dayTitle = dayBlock.querySelector('.day-title-input').value.trim();
+            const steps = [];
+            dayBlock.querySelectorAll('.time-row').forEach(timeRow => {
+                const time = timeRow.querySelector('.time-input').value.trim();
+                const desc = timeRow.querySelector('.desc-input').value.trim();
+                if (time || desc) {
+                    steps.push({ time, desc });
+                }
+            });
+            if (dayTitle) {
+                itinerary.push({ dayTitle, steps });
+            }
+        });
+
+        // Serialize Inclusions
+        const inclusions = [];
+        document.querySelectorAll('.inclusion-row').forEach(row => {
+            const selectVal = row.querySelector('.incl-image-select').value;
+            const customVal = row.querySelector('.incl-image-custom').value.trim();
+            const image = selectVal === 'custom' ? customVal : selectVal;
+            const title = row.querySelector('.incl-title-input').value.trim();
+            const desc = row.querySelector('.incl-desc-input').value.trim();
+            if (title) {
+                inclusions.push({ title, desc, image });
+            }
+        });
+
+        // Serialize Exclusions
+        const exclusions = [];
+        document.querySelectorAll('.exclusion-row').forEach(row => {
+            const title = row.querySelector('.excl-title-input').value.trim();
+            const desc = row.querySelector('.excl-desc-input').value.trim();
+            if (title) {
+                exclusions.push({ title, desc });
+            }
+        });
+
+        // Serialize Preparing
+        const preparing = [];
+        document.querySelectorAll('.preparing-row').forEach(row => {
+            const image = row.querySelector('.prep-image-select').value;
+            const title = row.querySelector('.prep-title-input').value.trim();
+            const desc = row.querySelector('.prep-desc-input').value.trim();
+            if (title) {
+                preparing.push({ title, desc, image });
+            }
+        });
+
+        // Serialize FAQs
+        const faqs = [];
+        document.querySelectorAll('.faq-row').forEach(row => {
+            const q = row.querySelector('.faq-q-input').value.trim();
+            const a = row.querySelector('.faq-a-input').value.trim();
+            if (q) {
+                faqs.push({ q, a });
+            }
+        });
+
         const payload = {
             id: id ? parseInt(id) : null,
             name: document.getElementById('tour-name').value,
@@ -503,7 +915,13 @@ export const afterRender = () => {
             price: document.getElementById('tour-price').value,
             sort_order: parseInt(document.getElementById('tour-sort-order').value) || 0,
             custom_domain: document.getElementById('tour-custom-domain').value.trim() || null,
-            is_visible: document.getElementById('tour-is-visible').checked
+            is_visible: document.getElementById('tour-is-visible').checked,
+            
+            itinerary,
+            inclusions,
+            exclusions,
+            preparing,
+            faqs
         };
 
         try {

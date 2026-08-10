@@ -70,7 +70,7 @@ function parseItinerary(htmlContent) {
 async function run() {
     try {
         console.log("Fetching active tours from DB...");
-        const dbRes = await pool.query("SELECT id, name, price, level, duration FROM tours WHERE is_visible = true ORDER BY sort_order ASC, id ASC");
+        const dbRes = await pool.query("SELECT id, name, price, level, duration, itinerary FROM tours WHERE is_visible = true ORDER BY sort_order ASC, id ASC");
         const dbTours = dbRes.rows;
         
         let markdownContent = `# DANH MỤC SẢN PHẨM & LỊCH TRÌNH CHI TIẾT (PRODUCT PORTFOLIO & ITINERARY)
@@ -84,21 +84,28 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
         let tourIndex = 1;
         for (const tour of dbTours) {
-            const fileName = tourFileMap[tour.name];
-            if (!fileName) {
-                console.warn(`No HTML file mapped for tour: "${tour.name}"`);
-                continue;
-            }
+            let itinerary = [];
             
-            const filePath = path.join(__dirname, '../tour', fileName);
-            if (!fs.existsSync(filePath)) {
-                console.warn(`File not found: ${filePath}`);
-                continue;
+            // Check if database contains itinerary data
+            if (tour.itinerary && Array.isArray(tour.itinerary) && tour.itinerary.length > 0) {
+                console.log(`Using database itinerary for: "${tour.name}"`);
+                itinerary = tour.itinerary;
+            } else {
+                // Fallback to static HTML file
+                const fileName = tourFileMap[tour.name];
+                if (fileName) {
+                    const filePath = path.join(__dirname, '../tour', fileName);
+                    if (fs.existsSync(filePath)) {
+                        console.log(`Parsing itinerary for: "${tour.name}" from ${fileName}`);
+                        const htmlContent = fs.readFileSync(filePath, 'utf8');
+                        itinerary = parseItinerary(htmlContent);
+                    } else {
+                        console.warn(`File not found: ${filePath}`);
+                    }
+                } else {
+                    console.warn(`No HTML file mapped for tour: "${tour.name}"`);
+                }
             }
-            
-            console.log(`Parsing itinerary for: "${tour.name}" from ${fileName}`);
-            const htmlContent = fs.readFileSync(filePath, 'utf8');
-            const itinerary = parseItinerary(htmlContent);
             
             // Format price
             const formattedPrice = typeof tour.price === 'number' ? tour.price.toLocaleString('vi-VN') + 'đ' : 'Liên hệ';
