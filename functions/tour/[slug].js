@@ -458,8 +458,8 @@ export async function onRequest(context) {
 
                     <div class="text-center">
                         <p class="text-xs font-bold text-gray-400 uppercase mb-2">Cần hỗ trợ gấp?</p>
-                        <a href="tel:0988888888" class="text-sm font-black text-gray-700 hover:text-primary transition-colors flex items-center justify-center gap-1">
-                            📞 0988.888.888
+                        <a href="tel:0819685878" class="text-sm font-black text-gray-700 hover:text-primary transition-colors flex items-center justify-center gap-1">
+                            📞 0819.685.878
                         </a>
                     </div>
                 </div>
@@ -467,18 +467,28 @@ export async function onRequest(context) {
         </div>
     </section>
 
-    <!-- Success Modal -->
+    <!-- Contact / Booking Modal -->
     <div id="success-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4" onclick="if(event.target === this) closeSuccessModal()">
-        <div class="bg-white p-8 rounded-3xl max-w-md w-full text-center shadow-2xl relative">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="check" class="w-8 h-8 text-green-600 stroke-[3]"></i>
+        <div class="bg-white p-8 rounded-3xl max-w-md w-full text-center shadow-2xl relative space-y-6">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="message-square" class="w-8 h-8 text-primary stroke-[2.5]"></i>
             </div>
-            <h4 class="text-2xl font-black text-primary mb-2">Gửi Thành Công!</h4>
-            <p class="text-gray-500 text-sm leading-relaxed mb-8">
-                Cảm ơn bạn đã tin tưởng CAM SITE RETREATS. Đội ngũ chúng mình sẽ liên hệ phản hồi cho bạn trong vòng 24 giờ tới.
-            </p>
-            <button onclick="closeSuccessModal()" class="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
-                Đồng ý
+            <div>
+                <h4 class="text-2xl font-black text-primary mb-2">Đăng Ký Chuyến Đi</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Bạn đang quan tâm đến hành trình <span class="font-bold text-gray-800">${tour.name}</span>.<br>Hãy liên hệ trực tiếp với chúng mình qua Zalo hoặc Facebook để đăng ký và nhận tư vấn nhanh nhất nhé!
+                </p>
+            </div>
+            <div class="flex flex-col gap-3">
+                <a id="modal-zalo-btn" href="https://zalo.me/0819685878" target="_blank" class="w-full py-4 bg-[#0068ff] text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    💬 Trò chuyện qua Zalo
+                </a>
+                <a id="modal-facebook-btn" href="https://facebook.com/camsiteretreats" target="_blank" class="w-full py-4 bg-[#1877f2] text-white font-bold rounded-2xl shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    👥 Nhắn tin Fanpage
+                </a>
+            </div>
+            <button onclick="closeSuccessModal()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-500 font-bold rounded-2xl transition-all">
+                Đóng
             </button>
         </div>
     </div>
@@ -590,9 +600,15 @@ export async function onRequest(context) {
                     const rem = item.remaining; 
                     const st = item.calculatedStatus;
                     let sd='', sc='', oc='', ck=true;
-                    if (st === 'Hết chỗ') { sd='Hết chỗ'; sc='text-gray-400'; oc='opacity-50 cursor-not-allowed bg-gray-100'; ck=false; }
-                    else if (rem<=3) { sd='Chỉ còn '+rem+' chỗ'; sc='text-orange-500'; }
-                    else { sd='Đang mở'; sc='text-green-600'; }
+                    if (st === 'Hết chỗ' || rem <= 0) { 
+                        sd='Hết chỗ'; 
+                        sc='text-red-500'; 
+                        oc='opacity-50 cursor-not-allowed bg-gray-100'; 
+                        ck=false; 
+                    } else { 
+                        sd='Còn '+rem+' chỗ'; 
+                        sc=rem<=3 ? 'text-orange-500' : 'text-green-600'; 
+                    }
                     
                     const ss = item.date;
                     const ca = ck ? 'onclick="selectDate(this, \\''+ss+'\\')"' : '';
