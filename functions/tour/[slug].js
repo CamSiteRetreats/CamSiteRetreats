@@ -93,7 +93,7 @@ export async function onRequest(context) {
             inclusionsHTML = inclusions.map(item => `
                 <div class="flex flex-col md:flex-row gap-2 md:gap-4 items-center md:items-start text-center md:text-left">
                     <div class="w-14 h-14 md:w-24 md:h-24 rounded-xl md:rounded-2xl border border-primary/20 flex items-center justify-center shrink-0 bg-primary/5">
-                        <img src="../tour/${item.image}" alt="${item.title}" class="w-8 h-8 md:w-20 md:h-20 object-contain" onerror="this.src='../Logo cam.png'">
+                        <img src="/tour/${item.image}?v=1.1" alt="${item.title}" class="w-8 h-8 md:w-20 md:h-20 object-contain" onerror="this.src='/Logo cam.png'">
                     </div>
                     <div>
                         <h4 class="text-xs md:text-base font-black text-primary uppercase mb-1 whitespace-normal md:whitespace-nowrap">${item.title}</h4>
@@ -129,7 +129,7 @@ export async function onRequest(context) {
             preparingHTML = preparing.map(item => `
                 <div class="flex items-start gap-6 group">
                     <div class="shrink-0 w-48 h-48 object-contain">
-                        <img src="/tour/${item.image}" loading="lazy" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500" alt="${item.title}" onerror="this.src='/Logo cam.png'">
+                        <img src="/tour/${item.image}?v=1.1" loading="lazy" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500" alt="${item.title}" onerror="this.src='/Logo cam.png'">
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">${item.title}</h3>
