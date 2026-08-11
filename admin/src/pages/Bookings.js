@@ -698,9 +698,29 @@ export const afterRender = () => {
         matched
             .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
             .forEach(s => {
+                const sDate = new Date(s.start_date);
+                const dateStr = `${sDate.getDate().toString().padStart(2, '0')}/${(sDate.getMonth() + 1).toString().padStart(2, '0')}/${sDate.getFullYear()}`;
+                
+                // Normalize currentDateVal to DD/MM/YYYY to compare
+                let normalizedCurrentDate = currentDateVal || '';
+                if (normalizedCurrentDate.includes('-') && normalizedCurrentDate.length >= 10) {
+                    const p = normalizedCurrentDate.substring(0, 10).split('-');
+                    if (p.length === 3) normalizedCurrentDate = `${p[2]}/${p[1]}/${p[0]}`;
+                }
+
+                const isCurrentlySelected = (currentScheduleId && String(s.id) === String(currentScheduleId)) || 
+                                           (normalizedCurrentDate && dateStr === normalizedCurrentDate);
+
+                // Ẩn các lịch đã trôi qua, trừ trường hợp lịch đó đang được chọn cho đơn hàng đang sửa
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Đầu ngày hôm nay
+                
+                if (sDate < today && !isCurrentlySelected) {
+                    return; // Bỏ qua lịch trong quá khứ
+                }
+
                 const booked = parseInt(s.booked_count) || 0;
                 const remaining = (s.slots || 0) - booked;
-                const sDate = new Date(s.start_date);
                 const eDate = s.end_date ? new Date(s.end_date) : null;
                 const fmtDate = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 
@@ -711,8 +731,6 @@ export const afterRender = () => {
                 label += ` (${remaining >= 0 ? remaining : 0} chỗ trống)`;
 
                 const opt = document.createElement('option');
-                // Value = "scheduleId::DD/MM/YYYY" — phân biệt 2 lịch cùng ngày
-                const dateStr = `${sDate.getDate().toString().padStart(2, '0')}/${(sDate.getMonth() + 1).toString().padStart(2, '0')}/${sDate.getFullYear()}`;
                 opt.value = `${s.id}::${dateStr}`;
                 opt.dataset.scheduleId = s.id;
                 opt.dataset.date = dateStr;
@@ -721,13 +739,6 @@ export const afterRender = () => {
                 if (remaining <= 0) {
                     opt.disabled = true;
                     opt.textContent = label.replace('chỗ trống', 'HẾT CHỖ');
-                }
-                // Normalize currentDateVal về DD/MM/YYYY để so sánh
-                let normalizedCurrentDate = currentDateVal || '';
-                if (normalizedCurrentDate.includes('-') && normalizedCurrentDate.length >= 10) {
-                    // ISO format: "2026-06-13" → "13/06/2026"
-                    const p = normalizedCurrentDate.substring(0, 10).split('-');
-                    if (p.length === 3) normalizedCurrentDate = `${p[2]}/${p[1]}/${p[0]}`;
                 }
 
                 // Auto-select: ưu tiên match schedule_id, fallback match date (đã normalize)
