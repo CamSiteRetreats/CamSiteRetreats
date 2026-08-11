@@ -285,8 +285,7 @@ export async function onRequest(context) {
                 <span class="${levelColor} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${tour.level}</span>
                 ${tour.altitude ? `<span class="bg-gray-900/80 text-white text-[10px] font-bold px-3 py-1 rounded-full">${tour.altitude}</span>` : ''}
             </div>
-            <h1 class="text-3xl md:text-6xl font-black mb-6 uppercase tracking-tight hero-title">${tour.name}</h1>
-            <p class="text-sm md:text-lg max-w-2xl mx-auto text-gray-200 font-medium leading-relaxed drop-shadow-sm">${tour.short_desc || ''}</p>
+            <h1 class="text-3xl md:text-6xl font-black mb-2 uppercase tracking-tight hero-title">${tour.name}</h1>
         </div>
     </section>
 
@@ -295,6 +294,13 @@ export async function onRequest(context) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- LEFT COLUMN (70%) -->
             <div class="lg:col-span-2 space-y-12">
+                <!-- Overview / General Info Section -->
+                ${tour.short_desc ? `
+                <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-4">
+                    <h2 class="text-2xl font-black uppercase text-primary tracking-tight">Thông tin chung</h2>
+                    <p class="text-gray-600 leading-relaxed text-justify text-base">${tour.short_desc}</p>
+                </div>` : ''}
+
                 <!-- SECTION 3: SPECS (8 Items Grid - User Requested) -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- Spec 1: Location -->
