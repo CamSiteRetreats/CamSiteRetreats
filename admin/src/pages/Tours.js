@@ -577,11 +577,32 @@ export const afterRender = () => {
             document.getElementById('tour-transport').value = '';
             document.getElementById('tour-groupsize').value = '';
 
-            // Empty the dynamic lists
-            renderItinerary([]);
-            renderInclusions([]);
-            renderExclusions([]);
-            renderPreparing([]);
+            const defaultInclusions = [
+                { title: 'Xe đưa đón', desc: 'Di chuyển bằng xe du lịch đời mới, đưa đón 2 chiều từ điểm hẹn.', image: 'XeTrungChuyen.png' },
+                { title: 'Hướng dẫn viên', desc: 'Đội ngũ HDV chuyên nghiệp, nhiệt tình, hỗ trợ suốt tuyến.', image: 'HuongDanVien-SuaLai.png' },
+                { title: 'Ăn uống', desc: 'Các bữa ăn chất lượng theo chương trình dã ngoại.', image: 'DoAn-SuaLai.png' },
+                { title: 'Bảo hiểm du lịch', desc: 'Bảo hiểm du lịch trọn gói theo quy định.', image: 'BaoHiem.png' },
+                { title: 'Dụng cụ cắm trại', desc: 'Lều trại, túi ngủ, thảm cách nhiệt tiêu chuẩn chất lượng.', image: 'Leu-SuaLai.png' }
+            ];
+            const defaultExclusions = [
+                { title: 'Thuế VAT', desc: 'Chi phí chưa bao gồm thuế giá trị gia tăng (VAT) nếu cần xuất hóa đơn.' },
+                { title: 'Chi phí cá nhân', desc: 'Điện thoại, giặt ủi, nước uống tự gọi ngoài chương trình.' },
+                { title: 'Tip cho HDV', desc: 'Tiền tip cho đội ngũ phục vụ (tùy hỷ theo mức độ hài lòng).' }
+            ];
+            const defaultPreparing = [
+                { title: 'Giày Trekking', desc: 'Lựa chọn giày có độ bám tốt, ưu tiên cao cổ bảo vệ cổ chân. Nên chọn kích cỡ lớn hơn chân từ 1-2 size để tránh đau mũi chân khi xuống dốc.', image: 'NMG_giay.png' },
+                { title: 'Balo Trekking', desc: 'Sử dụng balo có hệ thống trợ lực để giảm áp lực cột sống. Nên sắp xếp đồ nặng sát lưng và cân đối hai bên.', image: 'NMG_balo.png' },
+                { title: 'Trang phục', desc: 'Ưu tiên chất liệu khô nhanh (Quick-dry), thoáng khí. Nên mang theo áo khoác gió mỏng và quần dài để tránh trầy xước.', image: 'NMG_quanao.png' },
+                { title: 'Dụng cụ cá nhân', desc: 'Cần chuẩn bị sạc dự phòng, đèn pin, kem chống nắng và thuốc xịt côn trùng. Gậy trekking là một trợ thủ đắc lực.', image: 'NMG_dungcu.png' }
+            ];
+            const defaultItinerary = [
+                { dayTitle: 'Ngày 1: Xuất phát & Trải nghiệm', steps: [ { time: '05:00', desc: 'Tập trung tại điểm hẹn và di chuyển.' }, { time: '11:30', desc: 'Dùng bữa trưa và nhận lều trại.' } ] }
+            ];
+
+            renderItinerary(defaultItinerary);
+            renderInclusions(defaultInclusions);
+            renderExclusions(defaultExclusions);
+            renderPreparing(defaultPreparing);
             renderFaqs([]);
         }
 
