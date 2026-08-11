@@ -128,8 +128,8 @@ export async function onRequest(context) {
         } else {
             preparingHTML = preparing.map(item => `
                 <div class="flex items-start gap-6 group">
-                    <div class="shrink-0 w-48 h-48 object-contain bg-white rounded-xl p-2 border border-gray-100 flex items-center justify-center">
-                        <img src="../tour/${item.image}" loading="lazy" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500" alt="${item.title}" onerror="this.src='../Logo cam.png'">
+                    <div class="shrink-0 w-48 h-48 object-contain">
+                        <img src="/tour/${item.image}" loading="lazy" class="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500" alt="${item.title}" onerror="this.src='/Logo cam.png'">
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 uppercase mb-2 group-hover:text-primary transition-colors">${item.title}</h3>
