@@ -468,19 +468,12 @@
                 const upcoming = all
                     .filter(s => {
                         const startDate = new Date(s.start_date);
-                        const booked = parseInt(s.booked_count) || 0;
-                        const slots = parseInt(s.slots) || 0;
-                        const remaining = Math.max(0, slots - booked);
                         const status = (s.status || '').toLowerCase();
 
                         return startDate >= today
-                            && remaining > 0
-                            && !status.includes('hết')
                             && !status.includes('huy')
                             && !status.includes('hủy')
-                            && !status.includes('cancel')
-                            && !status.includes('đóng')
-                            && !status.includes('dong');
+                            && !status.includes('cancel');
                     })
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 
@@ -489,181 +482,183 @@
                     return;
                 }
 
+                // Helper to get ISO week number
+                const getWeekNumber = (d) => {
+                    const tempDate = new Date(d.getTime());
+                    tempDate.setHours(0, 0, 0, 0);
+                    tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+                    const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+                    return Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7);
+                };
+
                 // Group by month key "YYYY-MM"
                 const grouped = {};
                 upcoming.forEach(s => {
                     const d = new Date(s.start_date);
                     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                    if (!grouped[key]) grouped[key] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, items: [] };
+                    if (!grouped[key]) grouped[key] = { label: `THÁNG ${d.getMonth() + 1}`, items: [] };
                     grouped[key].items.push(s);
                 });
 
-                const monthCols = Object.values(grouped); // hiển thị tất cả các tháng
+                const monthCols = Object.values(grouped);
 
                 let html = '';
-                monthCols.forEach((col, colIdx) => {
-                    const isLastColumn = colIdx === monthCols.length - 1;
-
-                    html += `
-                    <div class="flex flex-col gap-6">
-                        <!-- Column Header -->
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-sm shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 tracking-wide">${col.label}</h3>
-                        </div>
-                        
-                        <!-- Cards List -->
-                        <div class="flex flex-col gap-4">`;
-
+                monthCols.forEach((col) => {
+                    // Group items inside this month by ISO week number
+                    const weekGroups = {};
                     col.items.forEach(s => {
-                        const booked = parseInt(s.booked_count) || 0;
-                        const slots = parseInt(s.slots) || 0;
-                        const remaining = Math.max(0, slots - booked);
-
-                        let statusClass, statusText;
-                        if (remaining <= 3) {
-                            statusClass = 'bg-orange-50 text-orange-600';
-                            statusText = `Chỉ còn ${remaining} suất`;
-                        } else {
-                            statusClass = 'bg-emerald-50 text-emerald-600';
-                            statusText = `Còn ${remaining} chỗ`;
-                        }
-
-                        const startFmt = fmtDate(s.start_date);
-                        const endFmt = s.end_date ? fmtDate(s.end_date) : '';
-                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt} - ${endFmt}` : startFmt;
-
-                        // Find tour details for Image, URL, and Popup Info
-                        const tourInfo = findTourInfo(s.tour_name);
-                        const tourImage = tourInfo && tourInfo.image ? tourInfo.image : 'logo.png';
-                        
-                        let tourUrl = '#';
-                        if (tourInfo && tourInfo.url) {
-                            tourUrl = tourInfo.url.startsWith('/') ? tourInfo.url : '/' + tourInfo.url;
-                        } else {
-                            const mappedKey = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k));
-                            if (mappedKey) tourUrl = tourLinks[mappedKey];
-                        }
-
-                        const formatPrice = (price) => {
-                            if (!price || price === 'Update' || (typeof price === 'string' && price.toLowerCase().includes('update'))) {
-                                return 'Liên hệ';
-                            }
-                            const numericPrice = parseInt(price);
-                            if (isNaN(numericPrice) || numericPrice === 0) return 'Liên hệ';
-                            return numericPrice.toLocaleString('vi-VN') + 'đ';
-                        };
-
-                        const tourPrice = tourInfo ? formatPrice(tourInfo.price) : 'Liên hệ';
-                        const tourDuration = tourInfo && tourInfo.duration ? tourInfo.duration : 'Đang cập nhật';
-                        const tourDesc = tourInfo && (tourInfo.short_desc || tourInfo.shortDesc) ? (tourInfo.short_desc || tourInfo.shortDesc) : 'Trải nghiệm hành trình tuyệt vời cùng Cam Site Retreats.';
-                        
-                        // Specs from tour details
-                        const specs = getTourSpecs(s.tour_name);
-
-                        html += `
-                        <a href="${tourUrl}" class="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 border border-gray-100/50 relative cursor-pointer text-decoration-none">
-                            <!-- Thumbnail Image -->
-                            <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100 shadow-sm relative">
-                                <img src="${tourImage}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${s.tour_name}" onerror="this.src='logo.png'">
-                            </div>
-                            
-                            <!-- Details -->
-                            <div class="flex-1 min-w-0 flex flex-col gap-0.5">
-                                <!-- Date range -->
-                                <span class="text-[11px] font-extrabold text-[#E85D04] tracking-wide uppercase">${dateLabel}</span>
-                                <!-- Tour name -->
-                                <h4 class="text-sm md:text-base font-bold text-gray-800 tracking-wide line-clamp-1 group-hover:text-[#E85D04] transition-colors">${s.tour_name}</h4>
-                                <!-- Remaining Slots Badge -->
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${statusClass}">
-                                        ${statusText}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <!-- Arrow Icon -->
-                            <div class="ml-auto text-gray-300 group-hover:text-[#E85D04] group-hover:translate-x-1 transition-all duration-300 shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </div>
-
-                            <!-- Popup Hover (Tooltip) -->
-                            <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[320px] bg-white rounded-2xl p-5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left animate-duration-150">
-                                <h5 class="text-gray-900 font-extrabold text-base mb-3 leading-snug">${s.tour_name}</h5>
-                                
-                                <div class="flex flex-col gap-2.5">
-                                    <!-- Duration -->
-                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
-                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                        </svg>
-                                        <span>${tourDuration}</span>
-                                    </div>
-                                    <!-- Price -->
-                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
-                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                            <line x1="12" y1="10" x2="12" y2="14"></line>
-                                            <circle cx="12" cy="12" r="2"></circle>
-                                        </svg>
-                                        <span class="text-[#E85D04] font-black text-sm">${tourPrice}</span>
-                                    </div>
-                                    <!-- Slots -->
-                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
-                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                        </svg>
-                                        <span>${specs.groupSize}</span>
-                                    </div>
-                                    <!-- Vehicle -->
-                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
-                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="10" width="18" height="12" rx="2"></rect>
-                                            <path d="M12 2v8"></path>
-                                            <path d="M9 6h6"></path>
-                                            <circle cx="7" cy="18" r="1"></circle>
-                                            <circle cx="17" cy="18" r="1"></circle>
-                                        </svg>
-                                        <span>${specs.vehicle}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Description -->
-                                <div class="text-gray-400 text-xs italic mt-3 pt-3 border-t border-gray-100 line-clamp-2 leading-relaxed">
-                                    ${tourDesc}
-                                </div>
-
-                                <!-- Tooltip Arrow -->
-                                <div class="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-gray-100/80 rotate-45 pointer-events-none"></div>
-                            </div>
-                        </a>`;
+                        const d = new Date(s.start_date);
+                        const wk = getWeekNumber(d);
+                        if (!weekGroups[wk]) weekGroups[wk] = [];
+                        weekGroups[wk].push(s);
                     });
 
-                    // Add dashed placeholder for last column
-                    if (isLastColumn) {
-                        html += `
-                        <div class="border-2 border-dashed border-gray-200/80 rounded-2xl p-4 flex items-center justify-center bg-gray-50/20 mt-1 min-h-[96px]">
-                            <span class="text-xs font-medium italic text-gray-400">More expeditions coming soon...</span>
-                        </div>`;
-                    }
+                    const weekKeys = Object.keys(weekGroups).sort((a, b) => Number(a) - Number(b));
+                    let groupsHTML = '';
+
+                    weekKeys.forEach((wk, wkIdx) => {
+                        const items = weekGroups[wk];
+                        let itemsHTML = '';
+
+                        // Check if any tour starts on Fri (5), Sat (6) or Sun (0)
+                        const isWeekend = items.some(s => {
+                            const d = new Date(s.start_date);
+                            const day = d.getDay();
+                            return day === 5 || day === 6 || day === 0;
+                        });
+
+                        const groupLabel = isWeekend ? '*Tour cuối tuần' : '*Tour trong tuần';
+
+                        items.forEach(s => {
+                            const booked = parseInt(s.booked_count) || 0;
+                            const slots = parseInt(s.slots) || 0;
+                            const remaining = Math.max(0, slots - booked);
+
+                            let badgeBg = '';
+                            let badgeText = '';
+
+                            if (s.status && (s.status.toLowerCase().includes('hết') || remaining <= 0)) {
+                                badgeBg = 'bg-[#E63946]'; // Red
+                                badgeText = 'HẾT CHỖ';
+                            } else if (remaining <= 3) {
+                                badgeBg = 'bg-[#E85D04]'; // Dark Orange
+                                badgeText = `CÒN ${remaining} CHỖ`;
+                            } else if (remaining <= 6) {
+                                badgeBg = 'bg-[#F2A654]'; // Orange-Yellow
+                                badgeText = `CÒN ${remaining} CHỖ`;
+                            } else {
+                                badgeBg = 'bg-[#1E5631]'; // Dark Green
+                                badgeText = `CÒN ${remaining} CHỖ`;
+                            }
+
+                            const startFmt = fmtDate(s.start_date);
+                            const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                            const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}-${endFmt}` : startFmt;
+
+                            const tourInfo = findTourInfo(s.tour_name);
+                            let tourUrl = '#';
+                            if (tourInfo && tourInfo.url) {
+                                tourUrl = tourInfo.url.startsWith('/') ? tourInfo.url : '/' + tourInfo.url;
+                            } else {
+                                const mappedKey = Object.keys(tourLinks).find(k => s.tour_name && s.tour_name.includes(k));
+                                if (mappedKey) tourUrl = tourLinks[mappedKey];
+                            }
+
+                            const tourPrice = tourInfo ? formatPrice(tourInfo.price) : 'Liên hệ';
+                            const tourDuration = tourInfo && tourInfo.duration ? tourInfo.duration : 'Đang cập nhật';
+                            const tourDesc = tourInfo && (tourInfo.short_desc || tourInfo.shortDesc) ? (tourInfo.short_desc || tourInfo.shortDesc) : 'Trải nghiệm hành trình tuyệt vời cùng Cam Site Retreats.';
+                            const specs = getTourSpecs(s.tour_name);
+
+                            itemsHTML += `
+                            <a href="${tourUrl}" class="flex items-center justify-between p-3 bg-[#FDFBF9] hover:bg-orange-50/30 border border-gray-100 hover:border-orange-200 rounded-2xl transition-all duration-300 group cursor-pointer text-decoration-none shadow-[0_2px_6px_rgba(0,0,0,0.01)] hover:shadow-[0_4px_12px_rgba(232,93,4,0.06)] hover:-translate-y-0.5 relative">
+                                <div class="flex flex-col gap-1 min-w-0 pr-2">
+                                    <span class="text-xs font-black text-[#E85D04] tracking-wide leading-none">${dateLabel}</span>
+                                    <span class="text-sm font-bold text-gray-800 tracking-wide line-clamp-1 leading-normal group-hover:text-[#E85D04] transition-colors">${s.tour_name}</span>
+                                </div>
+                                <div class="shrink-0">
+                                    <span class="inline-block text-[10px] font-black px-2.5 py-1.5 rounded-lg text-white ${badgeBg} tracking-wider shadow-sm">
+                                        ${badgeText}
+                                    </span>
+                                </div>
+
+                                <!-- Popup Hover (Tooltip) -->
+                                <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[320px] bg-white rounded-2xl p-5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left animate-duration-150">
+                                    <h5 class="text-gray-900 font-extrabold text-base mb-3 leading-snug">${s.tour_name}</h5>
+                                    
+                                    <div class="flex flex-col gap-2.5">
+                                        <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                            </svg>
+                                            <span>${tourDuration}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                                <line x1="12" y1="10" x2="12" y2="14"></line>
+                                                <circle cx="12" cy="12" r="2"></circle>
+                                            </svg>
+                                            <span class="text-[#E85D04] font-black text-sm">${tourPrice}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="9" cy="7" r="4"></circle>
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                            </svg>
+                                            <span>${specs.groupSize}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="10" width="18" height="12" rx="2"></rect>
+                                                <path d="M12 2v8"></path>
+                                                <path d="M9 6h6"></path>
+                                                <circle cx="7" cy="18" r="1"></circle>
+                                                <circle cx="17" cy="18" r="1"></circle>
+                                            </svg>
+                                            <span>${specs.vehicle}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-gray-400 text-xs italic mt-3 pt-3 border-t border-gray-100 line-clamp-2 leading-relaxed">
+                                        ${tourDesc}
+                                    </div>
+                                    <div class="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-gray-100/80 rotate-45 pointer-events-none"></div>
+                                </div>
+                            </a>
+                            `;
+                        });
+
+                        const separator = wkIdx < weekKeys.length - 1 ? '<div class="border-b border-gray-100/80 my-4"></div>' : '';
+
+                        groupsHTML += `
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">${groupLabel}</span>
+                            <div class="flex flex-col gap-2">
+                                ${itemsHTML}
+                            </div>
+                            ${separator}
+                        </div>
+                        `;
+                    });
 
                     html += `
+                    <div class="bg-white rounded-[32px] border border-gray-100/80 shadow-[0_15px_40px_rgba(0,0,0,0.02)] p-6 relative flex flex-col min-h-[350px]">
+                        <!-- Pushpin Icon -->
+                        <div class="absolute top-5 right-5 text-orange-500 transform rotate-[15deg] filter drop-shadow-[0_2px_3px_rgba(0,0,0,0.15)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-orange-500 fill-orange-500" viewBox="0 0 24 24">
+                                <path d="M19 12l-1.5-1.5V5c0-.55-.45-1-1-1V3c0-.55-.45-1-1-1H8.5c-.55 0-1 .45-1 1v1c-.55 0-1 .45-1 1v5.5L5 12c-.55.55-.55 1.45 0 2h5v7h4v-7h5c.55-.55.55-1.45 0-2z" />
+                            </svg>
                         </div>
-                    </div>`;
+                        
+                        <h3 class="text-lg font-black text-gray-900 uppercase text-center mb-6 tracking-wide">${col.label}</h3>
+                        <div class="flex-1 space-y-6">
+                            ${groupsHTML}
+                        </div>
+                    </div>
+                    `;
                 });
 
                 container.innerHTML = html;
