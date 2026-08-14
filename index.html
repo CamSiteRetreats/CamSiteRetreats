@@ -688,6 +688,24 @@
 
             setLoading(true);
 
+            // Preload the logo image first
+            let logoSrc = '';
+            try {
+                logoSrc = await new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = '/Logo%20cam.png';
+                    img.onload = () => resolve('/Logo%20cam.png');
+                    img.onerror = () => {
+                        const fallback = new Image();
+                        fallback.src = '/logo.png';
+                        fallback.onload = () => resolve('/logo.png');
+                        fallback.onerror = () => resolve('');
+                    };
+                });
+            } catch (e) {
+                console.error("Logo preload failed", e);
+            }
+
             // 1. Load html2canvas dynamically if needed
             if (typeof html2canvas === 'undefined') {
                 try {
@@ -723,7 +741,7 @@
             let headerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(232, 93, 4, 0.15); padding-bottom: 24px; margin-bottom: 30px;">
                     <div style="display: flex; align-items: center; gap: 20px;">
-                        <img src="/Logo cam.png" style="height: 70px; width: 70px; object-fit: contain;" alt="Logo" onerror="this.src='/logo.png'">
+                        ${logoSrc ? `<img src="${logoSrc}" style="height: 70px; width: 70px; object-fit: contain;" alt="Logo">` : ''}
                         <div>
                             <h1 style="font-size: 26px; font-weight: 900; color: #E85D04; margin: 0; text-transform: uppercase; letter-spacing: 1px;">CAM SITE RETREATS</h1>
                             <p style="font-size: 13px; color: #4b5563; margin: 4px 0 0 0; font-weight: 700;">Khám Phá Thiên Nhiên Nguyên Bản</p>
