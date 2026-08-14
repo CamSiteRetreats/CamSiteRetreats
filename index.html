@@ -827,17 +827,13 @@
                             badgeText = `CÒN ${remaining} CHỖ`;
                         }
 
-                        const startFmt = fmtDate(s.start_date);
-                        const endFmt = s.end_date ? fmtDate(s.end_date) : '';
-                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}-${endFmt}` : startFmt;
-
                         itemsHTML += `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: white; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); width: 280px; box-sizing: border-box;">
-                            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: 8px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: white; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); width: 100%; box-sizing: border-box;">
+                            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; padding-right: 12px;">
                                 <span style="font-size: 10px; font-weight: 900; color: #E85D04; letter-spacing: 0.5px;">${dateLabel}</span>
-                                <span style="font-size: 12px; font-weight: 700; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.tour_name}</span>
+                                <span style="font-size: 12px; font-weight: 700; color: #1f2937; line-height: 1.4; word-break: break-word;">${s.tour_name}</span>
                             </div>
-                            <div>
+                            <div style="flex-shrink: 0;">
                                 <span style="display: inline-block; font-size: 9px; font-weight: 900; color: white; ${badgeBg} padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;">
                                     ${badgeText}
                                 </span>
@@ -886,7 +882,7 @@
                     <div>
                         <p style="margin: 0; font-size: 12px; font-weight: 800; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px;">LIÊN HỆ ĐĂNG KÝ TOUR:</p>
                         <p style="margin: 6px 0 0 0; font-size: 18px; font-weight: 900; color: #E85D04;">
-                            📞 Hotline khẩn cấp: 0819.685.878 (Zalo)
+                            📞 Hotline: 0819.685.878 (Zalo)
                         </p>
                     </div>
                     <div style="text-align: right;">
@@ -906,7 +902,9 @@
                     scale: 2,
                     useCORS: true,
                     backgroundColor: '#FDFBF9',
-                    logging: false
+                    logging: false,
+                    width: 1120,
+                    windowWidth: 1120
                 });
                 
                 const dataUrl = canvas.toDataURL('image/png');
