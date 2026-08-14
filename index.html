@@ -952,7 +952,7 @@
                     ${desc}
                 </div>
                 <!-- Tooltip Arrow -->
-                <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: white; border-right: 1px solid rgba(243, 244, 246, 0.8); border-bottom: 1px solid rgba(243, 244, 246, 0.8);"></div>
+                <div class="tooltip-arrow" style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: white; border-right: 1px solid rgba(243, 244, 246, 0.8); border-bottom: 1px solid rgba(243, 244, 246, 0.8);"></div>
             `;
 
             tooltip.classList.remove('hidden');
@@ -967,7 +967,7 @@
             // Boundary checks to prevent overflowing window sides
             if (leftPos < 10) {
                 leftPos = 10;
-                const arrow = tooltip.querySelector('div:last-child');
+                const arrow = tooltip.querySelector('.tooltip-arrow');
                 if (arrow) {
                     const offset = rect.left + (rect.width / 2) - 10;
                     arrow.style.left = `${offset}px`;
@@ -975,14 +975,14 @@
                 }
             } else if (leftPos + tooltipWidth > window.innerWidth - 10) {
                 leftPos = window.innerWidth - tooltipWidth - 10;
-                const arrow = tooltip.querySelector('div:last-child');
+                const arrow = tooltip.querySelector('.tooltip-arrow');
                 if (arrow) {
                     const offset = rect.left + (rect.width / 2) - leftPos;
                     arrow.style.left = `${offset}px`;
                     arrow.style.transform = 'translate(0, 0) rotate(45deg)';
                 }
             } else {
-                const arrow = tooltip.querySelector('div:last-child');
+                const arrow = tooltip.querySelector('.tooltip-arrow');
                 if (arrow) {
                     arrow.style.left = '50%';
                     arrow.style.transform = 'translateX(-50%) rotate(45deg)';
@@ -992,7 +992,7 @@
             // If the element is too high, render tooltip below the element
             if (topPos < 10) {
                 topPos = rect.bottom + 12;
-                const arrow = tooltip.querySelector('div:last-child');
+                const arrow = tooltip.querySelector('.tooltip-arrow');
                 if (arrow) {
                     arrow.style.bottom = 'auto';
                     arrow.style.top = '-5px';
@@ -1002,7 +1002,7 @@
                     arrow.style.borderTop = '1px solid rgba(243, 244, 246, 0.8)';
                 }
             } else {
-                const arrow = tooltip.querySelector('div:last-child');
+                const arrow = tooltip.querySelector('.tooltip-arrow');
                 if (arrow) {
                     arrow.style.top = 'auto';
                     arrow.style.bottom = '-5px';
