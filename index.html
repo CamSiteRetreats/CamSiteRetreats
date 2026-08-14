@@ -376,9 +376,14 @@
                     <p class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Cập nhật liên tục</p>
                     <h2 class="text-2xl md:text-3xl font-black text-gray-900 uppercase">Lịch Khởi Hành Hiện Hành</h2>
                 </div>
-                <a href="tour" class="hidden md:flex items-center gap-1 text-sm font-bold text-primary hover:underline">
-                    Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
+                <button onclick="downloadScheduleAsImage()" id="download-schedule-btn" class="hidden md:flex items-center gap-1.5 text-sm font-bold text-primary hover:underline bg-transparent border-0 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Tải xuống lịch trình
+                </button>
             </div>
 
             <div class="bg-white rounded-[32px] p-6 md:p-10 shadow-[0_20px_50px_rgba(232,93,4,0.03)] border border-gray-100/80">
@@ -388,9 +393,14 @@
             </div>
 
             <div class="flex justify-center mt-5 md:hidden">
-                <a href="tour" class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
-                    Xem tất cả tour <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
+                <button onclick="downloadScheduleAsImage()" id="download-schedule-btn-mobile" class="flex items-center gap-1.5 text-sm font-bold text-primary hover:underline bg-transparent border-0 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Tải xuống lịch trình
+                </button>
             </div>
         </div>
     </section>
@@ -487,6 +497,8 @@
                             && !status.includes('cancel');
                     })
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+                window._allSchedulesForPoster = upcoming;
 
                 if (upcoming.length === 0) {
                     container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Hiện chưa có lịch khởi hành đang mở.</div>';
@@ -686,6 +698,228 @@
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch (e) {
                 container.innerHTML = '<div style="grid-column:1/-1" class="text-center py-8 text-gray-400 text-sm">Không thể tải lịch trình.</div>';
+            }
+        }
+
+        async function downloadScheduleAsImage() {
+            if (!window._allSchedulesForPoster || window._allSchedulesForPoster.length === 0) {
+                alert("Đang tải dữ liệu lịch trình, vui lòng đợi trong giây lát...");
+                return;
+            }
+
+            const btn = document.getElementById('download-schedule-btn');
+            const btnMobile = document.getElementById('download-schedule-btn-mobile');
+            const oldHtml = btn ? btn.innerHTML : '';
+            const oldHtmlMobile = btnMobile ? btnMobile.innerHTML : '';
+            
+            const setLoading = (loading) => {
+                if (loading) {
+                    if (btn) { btn.innerHTML = 'Đang tạo ảnh...'; btn.disabled = true; }
+                    if (btnMobile) { btnMobile.innerHTML = 'Đang tạo ảnh...'; btnMobile.disabled = true; }
+                } else {
+                    if (btn) { btn.innerHTML = oldHtml; btn.disabled = false; }
+                    if (btnMobile) { btnMobile.innerHTML = oldHtmlMobile; btnMobile.disabled = false; }
+                }
+            };
+
+            setLoading(true);
+
+            // 1. Load html2canvas dynamically if needed
+            if (typeof html2canvas === 'undefined') {
+                try {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                        script.crossOrigin = 'anonymous';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                } catch (e) {
+                    console.error("Failed to load html2canvas from CDN", e);
+                    alert("Không thể kết nối mạng để tải thư viện xử lý ảnh. Vui lòng kiểm tra lại kết nối.");
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // 2. Build dynamic offscreen poster
+            const poster = document.createElement('div');
+            poster.style.position = 'absolute';
+            poster.style.left = '-9999px';
+            poster.style.top = '0';
+            poster.style.width = '1120px';
+            poster.style.background = '#FDFBF9';
+            poster.style.padding = '45px 50px';
+            poster.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+            poster.style.color = '#1f2937';
+            poster.style.borderRadius = '24px';
+            poster.style.boxSizing = 'border-box';
+
+            let headerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(232, 93, 4, 0.15); padding-bottom: 24px; margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="/Logo cam.png" style="height: 70px; width: 70px; object-fit: contain;" alt="Logo" onerror="this.src='/logo.png'">
+                        <div>
+                            <h1 style="font-size: 26px; font-weight: 900; color: #E85D04; margin: 0; text-transform: uppercase; letter-spacing: 1px;">CAM SITE RETREATS</h1>
+                            <p style="font-size: 13px; color: #4b5563; margin: 4px 0 0 0; font-weight: 700;">Khám Phá Thiên Nhiên Nguyên Bản</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="background: #E85D04; color: white; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 99px; text-transform: uppercase; letter-spacing: 1px;">LỊCH KHỞI HÀNH CẬP NHẬT LIÊN TỤC</span>
+                    </div>
+                </div>
+            `;
+
+            const grouped = {};
+            window._allSchedulesForPoster.forEach(s => {
+                const d = new Date(s.start_date);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                if (!grouped[key]) grouped[key] = { label: `THÁNG ${d.getMonth() + 1}`, items: [] };
+                grouped[key].items.push(s);
+            });
+
+            const monthCols = Object.values(grouped);
+            let columnsHTML = '<div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: start;">';
+
+            const fmtDate = (iso) => {
+                const d = new Date(iso);
+                return `${d.getDate()}/${d.getMonth() + 1}`;
+            };
+
+            monthCols.forEach((col) => {
+                const weekdays = [];
+                const weekends = [];
+
+                col.items.forEach(s => {
+                    const d = new Date(s.start_date);
+                    const day = d.getDay();
+                    if (day === 5 || day === 6 || day === 0) {
+                        weekends.push(s);
+                    } else {
+                        weekdays.push(s);
+                    }
+                });
+
+                const renderGroupHTML = (label, items) => {
+                    if (items.length === 0) return '';
+                    
+                    let itemsHTML = '';
+                    items.forEach(s => {
+                        const booked = parseInt(s.booked_count) || 0;
+                        const slots = parseInt(s.slots) || 0;
+                        const remaining = Math.max(0, slots - booked);
+
+                        let badgeBg = '';
+                        let badgeText = '';
+
+                        if (s.status && (s.status.toLowerCase().includes('hết') || remaining <= 0)) {
+                            badgeBg = 'background-color: #E63946;';
+                            badgeText = 'HẾT CHỖ';
+                        } else if (remaining <= 3) {
+                            badgeBg = 'background-color: #E85D04;';
+                            badgeText = `CÒN ${remaining} CHỖ`;
+                        } else if (remaining <= 6) {
+                            badgeBg = 'background-color: #F2A654;';
+                            badgeText = `CÒN ${remaining} CHỖ`;
+                        } else {
+                            badgeBg = 'background-color: #1E5631;';
+                            badgeText = `CÒN ${remaining} CHỖ`;
+                        }
+
+                        const startFmt = fmtDate(s.start_date);
+                        const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}-${endFmt}` : startFmt;
+
+                        itemsHTML += `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: white; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); width: 280px; box-sizing: border-box;">
+                            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: 8px;">
+                                <span style="font-size: 10px; font-weight: 900; color: #E85D04; letter-spacing: 0.5px;">${dateLabel}</span>
+                                <span style="font-size: 12px; font-weight: 700; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.tour_name}</span>
+                            </div>
+                            <div>
+                                <span style="display: inline-block; font-size: 9px; font-weight: 900; color: white; ${badgeBg} padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; white-space: nowrap;">
+                                    ${badgeText}
+                                </span>
+                            </div>
+                        </div>
+                        `;
+                    });
+
+                    return `
+                    <div style="margin-bottom: 16px;">
+                        <span style="font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;">${label}</span>
+                        ${itemsHTML}
+                    </div>
+                    `;
+                };
+
+                const weekdayGroupHTML = renderGroupHTML('*Tour trong tuần', weekdays);
+                const weekendGroupHTML = renderGroupHTML('*Tour cuối tuần', weekends);
+                
+                let contentHTML = '';
+                if (weekdayGroupHTML && weekendGroupHTML) {
+                    contentHTML = weekdayGroupHTML + '<div style="border-bottom: 1px dashed #e5e7eb; margin: 12px 0;"></div>' + weekendGroupHTML;
+                } else {
+                    contentHTML = weekdayGroupHTML || weekendGroupHTML;
+                }
+
+                columnsHTML += `
+                <div style="background: white; border: 1px solid #f1f5f9; border-radius: 20px; padding: 20px; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); width: 320px; box-sizing: border-box; flex-shrink: 0; min-height: 250px;">
+                    <div style="position: absolute; top: 16px; right: 16px; color: #E85D04;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                            <path d="M19 12l-1.5-1.5V5c0-.55-.45-1-1-1V3c0-.55-.45-1-1-1H8.5c-.55 0-1 .45-1 1v1c-.55 0-1 .45-1 1v5.5L5 12c-.55.55-.55 1.45 0 2h5v7h4v-7h5c.55-.55.55-1.45 0-2z" />
+                        </svg>
+                    </div>
+                    <h3 style="font-size: 15px; font-weight: 900; color: #111827; text-align: center; text-transform: uppercase; margin: 0 0 16px 0; letter-spacing: 0.5px;">${col.label}</h3>
+                    <div>
+                        ${contentHTML}
+                    </div>
+                </div>
+                `;
+            });
+            
+            columnsHTML += '</div>';
+
+            let footerHTML = `
+                <div style="margin-top: 35px; padding-top: 25px; border-top: 2px solid #ffedd5; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+                    <div>
+                        <p style="margin: 0; font-size: 12px; font-weight: 800; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px;">LIÊN HỆ ĐĂNG KÝ TOUR:</p>
+                        <p style="margin: 6px 0 0 0; font-size: 18px; font-weight: 900; color: #E85D04;">
+                            📞 Hotline khẩn cấp: 0819.685.878 (Zalo)
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 12px; color: #4b5563; font-weight: 700;">Website: <span style="color: #E85D04; font-weight: 800;">camsiteretreats.com</span></p>
+                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #4b5563; font-weight: 700;">Fanpage: <span style="color: #E85D04; font-weight: 800;">fb.com/camsiteretreats</span></p>
+                    </div>
+                </div>
+            `;
+
+            poster.innerHTML = headerHTML + columnsHTML + footerHTML;
+            document.body.appendChild(poster);
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            try {
+                const canvas = await html2canvas(poster, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#FDFBF9',
+                    logging: false
+                });
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'Lich_Khoi_Hanh_CamSiteRetreats.png';
+                link.href = dataUrl;
+                link.click();
+            } catch (err) {
+                console.error("Canvas export failed", err);
+                alert("Không thể chuyển đổi lịch trình thành ảnh. Quá trình xử lý bị lỗi.");
+            } finally {
+                poster.remove();
+                setLoading(false);
             }
         }
 
