@@ -705,7 +705,7 @@
             poster.style.width = '1120px';
             poster.style.background = '#FDFBF9';
             poster.style.padding = '42px 48px';
-            poster.style.fontFamily = "'Plus Jakarta Sans', Arial, Helvetica, sans-serif";
+            poster.style.fontFamily = "'Montserrat', sans-serif";
             poster.style.color = '#1f2937';
             poster.style.borderRadius = '24px';
             poster.style.boxSizing = 'border-box';
@@ -845,6 +845,9 @@
             poster.innerHTML = headerHTML + columnsHTML + footerHTML;
             document.body.appendChild(poster);
 
+            if (document.fonts) {
+                await document.fonts.ready;
+            }
             await new Promise(resolve => setTimeout(resolve, 200));
 
             try {
