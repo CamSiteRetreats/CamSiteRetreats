@@ -699,9 +699,10 @@
 
             // 2. Build dynamic offscreen poster
             const poster = document.createElement('div');
-            poster.style.position = 'absolute';
-            poster.style.left = '-9999px';
+            poster.style.position = 'fixed';
+            poster.style.left = '0';
             poster.style.top = '0';
+            poster.style.zIndex = '-99999';
             poster.style.width = '1120px';
             poster.style.background = '#FDFBF9';
             poster.style.padding = '42px 48px';
@@ -778,17 +779,15 @@
                         }
 
                         itemsHTML += `
-                        <table style="width: 100%; border-collapse: collapse; background: #ffffff; border: 1px solid #f0ede8; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); table-layout: fixed;">
-                            <tr>
-                                <td style="padding: 10px 8px 10px 12px; vertical-align: middle; border: none;">
-                                    <div style="font-size: 10.5px; font-weight: 800; color: #E85D04; letter-spacing: 0.5px; line-height: 14px; margin: 0 0 2px 0;">${dateLabel}</div>
-                                    <div style="font-size: 12px; font-weight: 700; color: #1f2937; line-height: 16px; word-break: break-word; margin: 0;">${s.tour_name}</div>
-                                </td>
-                                <td style="padding: 10px 12px 10px 0; vertical-align: middle; text-align: right; width: 88px; border: none; white-space: nowrap;">
-                                    <div style="display: inline-block; font-size: 9.5px; font-weight: 800; color: #ffffff; ${badgeBg} height: 24px; line-height: 24px; padding: 0 9px; border-radius: 6px; letter-spacing: 0.4px; text-align: center; vertical-align: middle; box-sizing: border-box;">${badgeText}</div>
-                                </td>
-                            </tr>
-                        </table>
+                        <div style="background: #ffffff; border: 1px solid #f0ede8; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); padding: 8px 12px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 10.5px; font-weight: 800; color: #E85D04; letter-spacing: 0.5px; line-height: 14px; margin: 0 0 2px 0;">${dateLabel}</div>
+                                <div style="font-size: 12px; font-weight: 700; color: #1f2937; line-height: 16px; word-break: break-word; margin: 0;">${s.tour_name}</div>
+                            </div>
+                            <div style="flex-shrink: 0;">
+                                <div style="font-size: 9.5px; font-weight: 800; color: #ffffff; ${badgeBg} height: 24px; line-height: 24px; padding: 0 9px; border-radius: 6px; letter-spacing: 0.4px; text-align: center; white-space: nowrap; box-sizing: border-box;">${badgeText}</div>
+                            </div>
+                        </div>
                         `;
                     });
 
@@ -848,7 +847,7 @@
             if (document.fonts) {
                 await document.fonts.ready;
             }
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, 250));
 
             try {
                 const canvas = await html2canvas(poster, {
