@@ -491,6 +491,15 @@
                     return Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7);
                 };
 
+                const formatPrice = (price) => {
+                    if (!price || price === 'Update' || (typeof price === 'string' && price.toLowerCase().includes('update'))) {
+                        return 'Liên hệ';
+                    }
+                    const numericPrice = parseInt(price);
+                    if (isNaN(numericPrice) || numericPrice === 0) return 'Liên hệ';
+                    return numericPrice.toLocaleString('vi-VN') + 'đ';
+                };
+
                 // Group by month key "YYYY-MM"
                 const grouped = {};
                 upcoming.forEach(s => {
