@@ -764,6 +764,10 @@
                         const slots = parseInt(s.slots) || 0;
                         const remaining = Math.max(0, slots - booked);
 
+                        const startFmt = fmtDate(s.start_date);
+                        const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                        const dateLabel = endFmt && endFmt !== startFmt ? `${startFmt}-${endFmt}` : startFmt;
+
                         let badgeBg = '';
                         let badgeText = '';
 
