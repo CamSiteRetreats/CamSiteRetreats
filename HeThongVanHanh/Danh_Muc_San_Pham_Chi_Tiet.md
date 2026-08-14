@@ -45,7 +45,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ## 2. TOUR TÓC TIÊN - THỊ VẢI
 *   **Thời lượng:** 1 Ngày
-*   **Giá bán lẻ:** 345.000đ
+*   **Giá bán lẻ:** 480.000đ
 *   **Cấp độ (Level):** Dễ
 *   **Tiền cọc yêu cầu:** 1,000,000đ / khách
 
@@ -55,8 +55,8 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
     *   **04:15** Đón khách tại Ngã Tư Thủ Đức
     *   **06:00** Ăn sáng, vệ sinh cá nhân tại quán ăn ven đường
     *   **07:30** Khởi hành lên đỉnh núi
-    *   **09:00** Checkin đỉnh núi Tóc Tiên
-    *   **11:00** Checkin đỉnh núi Thị Vải
+    *   **09:00** Checkin đỉnh núi Thị Vải
+    *   **11:00** Checkin đỉnh núi Tóc Tiên, nghỉ trưa, ăn uống
     *   **13:30** Tiến hành xuống núi
     *   **15:00** Di chuyển đến Phước Hải tắm biển
     *   **16:00** Ăn chiều tại bờ kè Phước Hải
@@ -117,7 +117,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ## 5. TOUR YANG ĐOAN
 *   **Thời lượng:** 1 Ngày 1 Đêm
-*   **Giá bán lẻ:** 1.100.000đ
+*   **Giá bán lẻ:** 1.250.000đ
 *   **Cấp độ (Level):** Trung Bình
 *   **Tiền cọc yêu cầu:** 1,000,000đ / khách
 

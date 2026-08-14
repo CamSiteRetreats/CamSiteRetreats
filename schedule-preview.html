@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch Khởi Hành – Cam Site Retreats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f4efe9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #1f2937;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            width: 100%;
+            background: #ffffff;
+            border-bottom: 1px solid #e7e0d8;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .topbar-brand {
+            font-size: 16px;
+            font-weight: 900;
+            color: #E85D04;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .topbar-sub {
+            font-size: 12px;
+            color: #78716c;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #E85D04;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 24px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(232, 93, 4, 0.25);
+            white-space: nowrap;
+        }
+        #btn-download:hover {
+            background: #c94d00;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(232, 93, 4, 0.35);
+        }
+        #btn-download:active {
+            transform: translateY(0);
+        }
+        #btn-download:disabled {
+            background: #d6d3d1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── Poster wrapper ── */
+        .poster-container {
+            padding: 36px 20px 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* ── Main Poster Canvas ── */
+        #poster {
+            width: 1120px;
+            min-width: 1120px;
+            background: #FDFBF9;
+            border-radius: 24px;
+            padding: 44px 50px 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+
+        /* ── Header ── */
+        .poster-header {
+            border-bottom: 2px solid rgba(232, 93, 4, 0.15);
+            padding-bottom: 22px;
+            margin-bottom: 28px;
+        }
+        .poster-header h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #E85D04;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+        }
+        .poster-header p {
+            font-size: 13.5px;
+            color: #4b5563;
+            font-weight: 600;
+            font-style: italic;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        /* ── Month Grid Columns ── */
+        .month-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .month-col {
+            background: #ffffff;
+            border: 1px solid #f0ede8;
+            border-radius: 20px;
+            padding: 22px 18px;
+            width: 326px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            min-height: 240px;
+        }
+        .month-title {
+            font-size: 15.5px;
+            font-weight: 900;
+            color: #111827;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            border-bottom: 1.5px solid #f5ede6;
+        }
+
+        .group-block {
+            margin-bottom: 14px;
+        }
+        .group-label {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: block;
+            margin-bottom: 7px;
+            margin-left: 2px;
+        }
+        .group-divider {
+            border-bottom: 1px dashed #e5e7eb;
+            margin: 12px 0 14px 0;
+        }
+
+        /* ── Schedule Item Row ── */
+        .sched-row {
+            background: #ffffff;
+            border: 1px solid #f0ede8;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            padding: 8px 12px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .sched-left {
+            flex: 1;
+            min-width: 0;
+        }
+        .sched-date {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #E85D04;
+            letter-spacing: 0.5px;
+            line-height: 14px;
+            margin-bottom: 2px;
+        }
+        .sched-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 16px;
+            word-break: break-word;
+        }
+        .sched-badge {
+            flex-shrink: 0;
+            font-size: 9.5px;
+            font-weight: 800;
+            color: #ffffff;
+            height: 24px;
+            line-height: 24px;
+            padding: 0 9px;
+            border-radius: 6px;
+            letter-spacing: 0.4px;
+            text-align: center;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        /* ── Footer ── */
+        .poster-footer {
+            margin-top: 32px;
+            padding-top: 22px;
+            border-top: 2px solid #ffedd5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .footer-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer-hotline {
+            font-size: 18px;
+            font-weight: 900;
+            color: #E85D04;
+            margin-top: 6px;
+        }
+        .footer-links {
+            text-align: right;
+            font-size: 12px;
+            color: #4b5563;
+            font-weight: 700;
+            line-height: 1.8;
+        }
+        .footer-links span {
+            color: #E85D04;
+            font-weight: 800;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 48px 24px;
+            color: #9ca3af;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <div>
+        <div class="topbar-brand">Cam Site Retreats</div>
+        <div class="topbar-sub">Lịch Khởi Hành Tour</div>
+    </div>
+    <div class="topbar-actions">
+        <button id="btn-download">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/>
+            </svg>
+            Tải xuống ảnh lịch trình
+        </button>
+    </div>
+</div>
+
+<!-- POSTER WRAPPER -->
+<div class="poster-container">
+    <div id="poster">
+        <div class="poster-header">
+            <h1>CAM SITE RETREATS</h1>
+            <p>Không chỉ là một cung đường, mà là hành trình để chúng ta tìm lại</p>
+        </div>
+        <div class="month-grid" id="month-grid">
+            <div class="no-data">Đang tải dữ liệu lịch trình...</div>
+        </div>
+        <div class="poster-footer">
+            <div>
+                <div class="footer-label">Liên hệ đăng ký tour:</div>
+                <div class="footer-hotline">📞 Hotline: 0819.685.878 (Zalo)</div>
+            </div>
+            <div class="footer-links">
+                Website: <span>camsiteretreats.com</span><br/>
+                Fanpage: <span>fb.com/camsiteretreats</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function () {
+    function fmtDate(iso) {
+        const d = new Date(iso);
+        return d.getDate() + '/' + (d.getMonth() + 1);
+    }
+
+    function badgeStyle(remaining, status) {
+        if (status && (status.toLowerCase().includes('hết') || remaining <= 0)) {
+            return { bg: 'background-color: #E63946;', text: 'HẾT CHỖ' };
+        }
+        if (remaining <= 3) {
+            return { bg: 'background-color: #E85D04;', text: 'CÒN ' + remaining + ' CHỖ' };
+        }
+        if (remaining <= 6) {
+            return { bg: 'background-color: #F2A654;', text: 'CÒN ' + remaining + ' CHỖ' };
+        }
+        return { bg: 'background-color: #1E5631;', text: 'CÒN ' + remaining + ' CHỖ' };
+    }
+
+    function renderSchedule(schedules) {
+        const grid = document.getElementById('month-grid');
+        if (!schedules || schedules.length === 0) {
+            grid.innerHTML = '<div class="no-data">Không có dữ liệu lịch trình để hiển thị.</div>';
+            return;
+        }
+
+        const grouped = {};
+        schedules.forEach(function (s) {
+            const d = new Date(s.start_date);
+            const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+            if (!grouped[key]) grouped[key] = { label: 'THÁNG ' + (d.getMonth() + 1), items: [] };
+            grouped[key].items.push(s);
+        });
+
+        const cols = Object.values(grouped);
+        let html = '';
+
+        cols.forEach(function (col) {
+            const weekdays = [];
+            const weekends = [];
+
+            col.items.forEach(function (s) {
+                const d = new Date(s.start_date);
+                const day = d.getDay();
+                if (day === 5 || day === 6 || day === 0) {
+                    weekends.push(s);
+                } else {
+                    weekdays.push(s);
+                }
+            });
+
+            function renderGroup(label, items) {
+                if (items.length === 0) return '';
+                let rows = '';
+                items.forEach(function (s) {
+                    const booked = parseInt(s.booked_count) || 0;
+                    const slots = parseInt(s.slots) || 0;
+                    const remaining = Math.max(0, slots - booked);
+
+                    const startFmt = fmtDate(s.start_date);
+                    const endFmt = s.end_date ? fmtDate(s.end_date) : '';
+                    const dateLabel = endFmt && endFmt !== startFmt ? (startFmt + '-' + endFmt) : startFmt;
+
+                    const badge = badgeStyle(remaining, s.status);
+
+                    rows += '<div class="sched-row">' +
+                        '<div class="sched-left">' +
+                            '<div class="sched-date">' + dateLabel + '</div>' +
+                            '<div class="sched-name">' + s.tour_name + '</div>' +
+                        '</div>' +
+                        '<div class="sched-badge" style="' + badge.bg + '">' + badge.text + '</div>' +
+                    '</div>';
+                });
+
+                return '<div class="group-block">' +
+                    '<span class="group-label">' + label + '</span>' +
+                    rows +
+                '</div>';
+            }
+
+            const wd = renderGroup('*Tour trong tuần', weekdays);
+            const we = renderGroup('*Tour cuối tuần', weekends);
+            const divider = (wd && we) ? '<div class="group-divider"></div>' : '';
+
+            html += '<div class="month-col">' +
+                '<div class="month-title">' + col.label + '</div>' +
+                wd + divider + we +
+            '</div>';
+        });
+
+        grid.innerHTML = html;
+    }
+
+    function loadSchedules() {
+        try {
+            const raw = localStorage.getItem('_camsite_schedules');
+            if (raw) return JSON.parse(raw);
+        } catch (e) {
+            console.error(e);
+        }
+        return null;
+    }
+
+    const data = loadSchedules();
+    renderSchedule(data);
+
+    // Xử lý nút tải xuống ảnh
+    const downloadBtn = document.getElementById('btn-download');
+    downloadBtn.addEventListener('click', async function () {
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = 'Đang tạo ảnh chất lượng cao...';
+
+        try {
+            if (document.fonts) {
+                await document.fonts.ready;
+            }
+            await new Promise(function (resolve) { setTimeout(resolve, 200); });
+
+            const poster = document.getElementById('poster');
+            const canvas = await html2canvas(poster, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#FDFBF9',
+                logging: false,
+                scrollX: 0,
+                scrollY: 0
+            });
+
+            const link = document.createElement('a');
+            link.download = 'Lich_Khoi_Hanh_CamSiteRetreats.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } catch (err) {
+            console.error('Download error:', err);
+            alert('Có lỗi khi tạo ảnh. Vui lòng thử lại.');
+        } finally {
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg> Tải xuống ảnh lịch trình';
+        }
+    });
+})();
+</script>
+</body>
+</html>
