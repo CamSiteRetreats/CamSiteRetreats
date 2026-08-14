@@ -403,6 +403,8 @@
                 </button>
             </div>
         </div>
+        <!-- Global Tour Tooltip -->
+        <div id="global-tour-tooltip" class="fixed hidden bg-white rounded-2xl p-4 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-50 pointer-events-none w-[300px] text-left animate-tooltip"></div>
     </section>
 
     <script>
@@ -595,7 +597,16 @@
                             const specs = getTourSpecs(s.tour_name);
 
                             itemsHTML += `
-                            <a href="${tourUrl}" class="flex items-center justify-between p-2.5 bg-[#FDFBF9] hover:bg-orange-50/30 border border-gray-100 hover:border-orange-200 rounded-xl transition-all duration-300 group cursor-pointer text-decoration-none shadow-[0_1px_4px_rgba(0,0,0,0.01)] hover:shadow-[0_4px_12px_rgba(232,93,4,0.06)] hover:-translate-y-0.5 relative">
+                            <a href="${tourUrl}" 
+                               data-tour-name="${s.tour_name}"
+                               data-duration="${tourDuration}"
+                               data-price="${tourPrice}"
+                               data-groupsize="${specs.groupSize}"
+                               data-vehicle="${specs.vehicle}"
+                               data-desc="${tourDesc}"
+                               onmouseenter="showGlobalTooltip(this, event)"
+                               onmouseleave="hideGlobalTooltip()"
+                               class="flex items-center justify-between p-2.5 bg-[#FDFBF9] hover:bg-orange-50/30 border border-gray-100 hover:border-orange-200 rounded-xl transition-all duration-300 group cursor-pointer text-decoration-none shadow-[0_1px_4px_rgba(0,0,0,0.01)] hover:shadow-[0_4px_12px_rgba(232,93,4,0.06)] hover:-translate-y-0.5 relative">
                                 <div class="flex flex-col gap-0.5 min-w-0 pr-2">
                                     <span class="text-[10px] font-black text-[#E85D04] tracking-wide leading-none">${dateLabel}</span>
                                     <span class="text-xs font-bold text-gray-800 tracking-wide line-clamp-1 leading-normal group-hover:text-[#E85D04] transition-colors">${s.tour_name}</span>
@@ -604,53 +615,6 @@
                                     <span class="inline-block text-[9px] font-black px-2 py-1 rounded-md text-white ${badgeBg} tracking-wider shadow-sm">
                                         ${badgeText}
                                     </span>
-                                </div>
-
-                                <!-- Popup Hover (Tooltip) -->
-                                <div class="hidden md:group-hover:block absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[300px] bg-white rounded-2xl p-4 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 z-30 pointer-events-none animate-tooltip text-left animate-duration-150">
-                                    <h5 class="text-gray-900 font-extrabold text-sm mb-2.5 leading-snug">${s.tour_name}</h5>
-                                    
-                                    <div class="flex flex-col gap-2">
-                                        <div class="flex items-center gap-2.5 text-[11px] font-semibold text-gray-600">
-                                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <polyline points="12 6 12 12 16 14"></polyline>
-                                            </svg>
-                                            <span>${tourDuration}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2.5 text-[11px] font-semibold text-gray-600">
-                                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                                <line x1="12" y1="10" x2="12" y2="14"></line>
-                                                <circle cx="12" cy="12" r="2"></circle>
-                                            </svg>
-                                            <span class="text-[#E85D04] font-black text-xs">${tourPrice}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2.5 text-[11px] font-semibold text-gray-600">
-                                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                                <circle cx="9" cy="7" r="4"></circle>
-                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                            </svg>
-                                            <span>${specs.groupSize}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2.5 text-[11px] font-semibold text-gray-600">
-                                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <rect x="3" y="10" width="18" height="12" rx="2"></rect>
-                                                <path d="M12 2v8"></path>
-                                                <path d="M9 6h6"></path>
-                                                <circle cx="7" cy="18" r="1"></circle>
-                                                <circle cx="17" cy="18" r="1"></circle>
-                                            </svg>
-                                            <span>${specs.vehicle}</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="text-gray-400 text-[11px] italic mt-2.5 pt-2.5 border-t border-gray-100 line-clamp-2 leading-relaxed">
-                                        ${tourDesc}
-                                    </div>
-                                    <div class="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-r border-b border-gray-100/80 rotate-45 pointer-events-none"></div>
                                 </div>
                             </a>
                             `;
@@ -918,6 +882,127 @@
             } finally {
                 poster.remove();
                 setLoading(false);
+            }
+        }
+
+        function showGlobalTooltip(el, event) {
+            const tooltip = document.getElementById('global-tour-tooltip');
+            if (!tooltip) return;
+
+            const name = el.getAttribute('data-tour-name');
+            const duration = el.getAttribute('data-duration');
+            const price = el.getAttribute('data-price');
+            const groupSize = el.getAttribute('data-groupsize');
+            const vehicle = el.getAttribute('data-vehicle');
+            const desc = el.getAttribute('data-desc');
+
+            tooltip.innerHTML = `
+                <h5 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #111827; line-height: 1.4;">${name}</h5>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; color: #4b5563;">
+                        <svg style="width: 14px; height: 14px; color: #9ca3af; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>${duration}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; color: #4b5563;">
+                        <svg style="width: 14px; height: 14px; color: #9ca3af; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <line x1="12" y1="10" x2="12" y2="14"></line>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                        <span style="color: #E85D04; font-weight: 900; font-size: 12px;">${price}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; color: #4b5563;">
+                        <svg style="width: 14px; height: 14px; color: #9ca3af; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                        <span>${groupSize}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; color: #4b5563;">
+                        <svg style="width: 14px; height: 14px; color: #9ca3af; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="10" width="18" height="12" rx="2"></rect>
+                            <circle cx="7" cy="18" r="1"></circle>
+                            <circle cx="17" cy="18" r="1"></circle>
+                        </svg>
+                        <span>${vehicle}</span>
+                    </div>
+                </div>
+                <div style="color: #9ca3af; font-size: 11px; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                    ${desc}
+                </div>
+                <!-- Tooltip Arrow -->
+                <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: white; border-right: 1px solid rgba(243, 244, 246, 0.8); border-bottom: 1px solid rgba(243, 244, 246, 0.8);"></div>
+            `;
+
+            tooltip.classList.remove('hidden');
+
+            const rect = el.getBoundingClientRect();
+            const tooltipWidth = 300;
+            const tooltipHeight = tooltip.offsetHeight || 180;
+            
+            let leftPos = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+            let topPos = rect.top - tooltipHeight - 12;
+
+            // Boundary checks to prevent overflowing window sides
+            if (leftPos < 10) {
+                leftPos = 10;
+                const arrow = tooltip.querySelector('div:last-child');
+                if (arrow) {
+                    const offset = rect.left + (rect.width / 2) - 10;
+                    arrow.style.left = `${offset}px`;
+                    arrow.style.transform = 'translate(0, 0) rotate(45deg)';
+                }
+            } else if (leftPos + tooltipWidth > window.innerWidth - 10) {
+                leftPos = window.innerWidth - tooltipWidth - 10;
+                const arrow = tooltip.querySelector('div:last-child');
+                if (arrow) {
+                    const offset = rect.left + (rect.width / 2) - leftPos;
+                    arrow.style.left = `${offset}px`;
+                    arrow.style.transform = 'translate(0, 0) rotate(45deg)';
+                }
+            } else {
+                const arrow = tooltip.querySelector('div:last-child');
+                if (arrow) {
+                    arrow.style.left = '50%';
+                    arrow.style.transform = 'translateX(-50%) rotate(45deg)';
+                }
+            }
+
+            // If the element is too high, render tooltip below the element
+            if (topPos < 10) {
+                topPos = rect.bottom + 12;
+                const arrow = tooltip.querySelector('div:last-child');
+                if (arrow) {
+                    arrow.style.bottom = 'auto';
+                    arrow.style.top = '-5px';
+                    arrow.style.borderRight = 'none';
+                    arrow.style.borderBottom = 'none';
+                    arrow.style.borderLeft = '1px solid rgba(243, 244, 246, 0.8)';
+                    arrow.style.borderTop = '1px solid rgba(243, 244, 246, 0.8)';
+                }
+            } else {
+                const arrow = tooltip.querySelector('div:last-child');
+                if (arrow) {
+                    arrow.style.top = 'auto';
+                    arrow.style.bottom = '-5px';
+                    arrow.style.borderLeft = 'none';
+                    arrow.style.borderTop = 'none';
+                    arrow.style.borderRight = '1px solid rgba(243, 244, 246, 0.8)';
+                    arrow.style.borderBottom = '1px solid rgba(243, 244, 246, 0.8)';
+                }
+            }
+
+            tooltip.style.left = `${leftPos}px`;
+            tooltip.style.top = `${topPos}px`;
+        }
+
+        function hideGlobalTooltip() {
+            const tooltip = document.getElementById('global-tour-tooltip');
+            if (tooltip) {
+                tooltip.classList.add('hidden');
             }
         }
 
