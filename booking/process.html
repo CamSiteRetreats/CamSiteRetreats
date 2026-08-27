@@ -201,89 +201,91 @@
                 services: []
             } : null;
 
-            // Luôn mount từ bước 1
-            const mountPromise = BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
-                tourData: fallbackTourData,
-                onSuccess: (saved) => {
-                    console.log('Booking saved:', saved.id);
-                }
-            });
-
-            // Nếu có bookingId → kiểm tra trạng thái trước khi pre-fill
+            // Nếu có bookingId từ đơn hàng -> fetch dữ liệu đơn trước khi mount
             if (bookingId) {
-                const doFill = () => {
-                    fetch(`/api/bookings?id=${bookingId}`)
-                        .then(r => r.json())
-                        .then(async b => {
-                            if (!b || !b.name) return;
-
-                            // ── KIỂM TRA: Link đã đóng nếu đã hoàn thành/hủy ──
-                            if (b.status && CLOSED_STATUSES.some(s => b.status.includes(s))) {
-                                showCompletedNotice(b);
-                                return; // Dừng, không render form
-                            }
-                            // ──────────────────────────────────────────────────
-
-                            // Lấy full tour config
-                            let fullTour = null;
-                            if (b.tour) {
-                                try {
-                                    const tr = await fetch('/api/admin_tours');
-                                    const td = await tr.json();
-                                    const tours = td.data || td;
-                                    fullTour = tours.find(t =>
-                                        t.name?.toLowerCase().trim() === b.tour?.toLowerCase().trim()
-                                    );
-                                } catch(e) { console.warn('Tour config fetch error:', e); }
-                            }
-
-                            const tourData = fullTour ? {
-                                id:            fullTour.id,
-                                name:          fullTour.name,
-                                price:         b.total_price || fullTour.price || 0,
-                                form_config:   typeof fullTour.form_config === 'string' ? JSON.parse(fullTour.form_config) : (fullTour.form_config || {}),
-                                pickup_points: typeof fullTour.pickup_points === 'string' ? JSON.parse(fullTour.pickup_points) : (fullTour.pickup_points || []),
-                                services:      typeof fullTour.services === 'string' ? JSON.parse(fullTour.services) : (fullTour.services || []),
-                            } : {
-                                id: null, name: b.tour || '',
-                                price: b.total_price || 0,
-                                form_config: { step2: { show_pickup: true, show_medal_name: true, show_vegetarian: true, show_trekking_pole: true, show_special_request: true }, step3: { show_coupon: true } },
-                                pickup_points: [], services: []
-                            };
-
-                            const prefill = {
-                                savedId:        bookingId,
-                                name:           b.name          || '',
-                                phone:          b.phone         || '',
-                                dob:            b.dob           || '',
-                                gender:         b.gender        || '',
-                                idCard:         b.id_card       || '',
-                                address:        b.address       || '',
-                                pickupPoint:    b.pickup_point  || '',
-                                medalName:      b.medal_name    || '',
-                                vegetarian:     b.diet === 'Ăn chay',
-                                trekkingPole:   b.trekking_pole === 'Có',
-                                specialRequest: b.special       || '',
-                                depositRequired: parseInt(b.deposit_required),
-                            };
-
-                            // Re-mount với đủ tourData (để sinh đúng form step 2 & 3)
-                            await BookingEngine.mount(container, tourData.id, b.date || '', {
-                                tourData,
+                fetch(`/api/bookings?id=${bookingId}`)
+                    .then(r => r.json())
+                    .then(async b => {
+                        if (!b || !b.name) {
+                            // Fallback mount bình thường nếu không tìm thấy đơn
+                            BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
+                                tourData: fallbackTourData,
                                 onSuccess: (saved) => { console.log('Booking saved:', saved.id); }
                             });
-                            BookingEngine.bookingData = prefill;
-                            BookingEngine._renderStep(1);
-                        })
-                        .catch(err => console.warn('Pre-fill error:', err));
-                };
+                            return;
+                        }
 
-                // Chờ mount() hoàn thành (async) rồi mới fill
-                if (mountPromise && typeof mountPromise.then === 'function') {
-                    mountPromise.then(doFill);
-                } else {
-                    setTimeout(doFill, 500);
-                }
+                        // ── KIỂM TRA: Link đã đóng nếu đã hoàn thành/hủy ──
+                        if (b.status && CLOSED_STATUSES.some(s => b.status.includes(s))) {
+                            showCompletedNotice(b);
+                            return;
+                        }
+
+                        // Lấy full tour config
+                        let fullTour = null;
+                        if (b.tour) {
+                            try {
+                                const tr = await fetch('/api/admin_tours');
+                                const td = await tr.json();
+                                const tours = td.data || td;
+                                fullTour = tours.find(t =>
+                                    t.name?.toLowerCase().trim() === b.tour?.toLowerCase().trim()
+                                );
+                            } catch(e) { console.warn('Tour config fetch error:', e); }
+                        }
+
+                        const tourData = fullTour ? {
+                            id:            fullTour.id,
+                            name:          fullTour.name,
+                            price:         b.total_price || fullTour.price || 0,
+                            form_config:   typeof fullTour.form_config === 'string' ? JSON.parse(fullTour.form_config) : (fullTour.form_config || {}),
+                            pickup_points: typeof fullTour.pickup_points === 'string' ? JSON.parse(fullTour.pickup_points) : (fullTour.pickup_points || []),
+                            services:      typeof fullTour.services === 'string' ? JSON.parse(fullTour.services) : (fullTour.services || []),
+                        } : {
+                            id: null, name: b.tour || '',
+                            price: b.total_price || 0,
+                            form_config: { step2: { show_pickup: true, show_medal_name: true, show_vegetarian: true, show_trekking_pole: true, show_special_request: true }, step3: { show_coupon: true } },
+                            pickup_points: [], services: []
+                        };
+
+                        const prefill = {
+                            savedId:        bookingId,
+                            name:           b.name          || '',
+                            phone:          b.phone         || '',
+                            dob:            b.dob           || '',
+                            gender:         b.gender        || '',
+                            idCard:         b.id_card       || '',
+                            address:        b.address       || '',
+                            pickupPoint:    b.pickup_point  || '',
+                            medalName:      b.medal_name    || '',
+                            vegetarian:     b.diet === 'Ăn chay',
+                            trekkingPole:   b.trekking_pole === 'Có',
+                            specialRequest: b.special       || '',
+                            depositRequired: parseInt(b.deposit_required),
+                        };
+
+                        // Mount với đầy đủ tourData và prefill
+                        BookingEngine.mount(container, tourData.id, b.date || '', {
+                            tourData,
+                            prefill,
+                            onSuccess: (saved) => { console.log('Booking saved:', saved.id); }
+                        });
+                    })
+                    .catch(err => {
+                        console.warn('Booking fetch error:', err);
+                        BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
+                            tourData: fallbackTourData,
+                            onSuccess: (saved) => { console.log('Booking saved:', saved.id); }
+                        });
+                    });
+            } else {
+                // Không có bookingId -> mount bình thường
+                BookingEngine.mount(container, tourId, decodeURIComponent(tourDate || ''), {
+                    tourData: fallbackTourData,
+                    onSuccess: (saved) => {
+                        console.log('Booking saved:', saved.id);
+                    }
+                });
             }
         });
 </script>

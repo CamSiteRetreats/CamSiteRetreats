@@ -39,6 +39,8 @@ const BookingEngine = {
         return parseInt(n || 0).toLocaleString('vi-VN') + 'đ';
     },
 
+    hasAcceptedLetter: false,
+
     // ── Mount vào một container 
     async mount(containerSelector, tourId, selectedDate, options = {}) {
         const container = typeof containerSelector === 'string'
@@ -47,12 +49,13 @@ const BookingEngine = {
         if (!container) return;
 
         this.currentStep = 1;
-        this.bookingData = {};
+        this.bookingData = options.prefill || {};
         this.selectedServices = {};
         this.coupon = null;
         this.discountAmount = 0;
         this.selectedDate = selectedDate;
         this.onSuccess = options.onSuccess || null;
+        this.hasAcceptedLetter = options.skipWelcomeLetter === true;
 
         // Load tour data
         if (tourId) {
@@ -67,10 +70,189 @@ const BookingEngine = {
         }
         if (!this.tourData && options.tourData) this.tourData = options.tourData;
 
-        container.innerHTML = this._renderShell();
-        this._bindShell(container);
-        this._renderStep(1);
+        this._container = container;
+
+        if (!this.hasAcceptedLetter) {
+            this._renderWelcomeLetter();
+        } else {
+            container.innerHTML = this._renderShell();
+            this._bindShell(container);
+            this._renderStep(1);
+        }
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    },
+
+    // ── Màn hình Thư tâm sự đầu tiên ──────────────────────────────────────
+    _renderWelcomeLetter() {
+        const container = this._container;
+        if (!container) return;
+
+        const dateDisplay = this.selectedDate
+            ? (this.selectedDate.includes('-') ? this.selectedDate.split('-').reverse().join('/') : this.selectedDate)
+            : '';
+
+        container.innerHTML = `
+        <style>
+            .be-letter-box {
+                background: #fdfbf7;
+                border: 1.5px solid #ebe4d8;
+                border-radius: 20px;
+                padding: 22px 20px;
+                font-size: 13.5px;
+                line-height: 1.75;
+                color: #374151;
+                box-shadow: inset 0 1px 4px rgba(0,0,0,.02);
+            }
+            .be-letter-point {
+                background: white;
+                border: 1px solid #f0eee6;
+                border-radius: 14px;
+                padding: 14px 16px;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .be-letter-point:hover {
+                box-shadow: 0 4px 12px rgba(232,93,4,.06);
+            }
+            .be-letter-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: #fff3e8;
+                border: 1px solid #fde8d8;
+                border-radius: 999px;
+                padding: 6px 14px;
+                font-size: 12px;
+                font-weight: 800;
+                color: #E85D04;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                margin-bottom: 12px;
+            }
+            .be-agree-card {
+                background: #fff8f0;
+                border: 2px solid #fdba74;
+                border-radius: 16px;
+                padding: 16px;
+                transition: all 0.2s;
+            }
+            .be-agree-card:hover {
+                border-color: #E85D04;
+            }
+            @keyframes beFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+            .be-letter-anim { animation: beFade 0.35s ease-out; }
+        </style>
+
+        <div class="be-letter-anim" style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Header tiêu đề -->
+            <div style="text-align:center; padding-top:4px;">
+                <div class="be-letter-badge">
+                    <span>🌲</span> Thư gửi Bạn đồng hành
+                </div>
+                <h2 style="font-size:21px; font-weight:900; color:#1f2937; line-height:1.3; margin:0 0 6px; font-family:'Plus Jakarta Sans','Montserrat',sans-serif;">
+                    VỀ RỪNG – VỀ LÒNG – VỀ NHAU
+                </h2>
+                <p style="font-size:13px; color:#6b7280; margin:0; line-height:1.5;">
+                    Một chút lắng đọng cùng <strong>CAM SITE RETREATS</strong> trước khi bước vào hành trình
+                </p>
+            </div>
+
+            <!-- Tour Preview nếu có -->
+            ${(this.tourData?.name || dateDisplay) ? `
+            <div style="background: linear-gradient(135deg, #fff3e8 0%, #fff8f0 100%); border: 1.5px solid #fde8d8; border-radius: 16px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:0.04em;">Tour tham gia</div>
+                    <div style="font-weight:800; color:#1f2937; font-size:14px; margin-top:2px;">${this.tourData?.name || 'Tour trải nghiệm thiên nhiên'}</div>
+                </div>
+                ${dateDisplay ? `
+                <div style="text-align:right;">
+                    <div style="font-size:10px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:0.04em;">Ngày khởi hành</div>
+                    <div style="font-weight:800; color:#E85D04; font-size:14px; margin-top:2px;">${dateDisplay}</div>
+                </div>` : ''}
+            </div>` : ''}
+
+            <!-- Thư tâm sự -->
+            <div class="be-letter-box">
+                <p style="margin:0 0 14px; font-style:italic; color:#4b5563;">
+                    Chào bạn thân mến,<br>
+                    Chào mừng bạn đã lựa chọn bước ra khỏi vòng xoay bận rộn của phố thị để chuẩn bị đồng hành cùng tụi mình. Trước khi điền thông tin đăng ký, CAM muốn chia sẻ đôi lời tâm sự rất chân thành:
+                </p>
+
+                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px;">
+                    <div class="be-letter-point">
+                        <div style="font-weight:800; color:#E85D04; font-size:13.5px; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span>⛰️</span> 1. Khác hoàn toàn với du lịch nghỉ dưỡng
+                        </div>
+                        <div style="font-size:13px; color:#4b5563; line-height:1.6;">
+                            Đây là chuyến đi về với rừng nguyên sơ, không có tiện nghi máy lạnh, nệm êm hay xe đưa rước tận cửa phòng. Bạn sẽ ngắt kết nối sóng điện thoại 4G, sinh hoạt dã ngoại mộc mạc và hòa mình trọn vẹn vào thiên nhiên.
+                        </div>
+                    </div>
+
+                    <div class="be-letter-point">
+                        <div style="font-weight:800; color:#E85D04; font-size:13.5px; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span>🥾</span> 2. Tự thân vận động bằng chính đôi chân
+                        </div>
+                        <div style="font-size:13px; color:#4b5563; line-height:1.6;">
+                            Không ai có thể bước đi thay bạn. Bạn sẽ tự mình vượt qua những con dốc đất đỏ, lội qua dòng suối mát và đón nhận từng giọt mồ hôi. Đó là sự nỗ lực tự thân để đánh thức cơ thể, rèn luyện sự bền bỉ và vượt qua giới hạn của chính mình.
+                        </div>
+                    </div>
+
+                    <div class="be-letter-point">
+                        <div style="font-weight:800; color:#E85D04; font-size:13.5px; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span>🌿</span> 3. Chữa lành và Kết nối chân thành
+                        </div>
+                        <div style="font-size:13px; color:#4b5563; line-height:1.6;">
+                            CAM và các anh em bản địa đã chuẩn bị chu đáo hậu cần, dựng lều, nấu bữa cơm nóng bên lửa trại và bảo vệ an toàn cho bạn. Bạn chỉ cần mang theo một trái tim rộng mở, tinh thần sẻ chia và sẵn sàng mở lòng cùng những người bạn đồng hành mới.
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin:0; font-size:13px; color:#6b7280; text-align:center; font-style:italic;">
+                    "Nếu bạn đã sẵn sàng cho một chuyến đi đậm chất trải nghiệm và kết nối thật lòng, hãy bắt đầu cùng CAM nhé!"
+                </p>
+            </div>
+
+            <!-- Dấu tích chọn bắt buộc -->
+            <div class="be-agree-card">
+                <label style="display:flex; gap:12px; align-items:flex-start; cursor:pointer; user-select:none;">
+                    <input type="checkbox" id="be-letter-agree" style="width:22px; height:22px; margin-top:1px; accent-color:#E85D04; flex-shrink:0; cursor:pointer;">
+                    <span style="font-size:13.5px; font-weight:700; color:#1f2937; line-height:1.5;">
+                        Tôi đã đọc, hiểu rõ đặc thù của hoạt động trekking (<span style="color:#E85D04;">tự thân vận động</span>, sinh hoạt dã ngoại tối giản, khác với du lịch nghỉ dưỡng) và hào hứng sẵn sàng tham gia hành trình.
+                    </span>
+                </label>
+            </div>
+
+            <!-- Nút Bắt đầu điền thông tin -->
+            <button id="be-letter-submit" class="be-step-btn be-btn-primary" style="opacity:0.4; cursor:not-allowed; transform:none;" disabled>
+                Tôi đã hiểu &amp; Bắt đầu điền thông tin →
+            </button>
+        </div>
+        `;
+
+        const checkbox = document.getElementById('be-letter-agree');
+        const submitBtn = document.getElementById('be-letter-submit');
+
+        if (checkbox && submitBtn) {
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.4';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            });
+
+            submitBtn.addEventListener('click', () => {
+                if (!checkbox.checked) return;
+                this.hasAcceptedLetter = true;
+                container.innerHTML = this._renderShell();
+                this._bindShell(container);
+                this._renderStep(1);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
     },
 
     // ── HTML khung 4 bước ───────────────────────────────────────────────────

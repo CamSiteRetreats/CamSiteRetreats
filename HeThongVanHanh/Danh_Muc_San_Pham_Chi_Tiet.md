@@ -45,21 +45,21 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ## 2. TOUR TÓC TIÊN - THỊ VẢI
 *   **Thời lượng:** 1 Ngày
-*   **Giá bán lẻ:** 480.000đ
-*   **Cấp độ (Level):** Dễ
+*   **Giá bán lẻ:** 575.000đ
+*   **Cấp độ (Level):** Trung Bình
 *   **Tiền cọc yêu cầu:** 1,000,000đ / khách
 
 ### 📅 Lịch trình chi tiết:
 *   **Ngày 1: Xuất phát & Trải nghiệm**
-    *   **04:00** Tập trung và xuất phát tại SVĐ Hoa Lư
-    *   **04:15** Đón khách tại Ngã Tư Thủ Đức
-    *   **06:00** Ăn sáng, vệ sinh cá nhân tại quán ăn ven đường
+    *   **05:00** Tập trung và xuất phát tại SVĐ Hoa Lư
+    *   **05:15** Đón khách tại Ngã Tư Thủ Đức
+    *   **06:30** Ăn sáng, vệ sinh cá nhân tại quán ăn ven đường
     *   **07:30** Khởi hành lên đỉnh núi
     *   **09:00** Checkin đỉnh núi Thị Vải
-    *   **11:00** Checkin đỉnh núi Tóc Tiên, nghỉ trưa, ăn uống
-    *   **13:30** Tiến hành xuống núi
-    *   **15:00** Di chuyển đến Phước Hải tắm biển
-    *   **16:00** Ăn chiều tại bờ kè Phước Hải
+    *   **12:00** Checkin đỉnh núi Tóc Tiên, nghỉ trưa, ăn uống
+    *   **14:00** Tiến hành xuống núi
+    *   **16:00** Xuống núi
+    *   **17:00** Ăn chiều tại bờ kè Phước Hải
     *   **19:00** Lên xe trở về HCM
     *   **22:00** Kết thúc hành trình
 
@@ -67,7 +67,7 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 
 ## 3. TOUR TÀ NĂNG - PHAN DŨNG
 *   **Thời lượng:** 2 Ngày 1 Đêm
-*   **Giá bán lẻ:** 2.850.000đ
+*   **Giá bán lẻ:** 2.950.000đ
 *   **Cấp độ (Level):** Trung Bình
 *   **Tiền cọc yêu cầu:** 1,000,000đ / khách
 
