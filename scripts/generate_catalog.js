@@ -15,7 +15,11 @@ const tourFileMap = {
     'Yang Đoan': 'yangdoan.html',
     'Thác Mưa Bay': 'thacmuabay.html',
     'Langbiang - Tour Săn Mây': 'langbiang.html',
-    'Bạch Mộc Lương Tử': 'kyquansang.html'
+    'Bạch Mộc Lương Tử': 'kyquansang.html',
+    'Ky Quan San': 'kyquansang.html',
+    'Kỳ Quan San': 'kyquansang.html',
+    'Ky Quan Sang': 'kyquansang.html',
+    'Kỳ Quan Sang': 'kyquansang.html'
 };
 
 function cleanHtml(html) {

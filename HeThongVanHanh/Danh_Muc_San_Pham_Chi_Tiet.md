@@ -15,21 +15,21 @@ Tài liệu này hệ thống hóa chi tiết lịch trình thực tế được
 *   **Ngày 0: Di chuyển đến Lào Cai**
     *   **23h30:** Có mặt tại bến xe Mỹ Đình, di chuyển bằng Futa Hà Sơn đi Hà Nội - Lào Cai.
     *   **00h30:** Đón anh chị di chuyển từ sân bay (Văn Phòng Futa Hà Sơn).
-*   **Ngày 1: Bản Ky Quan Sang - Lán Núi Muối**
+*   **Ngày 1: Bản Ky Quan San - Lán Núi Muối**
     *   **04h00:** Đến bến xe Lào Cai.
     *   **04h30:** Đi xe trung chuyển đến Mường Hum.
     *   **06h30:** Vệ sinh cá nhân, ăn sáng.
-    *   **08h00:** Trung chuyển bằng xe ôm đến bản Ky Quan Sang.
+    *   **08h00:** Trung chuyển bằng xe ôm đến bản Ky Quan San.
     *   **09h00:** Khởi hành, băng qua những cánh rừng tre, khu rừng nguyên sinh, những con dốc dọc bờ suối.
     *   **11h30:** Dừng nghỉ ăn trưa tại bãi cỏ.
     *   **16h00:** Đến lán trại tại núi Muối, nhận chỗ nghỉ, tắm thay, vệ sinh cá nhân.
     *   **19h00:** Thưởng thức buổi tối bằng một nồi lẩu ấm cúng.
-*   **Ngày 2: Chinh phục đỉnh Ky Quan Sang**
+*   **Ngày 2: Chinh phục đỉnh Ky Quan San**
     *   **05h00:** Thức dậy, đón bình minh, săn mây, vệ sinh cá nhân.
     *   **06h00:** Thưởng thức buổi sáng bằng 1 tô mì trứng, rau củ.
-    *   **07h00:** Khởi hành chinh phục đỉnh núi Ky Quan Sang.
+    *   **07h00:** Khởi hành chinh phục đỉnh núi Ky Quan San.
     *   **11h30:** Dừng chân nghỉ trưa tại rừng rêu, thưởng thức gà luộc, thịt nướng cùng cơm nắm.
-    *   **13h30:** Checkin cột mốc Ky Quan Sang, nhận huy chương chinh phục, chụp ảnh.
+    *   **13h30:** Checkin cột mốc Ky Quan San, nhận huy chương chinh phục, chụp ảnh.
     *   **17h30:** Trở về lán núi Muối, vệ sinh cá nhân, nghỉ ngơi.
     *   **19h30:** Ăn tối, đốt lửa trại, thưởng thức cơm, thịt nướng, canh rau củ...
 *   **Ngày 3: Núi Muối - Mường Hum - Sapa - Hà Nội**
